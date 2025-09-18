@@ -4786,6 +4786,104 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.ML.SpikePrediction.SpikePredictionConfig.yml\" sourcestartlinenumber=\"1\">Configuration for spike prediction parameters.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionData",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.ML.SpikePrediction.SpikePredictionData.yml\" sourcestartlinenumber=\"1\">Input data structure for ML model.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionExtensions",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.ML.SpikePrediction.SpikePredictionExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods for easier integration with MarketSnapshot.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionModel.SpikePredictionData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionModel.SpikePredictionData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionModel.SpikePredictionData",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.ML.SpikePrediction.SpikePredictionModel.SpikePredictionData.yml\" sourcestartlinenumber=\"1\">Input data structure for ML model.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.SpikePredictionResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction.SpikePredictionResult",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.ML.SpikePrediction.SpikePredictionResult.yml\" sourcestartlinenumber=\"1\">Prediction result structure.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.ML.SpikePrediction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.ML.SpikePrediction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.ML.SpikePrediction",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.ML.yml",
       "output": {
         ".html": {
@@ -5066,6 +5164,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Strategies.Strats.MLSpikePredictionStrat.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Strategies.Strats.MLSpikePredictionStrat.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Strategies.Strats.MLSpikePredictionStrat",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Strategies.Strats.MLSpikePredictionStrat.yml\" sourcestartlinenumber=\"1\">ML-based strategy that uses machine learning to predict 15% price spikes within 10 minutes.\nUses Random Forest classifier trained on historical market data with feature engineering\nincluding lagged prices, volumes, and technical indicators.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Strategies.Strats.MomentumTrading.ParamKey.yml",
       "output": {
         ".html": {
@@ -5290,6 +5402,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.EventGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.EventGroup.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.EventGroup",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.EventGroup.yml\" sourcestartlinenumber=\"1\">Represents a grouped collection of related event logs that share the same market type and action.\nThis class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,\nproviding averaged metrics and position changes over a time period.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.MarketTypeService.yml",
       "output": {
         ".html": {
@@ -5301,6 +5427,34 @@
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.MarketTypeService",
       "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.MarketTypeService.yml\" sourcestartlinenumber=\"1\">Service responsible for determining and caching market types for trading snapshots.\nThis class acts as a facade over the MarketTypeHelper, providing caching functionality\nto avoid redundant market type calculations for the same market snapshot.\nIncludes performance metrics collection, configurable cache expiration, and async operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PathInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PathInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PathInfo",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PathInfo.yml\" sourcestartlinenumber=\"1\">Contains information about the strategies used in a specific trading path.\nThis class provides a simple container for listing the strategy names that were\nactive during a particular market condition or trading scenario.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PathPerformance.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PathPerformance.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PathPerformance",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PathPerformance.yml\" sourcestartlinenumber=\"1\">Represents the performance metrics for a complete trading path or simulation run.\nThis class aggregates key performance indicators including profit/loss, equity changes,\ntrade counts, and market state transitions for comprehensive analysis of trading outcomes.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5388,62 +5542,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.yml\" sourcestartlinenumber=\"1\">Represents a grouped collection of related event logs that share the same market type and action.\nThis class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,\nproviding averaged metrics and position changes over a time period.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.yml\" sourcestartlinenumber=\"1\">Contains information about the strategies used in a specific trading path.\nThis class provides a simple container for listing the strategy names that were\nactive during a particular market condition or trading scenario.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.yml\" sourcestartlinenumber=\"1\">Represents the performance metrics for a complete trading path or simulation run.\nThis class aggregates key performance indicators including profit/loss, equity changes,\ntrade counts, and market state transitions for comprehensive analysis of trading outcomes.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.yml\" sourcestartlinenumber=\"1\">Represents a single event log entry from a trading simulation, capturing the complete state\nof the trading environment at a specific point in time. This data structure is used to record\nand analyze the progression of trading activities, market conditions, and strategy decisions\nthroughout a simulation run.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.ReportGenerator.yml",
       "output": {
         ".html": {
@@ -5469,6 +5567,20 @@
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.SimulationEngine",
       "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.SimulationEngine.yml\" sourcestartlinenumber=\"1\">Core engine for executing trading strategy simulations against historical market data.\nThis class orchestrates the complete simulation lifecycle, processing market snapshots sequentially,\napplying trading strategies, simulating order execution and fills, managing position and cash flow,\nand generating detailed event logs for backtesting and performance analysis.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.SimulationEventLog.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.SimulationEventLog.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.SimulationEventLog",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.SimulationEventLog.yml\" sourcestartlinenumber=\"1\">Represents a single event log entry from a trading simulation, capturing the complete state\nof the trading environment at a specific point in time. This data structure is used to record\nand analyze the progression of trading activities, market conditions, and strategy decisions\nthroughout a simulation run.</p>\n"
     },
     {
       "type": "ManagedReference",

@@ -129,20 +129,20 @@ and async method implementations for better performance in high-throughput scena
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_Trading_Overseer_TradingOverseer__TradingStrategies_Trading_Overseer_PerformanceMonitor_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.TradingOverseer.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.ITradingSnapshotService%2CMicrosoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BTradingStrategies.Trading.Overseer.TradingOverseer%7D%2CTradingStrategies.Trading.Overseer.PerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_Trading_Overseer_TradingOverseer__TradingStrategies_Trading_Overseer_PerformanceMonitor_System_Boolean_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.TradingOverseer.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.ITradingSnapshotService%2CMicrosoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BTradingStrategies.Trading.Overseer.TradingOverseer%7D%2CTradingStrategies.Trading.Overseer.PerformanceMonitor%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L48">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_TradingOverseer__ctor_" data-uid="TradingStrategies.Trading.Overseer.TradingOverseer.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_Trading_Overseer_TradingOverseer__TradingStrategies_Trading_Overseer_PerformanceMonitor_" data-uid="TradingStrategies.Trading.Overseer.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{TradingStrategies.Trading.Overseer.TradingOverseer},TradingStrategies.Trading.Overseer.PerformanceMonitor)">TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger&lt;TradingOverseer&gt;, PerformanceMonitor)</h4>
+  <h4 id="TradingStrategies_Trading_Overseer_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_Trading_Overseer_TradingOverseer__TradingStrategies_Trading_Overseer_PerformanceMonitor_System_Boolean_" data-uid="TradingStrategies.Trading.Overseer.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{TradingStrategies.Trading.Overseer.TradingOverseer},TradingStrategies.Trading.Overseer.PerformanceMonitor,System.Boolean)">TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger&lt;TradingOverseer&gt;, PerformanceMonitor, bool)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the TradingOverseer class.
 Sets up dependencies for simulation, equity calculation, snapshot services, and performance monitoring.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger&lt;TradingOverseer&gt; logger, PerformanceMonitor performanceMonitor)</code></pre>
+    <pre><code class="lang-csharp hljs">public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger&lt;TradingOverseer&gt; logger, PerformanceMonitor performanceMonitor, bool enablePatternImageGeneration = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -184,6 +184,12 @@ Sets up dependencies for simulation, equity calculation, snapshot services, and 
         <td><p>Monitor for recording performance metrics.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">enablePatternImageGeneration</span></td>
+        <td><p>Whether to enable pattern image generation.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
@@ -193,7 +199,7 @@ Sets up dependencies for simulation, equity calculation, snapshot services, and 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_TradingOverseer_TestScenario_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_BacklashDTOs_Data_SnapshotGroupDTO_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.TradingOverseer.TestScenario(TradingStrategies.Strategies.Scenario%2CSystem.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean%2CSystem.Double%2CBacklashDTOs.Data.SnapshotGroupDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L77">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L78">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_TradingOverseer_TestScenario_" data-uid="TradingStrategies.Trading.Overseer.TradingOverseer.TestScenario*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_TradingOverseer_TestScenario_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_BacklashDTOs_Data_SnapshotGroupDTO_" data-uid="TradingStrategies.Trading.Overseer.TradingOverseer.TestScenario(TradingStrategies.Strategies.Scenario,System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean,System.Double,BacklashDTOs.Data.SnapshotGroupDTO)">TestScenario(Scenario, List&lt;MarketSnapshot&gt;, bool, double, SnapshotGroupDTO?)</h4>
@@ -206,7 +212,7 @@ and asynchronous execution for high-throughput scenarios.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;(ReportGenerator.PathPerformance performance, List&lt;ReportGenerator.SimulationEventLog&gt; events)&gt;&gt; TestScenario(Scenario scenario, List&lt;MarketSnapshot&gt; snapshots, bool writeToFile, double initialCash = 100, SnapshotGroupDTO? group = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;(PathPerformance performance, List&lt;SimulationEventLog&gt; events)&gt;&gt; TestScenario(Scenario scenario, List&lt;MarketSnapshot&gt; snapshots, bool writeToFile, double initialCash = 100, SnapshotGroupDTO? group = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -260,7 +266,7 @@ and asynchronous execution for high-throughput scenarios.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.html">ReportGenerator</a>.<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.html">PathPerformance</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-tradingstrategies.trading.overseer.reportgenerator.pathperformance,system.collections.generic.list-tradingstrategies.trading.overseer.reportgenerator.simulationeventlog--.performance">performance</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.html">ReportGenerator</a>.<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html">SimulationEventLog</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-tradingstrategies.trading.overseer.reportgenerator.pathperformance,system.collections.generic.list-tradingstrategies.trading.overseer.reportgenerator.simulationeventlog--.events">events</a>)&gt;&gt;</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="TradingStrategies.Trading.Overseer.PathPerformance.html">PathPerformance</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-tradingstrategies.trading.overseer.pathperformance,system.collections.generic.list-tradingstrategies.trading.overseer.simulationeventlog--.performance">performance</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Trading.Overseer.SimulationEventLog.html">SimulationEventLog</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-tradingstrategies.trading.overseer.pathperformance,system.collections.generic.list-tradingstrategies.trading.overseer.simulationeventlog--.events">events</a>)&gt;&gt;</td>
         <td><p>A task that returns a list of tuples containing performance metrics and event logs for each simulation path.</p>
 </td>
       </tr>

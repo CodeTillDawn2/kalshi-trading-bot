@@ -98,11 +98,26 @@ This class is responsible for determining the current market value of positions 
 taking into account both cash holdings and the unrealized value of open positions based on current order book data.
 It includes performance metrics collection for timing analysis and async versions for high-throughput scenarios.</p>
 </section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.EventGroup.html">EventGroup</a></h4>
+      <section><p>Represents a grouped collection of related event logs that share the same market type and action.
+This class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,
+providing averaged metrics and position changes over a time period.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.MarketTypeService.html">MarketTypeService</a></h4>
       <section><p>Service responsible for determining and caching market types for trading snapshots.
 This class acts as a facade over the MarketTypeHelper, providing caching functionality
 to avoid redundant market type calculations for the same market snapshot.
 Includes performance metrics collection, configurable cache expiration, and async operations.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PathInfo.html">PathInfo</a></h4>
+      <section><p>Contains information about the strategies used in a specific trading path.
+This class provides a simple container for listing the strategy names that were
+active during a particular market condition or trading scenario.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PathPerformance.html">PathPerformance</a></h4>
+      <section><p>Represents the performance metrics for a complete trading path or simulation run.
+This class aggregates key performance indicators including profit/loss, equity changes,
+trade counts, and market state transitions for comprehensive analysis of trading outcomes.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PatternDetectionConfig.html">PatternDetectionConfig</a></h4>
       <section><p>Configuration options for pattern detection parameters.</p>
@@ -151,32 +166,17 @@ trading performance, market statistics, strategy effectiveness, and simulation o
 core reporting engine for the trading overseer system, enabling detailed analysis of backtesting results
 and strategy evaluation through structured data exports.</p>
 </section>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.html">ReportGenerator.EventGroup</a></h4>
-      <section><p>Represents a grouped collection of related event logs that share the same market type and action.
-This class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,
-providing averaged metrics and position changes over a time period.</p>
-</section>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.html">ReportGenerator.PathInfo</a></h4>
-      <section><p>Contains information about the strategies used in a specific trading path.
-This class provides a simple container for listing the strategy names that were
-active during a particular market condition or trading scenario.</p>
-</section>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.html">ReportGenerator.PathPerformance</a></h4>
-      <section><p>Represents the performance metrics for a complete trading path or simulation run.
-This class aggregates key performance indicators including profit/loss, equity changes,
-trade counts, and market state transitions for comprehensive analysis of trading outcomes.</p>
-</section>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html">ReportGenerator.SimulationEventLog</a></h4>
-      <section><p>Represents a single event log entry from a trading simulation, capturing the complete state
-of the trading environment at a specific point in time. This data structure is used to record
-and analyze the progression of trading activities, market conditions, and strategy decisions
-throughout a simulation run.</p>
-</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationEngine.html">SimulationEngine</a></h4>
       <section><p>Core engine for executing trading strategy simulations against historical market data.
 This class orchestrates the complete simulation lifecycle, processing market snapshots sequentially,
 applying trading strategies, simulating order execution and fills, managing position and cash flow,
 and generating detailed event logs for backtesting and performance analysis.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationEventLog.html">SimulationEventLog</a></h4>
+      <section><p>Represents a single event log entry from a trading simulation, capturing the complete state
+of the trading environment at a specific point in time. This data structure is used to record
+and analyze the progression of trading activities, market conditions, and strategy decisions
+throughout a simulation run.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPath.html">SimulationPath</a></h4>
       <section><p>Represents the complete state of a single trading simulation path in the Kalshi trading bot system.
