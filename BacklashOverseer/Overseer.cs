@@ -13,6 +13,7 @@ using BacklashOverseer.Services;
 using BacklashOverseer.Config;
 using Microsoft.Extensions.Options;
 using BacklashBotData.Data.Interfaces;
+using OverseerBotShared;
 
 namespace BacklashOverseer
 {

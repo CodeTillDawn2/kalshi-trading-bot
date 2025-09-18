@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using TradingStrategies.Configuration;
 using BacklashBotData.Data;
+using BacklashDTOs.Configuration;
 
 namespace KalshiBotTasks
 {
@@ -197,7 +198,7 @@ namespace KalshiBotTasks
             /// The constructor validates all dependencies to ensure the service is properly initialized.
             /// This prevents runtime errors during schema deployment operations.
             /// </remarks>
-            public SchemaDeploymentObj(KalshiBotContext context, ILogger<SchemaDeployment> logger, GeneralExecutionConfig generalExecutionConfig, IConfigurationRoot configuration)
+            public SchemaDeploymentObj(BacklashBotContext context, ILogger<SchemaDeployment> logger, GeneralExecutionConfig generalExecutionConfig, IConfigurationRoot configuration)
             {
                 _context = context ?? throw new ArgumentNullException(nameof(context));
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));

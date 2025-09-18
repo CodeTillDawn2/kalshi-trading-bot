@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using BacklashDTOs;
 using BacklashBotData.Data.Interfaces;
 using BacklashOverseer.Models;
+using BacklashOverseer.Config;
+using OverseerBotShared;
 
 namespace OverseerTests
 {
@@ -45,7 +47,7 @@ namespace OverseerTests
             _loggerMock = new Mock<ILogger<OverseerHub>>();
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
             _brainServiceLoggerMock = new Mock<ILogger<BrainPersistenceService>>();
-            var brainConfig = new BacklashOverseer.Services.BrainPersistenceServiceConfig();
+            var brainConfig = new BrainPersistenceServiceConfig();
             var brainConfigOptions = Options.Create(brainConfig);
             _brainService = new BrainPersistenceService(brainConfigOptions, null, _brainServiceLoggerMock.Object, null);
 

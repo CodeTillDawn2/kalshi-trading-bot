@@ -42,6 +42,6 @@ namespace BacklashOverseer.Config
         /// When disabled, only essential operations are performed with minimal overhead.
         /// Default is false for performance reasons.
         /// </summary>
-        public bool EnableOverseerHubPerformanceMetrics { get; set; } = false;
+        public bool EnablePerformanceMetrics { get; set; } = false;
     }
 }

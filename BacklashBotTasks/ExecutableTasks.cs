@@ -23,6 +23,7 @@ using TradingStrategies.Configuration;
 using BacklashBot.Management;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
+using BacklashCommon.Helpers;
 
 
 namespace KalshiBotTasks
@@ -42,7 +43,7 @@ namespace KalshiBotTasks
         private SnapshotPeriodHelper _snapshotPeriodHelper;
         private IOptions<GeneralExecutionConfig> _executionConfig;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
-        private MarketAnalysisHelper _marketAnalysisHelper;
+        private SnapshotGroupHelper _snapshotGroupHelper;
         private IBacklashBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
         private IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceOptions;
@@ -163,7 +164,7 @@ namespace KalshiBotTasks
             var overnightLoggerMock = new Mock<ILogger<OvernightActivitiesHelper>>();
             var interestLoggerMock = new Mock<ILogger<InterestScoreService>>();
             var tradingLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
-            var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
+            var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
 
             // Add mocks for missing dependencies
             var scopeManagerMock = new Mock<IScopeManagerService>();
@@ -205,8 +206,8 @@ namespace KalshiBotTasks
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
-            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
+            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
+            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 
             _dbContext = new BacklashBotContext(config);
@@ -236,7 +237,7 @@ namespace KalshiBotTasks
         [Test]
         public async Task GenerateSnapshotGroups()
         {
-            await _marketAnalysisHelper.GenerateSnapshotGroups();
+            await _snapshotGroupHelper.GenerateSnapshotGroups();
         }
 
         /// <summary>

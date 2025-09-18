@@ -563,48 +563,4 @@ namespace BacklashOverseer.Models
         public double Value { get; set; }
     }
 
-    /// <summary>
-    /// Contains detailed information about a market being watched by a brain instance.
-    /// Includes interest scoring data, watch history, and performance metrics for the specific market.
-    /// </summary>
-    public class MarketWatchData
-    {
-        /// <summary>
-        /// Gets or sets the unique ticker symbol identifying the market.
-        /// Serves as the primary identifier for market operations and data retrieval.
-        /// </summary>
-        [Required]
-        [JsonPropertyName("marketTicker")]
-        public string MarketTicker { get; set; } = "";
-
-        /// <summary>
-        /// Gets or sets the GUID of the brain instance watching this market.
-        /// Used to correlate market watch data with specific brain instances.
-        /// </summary>
-        public Guid? Brain { get; set; }
-
-        /// <summary>
-        /// Gets or sets the calculated interest score for this market.
-        /// Higher scores indicate greater trading interest and potential for inclusion in watch lists.
-        /// </summary>
-        public double? InterestScore { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when the interest score was last calculated.
-        /// Used to determine if the score needs to be recalculated based on data freshness.
-        /// </summary>
-        public DateTime? InterestScoreDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when this market was last actively watched.
-        /// Used to track market engagement and determine watch list optimization.
-        /// </summary>
-        public DateTime? LastWatched { get; set; }
-
-        /// <summary>
-        /// Gets or sets the average number of WebSocket events received per minute for this market.
-        /// Indicates market activity level and data stream density for performance monitoring.
-        /// </summary>
-        public double? AverageWebsocketEventsPerMinute { get; set; }
-    }
 }
