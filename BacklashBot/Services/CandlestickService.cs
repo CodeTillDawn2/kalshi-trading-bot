@@ -64,49 +64,6 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
-        /// Performs cleanup of old candlestick data based on retention policies.
-        /// </summary>
-        /// <returns>A task representing the asynchronous cleanup operation</returns>
-        public async Task PerformDataCleanupAsync()
-        {
-            var stopwatch = Stopwatch.StartNew();
-            try
-            {
-                _logger.LogInformation("Starting candlestick data cleanup");
-
-                var retentionCutoff = DateTime.UtcNow.AddDays(-_candlestickConfig.CandlestickDataRetentionDays);
-                int totalCleaned = 0;
-
-                // Clean up old Parquet files
-                var hardDataStorageLocation = _centralBrainConfig.HardDataStorageLocation;
-                if (Directory.Exists(hardDataStorageLocation))
-                {
-                    var candlestickDir = Path.Combine(hardDataStorageLocation, "Candlesticks");
-                    if (Directory.Exists(candlestickDir))
-                    {
-                        foreach (var marketDir in Directory.GetDirectories(candlestickDir))
-                        {
-                            var marketTicker = Path.GetFileName(marketDir);
-                            var filesCleaned = await CleanupOldParquetFilesAsync(marketDir, retentionCutoff);
-                            totalCleaned += filesCleaned;
-                        }
-                    }
-                }
-
-                stopwatch.Stop();
-                LogPerformanceMetric("PerformDataCleanupAsync", stopwatch.ElapsedMilliseconds, $"Total cleaned: {totalCleaned}");
-
-                _logger.LogInformation("Completed candlestick data cleanup: {TotalCleaned} items removed", totalCleaned);
-            }
-            catch (Exception ex)
-            {
-                stopwatch.Stop();
-                LogPerformanceMetric("PerformDataCleanupAsync", stopwatch.ElapsedMilliseconds, "Failed");
-                _logger.LogError(ex, "Error during candlestick data cleanup");
-            }
-        }
-
-        /// <summary>
         /// Cleans up old Parquet files for a specific market based on retention policy.
         /// </summary>
         /// <param name="marketDir">Market directory path</param>
@@ -764,19 +721,6 @@ namespace BacklashBot.Services
                 .Select(g => g.First())
                 .OrderBy(c => c.Date)
                 .ToList();
-
-            // Apply data retention limit
-            if (finalCandlesticks.Count > _candlestickConfig.MaxCandlesticksPerMarket)
-            {
-                var retentionCutoff = DateTime.UtcNow.AddDays(-_candlestickConfig.CandlestickDataRetentionDays);
-                finalCandlesticks = finalCandlesticks
-                    .Where(c => c.Date >= retentionCutoff)
-                    .Take(_candlestickConfig.MaxCandlesticksPerMarket)
-                    .ToList();
-
-                _logger.LogDebug("Applied data retention limit for {MarketTicker} at {Interval}: Kept {Count} candlesticks after filtering",
-                    marketTicker, interval, finalCandlesticks.Count);
-            }
 
             _logger.LogDebug("Processed candlesticks for {MarketTicker} at {Interval}: ForwardFilledAdded={ForwardFilledCount}, TotalAfterFill={TotalCount}",
                 marketTicker, interval, forwardFilledCount, finalCandlesticks.Count);

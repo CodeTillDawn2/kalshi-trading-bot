@@ -1219,18 +1219,9 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.OrderbookChangeCleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
             int removedCount = 0;
             int queueSizeBefore = _orderbookChanges.Count;
-
-            // First, enforce queue size limits by removing oldest events if queue is too large
-            while (_orderbookChanges.Count > _trackerConfig.Value.MaxOrderbookChangeQueueSize && _orderbookChanges.TryDequeue(out var oldChange))
-            {
-                removedCount++;
-                _logger.LogDebug(
-                    "Orderbook change removed due to queue size limit for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                    _marketTicker, oldChange.Id, oldChange.Side, oldChange.Price, oldChange.DeltaContracts, oldChange.Timestamp);
-            }
 
             // Then, remove events older than the cleanup threshold
             while (_orderbookChanges.TryPeek(out var change) && change.Timestamp < cutoff)
@@ -1333,22 +1324,13 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.TradeEventCleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
             var gracePeriodEnd = LastMarketOpenTime.Add(TimeSpan.FromMinutes(5));
             int removedCount = 0;
             int warningCount = 0;
             int queueSizeBefore = _tradeEvents.Count;
 
-            // First, enforce queue size limits by removing oldest trades if queue is too large
-            while (_tradeEvents.Count > _trackerConfig.Value.MaxTradeEventQueueSize && _tradeEvents.TryDequeue(out var oldTrade))
-            {
-                removedCount++;
-                _logger.LogDebug(
-                    "Trade event removed due to queue size limit for {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, Count={Count}, Timestamp={Timestamp}",
-                    _marketTicker, oldTrade.Id, oldTrade.TakerSide, oldTrade.Count, oldTrade.Timestamp);
-            }
-
-            // Then, remove trades older than the cleanup threshold
+            // remove trades older than the cleanup threshold
             while (_tradeEvents.TryPeek(out var trade) && trade.Timestamp < cutoff)
             {
                 if (_cancellationToken.IsCancellationRequested)

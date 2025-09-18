@@ -6,7 +6,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Management;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
-using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 using System.Text.Json;
 using BacklashBot.Hubs;
 
@@ -120,6 +120,7 @@ namespace BacklashBot.Services
         /// <param name="logger">Logger for recording service operations and errors</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="configuration">Configuration instance for reading settings</param>
+        /// <param name="broadcastServiceConfig">Configuration options for broadcast service settings</param>
         public BroadcastService(
             IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
@@ -128,7 +129,8 @@ namespace BacklashBot.Services
             ILogger<IBroadcastService> logger,
             IScopeManagerService scopeManagerService,
             IConfiguration configuration,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
+            ICentralPerformanceMonitor centralPerformanceMonitor,
+            IOptions<BroadcastServiceConfig> broadcastServiceConfig)
         {
             _scopeManagerService = scopeManagerService;
             _hubContext = hubContext;
@@ -140,13 +142,12 @@ namespace BacklashBot.Services
             _centralPerformanceMonitor = centralPerformanceMonitor;
             _serviceStartTime = DateTime.Now;
 
-            // Configure broadcast settings from configuration
-            _broadcastIntervalSeconds = GetConfigValue("Execution:BroadcastIntervalSeconds", 30);
-            _maxRetryAttempts = GetConfigValue("Execution:BroadcastMaxRetryAttempts", 3);
-            _retryDelay = TimeSpan.FromSeconds(GetConfigValue("Execution:BroadcastRetryDelaySeconds", 1));
-
-            // Configure metric tracking flag
-            _enablePerformanceMetrics = GetConfigBoolValue("Execution:BroadcastService_EnablePerformanceMetrics", false);
+            // Configure broadcast settings from BroadcastServiceConfig
+            var config = broadcastServiceConfig.Value;
+            _broadcastIntervalSeconds = config.BroadcastIntervalSeconds;
+            _maxRetryAttempts = config.BroadcastMaxRetryAttempts;
+            _retryDelay = TimeSpan.FromSeconds(config.BroadcastRetryDelaySeconds);
+            _enablePerformanceMetrics = config.EnablePerformanceMetrics;
         }
 
         /// <summary>

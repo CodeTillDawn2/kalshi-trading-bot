@@ -6,9 +6,8 @@ namespace TradingStrategies.Configuration;
 /// Configuration class for candlestick-related parameters.
 /// Controls precision and formatting for candlestick data processing.
 /// </summary>
-public class CandlestickConfig
+public class PseudoCandlestickExtensionsConfig
 {
-    [Range(0, 10)]
     /// <summary>
     /// Number of decimal places to round volume values when converting to double.
     /// This controls precision handling for volume data in candlestick conversions.

@@ -9,6 +9,7 @@ using BacklashBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 using BacklashBot.Services;
 using BacklashBot.Hubs;
 using BacklashBot.KalshiAPI.Interfaces;
@@ -57,14 +58,14 @@ builder.Configuration
     .AddCommandLine(args);
 
 // Bind configurations to respective models
-builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Logging"));
+builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Communications:Logging"));
 builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
 builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API"));
-builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websocket:WebSocketConnectionManager"));
-builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websocket:MessageProcessor"));
-builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websocket:SubscriptionManager"));
-builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websocket:WebSocketMonitor"));
-builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websocket:KalshiWebSocketClient"));
+builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websockets:WebSocketConnectionManager"));
+builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websockets:MessageProcessor"));
+builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websockets:SubscriptionManager"));
+builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websockets:WebSocketMonitor"));
+builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websockets:KalshiWebSocketClient"));
 builder.Services.Configure<TradingSnapshotServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TradingSnapshotService"));
 builder.Services.AddOptions<TradingSnapshotServiceConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SnapshotPeriodHelperConfig>(builder.Configuration.GetSection("WatchedMarkets:SnapshotPeriodHelper"));
@@ -72,16 +73,15 @@ builder.Services.AddOptions<SnapshotPeriodHelperConfig>().ValidateDataAnnotation
 builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
 builder.Services.AddOptions<SimulationConfig>().ValidateDataAnnotations();
 builder.Services.AddOptions<GeneralExecutionConfig>().ValidateDataAnnotations();
-builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("OrderbookChangeTracker"));
-builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("MarketRefreshService"));
+builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderbookChangeTracker"));
+builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketRefreshService"));
 builder.Services.Configure<MarketTypeServiceConfig>(builder.Configuration.GetSection("MarketTypeService"));
 builder.Services.Configure<StrategySelectionHelperConfig>(builder.Configuration.GetSection("StrategySelectionHelper"));
 builder.Services.Configure<EquityCalculatorConfig>(builder.Configuration.GetSection("EquityCalculator"));
-builder.Services.Configure<RiskManagementConfig>(builder.Configuration.GetSection("RiskManagement"));
-builder.Services.Configure<CandlestickConfig>(builder.Configuration.GetSection("Candlestick"));
+builder.Services.Configure<PseudoCandlestickExtensionsConfig>(builder.Configuration.GetSection("WatchedMarkets:PseudoCandlestickExtensions"));
 builder.Services.Configure<GeneralExecutionConfig>(builder.Configuration.GetSection("Central:GeneralExecution"));
-builder.Services.Configure<OverseerClientServiceConfig>(builder.Configuration.GetSection("OverseerClientService"));
-builder.Services.Configure<CandlestickServiceConfig>(builder.Configuration.GetSection("CandlestickService"));
+builder.Services.Configure<OverseerClientServiceConfig>(builder.Configuration.GetSection("Communications:OverseerClientService"));
+builder.Services.Configure<CandlestickServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:CandlestickService"));
 builder.Services.Configure<BroadcastServiceConfig>(builder.Configuration.GetSection("BroadcastService"));
 builder.Services.Configure<MarketDataInitializerConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketDataInitializer"));
 builder.Services.Configure<CentralPerformanceMonitorConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
@@ -162,15 +162,15 @@ builder.Services.AddSingleton<ILoggerProvider>(provider =>
 {
     var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
     var minLevel = LogLevel.Warning; // Default
-    if (!string.IsNullOrEmpty(loggingConfig.SqlDatabaseLogLevel))
+    if (!string.IsNullOrEmpty(loggingConfig.LogLevel?.SqlDatabaseLogLevel))
     {
         try
         {
-            minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
+            minLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
         }
         catch (ArgumentException ex)
         {
-            Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
+            Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.LogLevel.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
         }
     }
 
@@ -276,7 +276,8 @@ builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
     sp.GetRequiredService<ILogger<IBroadcastService>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IConfiguration>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>()));
+    sp.GetRequiredService<ICentralPerformanceMonitor>(),
+    sp.GetRequiredService<IOptions<BacklashBot.Configuration.BroadcastServiceConfig>>()));
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorService(
     sp.GetRequiredService<IServiceScopeFactory>(),
@@ -358,18 +359,18 @@ builder.Services.AddSignalR(options =>
 // Configure Kestrel for IIS (no specific URL binding)
 builder.WebHost.ConfigureKestrel(options => { });
 
-var loggingConfig = builder.Configuration.GetSection("Logging").Get<LoggingConfig>();
-if (!string.IsNullOrEmpty(loggingConfig?.ConsoleLogLevel))
+var loggingConfig = builder.Configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
+if (!string.IsNullOrEmpty(loggingConfig?.LogLevel?.ConsoleLogLevel))
 {
     try
     {
-        var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.ConsoleLogLevel, true);
+        var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.ConsoleLogLevel, true);
         builder.Logging.SetMinimumLevel(consoleLogLevel);
     }
     catch (ArgumentException ex)
     {
         builder.Logging.SetMinimumLevel(LogLevel.Information);
-        Console.WriteLine($"Invalid ConsoleLogLevel '{loggingConfig.ConsoleLogLevel}' in LoggingConfig. Falling back to Information. Error: {ex.Message}");
+        Console.WriteLine($"Invalid ConsoleLogLevel '{loggingConfig.LogLevel.ConsoleLogLevel}' in LoggingConfig. Falling back to Information. Error: {ex.Message}");
     }
 }
 else

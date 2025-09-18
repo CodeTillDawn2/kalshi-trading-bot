@@ -8,7 +8,6 @@ namespace TradingStrategies.Configuration;
 /// </summary>
 public class MarketRefreshServiceConfig
 {
-    [Range(1, 1440)]
     /// <summary>
     /// Interval in minutes for refreshing market data and recalculating trading metrics.
     /// This controls how often the system updates cached market information and technical indicators.
@@ -18,7 +17,6 @@ public class MarketRefreshServiceConfig
     /// </summary>
     public int RefreshIntervalMinutes { get; set; }
 
-    [Range(0.01, 0.99)]
     /// <summary>
     /// Threshold ratio for triggering additional refresh pass when refresh ratio falls below this value.
     /// This determines when to perform a forced refresh on markets that haven't been updated recently.
@@ -27,7 +25,6 @@ public class MarketRefreshServiceConfig
     /// </summary>
     public double RefreshThresholdRatio { get; set; } = 0.25;
 
-    [Range(0.01, 0.99)]
     /// <summary>
     /// Time budget ratio for the forced refresh pass relative to the total refresh interval.
     /// This limits how much time the additional refresh pass can consume to avoid exceeding the interval.
