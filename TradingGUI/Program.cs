@@ -1,8 +1,12 @@
 using System.Diagnostics;
 using System.Management;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradingStrategies.Trading.Overseer;
 using BacklashInterfaces.PerformanceMetrics;
+using TradingStrategies.Configuration;
+using TradingStrategies.Trading.Helpers;
+using BacklashDTOs.Configuration;
 
 namespace TradingGUI
 {
@@ -13,9 +17,30 @@ namespace TradingGUI
         {
             if (IsUnderTestHost()) return;
 
+            // Set up configuration
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                .Build();
+
             // Set up DI container
             var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
+
+            // Add connection string access (matching BacklashBot pattern)
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                services.AddSingleton(connectionString);
+            }
+
+            // Add configuration bindings
+            services.Configure<MarketTypeServiceConfig>(configuration.GetSection("Simulator:MarketTypeService"));
+            services.Configure<EquityCalculatorConfig>(configuration.GetSection("Simulator:EquityCalculator"));
+            services.Configure<StrategySelectionHelperConfig>(configuration.GetSection("Simulator:StrategySelectionHelper"));
+            services.Configure<DataLoaderConfig>(configuration.GetSection("SnapshotHandling:DataLoader"));
+
             var serviceProvider = services.BuildServiceProvider();
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);

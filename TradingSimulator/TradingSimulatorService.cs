@@ -89,7 +89,7 @@ namespace TradingSimulator
         private IBacklashBotContext _dbContext;
         private SnapshotGroupHelper _marketAnalysisHelper;
         private IOptions<GeneralExecutionConfig> _executionConfig;
-        private IOptions<SimulatorConfig> _simulatorOptions;
+        private IOptions<TradingSimulatorServiceConfig> _simulatorOptions;
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
@@ -151,9 +151,13 @@ namespace TradingSimulator
             var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
+            var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
             _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>());
             _simulatorOptions = Options.Create(simulatorConfig);
+
+            // Configure DataLoaderConfig
+            var dataLoaderConfig = config.GetSection("SnapshotHandling:DataLoader").Get<DataLoaderConfig>() ?? new DataLoaderConfig();
+            var dataLoaderOptions = Options.Create(dataLoaderConfig);
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
@@ -182,7 +186,7 @@ namespace TradingSimulator
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
-            _dataLoader = new DataLoader(_snapshotService, _simulatorOptions);
+            _dataLoader = new DataLoader(_snapshotService, dataLoaderOptions);
             var marketProcessorConfig = new MarketProcessorConfig
             {
                 CacheDirectory = _cacheDirectory,

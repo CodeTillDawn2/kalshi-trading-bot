@@ -3,7 +3,7 @@ namespace BacklashDTOs.Configuration
     /// <summary>
     /// Configuration class for trading simulator settings.
     /// </summary>
-    public class SimulatorConfig
+    public class TradingSimulatorServiceConfig
     {
         /// <summary>
         /// Gets or sets the directory path where simulation cache files and reports are stored.
@@ -45,18 +45,5 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         public int DiscrepancyThresholdPercentage { get; set; } = 10; // Threshold for widespread discrepancies
 
-        /// <summary>
-        /// Gets or sets whether to enable validation of market snapshots before processing.
-        /// When enabled, snapshots are checked for data integrity and completeness.
-        /// Default is true.
-        /// </summary>
-        public bool EnableSnapshotValidation { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the minimum number of snapshots required for validation to be meaningful.
-        /// Markets with fewer snapshots will still be processed but with warnings.
-        /// Default is 1.
-        /// </summary>
-        public int MinSnapshotCountForValidation { get; set; } = 1;
     }
 }

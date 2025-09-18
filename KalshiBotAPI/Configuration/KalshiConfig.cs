@@ -19,12 +19,6 @@ public class KalshiConfig
     /// Gets or sets the path to the API key file.
     /// </summary>
     public string KeyFile { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets whether KalshiAPIService performance metrics collection is enabled.
-    /// When disabled, method execution times, API response times, and error counts are not tracked to reduce overhead. Defaults to true.
-    /// </summary>
-    public bool EnablePerformanceMetrics { get; set; } = true;
 }
 
 

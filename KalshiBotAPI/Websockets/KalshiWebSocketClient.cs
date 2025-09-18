@@ -232,7 +232,7 @@ namespace KalshiBotAPI.Websockets
             _performanceMetrics = performanceMetrics;
             WriteToSQL = writeToSql;
             _webSocketBufferSize = webSocketBufferSize;
-            EnablePerformanceMetrics = enablePerformanceMetrics ?? true;
+            EnablePerformanceMetrics = enablePerformanceMetrics ?? _websocketConfig.EnablePerformanceMetrics;
 
             // Wire up events from MessageProcessor to expose them publicly
             _messageProcessor.OrderBookReceived += (sender, args) => OrderBookReceived?.Invoke(sender, args);
