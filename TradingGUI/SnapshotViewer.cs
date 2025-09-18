@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using TradingSimulator;
 using ScottPlot.WinForms;
+using ScottPlot;
 
 
 namespace TradingGUI

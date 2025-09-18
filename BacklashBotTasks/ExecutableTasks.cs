@@ -153,7 +153,7 @@ namespace KalshiBotTasks
             this.config = configuration;
 
             var tradingSnapshotServiceConfig = config.GetSection("WatchedMarkets:TradingSnapshotService").Get<TradingSnapshotServiceConfig>()!;
-            var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
+            var tradingConfig = config.GetSection("TradingConfig").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>()!;
             var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
             _tradingSnapshotServiceOptions = Options.Create(tradingSnapshotServiceConfig);
             _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
@@ -206,7 +206,19 @@ namespace KalshiBotTasks
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
+            var centralBrainConfig = new CentralBrainConfig
+            {
+                HardDataStorageLocation = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestData")
+            };
+            var centralBrainOptions = Options.Create(centralBrainConfig);
+
+            var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig
+            {
+                EnablePerformanceMetrics = true
+            };
+            var snapshotGroupHelperOptions = Options.Create(snapshotGroupHelperConfig);
+
+            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, centralBrainOptions, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 

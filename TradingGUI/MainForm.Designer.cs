@@ -1,3 +1,4 @@
+using ScottPlot;
 using ScottPlot.WinForms;
 
 namespace TradingGUI

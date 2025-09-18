@@ -6,6 +6,7 @@
 /// data aggregation, sorting, and visualization to support trading analysis
 /// and simulation in the GUI application.
 /// </summary>
+using ScottPlot;
 using ScottPlot.WinForms;
 using System.Text.Json;
 using System.Text.RegularExpressions;
