@@ -44,10 +44,6 @@ namespace TradingSimulator.Strategies
         /// </summary>
         private readonly IOptions<SnapshotConfig> _snapshotOptions;
 
-        /// <summary>
-        /// Configuration options for trading parameters and behavior.
-        /// </summary>
-        private readonly IOptions<TradingConfig> _tradingOptions;
 
         /// <summary>
         /// Factory for creating service scopes for dependency injection.
@@ -136,7 +132,6 @@ namespace TradingSimulator.Strategies
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods.</param>
         /// <param name="logger">Logger for recording simulation events.</param>
         /// <param name="snapshotOptions">Configuration for snapshot processing.</param>
-        /// <param name="tradingOptions">Configuration for trading parameters.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="dbContext">Database context for data access.</param>
         /// <param name="strategies">List of strategies to execute, each with name and function.</param>
@@ -145,7 +140,6 @@ namespace TradingSimulator.Strategies
             ISnapshotPeriodHelper snapshotPeriodHelper,
             ILogger<TradingStrategy<T>> logger,
             IOptions<SnapshotConfig> snapshotOptions,
-            IOptions<TradingConfig> tradingOptions,
             IServiceScopeFactory scopeFactory,
             IBacklashBotContext dbContext,
             List<(string Name, TradingStrategyFunc<T> Func)> strategies)
@@ -154,7 +148,6 @@ namespace TradingSimulator.Strategies
             _logger = logger;
             _snapshotPeriodHelper = snapshotPeriodHelper;
             _snapshotOptions = snapshotOptions;
-            _tradingOptions = tradingOptions;
             _scopeFactory = scopeFactory;
             _dbContext = dbContext;
             _strategies = strategies;

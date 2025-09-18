@@ -92,7 +92,6 @@ namespace BacklashBot.Services
             var configuration = sp.GetRequiredService<IConfiguration>();
             var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
             var snapshotConfig = sp.GetRequiredService<IOptions<SnapshotConfig>>();
-            var tradingConfig = sp.GetRequiredService<IOptions<TradingConfig>>();
             var calculationConfig = sp.GetRequiredService<IOptions<CalculationConfig>>();
             var serviceScopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
             var marketDataLogger = sp.GetRequiredService<ILogger<IMarketDataService>>();

@@ -40,26 +40,26 @@ namespace TradingStrategies.Trading.Helpers
 
         /// <summary>
         /// Static configuration instance for StrategySelectionHelper settings.
-        /// This should be set during application startup with the TradingConfig instance.
+        /// This should be set during application startup with the StrategySelectionHelperConfig instance.
         /// </summary>
-        private static TradingConfig? _config;
+        private static StrategySelectionHelperConfig? _config;
 
         /// <summary>
         /// Sets the configuration for StrategySelectionHelper.
         /// This method should be called during application startup to configure performance metrics.
         /// </summary>
-        /// <param name="config">The trading configuration containing StrategySelectionHelper settings.</param>
-        public static void SetConfiguration(TradingConfig config)
+        /// <param name="config">The strategy selection helper configuration containing performance metrics settings.</param>
+        public static void SetConfiguration(StrategySelectionHelperConfig config)
         {
             _config = config;
         }
 
         /// <summary>
         /// Flag to enable/disable performance metrics collection.
-        /// Uses configuration from TradingConfig:StrategySelectionHelper_EnablePerformanceMetrics.
+        /// Uses configuration from StrategySelectionHelperConfig:EnablePerformanceMetrics.
         /// Defaults to false for performance reasons (individual instance tracking has overhead).
         /// </summary>
-        public static bool EnablePerformanceMetrics => _config?.StrategySelectionHelper_EnablePerformanceMetrics ?? false;
+        public static bool EnablePerformanceMetrics => _config?.EnablePerformanceMetrics ?? false;
 
         /// <summary>
         /// Thread-safe collection to store performance metrics.

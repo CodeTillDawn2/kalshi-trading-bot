@@ -31,13 +31,13 @@ namespace TradingStrategies.Classification
     /// </remarks>
     public class SnapshotPeriodHelper : ISnapshotPeriodHelper
     {
-        private readonly SnapshotConfig _config;
+        private readonly SnapshotPeriodHelperConfig _config;
 
         /// <summary>
         /// Initializes a new instance of the SnapshotPeriodHelper class with the specified configuration.
         /// </summary>
-        /// <param name="config">The snapshot configuration containing thresholds and settings.</param>
-        public SnapshotPeriodHelper(SnapshotConfig config)
+        /// <param name="config">The snapshot period helper configuration containing thresholds and settings.</param>
+        public SnapshotPeriodHelper(SnapshotPeriodHelperConfig config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }

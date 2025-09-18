@@ -43,9 +43,8 @@ namespace BacklashBot.Management
         private readonly ICentralErrorHandler _errorHandler;
         private readonly ICentralPerformanceMonitor _performanceTracker;
         private readonly IBrainStatusService _brainStatus;
-        private readonly SnapshotConfig _snapshotConfig;
+        private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
         private readonly GeneralExecutionConfig _generalConfig;
-        private readonly TradingConfig _tradingTimingConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IHealthCheckService _healthCheckService;
@@ -81,8 +80,8 @@ namespace BacklashBot.Management
             ILogger<ICentralBrain> logger,
             IServiceFactory serviceFactory,
             IServiceScopeFactory scopeFactory,
-            IOptions<SnapshotConfig> snapshotConfig,
-            IOptions<TradingConfig> tradingTimingConfig,
+            IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<GeneralExecutionConfig> generalConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
@@ -100,19 +99,18 @@ namespace BacklashBot.Management
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
-            _snapshotConfig = snapshotConfig.Value;
+            _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig.Value;
             _marketManager = marketManager;
             _brainStatus = brainStatusService;
             _errorHandler = backlashErrorHandler;
             _performanceTracker = backlashPerformanceTracker;
-            _tradingTimingConfig = tradingTimingConfig.Value;
-            _generalConfig = generalConfig.Value;
+            _generalConfig = generalExecutionConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
             _brainInstance = _generalConfig.BrainInstance;
-            _decisionInterval = TimeSpan.FromSeconds(_tradingTimingConfig.DecisionFrequencySeconds);
+            _decisionInterval = TimeSpan.FromSeconds(_generalConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
 
         }
@@ -939,7 +937,7 @@ namespace BacklashBot.Management
                 _logger.LogDebug("BRAIN: Completed parallel snapshot creation, processed {Count} markets successfully", marketSnapshots.Count);
 
                 cancellationToken.ThrowIfCancellationRequested();
-                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _snapshotConfig.SnapshotSchemaVersion,
+                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _generalConfig.SnapshotSchemaVersion,
                     _serviceFactory.GetDataCache().AccountBalance, _serviceFactory.GetDataCache().PortfolioValue, _serviceFactory.GetDataCache().LastWebSocketTimestamp, marketSnapshots);
 
 
@@ -1150,8 +1148,8 @@ namespace BacklashBot.Management
                kvp.Value.YesBidCenterOfMass,
                kvp.Value.NoBidCenterOfMass,
                kvp.Value.TolerancePercentage,
-               _snapshotConfig.SnapshotSchemaVersion,
-               totalYesDepth,
+                _generalConfig.SnapshotSchemaVersion,
+                totalYesDepth,
                totalNoDepth,
                kvp.Value.TotalBidVolume_Yes,
                kvp.Value.TotalBidVolume_No,

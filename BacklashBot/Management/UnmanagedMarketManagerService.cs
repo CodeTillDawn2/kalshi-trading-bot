@@ -31,7 +31,6 @@ namespace BacklashBot.Management
         /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="executionConfig">Configuration options for execution parameters</param>
-        /// <param name="tradingConfig">Configuration options for trading parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
@@ -42,13 +41,12 @@ namespace BacklashBot.Management
             IServiceScopeFactory scopeFactory,
             ICentralPerformanceMonitor performanceMonitor,
             IOptions<GeneralExecutionConfig> executionConfig,
-            IOptions<TradingConfig> tradingConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
         }
 

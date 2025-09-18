@@ -42,5 +42,6 @@ public class MarketRefreshServiceConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    public bool MarketRefreshService_EnablePerformanceMetrics { get; set; } = true;
+    [Required]
+    public bool EnablePerformanceMetrics { get; set; } = true;
 }

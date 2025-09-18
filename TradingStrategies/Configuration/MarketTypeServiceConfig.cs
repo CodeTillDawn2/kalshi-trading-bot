@@ -15,7 +15,8 @@ public class MarketTypeServiceConfig
     /// Typical values: 15-60 minutes depending on market volatility and freshness requirements.
     /// Default: 30 minutes
     /// </summary>
-    public int? MarketTypeCacheExpirationMinutes { get; set; } = 30;
+    [Required]
+    public int? CacheExpirationMinutes { get; set; } = 30;
 
     /// <summary>
     /// Enables or disables performance metrics collection in MarketTypeService.
@@ -23,5 +24,6 @@ public class MarketTypeServiceConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: true
     /// </summary>
-    public bool MarketTypeService_EnablePerformanceMetrics { get; set; } = true;
+    [Required]
+    public bool EnablePerformanceMetrics { get; set; } = true;
 }

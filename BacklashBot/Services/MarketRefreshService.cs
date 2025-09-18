@@ -21,7 +21,7 @@ namespace BacklashBot.Services
         private readonly IStatusTrackerService _statusTracker;
         private readonly ILogger<IMarketRefreshService> _logger;
         private readonly TimeSpan _updateInterval;
-        private readonly TradingConfig _tradingConfig;
+        private readonly MarketRefreshServiceConfig _marketRefreshServiceConfig;
         private DateTime? _lastRefreshTime;
         private Task _executeTask;
         /// <summary>
@@ -36,7 +36,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _lastWorkDuration;
             }
@@ -50,7 +50,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _lastWorkMarketCount;
             }
@@ -68,7 +68,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _averageRefreshTimePerMarket;
             }
@@ -82,7 +82,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _lastRefreshCount;
             }
@@ -96,7 +96,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _lastCpuTime;
             }
@@ -110,7 +110,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _lastMemoryUsage;
             }
@@ -124,7 +124,7 @@ namespace BacklashBot.Services
         {
             get
             {
-                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                if (!_marketRefreshServiceConfig.EnablePerformanceMetrics)
                     throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
                 return _refreshThroughput;
             }
@@ -138,14 +138,14 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes for dependency injection.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        /// <param name="tradingConfig">Configuration options for trading parameters including refresh intervals.</param>
+        /// <param name="marketRefreshServiceConfig">Configuration options for market refresh service parameters.</param>
         /// <param name="serviceFactory">Factory for accessing other services in the application.</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="statusTrackerService">Service for tracking application status and cancellation tokens.</param>
         public MarketRefreshService(
             IServiceScopeFactory scopeFactory,
             ILogger<IMarketRefreshService> logger,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<MarketRefreshServiceConfig> marketRefreshServiceConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService
@@ -156,8 +156,8 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
             _statusTracker = statusTrackerService;
             _scopeFactory = scopeFactory;
-            _tradingConfig = tradingConfig.Value;
-            _updateInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
+            _marketRefreshServiceConfig = marketRefreshServiceConfig.Value;
+            _updateInterval = TimeSpan.FromMinutes(_marketRefreshServiceConfig.RefreshIntervalMinutes);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace BacklashBot.Services
             var stopwatch = Stopwatch.StartNew();
             var startCpu = TimeSpan.Zero;
             var startMemory = 0L;
-            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            if (_marketRefreshServiceConfig.EnablePerformanceMetrics)
             {
                 startCpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
                 startMemory = System.GC.GetTotalMemory(false);
@@ -398,14 +398,14 @@ namespace BacklashBot.Services
             if (watchedMarkets.Count > 0)
             {
                 double refreshRatio = (double)MarketsRefreshed / watchedMarkets.Count; // FIX: ensure double division
-                if (refreshRatio < _tradingConfig.RefreshThresholdRatio)
+                if (refreshRatio < _marketRefreshServiceConfig.RefreshThresholdRatio)
                 {
-                    int targetForceTotal = (int)Math.Round(watchedMarkets.Count * _tradingConfig.RefreshThresholdRatio);
+                    int targetForceTotal = (int)Math.Round(watchedMarkets.Count * _marketRefreshServiceConfig.RefreshThresholdRatio);
                     int remainingToForce = Math.Max(0, targetForceTotal - MarketsRefreshed);
                     int ForcedRefreshCount = 0;
 
                     // Simple time budget: stop forced pass if =timeBudgetRatio% of the interval has elapsed
-                    TimeSpan forcedBudget = TimeSpan.FromTicks((long)(_updateInterval.Ticks * _tradingConfig.TimeBudgetRatio));
+                    TimeSpan forcedBudget = TimeSpan.FromTicks((long)(_updateInterval.Ticks * _marketRefreshServiceConfig.TimeBudgetRatio));
 
                     foreach (var marketTicker in ShuffleList(watchedMarkets))
                     {
@@ -450,14 +450,14 @@ namespace BacklashBot.Services
             LastRefreshCount = MarketsRefreshed;
             TotalRefreshOperations++;
             AverageRefreshTimePerMarket = LastWorkMarketCount > 0 ? TimeSpan.FromTicks(LastWorkDuration.Ticks / LastWorkMarketCount) : TimeSpan.Zero;
-            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            if (_marketRefreshServiceConfig.EnablePerformanceMetrics)
             {
                 var endCpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
                 var endMemory = System.GC.GetTotalMemory(false);
                 LastCpuTime = endCpu - startCpu;
                 LastMemoryUsage = endMemory;
             }
-            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            if (_marketRefreshServiceConfig.EnablePerformanceMetrics)
             {
                 RefreshThroughput = LastWorkDuration.TotalSeconds > 0 ? (double)LastRefreshCount / LastWorkDuration.TotalSeconds : 0;
             }

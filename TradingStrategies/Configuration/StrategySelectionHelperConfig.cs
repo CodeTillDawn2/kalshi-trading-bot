@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TradingStrategies.Configuration;
 
 /// <summary>
@@ -12,5 +14,6 @@ public class StrategySelectionHelperConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: false (due to performance impact of individual instance tracking)
     /// </summary>
-    public bool StrategySelectionHelper_EnablePerformanceMetrics { get; set; } = false;
+    [Required]
+    public bool EnablePerformanceMetrics { get; set; } = false;
 }

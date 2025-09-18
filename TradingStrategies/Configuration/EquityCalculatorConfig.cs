@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TradingStrategies.Configuration;
 
 /// <summary>
@@ -12,5 +14,6 @@ public class EquityCalculatorConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: true
     /// </summary>
-    public bool EquityCalculator_EnablePerformanceMetrics { get; set; } = true;
+    [Required]
+    public bool EnablePerformanceMetrics { get; set; } = true;
 }

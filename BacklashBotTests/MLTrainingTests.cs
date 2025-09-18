@@ -5,6 +5,7 @@ using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashDTOs.Configuration;
 /// <summary>
 /// Comprehensive NUnit test fixture for validating machine learning training and evaluation workflows
 /// in the Kalshi trading bot system. This class tests the complete pipeline from real market data
@@ -69,10 +70,10 @@ namespace KalshiBotTests
         private IOptions<SnapshotConfig> _snapOpts;
 
         /// <summary>
-        /// Configuration options for trading parameters, including decision frequencies
+        /// Configuration options for general execution parameters, including decision frequencies
         /// and other settings that affect snapshot timing and processing.
         /// </summary>
-        private IOptions<TradingConfig> _tradeOpts;
+        private IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> _generalExecutionOpts;
 
         /// <summary>
         /// Output directory path where training data CSV files and model files are saved.
@@ -111,12 +112,12 @@ namespace KalshiBotTests
             var centralPerformanceMonitor = _sp.GetRequiredService<CentralPerformanceMonitor>();
 
             // Options from config
-            _snapOpts  = Options.Create(config.GetSection("Snapshots").Get<SnapshotConfig>());
-            _tradeOpts = Options.Create(config.GetSection("TradingConfig").Get<TradingConfig>());
+            var snapshotServiceConfig = Options.Create(new BacklashDTOs.Configuration.TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
+            _generalExecutionOpts = Options.Create(config.GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>());
 
             // Snapshot loader (same implementation you use elsewhere)
             _snapshotService = new TradingSnapshotService(
-                NullLogger<ITradingSnapshotService>.Instance, _snapOpts, _tradeOpts, _scopeFactory, config, centralPerformanceMonitor);
+                NullLogger<ITradingSnapshotService>.Instance, snapshotServiceConfig, _generalExecutionOpts, _scopeFactory, config, centralPerformanceMonitor);
 
             _outDir = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
             Directory.CreateDirectory(_outDir);

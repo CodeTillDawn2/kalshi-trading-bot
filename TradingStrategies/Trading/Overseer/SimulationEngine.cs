@@ -47,10 +47,14 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
         {
-            var tradingConfig = new TradingConfig();
-            configuration.GetSection("TradingConfig").Bind(tradingConfig);
-            _marketTypeService = new MarketTypeService(tradingConfig);
-            StrategySelectionHelper.SetConfiguration(tradingConfig);
+            var marketTypeServiceConfig = new Configuration.MarketTypeServiceConfig();
+            configuration.GetSection("MarketTypeServiceConfig").Bind(marketTypeServiceConfig);
+            _marketTypeService = new MarketTypeService(marketTypeServiceConfig);
+
+            var strategySelectionHelperConfig = new Configuration.StrategySelectionHelperConfig();
+            configuration.GetSection("StrategySelectionHelperConfig").Bind(strategySelectionHelperConfig);
+            StrategySelectionHelper.SetConfiguration(strategySelectionHelperConfig);
+
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);

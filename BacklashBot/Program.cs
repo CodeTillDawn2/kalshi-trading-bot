@@ -64,12 +64,13 @@ builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSect
 builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websocket:SubscriptionManager"));
 builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websocket:WebSocketMonitor"));
 builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websocket:KalshiWebSocketClient"));
-builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("WatchedMarkets:Snapshots"));
-builder.Services.AddOptions<SnapshotConfig>().ValidateDataAnnotations();
+builder.Services.Configure<TradingSnapshotServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TradingSnapshotServiceConfig"));
+builder.Services.AddOptions<TradingSnapshotServiceConfig>().ValidateDataAnnotations();
+builder.Services.Configure<SnapshotPeriodHelperConfig>(builder.Configuration.GetSection("WatchedMarkets:SnapshotPeriodHelperConfig"));
+builder.Services.AddOptions<SnapshotPeriodHelperConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
 builder.Services.AddOptions<SimulationConfig>().ValidateDataAnnotations();
-builder.Services.Configure<TradingTimingConfig>(builder.Configuration.GetSection("TradingDecisionService"));
-builder.Services.Configure<TradingConfig>(builder.Configuration.GetSection("TradingDecisionService"));
+builder.Services.AddOptions<GeneralExecutionConfig>().ValidateDataAnnotations();
 builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("OrderbookChangeTracker"));
 builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("MarketRefreshServiceConfig"));
 builder.Services.Configure<MarketTypeServiceConfig>(builder.Configuration.GetSection("MarketTypeServiceConfig"));
@@ -107,8 +108,8 @@ builder.Services.AddSingleton<ICentralBrain>(sp => new CentralBrain(
     sp.GetRequiredService<ILogger<ICentralBrain>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<IOptions<SnapshotConfig>>(),
-    sp.GetRequiredService<IOptions<TradingConfig>>(),
+    sp.GetRequiredService<IOptions<TradingSnapshotServiceConfig>>(),
+    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<ICentralErrorHandler>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
@@ -129,7 +130,7 @@ builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerfo
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
     sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
-    sp.GetRequiredService<IOptions<TradingConfig>>(),
+    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>()));
@@ -143,7 +144,6 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
-    sp.GetRequiredService<IOptions<TradingConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>(),
@@ -191,7 +191,6 @@ builder.Services.AddTransient(provider =>
         "unknown",
         provider.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
         dataCache,
-        provider.GetRequiredService<IOptions<TradingConfig>>(),
         provider.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
@@ -218,7 +217,6 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 market.market_ticker,
                 sp.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
                 dataCache,
-                sp.GetRequiredService<IOptions<TradingConfig>>(),
                 sp.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
@@ -343,7 +341,7 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
         provider.GetRequiredService<ISqlDataService>(),
         provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
-    new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotConfig>>().Value));
+    new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value));
 builder.Services.AddScoped<BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService, HealthCheckService>();
 builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 

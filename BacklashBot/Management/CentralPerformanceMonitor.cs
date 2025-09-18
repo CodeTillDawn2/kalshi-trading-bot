@@ -53,7 +53,6 @@ namespace BacklashBot.Management
         /// Key is the method name, value is a list of timestamp and milliseconds.
         /// </summary>
         public readonly ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>> ApiExecutionTimes;
-        private readonly TradingConfig _tradingConfig;
         private readonly GeneralExecutionConfig _generalExecutionConfig;
         private readonly QueueMonitoringConfig _queueMonitoringConfig;
         private readonly CentralPerformanceMonitorConfig _centralPerformanceMonitorConfig;
@@ -206,7 +205,7 @@ namespace BacklashBot.Management
             IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<QueueMonitoringConfig> queueMonitoringConfig,
             IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig2,
             IServiceScopeFactory scopeFactory,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService)
@@ -220,8 +219,7 @@ namespace BacklashBot.Management
             _generalExecutionConfig = generalExecutionConfig.Value;
             _queueMonitoringConfig = queueMonitoringConfig.Value;
             _centralPerformanceMonitorConfig = centralPerformanceMonitorConfig.Value;
-            _tradingConfig = tradingConfig.Value;
-            RefreshInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
+            RefreshInterval = TimeSpan.FromMinutes(_generalExecutionConfig.RefreshIntervalMinutes);
             BrainInstance = _generalExecutionConfig.BrainInstance;
             _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();

@@ -37,6 +37,7 @@ using static BacklashInterfaces.Enums.StrategyEnums;
 using TradingSimulator.Simulator;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
+using BacklashCommon.Services;
 
 namespace TradingSimulator
 {
@@ -85,7 +86,6 @@ namespace TradingSimulator
         private Mock<ILogger<IInterestScoreService>> _interestScoreLoggerMock;
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
         private IOptions<SnapshotConfig> _snapshotOptions;
-        private IOptions<TradingConfig> _tradingOptions;
         private IServiceScopeFactory _scopeFactory;
         private IBacklashBotContext _dbContext;
         private MarketAnalysisHelper _marketAnalysisHelper;
@@ -153,10 +153,8 @@ namespace TradingSimulator
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
-            var tradingConfig = config.GetSection("TradingStrategy").Get<TradingConfig>();
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
             _snapshotOptions = Options.Create(snapshotConfig);
-            _tradingOptions = Options.Create(tradingConfig);
             _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>());
             _simulatorOptions = Options.Create(simulatorConfig);
 
@@ -168,8 +166,8 @@ namespace TradingSimulator
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
-            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory, config);
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
+            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }), Options.Create(new BacklashDTOs.Configuration.GeneralExecutionConfig { HardDataStorageLocation = @"C:\Temp\Storage" }), _scopeFactory, config, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();
