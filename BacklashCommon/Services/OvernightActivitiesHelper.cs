@@ -242,6 +242,45 @@ namespace BacklashCommon.Services
             }
         }
 
+        /// <summary>
+        /// Cleans up candlestick data folders for markets that have ended.
+        /// This method removes directories containing candlestick data for closed markets
+        /// to free up storage space and maintain efficient disk usage.
+        /// </summary>
+        /// <param name="scopeFactory">The service scope factory for creating scoped service instances.</param>
+        /// <param name="cancellationToken">The cancellation token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task CleanUpClosedMarketCandlesticks(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
+        {
+            using var scope = scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+            string candlesticksPath = @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\candlesticks";
+            if (!Directory.Exists(candlesticksPath))
+            {
+                _logger.LogInformation("Candlesticks directory does not exist: {Path}", candlesticksPath);
+                return;
+            }
+            var directories = Directory.GetDirectories(candlesticksPath);
+            foreach (var dir in directories)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string marketTicker = Path.GetFileName(dir);
+                var market = await context.GetMarketByTicker(marketTicker);
+                if (market != null && KalshiConstants.IsMarketStatusEnded(market.status))
+                {
+                    try
+                    {
+                        Directory.Delete(dir, true);
+                        _logger.LogInformation("Deleted candlesticks folder for closed market: {MarketTicker}", marketTicker);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to delete candlesticks folder for market: {MarketTicker}", marketTicker);
+                    }
+                }
+            }
+        }
+
         private async Task RemoveOldWatches(IServiceScopeFactory scopeFactory)
         {
             using var scope = scopeFactory.CreateScope();

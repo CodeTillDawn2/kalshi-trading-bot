@@ -275,6 +275,16 @@ namespace KalshiBotTasks
             await _overnightService.DeleteProcessedSnapshots(_scopeFactory, new CancellationToken());
         }
 
+        /// <summary>
+        /// Test method that cleans up candlestick data folders for closed markets.
+        /// This removes directories for markets that have ended to free up storage space.
+        /// </summary>
+        [Test]
+        public async Task CleanUpClosedMarketCandlesticks()
+        {
+            await _overnightService.CleanUpClosedMarketCandlesticks(_scopeFactory, new CancellationToken());
+        }
+
 
         /// <summary>
         /// Test method that performs comprehensive snapshot upgrade and validation processing.
