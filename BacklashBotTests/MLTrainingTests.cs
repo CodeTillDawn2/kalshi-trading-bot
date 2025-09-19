@@ -106,9 +106,13 @@ namespace KalshiBotTests
                 .Build();
 
             // DI: EF context for real snapshot fetching
+            var connectionString = ConfigurationHelper.BuildConnectionString(config);
+            var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(ConfigurationHelper.BuildConnectionString(config)));
+            services.AddSingleton(connectionString);
+            services.AddSingleton(dataConfig);
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             _sp = services.BuildServiceProvider();
             _scopeFactory = _sp.GetRequiredService<IServiceScopeFactory>();

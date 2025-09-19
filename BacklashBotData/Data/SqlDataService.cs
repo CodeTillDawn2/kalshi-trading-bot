@@ -141,22 +141,21 @@ namespace KalshiBotData.Data
         private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
-        /// Initializes a new instance of the SqlDataService with configuration and logging dependencies.
+        /// Initializes a new instance of the SqlDataService with connection string and logging dependencies.
         /// Sets up concurrent queues for different data types and starts background worker tasks for processing.
         /// </summary>
-        /// <param name="configuration">Application configuration containing database connection string.</param>
+        /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
+        /// <param name="dataConfig">Configuration options for data service operations.</param>
         /// <param name="performanceMetricsReceivers">Collection of services that will receive performance metrics automatically.</param>
-        public SqlDataService(IConfiguration configuration, ILogger<ISqlDataService> logger,
-                             IEnumerable<ISqlDataServicePerformanceMetrics>? performanceMetricsReceivers = null)
+        public SqlDataService(string connectionString, ILogger<ISqlDataService> logger, BacklashBotDataConfig dataConfig,
+                              IEnumerable<ISqlDataServicePerformanceMetrics> performanceMetricsReceivers)
         {
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _logger = logger;
-            _connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(configuration) ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
             _startTime = DateTime.UtcNow;
             _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
-            // Load configuration options with defaults
-            var dataConfig = configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
             _retryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
             _maxQueueSize = dataConfig.MaxQueueSize;

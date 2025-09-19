@@ -161,9 +161,13 @@ namespace TradingSimulator
             var dataLoaderConfig = config.GetSection("SnapshotHandling:DataLoader").Get<DataLoaderConfig>() ?? new DataLoaderConfig();
             var dataLoaderOptions = Options.Create(dataLoaderConfig);
 
+            var connectionString = ConfigurationHelper.BuildConnectionString(config);
+            var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(ConfigurationHelper.BuildConnectionString(config)));
+            services.AddSingleton(connectionString);
+            services.AddSingleton(dataConfig);
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             var serviceProvider = services.BuildServiceProvider();
 
@@ -181,7 +185,7 @@ namespace TradingSimulator
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            _sqlDataService = new SqlDataService(config, _sqlLoggerMock.Object);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
 
             _processedMarkets = new HashSet<string>();
             _cacheDirectory = _simulatorOptions.Value.CacheDirectory;

@@ -69,7 +69,6 @@ namespace BacklashBotData.Data
         private DbSet<BacklashDTOs.Data.OverseerInfo> OverseerInfos { get; set; }
 
         private readonly string _connectionString;
-        private readonly IConfiguration _config;
         private readonly ILogger<BacklashBotContext>? _logger;
 
         // Configuration options
@@ -79,19 +78,16 @@ namespace BacklashBotData.Data
         private readonly Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> _performanceMetrics;
 
         /// <summary>
-        /// Initializes a new instance of the KalshiBotContext with configuration and optional logging.
+        /// Initializes a new instance of the KalshiBotContext with connection string and optional logging.
         /// </summary>
-        /// <param name="config">Application configuration containing database connection strings.</param>
+        /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Optional logger for context operations. If null, logging is disabled.</param>
-        /// <exception cref="InvalidOperationException">Thrown when DefaultConnection is not configured.</exception>
-        public BacklashBotContext(IConfiguration config, ILogger<BacklashBotContext>? logger = null)
+        /// <param name="dataConfig">Configuration options for database operations.</param>
+        /// <exception cref="ArgumentNullException">Thrown when connectionString or dataConfig is null.</exception>
+        public BacklashBotContext(string connectionString, ILogger<BacklashBotContext>? logger, BacklashBotDataConfig dataConfig)
         {
-            _config = config;
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _logger = logger;
-            _connectionString = ConfigurationHelper.BuildConnectionString(_config) ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
-
-            // Initialize configuration options with defaults
-            var dataConfig = _config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
             _maxRetryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
             _batchSize = dataConfig.BatchSize;

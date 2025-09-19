@@ -35,6 +35,7 @@ using KalshiBotLogging;
 using BacklashCommon.Helpers;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Configuration;
+using BacklashBotData.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +97,10 @@ builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection
 builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("Central:ErrorHandler"));
 builder.Services.Configure<OrderBookServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderBookService"));
 builder.Services.Configure<BacklashBot.State.CalculationConfig>(builder.Configuration.GetSection("WatchedMarkets:CalculationConfig"));
+builder.Services.Configure<BacklashBotDataConfig>(builder.Configuration.GetSection("DBConnection:BacklashBotData"));
+
+var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(builder.Configuration);
+builder.Services.AddSingleton(connectionString);
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
@@ -229,7 +234,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
 
 // Database context
 builder.Services.AddDbContext<BacklashBotContext>(options =>
-    options.UseSqlServer(ConfigurationHelper.BuildConnectionString(builder.Configuration),
+    options.UseSqlServer(connectionString,
         sqlOptions =>
         {
             sqlOptions.CommandTimeout(30); // 30 second timeout
@@ -248,7 +253,14 @@ builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
 ));
 
 // Register services as scoped
-builder.Services.AddScoped<ISqlDataService, KalshiBotData.Data.SqlDataService>();
+builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
+{
+    var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
+    var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
+    var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
+    var connectionString = serviceProvider.GetRequiredService<string>();
+    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
+});
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
 builder.Services.AddScoped<ITradingCalculator, TradingCalculator>();
