@@ -17,13 +17,13 @@ public class KalshiConfig
     /// Gets or sets the API key ID.
     /// </summary>
     [JsonRequired]
-    public string KeyId { get; set; }
+    public string BotKeyId { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
     [JsonRequired]
-    public string KeyFile { get; set; }
+    public string BotKeyFile { get; set; }
 }
 
 

@@ -12,6 +12,6 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is true.</value>
         [JsonRequired]
-        public bool KalshiBotScopeManagerService_EnableMetrics { get; set; }
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

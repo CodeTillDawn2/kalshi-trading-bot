@@ -145,17 +145,27 @@ namespace KalshiBotAPI.Websockets
             ILogger<WebSocketConnectionManager> logger,
             ICentralPerformanceMonitor? performanceMonitor = null)
         {
-            _logger.LogInformation("WebSocketConnectionManager: Constructor called");
             _kalshiConfig = kalshiConfig.Value;
             _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
 
+            _logger.LogInformation("WebSocketConnectionManager: Constructor called");
+
             _logger.LogInformation("WebSocketConnectionManager: Creating RSA key");
             _privateKey = RSA.Create();
 
-            _logger.LogInformation("WebSocketConnectionManager: Loading key file: {KeyFile}", _kalshiConfig.KeyFile);
-            _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
+            // Use the resolved key file path from configuration
+            var keyFilePath = _kalshiConfig.BotKeyFile;
+            _logger.LogInformation("WebSocketConnectionManager: Loading key file: {KeyFile}", keyFilePath);
+
+            if (!File.Exists(keyFilePath))
+            {
+                _logger.LogError("WebSocketConnectionManager: Key file not found at {KeyFile}", keyFilePath);
+                throw new FileNotFoundException($"Kalshi private key file not found at {keyFilePath}", keyFilePath);
+            }
+
+            _privateKey.ImportFromPem(File.ReadAllText(keyFilePath));
             _logger.LogInformation("WebSocketConnectionManager: Key file loaded successfully");
 
             // Warn if metrics are enabled but no performance monitor is provided
@@ -251,7 +261,7 @@ namespace KalshiBotAPI.Websockets
                 var newWebSocket = new ClientWebSocket();
                 newWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(10);
                 var (timestamp, signature) = GenerateAuthHeaders("GET", "/trade-api/ws/v2");
-                newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-KEY", _kalshiConfig.KeyId);
+                newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-KEY", _kalshiConfig.BotKeyId);
                 newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-SIGNATURE", signature);
                 newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-TIMESTAMP", timestamp);
 

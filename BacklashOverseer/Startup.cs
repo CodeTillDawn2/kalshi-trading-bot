@@ -169,17 +169,17 @@ namespace BacklashOverseer
             // Resolve KeyFile path - combine secrets path with filename from secrets
             services.PostConfigure<KalshiConfig>(config =>
             {
-                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
+                if (!string.IsNullOrEmpty(config.BotKeyFile) && config.BotKeyFile.Contains("{Kalshi:BotKeyFile}"))
                 {
                     // Get the key file name from secrets
-                    var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
+                    var keyFileName = Configuration.GetValue<string>("Kalshi:BotKeyFile");
                     if (!string.IsNullOrEmpty(keyFileName))
                     {
                         // Get secrets path from configuration
                         var secretsPath = Configuration.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
                         // Combine secrets directory path with filename
                         var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsPath);
-                        config.KeyFile = Path.Combine(secretsDir, keyFileName);
+                        config.BotKeyFile = Path.Combine(secretsDir, keyFileName);
                     }
                 }
             });
@@ -187,7 +187,7 @@ namespace BacklashOverseer
             // Optional: Manual override if configuration binding fails
             services.PostConfigure<KalshiConfig>(config =>
             {
-                if (string.IsNullOrEmpty(config.KeyId) || string.IsNullOrEmpty(config.KeyFile))
+                if (string.IsNullOrEmpty(config.BotKeyId) || string.IsNullOrEmpty(config.BotKeyFile))
                 {
                     Console.WriteLine("Warning: KalshiConfig not properly bound, attempting manual override...");
 
@@ -202,8 +202,8 @@ namespace BacklashOverseer
                             if (localConfig.TryGetProperty("Kalshi", out var kalshiElement))
                             {
                                 if (kalshiElement.TryGetProperty("Environment", out var env)) config.Environment = env.GetString() ?? "prd";
-                                if (kalshiElement.TryGetProperty("KeyId", out var keyId)) config.KeyId = keyId.GetString() ?? "";
-                                if (kalshiElement.TryGetProperty("KeyFile", out var keyFile)) config.KeyFile = keyFile.GetString() ?? "";
+                                if (kalshiElement.TryGetProperty("KeyId", out var botKeyId)) config.BotKeyId = botKeyId.GetString() ?? "";
+                                if (kalshiElement.TryGetProperty("KeyFile", out var botKeyFile)) config.BotKeyFile = botKeyFile.GetString() ?? "";
                             }
                         }
                         catch (Exception ex)

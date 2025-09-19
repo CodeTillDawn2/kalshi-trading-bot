@@ -92,8 +92,8 @@ namespace KalshiBotAPI.KalshiAPI
                 Timeout = TimeSpan.FromSeconds(30)
             };
 
-            string keyFile = _kalshiConfig.KeyFile ?? throw new ArgumentNullException("Kalshi:KeyFile not configured");
-            _keyId = _kalshiConfig.KeyId ?? throw new ArgumentNullException("Kalshi:KeyId not configured");
+            string keyFile = _kalshiConfig.BotKeyFile ?? throw new ArgumentNullException("Kalshi:BotKeyFile not configured");
+            _keyId = _kalshiConfig.BotKeyId ?? throw new ArgumentNullException("Kalshi:BotKeyId not configured");
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(keyFile));
             _scopeFactory = scopeFactory;

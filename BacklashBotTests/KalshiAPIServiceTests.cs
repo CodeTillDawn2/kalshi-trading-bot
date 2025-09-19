@@ -218,9 +218,9 @@ namespace KalshiBotTests
             _configuration.GetSection("Kalshi").Bind(kalshiConfig);
 
             // Validate configuration
-            Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyId is missing in appsettings.json");
-            Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyFile is missing in appsettings.json");
-            Assert.That(File.Exists(kalshiConfig.KeyFile), Is.True, $"KeyFile {kalshiConfig.KeyFile} does not exist");
+            Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
+            Assert.That(kalshiConfig.BotKeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
+            Assert.That(File.Exists(kalshiConfig.BotKeyFile), Is.True, $"KeyFile {kalshiConfig.BotKeyFile} does not exist");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
@@ -1106,8 +1106,8 @@ namespace KalshiBotTests
             var invalidConfig = new KalshiConfig
             {
                 Environment = _kalshiConfigOptions.Value.Environment,
-                KeyId = "invalid_key_id",
-                KeyFile = "nonexistent_key_file"
+                BotKeyId = "invalid_key_id",
+                BotKeyFile = "nonexistent_key_file"
             };
             var invalidOptions = Options.Create(invalidConfig);
 
@@ -1199,40 +1199,40 @@ namespace KalshiBotTests
             Console.WriteLine("   Expected: API service should validate all required configuration settings");
             Console.WriteLine("   Parameters: various invalid configuration scenarios");
 
-            // Test missing KeyId
+            // Test missing BotKeyId
             var config1 = new KalshiConfig
             {
                 Environment = "prod",
-                KeyId = null,
-                KeyFile = _kalshiConfigOptions.Value.KeyFile
+                BotKeyId = null,
+                BotKeyFile = _kalshiConfigOptions.Value.BotKeyFile
             };
             var options1 = Options.Create(config1);
 
             var ex1 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
                     _statusTrackerMock.Object, options1, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex1.Message, Does.Contain("KeyId"), "Expected KeyId validation message");
+            Assert.That(ex1.Message, Does.Contain("BotKeyId"), "Expected BotKeyId validation message");
 
-            // Test missing KeyFile
+            // Test missing BotKeyFile
             var config2 = new KalshiConfig
             {
                 Environment = "prod",
-                KeyId = _kalshiConfigOptions.Value.KeyId,
-                KeyFile = null
+                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
+                BotKeyFile = null
             };
             var options2 = Options.Create(config2);
 
             var ex2 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
                     _statusTrackerMock.Object, options2, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex2.Message, Does.Contain("KeyFile"), "Expected KeyFile validation message");
+            Assert.That(ex2.Message, Does.Contain("BotKeyFile"), "Expected BotKeyFile validation message");
 
             // Test missing Environment
             var config3 = new KalshiConfig
             {
                 Environment = null,
-                KeyId = _kalshiConfigOptions.Value.KeyId,
-                KeyFile = _kalshiConfigOptions.Value.KeyFile
+                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
+                BotKeyFile = _kalshiConfigOptions.Value.BotKeyFile
             };
             var options3 = Options.Create(config3);
 
@@ -1255,14 +1255,18 @@ namespace KalshiBotTests
         {
             Console.WriteLine("🧪 Testing: Key File Validation");
             Console.WriteLine("   Expected: API service should validate key file existence and accessibility");
-            Console.WriteLine("   Parameters: nonexistent key file path");
+            Console.WriteLine("   Parameters: nonexistent key file in secrets directory");
 
-            // Test with nonexistent key file
+            // Get the real key file name from configuration and modify it to make it nonexistent
+            var realKeyFile = _kalshiConfigOptions.Value.BotKeyFile;
+            var nonexistentKeyFile = Path.GetFileNameWithoutExtension(realKeyFile) + "_nonexistent" + Path.GetExtension(realKeyFile);
+
+            // Test with nonexistent key file in the secrets directory
             var config = new KalshiConfig
             {
                 Environment = _kalshiConfigOptions.Value.Environment,
-                KeyId = _kalshiConfigOptions.Value.KeyId,
-                KeyFile = "C:\\NonExistent\\KeyFile.pem"
+                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
+                BotKeyFile = nonexistentKeyFile // This file doesn't exist in secrets directory
             };
             var options = Options.Create(config);
 

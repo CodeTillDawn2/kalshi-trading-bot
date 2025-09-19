@@ -114,25 +114,47 @@ namespace BacklashBot.Services
         /// </remarks>
         public void ConfigureWebSocketEventHandlers()
         {
-            _serviceFactory.GetKalshiWebSocketClient().MessageReceived += (sender, timestamp) => _serviceFactory.GetDataCache().LastWebSocketTimestamp = timestamp;
-            _serviceFactory.GetKalshiWebSocketClient().TickerReceived += (sender, args) => _ = Task.Run(() => ProcessTickerUpdate(
-                args.market_ticker,
-                args.market_id,
-                args.price,
-                args.yes_bid,
-                args.yes_ask,
-                args.volume,
-                args.open_interest,
-                args.dollar_volume,
-                args.dollar_open_interest,
-                args.ts,
-                args.LoggedDate,
-                args.ProcessedDate
-            ));
-            _serviceFactory.GetKalshiWebSocketClient().MarketLifecycleReceived += ProcessMarketLifecycleEventAsync;
-            _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += ProcessEventLifecycleEventAsync;
-            _serviceFactory.GetKalshiWebSocketClient().FillReceived += (sender, args) =>
-                Task.Run(() => ProcessFillEventAsync(args));
+            _logger.LogInformation("MDS: ConfigureWebSocketEventHandlers called");
+            try
+            {
+                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                _logger.LogInformation("MDS: Got WebSocket client: {IsNull}", webSocketClient == null);
+                if (webSocketClient != null)
+                {
+                    _logger.LogInformation("MDS: About to add MessageReceived event handler");
+                    webSocketClient.MessageReceived += (sender, timestamp) => _serviceFactory.GetDataCache().LastWebSocketTimestamp = timestamp;
+                    _logger.LogInformation("MDS: MessageReceived event handler added successfully");
+                }
+                else
+                {
+                    _logger.LogWarning("MDS: WebSocket client is null.");
+                    throw new Exception("WebSocket client is null.");
+                }
+
+                _serviceFactory.GetKalshiWebSocketClient().TickerReceived += (sender, args) => _ = Task.Run(() => ProcessTickerUpdate(
+                    args.market_ticker,
+                    args.market_id,
+                    args.price,
+                    args.yes_bid,
+                    args.yes_ask,
+                    args.volume,
+                    args.open_interest,
+                    args.dollar_volume,
+                    args.dollar_open_interest,
+                    args.ts,
+                    args.LoggedDate,
+                    args.ProcessedDate
+                ));
+                _serviceFactory.GetKalshiWebSocketClient().MarketLifecycleReceived += ProcessMarketLifecycleEventAsync;
+                _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += ProcessEventLifecycleEventAsync;
+                _serviceFactory.GetKalshiWebSocketClient().FillReceived += (sender, args) =>
+                    Task.Run(() => ProcessFillEventAsync(args));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "MDS: Error setting up handlers");
+                throw;
+            }
         }
 
 

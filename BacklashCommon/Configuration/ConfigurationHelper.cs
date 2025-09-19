@@ -11,7 +11,7 @@ namespace BacklashCommon.Configuration
     {
         /// <summary>
         /// Adds secrets configuration to the configuration builder.
-        /// This method loads secrets from a separate JSON file based on the SecretsPath configuration.
+        /// This method loads secrets from all JSON files in the secrets directory.
         /// </summary>
         /// <param name="config">The configuration builder to add secrets to.</param>
         /// <param name="currentDir">The current working directory of the application.</param>
@@ -23,19 +23,27 @@ namespace BacklashCommon.Configuration
             IConfiguration baseConfig)
         {
             var secretsPath = baseConfig.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-            var secretsFilePath = Path.Combine(currentDir, secretsPath, "Database.json");
+            var secretsDir = Path.Combine(currentDir, secretsPath);
 
             Console.WriteLine($"Secrets path: {secretsPath}");
-            Console.WriteLine($"Secrets file exists: {File.Exists(secretsFilePath)}");
+            Console.WriteLine($"Secrets directory: {secretsDir}");
 
-            if (File.Exists(secretsFilePath))
+            if (Directory.Exists(secretsDir))
             {
-                config.AddJsonFile(secretsFilePath, optional: false, reloadOnChange: true);
-                Console.WriteLine("Secrets file loaded successfully");
+                var jsonFiles = Directory.GetFiles(secretsDir, "*.json");
+                Console.WriteLine($"Found {jsonFiles.Length} JSON files in secrets directory");
+
+                foreach (var jsonFile in jsonFiles)
+                {
+                    var fileName = Path.GetFileName(jsonFile);
+                    Console.WriteLine($"Loading secrets file: {fileName}");
+                    config.AddJsonFile(jsonFile, optional: false, reloadOnChange: true);
+                }
+                Console.WriteLine("All secrets files loaded successfully");
             }
             else
             {
-                Console.WriteLine($"Warning: Secrets file not found at {secretsFilePath}");
+                Console.WriteLine($"Warning: Secrets directory not found at {secretsDir}");
             }
 
             return config;

@@ -8,6 +8,7 @@ using BacklashDTOs.Exceptions;
 using BacklashInterfaces.SmokehouseBot.Services;
 using TradingStrategies.Helpers.Interfaces;
 using System.Collections.Concurrent;
+using BacklashCommon.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -23,6 +24,7 @@ namespace BacklashBot.Services
 
         private readonly object _lock = new();
         private readonly ILogger<IServiceFactory> _logger;
+        private readonly IOptions<SecretsConfig> _secretsConfig;
         private IScopeManagerService _scopeManager;
         private Guid _brainLock;
         private readonly ConcurrentDictionary<Type, object> _serviceCache = new();
@@ -32,10 +34,12 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="logger">Logger instance for recording service factory operations and errors.</param>
         /// <param name="scopeManagerService">Service responsible for managing dependency injection scopes.</param>
-        public ServiceFactory(ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService)
+        /// <param name="secretsConfig">Configuration for secrets paths.</param>
+        public ServiceFactory(ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService, IOptions<SecretsConfig> secretsConfig)
         {
             _scopeManager = scopeManagerService;
             _logger = logger;
+            _secretsConfig = secretsConfig;
         }
 
         /// <summary>
@@ -49,7 +53,22 @@ namespace BacklashBot.Services
             if (_scopeManager.Scope?.ServiceProvider == null)
                 return null;
 
-            return (T)_serviceCache.GetOrAdd(typeof(T), _ => _scopeManager.Scope.ServiceProvider.GetRequiredService<T>());
+            try
+            {
+                _logger.LogDebug("SF: Attempting to resolve service: {ServiceType}", typeof(T).Name);
+                var service = (T)_serviceCache.GetOrAdd(typeof(T), _ =>
+                {
+                    _logger.LogDebug("SF: Resolving {ServiceType} from DI container", typeof(T).Name);
+                    return _scopeManager.Scope.ServiceProvider.GetRequiredService<T>();
+                });
+                _logger.LogDebug("SF: Successfully resolved service: {ServiceType}", typeof(T).Name);
+                return service;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SF: Failed to resolve service {ServiceType}: {Message}", typeof(T).Name, ex.Message);
+                throw;
+            }
         }
 
         /// <summary>
@@ -63,8 +82,10 @@ namespace BacklashBot.Services
         {
             lock (_lock)
             {
+                _logger.LogInformation("SF: InitializeServices called with brainLock: {BrainLock}", brainLock);
 
                 _scopeManager.InitializeScope();
+                _logger.LogInformation("SF: Scope initialized");
 
                 var kalshiConfig = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOptions<KalshiConfig>>();
 
@@ -72,18 +93,28 @@ namespace BacklashBot.Services
                 _brainLock = brainLock;
 
 
-                if (kalshiConfig.Value.KeyFile == null || !File.Exists(kalshiConfig.Value.KeyFile))
+                _logger.LogInformation("SF: About to resolve key file path");
+                var resolvedKeyFile = ConfigurationHelper.ResolveSecretsFilePath(kalshiConfig.Value.BotKeyFile, _secretsConfig.Value, AppDomain.CurrentDomain.BaseDirectory);
+                _logger.LogInformation("SF: Key file resolved to: {ResolvedKeyFile}", resolvedKeyFile);
+
+                if (string.IsNullOrEmpty(resolvedKeyFile) || !File.Exists(resolvedKeyFile))
                 {
-                    var errorMessage = $"Kalshi Key file not found at {kalshiConfig.Value.KeyFile}";
+                    var errorMessage = $"Kalshi Key file not found at {resolvedKeyFile}";
                     _logger.LogError(errorMessage);
-                    throw new FileNotFoundException(errorMessage, kalshiConfig.Value.KeyFile);
+                    throw new FileNotFoundException(errorMessage, resolvedKeyFile);
                 }
+                _logger.LogInformation("SF: Key file validation passed");
 
                 var marketDataService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>();
                 var orderBookService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOrderBookService>();
 
+                _logger.LogInformation("SF: About to call ConfigureWebSocketEventHandlers on MarketDataService");
                 marketDataService.ConfigureWebSocketEventHandlers();
+                _logger.LogInformation("SF: ConfigureWebSocketEventHandlers completed on MarketDataService");
+
+                _logger.LogInformation("SF: About to call ConfigureWebSocketEventHandlers on OrderBookService");
                 orderBookService.ConfigureWebSocketEventHandlers();
+                _logger.LogInformation("SF: ConfigureWebSocketEventHandlers completed on OrderBookService");
             }
         }
 

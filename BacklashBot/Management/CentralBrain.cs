@@ -48,7 +48,6 @@ namespace BacklashBot.Management
         private readonly GeneralExecutionConfig _generalConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
-        private readonly IHealthCheckService _healthCheckService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
         private BTimer? _snapshotTimer;
@@ -93,9 +92,9 @@ namespace BacklashBot.Management
             IBotReadyStatus readyStatus,
             IBrainStatusService brainStatusService,
             IOptions<CentralBrainConfig> centralBrainConfig,
-            IHealthCheckService healthCheckService,
             Func<BTimer> timerFactory)
         {
+            Console.WriteLine("CentralBrain constructor started");
             _logger = logger;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
@@ -107,12 +106,12 @@ namespace BacklashBot.Management
             _performanceTracker = backlashPerformanceTracker;
             _generalConfig = generalExecutionConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
-            _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
             _brainInstance = _generalConfig.BrainInstance;
             _decisionInterval = TimeSpan.FromSeconds(_generalConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
+            Console.WriteLine("CentralBrain constructor completed");
 
         }
 
@@ -140,13 +139,21 @@ namespace BacklashBot.Management
         {
             try
             {
+                Console.WriteLine("BRAIN: StartAsync called at {0}", DateTime.UtcNow);
                 _logger.LogInformation("BRAIN: StartAsync called at {Time}", DateTime.UtcNow);
+                Console.WriteLine("BRAIN: StartAsync entered");
+                _logger.LogInformation("BRAIN: StartAsync entered");
 
                 // Perform health checks on dependent services before starting
+                Console.WriteLine("BRAIN: About to perform health check");
+                _logger.LogInformation("BRAIN: About to perform health check");
+                Console.WriteLine("BRAIN: Starting health check");
                 _logger.LogInformation("BRAIN: Starting health check...");
                 try
                 {
-                    if (!await _healthCheckService.CheckHealthAsync())
+                    using var scope = _scopeFactory.CreateScope();
+                    var healthCheckService = scope.ServiceProvider.GetRequiredService<IHealthCheckService>();
+                    if (!await healthCheckService.CheckHealthAsync())
                     {
                         _logger.LogWarning("BRAIN: Health check failed. Continuing startup anyway.");
                     }
@@ -161,19 +168,32 @@ namespace BacklashBot.Management
                 }
 
                 _logger.LogInformation("BRAIN: Ensuring brain status initialized...");
+                _logger.LogInformation("BRAIN: About to ensure brain status initialized");
                 await _brainStatus.EnsureInitializedAsync();
+                Console.WriteLine("BRAIN: Brain status ensured");
+                _logger.LogInformation("BRAIN: Brain status ensured");
                 _logger.LogInformation("BRAIN: Created SmokehouseBrain instance {InstanceName}", _brainInstance);
                 _logger.LogInformation("BRAIN: {InstanceName} Waking up, Session {1}", _brainInstance, _brainStatus.SessionIdentifier);
 
+                Console.WriteLine("BRAIN: Initializing brain");
                 _logger.LogInformation("BRAIN: Initializing brain...");
+                Console.WriteLine("BRAIN: About to initialize brain");
+                _logger.LogInformation("BRAIN: About to initialize brain");
                 InitializeBrain();
+                Console.WriteLine("BRAIN: Brain initialized");
+                _logger.LogInformation("BRAIN: Brain initialized");
 
                 if (!_centralBrainConfig.LaunchDataDashboard)
                 {
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
+                    _logger.LogInformation("BRAIN: Returning early due to LaunchDataDashboard false");
+                    Console.WriteLine("BRAIN: Returning early due to LaunchDataDashboard false");
                     return;
                 }
 
+                Console.WriteLine("BRAIN: About to set up error check timer");
+                _logger.LogInformation("BRAIN: About to set up error check timer");
+                Console.WriteLine("BRAIN: Setting up error check timer");
                 _logger.LogInformation("BRAIN: Setting up error check timer...");
                 _errorCheckTimer = _timerFactory();
                 _errorCheckTimer.Interval = _centralBrainConfig.ErrorCheckInterval.TotalMilliseconds;
@@ -186,9 +206,17 @@ namespace BacklashBot.Management
                 });
 
                 _logger.LogInformation("BRAIN: Starting complete startup sequence...");
+                _logger.LogInformation("BRAIN: About to start complete startup sequence task");
                 _=Task.Run(() => CompleteStartupSequence(), cancellationToken);
+                Console.WriteLine("BRAIN: Complete startup sequence task started");
+                _logger.LogInformation("BRAIN: Complete startup sequence task started");
 
+                Console.WriteLine("BRAIN: About to log running");
+                _logger.LogInformation("BRAIN: About to log running");
+                Console.WriteLine("BRAIN: SmokehouseBrain running");
                 _logger.LogInformation("BRAIN: SmokehouseBrain running...");
+                Console.WriteLine("BRAIN: StartAsync exiting");
+                _logger.LogInformation("BRAIN: StartAsync exiting");
             }
             catch (Exception ex)
             {
@@ -231,7 +259,11 @@ namespace BacklashBot.Management
 
         private async Task CompleteStartupSequence()
         {
+            Console.WriteLine("BRAIN: CompleteStartupSequence started");
+            _logger.LogInformation("BRAIN: CompleteStartupSequence started");
             await StartDashboard();
+            Console.WriteLine("BRAIN: CompleteStartupSequence completed");
+            _logger.LogInformation("BRAIN: CompleteStartupSequence completed");
             ConfigureScheduledTasks();
         }
 
@@ -242,6 +274,8 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: StartDashboard aborted: already starting up.");
                 return;
             }
+            Console.WriteLine("BRAIN: StartDashboard entered");
+            _logger.LogInformation("BRAIN: StartDashboard entered");
             _isStartingUp = true;
             _performanceTracker.IsStartingUp = true;
 
@@ -534,6 +568,7 @@ namespace BacklashBot.Management
             }
             finally
             {
+                _logger.LogInformation("BRAIN: StartDashboard completed");
                 _logger.LogInformation("BRAIN: Dashboard startup sequence completed successfully");
                 _isStartingUp = false;
                 _performanceTracker.IsStartingUp = false;

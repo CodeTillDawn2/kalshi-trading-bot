@@ -135,7 +135,6 @@ namespace BacklashBot.Management
         /// Gets or sets the count of refreshes in the last cycle.
         /// </summary>
         public int LastRefreshCount { get; set; }
-        private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? _databaseMetrics;
 
@@ -205,7 +204,6 @@ namespace BacklashBot.Management
         /// <param name="centralPerformanceMonitorConfig">Configuration settings for CentralPerformanceMonitor parameters.</param>
         /// <param name="tradingConfig">Configuration settings for trading parameters.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
-        /// <param name="scopeManagerService">Service for managing database operation scopes.</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
@@ -214,11 +212,9 @@ namespace BacklashBot.Management
             IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
             IOptions<GeneralExecutionConfig> generalExecutionConfig2,
             IServiceScopeFactory scopeFactory,
-            IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService)
         {
             _logger = logger;
-            _scopeManagerService = scopeManagerService;
             _statusTrackerService = statusTrackerService;
             _scopeFactory = scopeFactory;
             ApiExecutionTimes = new ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>();

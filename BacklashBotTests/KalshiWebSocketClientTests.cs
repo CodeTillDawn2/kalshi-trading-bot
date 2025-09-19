@@ -102,9 +102,9 @@ namespace KalshiBotTests
             _configuration.GetSection("Kalshi").Bind(kalshiConfig);
 
             // Validate configuration
-            Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyId is missing in appsettings.json");
-            Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyFile is missing in appsettings.json");
-            Assert.That(System.IO.File.Exists(kalshiConfig.KeyFile), Is.True, $"KeyFile {kalshiConfig.KeyFile} does not exist");
+            Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
+            Assert.That(kalshiConfig.BotKeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
+            Assert.That(System.IO.File.Exists(kalshiConfig.BotKeyFile), Is.True, $"KeyFile {kalshiConfig.BotKeyFile} does not exist");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
