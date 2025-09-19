@@ -29,6 +29,8 @@ using System.Text;
 using TradingSimulator.ML;
 using TradingStrategies.Configuration;
 using BacklashCommon.Configuration;
+using BacklashBotData.Configuration;
+using BacklashBot.Configuration;
 
 namespace KalshiBotTests
 {
@@ -119,7 +121,7 @@ namespace KalshiBotTests
             var centralPerformanceMonitor = _sp.GetRequiredService<CentralPerformanceMonitor>();
 
             // Options from config
-            var snapshotServiceConfig = Options.Create(new BacklashDTOs.Configuration.TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
+            var snapshotServiceConfig = Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
             _generalExecutionOpts = Options.Create(config.GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>());
 
             // Snapshot loader (same implementation you use elsewhere)

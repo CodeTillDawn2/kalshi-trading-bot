@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BacklashDTOs.Configuration
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for MarketDataInitializer settings.
@@ -12,6 +12,6 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is false.</value>
         [JsonRequired]
-        public bool MarketDataInitializer_EnablePerformanceMetrics { get; set; }
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

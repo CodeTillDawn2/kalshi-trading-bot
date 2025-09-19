@@ -14,6 +14,7 @@ using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
+using BacklashCommon.Configuration;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;

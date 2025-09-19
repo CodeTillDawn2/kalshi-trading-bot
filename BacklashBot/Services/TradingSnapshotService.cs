@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingStrategies.Configuration;
 using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {

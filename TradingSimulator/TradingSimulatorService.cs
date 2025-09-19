@@ -41,6 +41,8 @@ using BacklashCommon.Services;
 using BacklashCommon.Helpers;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Configuration;
+using BacklashBotData.Configuration;
+using BacklashBot.Configuration;
 
 namespace TradingSimulator
 {
@@ -169,6 +171,18 @@ namespace TradingSimulator
             services.AddSingleton(dataConfig);
             services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
+
+            // Add configuration bindings
+            services.Configure<SimulationEngineConfig>(config.GetSection("TradingSimulatorService:SimulationEngine"));
+            services.Configure<EquityCalculatorConfig>(config.GetSection("TradingSimulatorService:EquityCalculator"));
+
+            // Add services required by TradingOverseer
+            services.AddScoped<MarketTypeService>();
+            services.AddScoped<StrategySelectionHelper>();
+            services.AddScoped<PatternDetectionService>();
+            services.AddScoped<SimulationEngine>();
+            services.AddScoped<EquityCalculator>();
+
             var serviceProvider = services.BuildServiceProvider();
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -179,7 +193,9 @@ namespace TradingSimulator
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();
 
-            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object, _performanceMonitor, true);
+            var simulationEngine = serviceProvider.GetRequiredService<SimulationEngine>();
+            var equityCalculator = serviceProvider.GetRequiredService<EquityCalculator>();
+            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, simulationEngine, equityCalculator, config, overseerLoggerMock.Object, _performanceMonitor);
             _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 

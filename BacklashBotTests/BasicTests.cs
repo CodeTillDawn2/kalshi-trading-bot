@@ -12,6 +12,7 @@ using BacklashDTOs.Data;
 using BacklashDTOs.Configuration;
 using TradingStrategies.Configuration;
 using System.Collections.Generic;
+using BacklashBot.Configuration;
 
 namespace KalshiBotTests
 {
@@ -98,7 +99,7 @@ namespace KalshiBotTests
             _marginFactor = 0.001; // 0.1% margin factor
 
             var config = new ConfigurationBuilder().Build();
-            var snapshotServiceConfig = Options.Create(new BacklashDTOs.Configuration.TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
+            var snapshotServiceConfig = Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
             _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, snapshotServiceConfig, _generalExecutionOptions, _scopeFactory, config);
         }
 

@@ -2,7 +2,9 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBot.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Threading;
 
@@ -90,7 +92,7 @@ namespace BacklashBot.Services
         /// <param name="centralPerformanceMonitor">Central performance monitoring service.</param>
         /// <param name="configuration">Configuration for enabling/disabling performance metrics.</param>
         public MarketDataInitializer(ILogger<IMarketDataInitializer> logger, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus,
-            IStatusTrackerService statusTracker, ICentralPerformanceMonitor centralPerformanceMonitor, IConfiguration configuration)
+            IStatusTrackerService statusTracker, ICentralPerformanceMonitor centralPerformanceMonitor, IOptions<MarketDataInitializerConfig> config)
         {
             _logger = logger;
             _statusTracker = statusTracker;
@@ -98,7 +100,7 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _centralPerformanceMonitor = centralPerformanceMonitor;
-            _enablePerformanceMetrics = configuration.GetValue<bool>("MarketDataInitializer:EnablePerformanceMetrics", false);
+            _enablePerformanceMetrics = config.Value.EnablePerformanceMetrics;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using static BacklashInterfaces.Enums.StrategyEnums;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -83,19 +84,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Initializes a new instance of the MarketTypeService class.
         /// </summary>
-        /// <param name="config">The market type service configuration containing settings for cache expiration and performance metrics. If null, defaults are used.</param>
+        /// <param name="config">The market type service configuration containing settings for cache expiration and performance metrics.</param>
         /// <remarks>
         /// Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
         /// The cache expiration can be configured via MarketTypeServiceConfig:CacheExpirationMinutes in appsettings.json.
         /// Performance metrics collection can be enabled/disabled via MarketTypeServiceConfig:EnablePerformanceMetrics.
         /// This constructor sets up the service for immediate use in market type classification.
         /// </remarks>
-        public MarketTypeService(MarketTypeServiceConfig? config = null)
+        public MarketTypeService(IOptions<MarketTypeServiceConfig> config)
         {
             _marketTypeHelper = new MarketTypeHelper();
             _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
-            _cacheExpiration = TimeSpan.FromMinutes(config.CacheExpirationMinutes);
-            _enablePerformanceMetrics = config?.EnablePerformanceMetrics ?? true;
+            _cacheExpiration = TimeSpan.FromMinutes(config.Value.CacheExpirationMinutes);
+            _enablePerformanceMetrics = config.Value.EnablePerformanceMetrics;
         }
 
         /// <summary>

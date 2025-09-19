@@ -26,6 +26,9 @@ using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
 using BacklashCommon.Helpers;
 using BacklashCommon.Configuration;
+using BacklashBot.Configuration;
+using BacklashBotData.Configuration;
+using BacklashInterfaces.PerformanceMetrics;
 
 
 namespace KalshiBotTasks
@@ -180,7 +183,6 @@ namespace KalshiBotTasks
             var statusTrackerMock = new Mock<IStatusTrackerService>();
 
             var services = new ServiceCollection();
-            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(config));
             services.AddScoped<IKalshiAPIService, KalshiAPIService>(); // Register with interface
             services.AddScoped<IServiceFactory, ServiceFactory>();
             services.AddScoped<CentralPerformanceMonitor>();
@@ -204,11 +206,29 @@ namespace KalshiBotTasks
             services.AddScoped(p => _interestScoreService);
             services.AddSingleton<IOptions<KalshiConfig>>(kalshiOptions);
 
-
             var connectionString = ConfigurationHelper.BuildConnectionString(config);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
+
+            // Create BacklashBotDataConfig for database context and data service
+            var dataConfig = new BacklashBotDataConfig
+            {
+                MaxRetryCount = 3,
+                RetryDelaySeconds = 1.0,
+                BatchSize = 100,
+                MaxQueueSize = 10000,
+                WorkersPerQueue = 2,
+                EnablePerformanceMetrics = true
+            };
+            var dataConfigOptions = Options.Create(dataConfig);
+
+            // Create database context with proper parameters
+            var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
+            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig));
+
+            // Create SqlDataService with proper parameters
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            _sqlDataService = new SqlDataService(config, _sqlLoggerMock.Object);
+            var performanceMetricsReceivers = new List<ISqlDataServicePerformanceMetrics>();
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMetricsReceivers);
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -231,7 +251,7 @@ namespace KalshiBotTasks
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 
-            _dbContext = new BacklashBotContext(config);
+            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
             _missingOrderbookCount = 0;
             _overlappingPriceCount = 0;
             _rateDiscrepancyCount = 0; // Initialize new counter
@@ -341,7 +361,10 @@ namespace KalshiBotTasks
 
                     try
                     {
-                        using var dbContext = new BacklashBotContext(config);
+                        var connectionString = ConfigurationHelper.BuildConnectionString(config);
+                        var dataConfig = config.GetSection("BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+                        var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
+                        using var dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
 
                         // Get market info for category
                         string? marketCategory = null;

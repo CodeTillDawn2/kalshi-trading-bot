@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 using TradingStrategies.Trading.Overseer;
+using Microsoft.Extensions.Options;
 
 namespace TradingStrategies.Trading.Helpers
 {
@@ -17,7 +18,7 @@ namespace TradingStrategies.Trading.Helpers
     /// for creating strategy instances with different parameter combinations for backtesting and optimization.
     /// </summary>
     /// <remarks>
-    /// This class maintains static readonly collections of parameter sets that correspond to the ParamKey
+    /// This class maintains readonly collections of parameter sets that correspond to the ParamKey
     /// enums defined in each strategy implementation. The parameter sets are organized by strategy type
     /// and provide variations for different market conditions and risk profiles.
     /// </remarks>
@@ -38,33 +39,28 @@ namespace TradingStrategies.Trading.Helpers
             public long TotalMemoryAllocated { get; set; }
         }
 
-        /// <summary>
-        /// Static configuration instance for StrategySelectionHelper settings.
-        /// This should be set during application startup with the StrategySelectionHelperConfig instance.
-        /// </summary>
-        private static StrategySelectionHelperConfig? _config;
-
-        /// <summary>
-        /// Sets the configuration for StrategySelectionHelper.
-        /// This method should be called during application startup to configure performance metrics.
-        /// </summary>
-        /// <param name="config">The strategy selection helper configuration containing performance metrics settings.</param>
-        public static void SetConfiguration(StrategySelectionHelperConfig config)
-        {
-            _config = config;
-        }
+        private readonly StrategySelectionHelperConfig _config;
 
         /// <summary>
         /// Flag to enable/disable performance metrics collection.
         /// Uses configuration from StrategySelectionHelperConfig:EnablePerformanceMetrics.
         /// Defaults to false for performance reasons (individual instance tracking has overhead).
         /// </summary>
-        public static bool EnablePerformanceMetrics => _config?.EnablePerformanceMetrics ?? false;
+        public bool EnablePerformanceMetrics => _config.EnablePerformanceMetrics;
 
         /// <summary>
         /// Thread-safe collection to store performance metrics.
         /// </summary>
-        private static readonly ConcurrentBag<StrategyInstantiationMetrics> _performanceMetrics = new();
+        private readonly ConcurrentBag<StrategyInstantiationMetrics> _performanceMetrics = new();
+
+        /// <summary>
+        /// Initializes a new instance of the StrategySelectionHelper class.
+        /// </summary>
+        /// <param name="config">The strategy selection helper configuration containing performance metrics settings.</param>
+        public StrategySelectionHelper(IOptions<StrategySelectionHelperConfig> config)
+        {
+            _config = config.Value;
+        }
 
         /// <summary>
         /// Records performance metrics for strategy instantiation.
@@ -74,7 +70,7 @@ namespace TradingStrategies.Trading.Helpers
         /// <param name="totalTime">Total time spent instantiating strategies.</param>
         /// <param name="individualTimes">List of individual instantiation times.</param>
         /// <param name="individualMemoryAllocations">List of individual memory allocations.</param>
-        private static void RecordPerformanceMetrics(string strategyType, int instanceCount, TimeSpan totalTime,
+        private void RecordPerformanceMetrics(string strategyType, int instanceCount, TimeSpan totalTime,
             List<TimeSpan> individualTimes = null, List<long> individualMemoryAllocations = null)
         {
             if (!EnablePerformanceMetrics) return;
@@ -98,7 +94,7 @@ namespace TradingStrategies.Trading.Helpers
         /// Retrieves all collected performance metrics.
         /// </summary>
         /// <returns>An enumerable collection of performance metrics.</returns>
-        public static IEnumerable<StrategyInstantiationMetrics> GetPerformanceMetrics()
+        public IEnumerable<StrategyInstantiationMetrics> GetPerformanceMetrics()
         {
             return _performanceMetrics.ToArray();
         }
@@ -106,7 +102,7 @@ namespace TradingStrategies.Trading.Helpers
         /// <summary>
         /// Clears all collected performance metrics.
         /// </summary>
-        public static void ClearPerformanceMetrics()
+        public void ClearPerformanceMetrics()
         {
             while (_performanceMetrics.TryTake(out _)) { }
         }
@@ -115,7 +111,7 @@ namespace TradingStrategies.Trading.Helpers
         /// Posts the current performance metrics to the specified performance monitor.
         /// </summary>
         /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
-        public static void PostMetrics(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
+        public void PostMetrics(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
         {
             if (performanceMonitor == null || !EnablePerformanceMetrics) return;
 

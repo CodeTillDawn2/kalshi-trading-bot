@@ -18,6 +18,8 @@ using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashBotData.Configuration;
 
 namespace KalshiBotTests
 {
@@ -168,7 +170,10 @@ namespace KalshiBotTests
                 .Build();
 
             // Initialize real context to query for dynamic test data
-            _realContext = new BacklashBotContext(_configuration);
+            var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
+            var logger = new Mock<ILogger<BacklashBotContext>>().Object;
+            var dataConfig = _configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+            _realContext = new BacklashBotContext(connectionString, logger, dataConfig);
 
             // Query for an active market
             var activeMarket = await _realContext.GetMarketsFiltered(

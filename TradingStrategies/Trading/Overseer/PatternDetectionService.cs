@@ -1,9 +1,11 @@
 using BacklashDTOs;
 using BacklashPatterns;
 using TradingStrategies.Extensions;
+using TradingStrategies.Configuration;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents the comprehensive result of pattern detection including patterns and performance metrics.
@@ -18,54 +20,6 @@ public record PatternDetectionResult(
 
 namespace TradingStrategies.Trading.Overseer
 {
-    /// <summary>
-    /// Configuration options for pattern detection parameters.
-    /// </summary>
-    public class PatternDetectionConfig
-    {
-        /// <summary>
-        /// The lookback window in periods for trend context and pattern validation.
-        /// </summary>
-        public int LookbackWindow { get; set; }
-
-        /// <summary>
-        /// The types of patterns to detect. If empty, all patterns are detected.
-        /// </summary>
-        public List<string> PatternTypes { get; set; } = new List<string>();
-
-        /// <summary>
-        /// Minimum price change threshold for significance check.
-        /// </summary>
-        public double SignificancePriceThreshold { get; set; }
-
-        /// <summary>
-        /// Minimum volume increase multiplier for context check.
-        /// </summary>
-        public double VolumeIncreaseMultiplier { get; set; }
-
-        /// <summary>
-        /// Initial capacity for patterns array per candle.
-        /// </summary>
-        public int InitialPatternCapacity { get; set; }
-
-        /// <summary>
-        /// Whether to enable parallel processing for pattern detection.
-        /// </summary>
-        public bool EnableParallelProcessing { get; set; }
-
-        /// <summary>
-        /// Maximum degree of parallelism for pattern checks.
-        /// </summary>
-        public int MaxDegreeOfParallelism { get; set; }
-
-        /// <summary>
-        /// Whether to enable detailed pattern detection performance metrics collection and logging.
-        /// When disabled, no performance metrics or logging occurs. When enabled, comprehensive
-        /// metrics including execution time, candles processed, patterns found, and per-pattern
-        /// timing are collected and logged.
-        /// </summary>
-        public bool EnablePatternDetectionMetrics { get; set; }
-    }
 
     /// <summary>
     /// Service responsible for detecting candlestick patterns from market snapshots in the Kalshi trading bot system.
@@ -102,7 +56,7 @@ namespace TradingStrategies.Trading.Overseer
     /// </remarks>
     public class PatternDetectionService
     {
-        private readonly PatternDetectionConfig _config;
+        private readonly PatternDetectionServiceConfig _config;
         private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? _performanceMonitor;
 
         /// <summary>
@@ -112,16 +66,12 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
         public PatternDetectionService(IConfiguration configuration, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
         {
-            _config = new PatternDetectionConfig();
+            _config = new PatternDetectionServiceConfig();
             _performanceMonitor = performanceMonitor;
 
             // Bind PatternDetectionServiceConfig section (service-specific settings)
             var serviceConfig = configuration.GetSection("PatternDetectionServiceConfig");
             serviceConfig.Bind(_config);
-
-            // Bind PatternDetectionConfig section (PatternSearch-specific settings)
-            var patternConfig = configuration.GetSection("PatternDetectionConfig");
-            patternConfig.Bind(_config);
         }
 
         /// <summary>
@@ -130,9 +80,9 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
-        public PatternDetectionService(PatternDetectionConfig config, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
+        public PatternDetectionService(PatternDetectionServiceConfig config, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
         {
-            _config = config ?? new PatternDetectionConfig();
+            _config = config ?? new PatternDetectionServiceConfig();
             _performanceMonitor = performanceMonitor;
         }
 

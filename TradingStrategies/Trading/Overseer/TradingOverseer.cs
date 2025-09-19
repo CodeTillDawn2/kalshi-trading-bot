@@ -41,22 +41,21 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to resolve dependencies.</param>
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
+        /// <param name="simulationEngine">The simulation engine for running trading scenarios.</param>
+        /// <param name="equityCalculator">The equity calculator for computing portfolio values.</param>
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <param name="logger">Logger for recording warnings and errors.</param>
         /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
-        /// <param name="enablePatternImageGeneration">Whether to enable pattern image generation.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor, bool enablePatternImageGeneration = true)
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, SimulationEngine simulationEngine, EquityCalculator equityCalculator, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
+            _simulationEngine = simulationEngine;
+            _equityCalculator = equityCalculator;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
             _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
-            _simulationEngine = new SimulationEngine(configuration);
-            var equityCalculatorConfig = new EquityCalculatorConfig();
-            configuration.GetSection("EquityCalculator").Bind(equityCalculatorConfig);
-            _equityCalculator = new EquityCalculator(equityCalculatorConfig);
         }
 
         private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);

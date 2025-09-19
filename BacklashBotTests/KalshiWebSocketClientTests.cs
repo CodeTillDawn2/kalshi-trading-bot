@@ -16,6 +16,7 @@ using BacklashCommon.Configuration;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using BacklashBotData.Configuration;
 
 namespace KalshiBotTests
 {
@@ -115,7 +116,8 @@ namespace KalshiBotTests
             // Initialize real SqlDataService
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
-            _sqlService = new SqlDataService(_configuration, _sqlLoggerMock.Object);
+            var dataConfig = _configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+            _sqlService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
 
             // Create mock objects for the new refactored dependencies
             _connectionManagerMock = new Mock<IWebSocketConnectionManager>();

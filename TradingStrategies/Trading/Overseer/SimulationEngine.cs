@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
@@ -33,33 +34,33 @@ namespace TradingStrategies.Trading.Overseer
     {
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
+        private readonly StrategySelectionHelper _strategySelectionHelper;
         private readonly PerformanceMonitor? _performanceMonitor;
         private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
         /// Initializes a new instance of the SimulationEngine with required services.
         /// </summary>
-        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
+        /// <param name="simulatorEngineConfig">The simulation engine configuration options.</param>
+        /// <param name="marketTypeService">The market type service for market classification.</param>
+        /// <param name="strategySelectionHelper">The strategy selection helper for strategy management.</param>
+        /// <param name="patternDetectionService">The pattern detection service for pattern recognition.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording execution times.</param>
-        /// <param name="enablePatternImageGeneration">Whether to enable pattern image generation.</param>
         /// <remarks>
-        /// Creates instances of MarketTypeService and PatternDetectionService for
-        /// market classification and pattern recognition during simulation.
+        /// All services are injected through dependency injection for proper decoupling and testability.
         /// </remarks>
-        public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null, bool enablePatternImageGeneration = true)
+        public SimulationEngine(
+            IOptions<SimulationEngineConfig> simulatorEngineConfig,
+            MarketTypeService marketTypeService,
+            StrategySelectionHelper strategySelectionHelper,
+            PatternDetectionService patternDetectionService,
+            PerformanceMonitor? performanceMonitor = null)
         {
-            var marketTypeServiceConfig = new Configuration.MarketTypeServiceConfig();
-            configuration.GetSection("MarketTypeService").Bind(marketTypeServiceConfig);
-            _marketTypeService = new MarketTypeService(marketTypeServiceConfig);
-
-            var strategySelectionHelperConfig = new Configuration.StrategySelectionHelperConfig();
-            configuration.GetSection("StrategySelectionHelper").Bind(strategySelectionHelperConfig);
-            StrategySelectionHelper.SetConfiguration(strategySelectionHelperConfig);
-
-            _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
-            _patternDetectionService.EnablePatternImageGeneration = enablePatternImageGeneration;
+            _marketTypeService = marketTypeService;
+            _strategySelectionHelper = strategySelectionHelper;
+            _patternDetectionService = patternDetectionService;
             _performanceMonitor = performanceMonitor;
-            _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
+            _enablePerformanceMetrics = simulatorEngineConfig.Value.EnablePerformanceMetrics;
         }
 
        /// <summary>
@@ -210,7 +211,7 @@ namespace TradingStrategies.Trading.Overseer
             _marketTypeService.PostMetrics(_performanceMonitor);
 
             // Post StrategySelectionHelper metrics automatically
-            StrategySelectionHelper.PostMetrics(_performanceMonitor);
+            _strategySelectionHelper.PostMetrics(_performanceMonitor);
 
             return activePaths;
         }

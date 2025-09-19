@@ -1,19 +1,16 @@
-using System.Text.Json.Serialization;
-
-namespace TradingStrategies.Configuration;
-
-/// <summary>
-/// Configuration class for StrategySelectionHelper parameters.
-/// Controls performance metrics collection for strategy instantiation.
-/// </summary>
-public class StrategySelectionHelperConfig
+namespace TradingStrategies.Configuration
 {
     /// <summary>
-    /// Enables or disables performance metrics collection in StrategySelectionHelper.
-    /// When enabled, collects strategy instantiation timing and memory allocation metrics for each strategy instance.
-    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
-    /// Default: false (due to performance impact of individual instance tracking)
+    /// Configuration options for the StrategySelectionHelper.
     /// </summary>
-    [JsonRequired]
-    public bool EnablePerformanceMetrics { get; set; }
+    public class StrategySelectionHelperConfig
+    {
+        /// <summary>
+        /// Whether to enable performance metrics collection for strategy instantiation.
+        /// When disabled, no performance metrics or logging occurs. When enabled, comprehensive
+        /// metrics including instantiation time, memory allocation, and instance counts are collected.
+        /// Defaults to false for performance reasons (individual instance tracking has overhead).
+        /// </summary>
+        public bool EnablePerformanceMetrics { get; set; } = false;
+    }
 }

@@ -11,6 +11,7 @@ using KalshiBotData.Data;
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashCommon.Configuration;
+using BacklashBotData.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Options;
 using BacklashOverseer.Services;
@@ -128,7 +129,13 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
-            services.AddScoped<BacklashBotContext>(provider => new BacklashBotContext(Configuration));
+            services.AddScoped<BacklashBotContext>(provider =>
+            {
+                var connectionString = ConfigurationHelper.BuildConnectionString(Configuration);
+                var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
+                var dataConfig = Configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+                return new BacklashBotContext(connectionString, logger, dataConfig);
+            });
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();

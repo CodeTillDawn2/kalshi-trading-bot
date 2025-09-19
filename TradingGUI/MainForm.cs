@@ -9,6 +9,7 @@ using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 using ScottPlot.Plottable;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TradingGUI
 {
@@ -22,8 +23,9 @@ namespace TradingGUI
     /// </summary>
     public partial class MainForm : Form
     {
-        private readonly TradingSimulatorService _simulator;
-        private readonly BacklashBotContext _context;
+        private TradingSimulatorService _simulator;
+        private BacklashBotContext _context;
+        private IServiceProvider _serviceProvider;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "trading_gui_config.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
@@ -76,20 +78,6 @@ namespace TradingGUI
             InitializeComponent();
 
             toolTip1.ShowAlways = true;
-
-            // Initialize database context with TradingGUI's own configuration
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var config = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .Build();
-            _context = new BacklashBotContext(config);
-
-            _simulator = new TradingSimulatorService();
-            _simulator.EnsureInitialized();
-            _simulator.OnTestProgress += msg => AppendLog(msg);
-            _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
-            _simulator.OnMarketProcessed += m => AppendLog($"Processed market: {m}");
             // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts
             formsPlot1.Configuration.Pan = false;
             formsPlot1.Configuration.Zoom = false;
@@ -149,10 +137,20 @@ namespace TradingGUI
         /// <summary>
         /// Initializes a new instance of the MainForm class with dependency injection support.
         /// </summary>
+        /// <param name="simulator">The trading simulator service.</param>
+        /// <param name="context">The database context.</param>
         /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
-        public MainForm(IServiceProvider serviceProvider) : this()
+        public MainForm(TradingSimulatorService simulator, BacklashBotContext context, IServiceProvider serviceProvider) : this()
         {
-            // DI setup can be added here if needed in the future
+            _simulator = simulator;
+            _context = context;
+            _serviceProvider = serviceProvider;
+            _simulator.EnsureInitialized();
+
+            // Set up event handlers for the simulator
+            _simulator.OnTestProgress += msg => AppendLog(msg);
+            _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
+            _simulator.OnMarketProcessed += m => AppendLog($"Processed market: {m}");
         }
 
         /// <summary>
@@ -738,7 +736,7 @@ namespace TradingGUI
 
             if (_snapshotViewer == null)
             {
-                _snapshotViewer = new SnapshotViewer();
+                _snapshotViewer = _serviceProvider.GetRequiredService<SnapshotViewer>();
             }
 
             _snapshotViewer.CacheDir = _cacheDir;  // Pass the cache directory

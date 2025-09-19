@@ -197,7 +197,7 @@ namespace BacklashBot.Services
                 {
                     orderbook = new List<OrderbookData>();
                 }
-                if (_config.OrderBookService_EnableMetrics)
+                if (_config.EnablePerformanceMetrics)
                 {
                     var waitTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
                     _marketLockWaitDurations.AddOrUpdate(
@@ -448,7 +448,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetEventQueueProcessingMetrics()
         {
-            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
+            if (!_config.EnablePerformanceMetrics) return (0.0, 0);
             var times = _eventQueueProcessingTimes.GetOrAdd("event", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -461,7 +461,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetTickerQueueProcessingMetrics()
         {
-            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
+            if (!_config.EnablePerformanceMetrics) return (0.0, 0);
             var times = _tickerQueueProcessingTimes.GetOrAdd("ticker", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -474,7 +474,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetNotificationQueueProcessingMetrics()
         {
-            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
+            if (!_config.EnablePerformanceMetrics) return (0.0, 0);
             var times = _notificationQueueProcessingTimes.GetOrAdd("notification", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -488,7 +488,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average wait time in milliseconds and total operations count.</returns>
         public (double AverageWaitTimeMs, int TotalOperations) GetMarketLockWaitMetrics(string marketTicker)
         {
-            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
+            if (!_config.EnablePerformanceMetrics) return (0.0, 0);
             if (_marketLockWaitDurations.TryGetValue(marketTicker, out var times))
             {
                 if (times.Count == 0) return (0.0, 0);
@@ -592,7 +592,7 @@ namespace BacklashBot.Services
 
                     _logger.LogDebug("Processing notification for {MarketTicker}", marketTicker);
                     OrderBookUpdated?.Invoke(this, marketTicker);
-                    if (_config.OrderBookService_EnableMetrics)
+                    if (_config.EnablePerformanceMetrics)
                     {
                         var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
                         _notificationQueueProcessingTimes.AddOrUpdate(
@@ -664,7 +664,7 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Releasing semaphore for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                         semaphore.Release();
                     }
-                    if (_config.OrderBookService_EnableMetrics)
+                    if (_config.EnablePerformanceMetrics)
                     {
                         var processingTimeMs = (DateTime.UtcNow - queueStartTime).TotalMilliseconds;
                         _eventQueueProcessingTimes.AddOrUpdate(
@@ -712,7 +712,7 @@ namespace BacklashBot.Services
                         break;
                     }
                     GenerateTickerFromOrderBook(marketTicker);
-                    if (_config.OrderBookService_EnableMetrics)
+                    if (_config.EnablePerformanceMetrics)
                     {
                         var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
                         _tickerQueueProcessingTimes.AddOrUpdate(

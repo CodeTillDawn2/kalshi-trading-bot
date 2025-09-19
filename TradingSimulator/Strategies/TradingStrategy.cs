@@ -8,6 +8,7 @@ using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 
 namespace TradingSimulator.Strategies
 {

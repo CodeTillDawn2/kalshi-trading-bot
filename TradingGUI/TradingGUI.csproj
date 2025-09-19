@@ -26,6 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
     <PackageReference Include="ScottPlot.WinForms" Version="4.1.67" />
     <PackageReference Include="System.Management" Version="9.0.8" />
     <PackageReference Include="System.Text.Json" Version="9.0.8" />
@@ -52,6 +53,7 @@
     <Compile Update="SnapshotViewer.Designer.cs">
       <DependentUpon>SnapshotViewer.cs</DependentUpon>
     </Compile>
+    <Compile Update="Configuration\SnapshotViewerConfig.cs" />
   </ItemGroup>
 
   <ItemGroup>

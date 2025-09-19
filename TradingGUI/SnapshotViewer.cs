@@ -1,11 +1,13 @@
 using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using BacklashDTOs;
 using TradingSimulator;
 using ScottPlot;
 using Image = System.Drawing.Image;
 using Label = System.Windows.Forms.Label;
 using Color = System.Drawing.Color;
+using TradingGUI.Configuration;
 
 namespace TradingGUI
 {
@@ -84,73 +86,30 @@ namespace TradingGUI
         /// </summary>
         private const float MaxScale = 2.0f;
 
-        /// <summary>
-        /// Configuration class for interaction parameters loaded from appsettings.json.
-        /// </summary>
-        private class InteractionConfig
-        {
-            public double ZoomInFactor { get; set; }
-            public double ZoomOutFactor { get; set; }
-            public double PanThreshold { get; set; }
-            public int NavigationTimerInterval { get; set; }
-            public int NavigationResetDelay { get; set; }
-            public int RapidNavigationThreshold { get; set; }
-            public int FastNavigationThreshold { get; set; }
-            public int MediumNavigationThreshold { get; set; }
-            public int RapidStepSize { get; set; }
-            public int FastStepSize { get; set; }
-            public int MediumStepSize { get; set; }
-            public int NormalStepSize { get; set; }
-        }
-
-        private readonly InteractionConfig _interactionConfig;
+        private readonly SnapshotViewerConfig _interactionConfig;
 
         /// <summary>
         /// Initializes a new instance of the SnapshotViewer control.
         /// Sets up the user interface, configures chart controls, initializes navigation systems,
         /// and establishes event handlers for interactive functionality.
         /// </summary>
+        /// <param name="context">The database context for market data access.</param>
+        /// <param name="config">The configuration options for SnapshotViewer interaction parameters.</param>
         /// <remarks>
         /// This constructor performs comprehensive initialization including:
         /// - Component initialization and layout setup
-        /// - Database context configuration for market data access
         /// - Chart configuration (disabling built-in pan/zoom for custom controls)
         /// - Mouse and keyboard event handler registration
         /// - Navigation timer setup for deferred chart updates
         /// - Typography system initialization for responsive scaling
         /// - Tooltip configuration for user guidance
         /// </remarks>
-        public SnapshotViewer()
+        public SnapshotViewer(BacklashBotContext context, IOptions<SnapshotViewerConfig> config)
         {
+            _context = context;
+            _interactionConfig = config.Value;
             InitializeComponent();
             backButton.Click += (s, e) => BackAction?.Invoke();
-
-            // Initialize database context and load configuration
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
-                })
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .Build();
-            _context = new BacklashBotContext(config);
-
-            // Load SnapshotViewer interaction configuration
-            _interactionConfig = config.GetSection("SnapshotViewer:InteractionConfig").Get<InteractionConfig>() ?? new InteractionConfig
-            {
-                ZoomInFactor = 0.9,
-                ZoomOutFactor = 1.1,
-                PanThreshold = 0.001,
-                NavigationTimerInterval = 300,
-                NavigationResetDelay = 500,
-                RapidNavigationThreshold = 60,
-                FastNavigationThreshold = 15,
-                MediumNavigationThreshold = 5,
-                RapidStepSize = 60,
-                FastStepSize = 5,
-                MediumStepSize = 2,
-                NormalStepSize = 1
-            };
 
             // Add AutoScroll to containers to handle overflow
             marketInfoContainer.AutoScroll = true;

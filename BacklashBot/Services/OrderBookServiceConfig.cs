@@ -18,6 +18,6 @@ namespace BacklashBot.Services
         /// Default value is true to maintain existing behavior.
         /// </summary>
         [JsonRequired]
-        public bool OrderBookService_EnableMetrics { get; set; }
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

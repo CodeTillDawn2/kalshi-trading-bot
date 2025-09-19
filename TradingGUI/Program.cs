@@ -8,25 +8,23 @@ using TradingStrategies.Configuration;
 using TradingStrategies.Trading.Helpers;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Configuration;
+using BacklashBotData.Data;
+using TradingSimulator;
+using TradingGUI.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace TradingGUI
 {
     internal static class Program
     {
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             if (IsUnderTestHost()) return;
 
-            // Set up configuration
-            var baseConfig = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            var configuration = new ConfigurationBuilder()
-                .AddConfiguration(baseConfig)
-                .AddSecretsConfiguration(AppDomain.CurrentDomain.BaseDirectory, baseConfig)
-                .Build();
+            // Set up configuration using the standard helper
+            var configuration = ConfigurationHelper.CreateConfigurationBuilder(AppDomain.CurrentDomain.BaseDirectory, args).Build();
 
             // Set up DI container
             var services = new ServiceCollection();
@@ -40,18 +38,40 @@ namespace TradingGUI
                 services.AddSingleton(connectionString);
             }
 
+            // Register database context
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
+
+            // Register TradingSimulatorService
+            services.AddScoped<TradingSimulatorService>();
+
             // Add configuration bindings
             services.Configure<MarketTypeServiceConfig>(configuration.GetSection("Simulator:MarketTypeService"));
             services.Configure<EquityCalculatorConfig>(configuration.GetSection("Simulator:EquityCalculator"));
             services.Configure<StrategySelectionHelperConfig>(configuration.GetSection("Simulator:StrategySelectionHelper"));
+            services.Configure<SimulationEngineConfig>(configuration.GetSection("Simulator:SimulationEngine"));
+            services.Configure<PatternDetectionServiceConfig>(configuration.GetSection("Simulator:PatternDetectionService"));
             services.Configure<DataLoaderConfig>(configuration.GetSection("SnapshotHandling:DataLoader"));
+            services.Configure<SnapshotViewerConfig>(configuration.GetSection("GUI:SnapshotViewer"));
+
+            // Register SnapshotViewer with dependencies
+            services.AddTransient<SnapshotViewer>(sp =>
+                new SnapshotViewer(
+                    sp.GetRequiredService<BacklashBotContext>(),
+                    sp.GetRequiredService<IOptions<SnapshotViewerConfig>>()));
+
+            // Register MainForm with dependencies
+            services.AddTransient<MainForm>(sp =>
+                new MainForm(
+                    sp.GetRequiredService<TradingSimulatorService>(),
+                    sp.GetRequiredService<BacklashBotContext>(),
+                    sp));
 
             var serviceProvider = services.BuildServiceProvider();
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm(serviceProvider));
+            Application.Run(serviceProvider.GetRequiredService<MainForm>());
         }
 
         private static bool IsUnderTestHost()
