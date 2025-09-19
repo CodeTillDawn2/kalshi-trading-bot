@@ -10,6 +10,7 @@ using BacklashBot.Hubs;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashDTOs.Data;
 using BacklashBot.State.Interfaces;
+using OverseerBotShared;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 using Microsoft.AspNetCore.SignalR;

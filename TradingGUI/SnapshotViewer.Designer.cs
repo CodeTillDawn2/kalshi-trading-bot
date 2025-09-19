@@ -1,4 +1,4 @@
-using ScottPlot.WinForms;
+using ScottPlot;
 
 namespace TradingGUI
 {
@@ -6,7 +6,7 @@ namespace TradingGUI
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ToolTip toolTip1;
-        private FormsPlot secondaryChart;
+        private ScottPlot.FormsPlot secondaryChart;
 
 
         private void InitializeComponent()
