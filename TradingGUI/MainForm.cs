@@ -8,8 +8,7 @@ using TradingSimulator;
 using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
-
-
+using ScottPlot.Plottable;
 
 namespace TradingGUI
 {
@@ -32,7 +31,7 @@ namespace TradingGUI
         private HashSet<string> _checkedMarketNames = new();
         private bool _simSetup;
         private Label _tooltipOverlay;
-        private ScottPlot.Plottables.VerticalLine _hoverLine;
+        private VLine _hoverLine;
         private bool _isRightPanning;
         private Point _panStartPx;
         private (double xMin, double xMax, double yMin, double yMax) _panStartLimits;
@@ -131,7 +130,7 @@ namespace TradingGUI
             };
 
             // thin vertical hover indicator (black now)
-            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Black, 1);
+            _hoverLine = formsPlot1.Plot.AddVerticalLine(x: 0, color: Color.Black, width: 1);
             _hoverLine.IsVisible = false;
 
             // wire a MouseDown handler to allow swapping the chart with the dashboard on click

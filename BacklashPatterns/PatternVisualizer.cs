@@ -127,7 +127,7 @@ namespace BacklashPatterns
                                $"Uncertainty: {pattern.Uncertainty:F3}";
 
             // Add the label as text on the plot
-            var text = plt.AddText(labelText, labelX, labelY, fontSize: 10, color: Color.Black);
+            var text = plt.AddText(labelText, labelX, labelY, size: 10, color: Color.Black);
             text.Font.Bold = true;
             text.Font.Name = "Arial";
 

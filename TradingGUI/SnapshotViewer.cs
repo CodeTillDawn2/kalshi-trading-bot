@@ -472,7 +472,7 @@ namespace TradingGUI
         /// Interactive cursor line that follows mouse movement on charts.
         /// Provides visual feedback for precise time position identification.
         /// </summary>
-        private ScottPlot.IPlottable? _mouseCursorLine;
+        private ScottPlot.Plottable.IPlottable? _mouseCursorLine;
 
 
         /// <summary>
