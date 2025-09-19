@@ -628,6 +628,9 @@ namespace BacklashOverseer
             }
         }
 
+
+
+
         /// <summary>
         /// Processes performance metrics from a connected brain instance.
         /// </summary>
@@ -688,7 +691,7 @@ namespace BacklashOverseer
                 {
                     _logger.LogWarning(brainEx, "Failed to update performance metrics for {ClientName}", clientInfo.ClientName);
                 }
-                
+
 
                 // Update client last seen
                 clientInfo.LastSeen = DateTime.UtcNow;
@@ -755,7 +758,6 @@ namespace BacklashOverseer
                 }
             }
         }
-
 
         /// <summary>
         /// Handles incoming performance metrics from brain instances.

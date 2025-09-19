@@ -178,53 +178,7 @@ namespace BacklashBot.Hubs
             }
         }
 
-        /// <summary>
-        /// Sends comprehensive performance metrics from a brain instance to the Overseer for monitoring and display.
-        /// This is separate from the check-in process to allow independent timing and frequency of performance data transmission.
-        /// </summary>
-        /// <param name="brainInstanceName">The name of the brain instance sending the metrics.</param>
-        /// <param name="performanceMetrics">The comprehensive performance metrics data to send.</param>
-        public async Task SendPerformanceMetrics(string brainInstanceName, object performanceMetrics)
-        {
-            _logger.LogInformation("Sending performance metrics for brain {BrainInstanceName}", brainInstanceName);
 
-            try
-            {
-                // Send performance metrics to overseer
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", new
-                {
-                    BrainInstanceName = brainInstanceName,
-                    PerformanceMetrics = performanceMetrics,
-                    Timestamp = DateTime.UtcNow
-                });
-                _logger.LogInformation("Performance metrics sent to Overseer successfully for brain {BrainInstanceName}", brainInstanceName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error sending performance metrics to Overseer for brain {BrainInstanceName}", brainInstanceName);
-            }
-        }
-
-        /// <summary>
-        /// Sends detailed performance metrics from the CentralPerformanceMonitor to all connected clients, typically the Overseer.
-        /// Used for comprehensive performance monitoring and analytics beyond the basic check-in data.
-        /// </summary>
-        /// <param name="performanceMetrics">Detailed performance metrics including database operations, WebSocket metrics, and system performance data</param>
-        public async Task SendPerformanceMetrics(PerformanceMetricsData performanceMetrics)
-        {
-            _logger.LogInformation("Sending PerformanceMetrics to Overseer");
-
-            try
-            {
-                // Send performance metrics data to overseer
-                await Clients.All.SendAsync("PerformanceMetrics", performanceMetrics);
-                _logger.LogInformation("PerformanceMetrics sent to Overseer successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error sending PerformanceMetrics to Overseer");
-            }
-        }
 
         public async Task ConfirmTargetTickersReceived(string brainInstanceName)
         {

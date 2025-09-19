@@ -162,19 +162,16 @@ namespace OverseerBotShared
             return await InvokeAsync<CheckInResponse>("CheckIn", checkInData);
         }
 
-        public async Task SendPerformanceMetrics(string brainInstanceName, object performanceMetrics)
+
+
+        public async Task ConfirmTargetTickersReceived(string brainInstanceName)
         {
-            await InvokeAsync("SendPerformanceMetrics", brainInstanceName, performanceMetrics);
+            await InvokeAsync("ConfirmTargetTickersReceived", brainInstanceName);
         }
 
         public async Task<PerformanceMetricsResponse> SendPerformanceMetrics(PerformanceMetricsData performanceMetrics)
         {
             return await InvokeAsync<PerformanceMetricsResponse>("SendPerformanceMetrics", performanceMetrics);
-        }
-
-        public async Task ConfirmTargetTickersReceived(string brainInstanceName)
-        {
-            await InvokeAsync("ConfirmTargetTickersReceived", brainInstanceName);
         }
 
         public async Task<MessageResponse> SendOverseerMessage(string messageType, string message)

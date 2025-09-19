@@ -461,20 +461,13 @@ app.MapGet("/restart-services", async (ICentralBrain brain) =>
 Console.WriteLine("Starting application at {0}", DateTime.UtcNow);
 using (var scope = app.Services.CreateScope())
 {
-    bool brainInitialized = false;
-
     try
     {
-        if (!brainInitialized)
-        {
-            await app.StartAsync();
-            brainInitialized = true;
-            Console.WriteLine("Application started successfully at {0}", DateTime.UtcNow);
-        }
+        await app.StartAsync();
+        Console.WriteLine("Application started successfully at {0}", DateTime.UtcNow);
     }
     catch (Exception ex)
     {
-        brainInitialized = false;
         Console.WriteLine("Application startup failed: {0}", ex.Message);
         throw;
     }

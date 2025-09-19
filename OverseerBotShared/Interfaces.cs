@@ -11,7 +11,6 @@ namespace OverseerBotShared
         // Client-to-Server methods (called by BacklashBot)
         Task<HandshakeResponse> Handshake(string clientId, string clientName, string clientType, string? authToken = null);
         Task<CheckInResponse> CheckIn(CheckInData checkInData);
-        Task SendPerformanceMetrics(string brainInstanceName, object performanceMetrics);
         Task<PerformanceMetricsResponse> SendPerformanceMetrics(PerformanceMetricsData performanceMetrics);
         Task ConfirmTargetTickersReceived(string brainInstanceName);
         Task<MessageResponse> SendOverseerMessage(string messageType, string message);
