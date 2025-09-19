@@ -14,6 +14,7 @@ using OverseerBotShared;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 using Microsoft.AspNetCore.SignalR;
+using OverseerBotShared;
 
 namespace BacklashBot.Management
 {

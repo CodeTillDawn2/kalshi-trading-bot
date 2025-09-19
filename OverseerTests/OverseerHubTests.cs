@@ -242,7 +242,7 @@ namespace OverseerTests
             clientsMock.Setup(x => x.Caller).Returns(Mock.Of<ISingleClientProxy>());
             hub.SetClients(clientsMock.Object);
 
-            var checkInData = new CheckInData
+            var checkInData = new OverseerBotShared.CheckInData
             {
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "MARKET1", "MARKET2" },
@@ -270,7 +270,7 @@ namespace OverseerTests
                 LastRefreshTimeAcceptable = true,
                 LastPerformanceSampleDate = DateTime.UtcNow,
                 IsWebSocketConnected = true,
-                WatchedMarkets = new List<MarketWatchData>()
+                WatchedMarkets = new List<OverseerBotShared.MarketWatchData>()
             };
 
             // Act
@@ -462,7 +462,7 @@ namespace OverseerTests
             await base.Handshake(clientId, clientName, clientType);
         }
 
-        public async Task TestProcessCheckIn(CheckInData checkInData)
+        public async Task TestProcessCheckIn(OverseerBotShared.CheckInData checkInData)
         {
             await base.ProcessCheckIn(checkInData);
         }
