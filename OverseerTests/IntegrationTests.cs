@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using System;
 using BacklashBotData.Data.Interfaces;
 using BacklashOverseer.Models;
+using OverseerBotShared;
+using BacklashOverseer.Config;
 
 namespace OverseerTests
 {

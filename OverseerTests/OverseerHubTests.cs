@@ -464,7 +464,7 @@ namespace OverseerTests
 
         public async Task TestProcessCheckIn(OverseerBotShared.CheckInData checkInData)
         {
-            await base.ProcessCheckIn(checkInData);
+            await base.CheckIn(checkInData);
         }
     }
 }

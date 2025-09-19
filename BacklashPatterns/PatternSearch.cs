@@ -6,7 +6,6 @@ using static BacklashPatterns.PatternUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using BacklashInterfaces.PerformanceMetrics;
-using ScottPlot;
 
 namespace BacklashPatterns
 {

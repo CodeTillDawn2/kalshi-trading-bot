@@ -1,8 +1,11 @@
 using BacklashDTOs;
 using BacklashPatterns.PatternDefinitions;
 using ScottPlot;
-using ScottPlot.Plottables;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 
 namespace BacklashPatterns
 {
@@ -45,37 +48,46 @@ namespace BacklashPatterns
             }
 
             // Create the plot
-            var plot = new Plot();
+            var plt = new ScottPlot.Plot(800, 600);
 
-            // Convert to OHLC format for ScottPlot
-            var ohlcs = candles.Select((c, idx) => new OHLC(
+            // Convert to OHLC format for ScottPlot v4.1.67 with DateTime
+            var ohlcs = candles.Select(c => new OHLC(
                 open: c.Open,
                 high: c.High,
                 low: c.Low,
-                close: c.Close
+                close: c.Close,
+                timeStart: c.Timestamp,
+                timeSpan: TimeSpan.FromDays(1)  // Assuming daily candles; adjust if needed
             )).ToArray();
 
             // Add candlestick plot
-            var candlePlot = plot.Add.Candlestick(ohlcs.ToList());
-            candlePlot.Sequential = true;
+            var candlePlot = plt.AddCandlesticks(ohlcs);
 
-            // Highlight the pattern candles
+            // Enable DateTime format on X-axis
+            plt.XAxis.DateTimeFormat(true);
+
+            // Highlight the pattern candles using markers
             var patternIndices = pattern.Candles.Select(c => c - startIndex).Where(i => i >= 0 && i < candles.Count).ToArray();
             foreach (int idx in patternIndices)
             {
-                // Add a marker or annotation for pattern candles
-                plot.Add.Marker(candles[idx].Timestamp.ToOADate(), candles[idx].High + (candles[idx].High - candles[idx].Low) * 0.1,
-                    MarkerShape.FilledCircle, 10, Colors.Red);
+                double x = candles[idx].Timestamp.ToOADate();
+                double y = candles[idx].High + (candles[idx].High - candles[idx].Low) * 0.1;
+                plt.AddMarker(
+                    x: x,
+                    y: y,
+                    shape: MarkerShape.filledCircle,
+                    size: 10,
+                    color: Color.Red
+                );
             }
 
             // Add pattern information labels
-            AddPatternLabels(plot, pattern, candles);
+            AddPatternLabels(plt, pattern, candles);
 
             // Customize the plot
-            plot.Title($"{pattern.Name} Pattern");
-            plot.XLabel("Time");
-            plot.YLabel("Price");
-            plot.Axes.DateTimeTicksBottom();
+            plt.Title($"{pattern.Name} Pattern");
+            plt.XLabel("Time");
+            plt.YLabel("Price");
 
             // Generate unique filename
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
@@ -83,7 +95,7 @@ namespace BacklashPatterns
             string filePath = Path.Combine(ImagesFolder, filename);
 
             // Save the plot as image
-            plot.SavePng(filePath, 800, 600);
+            plt.SaveFig(filePath);
 
             return filePath;
         }
@@ -91,10 +103,10 @@ namespace BacklashPatterns
         /// <summary>
         /// Adds pattern information labels to the chart.
         /// </summary>
-        /// <param name="plot">The ScottPlot chart to add labels to.</param>
+        /// <param name="plt">The ScottPlot chart to add labels to.</param>
         /// <param name="pattern">The pattern definition containing the information to display.</param>
         /// <param name="candles">The candle data for positioning the labels.</param>
-        private static void AddPatternLabels(Plot plot, PatternDefinition pattern, List<CandleMids> candles)
+        private static void AddPatternLabels(ScottPlot.Plot plt, PatternDefinition pattern, List<CandleMids> candles)
         {
             if (candles.Count == 0) return;
 
@@ -110,30 +122,29 @@ namespace BacklashPatterns
 
             // Create label text with pattern information
             string labelText = $"Pattern: {pattern.Name}\n" +
-                              $"Strength: {pattern.Strength:F3}\n" +
-                              $"Certainty: {pattern.Certainty:F3}\n" +
-                              $"Uncertainty: {pattern.Uncertainty:F3}";
+                               $"Strength: {pattern.Strength:F3}\n" +
+                               $"Certainty: {pattern.Certainty:F3}\n" +
+                               $"Uncertainty: {pattern.Uncertainty:F3}";
 
             // Add the label as text on the plot
-            var textLabel = plot.Add.Text(labelText, labelX, labelY);
-            textLabel.LabelFontSize = 10;
-            textLabel.LabelFontColor = Colors.Black;
-            textLabel.LabelBold = true;
-            textLabel.LabelFontName = "Arial";
+            var text = plt.AddText(labelText, labelX, labelY, fontSize: 10, color: Color.Black);
+            text.Font.Bold = true;
+            text.Font.Name = "Arial";
 
             // Add a semi-transparent background rectangle for better readability
             double rectWidth = (maxTime - minTime) * 0.25; // 25% of chart width
             double rectHeight = (maxPrice - minPrice) * 0.15; // 15% of chart height
+            double padding = (maxTime - minTime) * 0.01; // slight padding
 
-            var backgroundRect = plot.Add.Rectangle(
-                labelX - (maxTime - minTime) * 0.01, // slight padding
-                labelY + (maxPrice - minPrice) * 0.02,
-                labelX + rectWidth,
-                labelY - rectHeight
+            var backgroundRect = plt.AddRectangle(
+                xMin: labelX - padding,
+                xMax: labelX + rectWidth,
+                yMin: labelY - rectHeight,
+                yMax: labelY + (maxPrice - minPrice) * 0.02
             );
-            backgroundRect.FillColor = Colors.White.WithAlpha(0.8f);
-            backgroundRect.LineColor = Colors.Black.WithAlpha(0.5f);
-            backgroundRect.LineWidth = 1;
+            backgroundRect.Color = Color.FromArgb(204, 255, 255, 255); // White with 80% opacity
+            backgroundRect.BorderColor = Color.Black;
+            backgroundRect.BorderLineWidth = 1;
         }
 
         /// <summary>
