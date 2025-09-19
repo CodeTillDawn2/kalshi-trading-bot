@@ -232,16 +232,13 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
     };
 });
 
-// Database context
-builder.Services.AddDbContext<BacklashBotContext>(options =>
-    options.UseSqlServer(connectionString,
-        sqlOptions =>
-        {
-            sqlOptions.CommandTimeout(30); // 30 second timeout
-            sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null); // Retry failed connections
-        }));
-
-builder.Services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
+// Database context - register manually to provide required constructor parameters
+builder.Services.AddScoped<IBacklashBotContext>(provider =>
+{
+    var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
+    var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
+    return new BacklashBotContext(connectionString, logger, dataConfig);
+});
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
     sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
     sp.GetRequiredService<IConfiguration>(),

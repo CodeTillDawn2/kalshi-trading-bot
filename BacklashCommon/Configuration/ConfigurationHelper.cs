@@ -23,7 +23,7 @@ namespace BacklashCommon.Configuration
             IConfiguration baseConfig)
         {
             var secretsPath = baseConfig.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-            var secretsFilePath = Path.Combine(currentDir, secretsPath, "secrets.json");
+            var secretsFilePath = Path.Combine(currentDir, secretsPath, "Database.json");
 
             Console.WriteLine($"Secrets path: {secretsPath}");
             Console.WriteLine($"Secrets file exists: {File.Exists(secretsFilePath)}");
