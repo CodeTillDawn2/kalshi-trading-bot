@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Configuration;
 
@@ -35,7 +36,7 @@ namespace BacklashBot.Services
         private int _createScopeCallCount = 0;
         private DateTime? _scopeCreationTime;
         private System.Timers.Timer? _metricsTimer;
-        private readonly CentralPerformanceMonitor _monitor;
+        private readonly ICentralPerformanceMonitor _monitor;
         private readonly IConfiguration _config;
         private readonly bool _enableMetrics;
 
@@ -52,7 +53,7 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording service operations.</param>
         /// <param name="monitor">The central performance monitor for posting metrics.</param>
         /// <param name="config">The configuration instance for reading settings.</param>
-        public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, CentralPerformanceMonitor monitor, IConfiguration config)
+        public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, ICentralPerformanceMonitor monitor, IConfiguration config)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

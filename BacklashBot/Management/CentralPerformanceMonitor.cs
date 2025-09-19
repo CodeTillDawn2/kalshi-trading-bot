@@ -49,7 +49,6 @@ namespace BacklashBot.Management
     public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, INightActivitiesPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
-        private readonly IServiceFactory _serviceFactory;
         /// <summary>
         /// Gets the concurrent dictionary storing API execution times for performance monitoring.
         /// Key is the method name, value is a list of timestamp and milliseconds.
@@ -59,7 +58,15 @@ namespace BacklashBot.Management
         private readonly QueueMonitoringConfig _queueMonitoringConfig;
         private readonly CentralPerformanceMonitorConfig _centralPerformanceMonitorConfig;
         private readonly IServiceScopeFactory _scopeFactory;
-        private IOrderBookService _orderbookService => _serviceFactory.GetOrderBookService();
+        private IOrderBookService _orderbookService
+        {
+            get
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var serviceFactory = scope.ServiceProvider.GetRequiredService<IServiceFactory>();
+                return serviceFactory.GetOrderBookService();
+            }
+        }
         /// <summary>
         /// Gets the brain instance identifier used for configuration and logging.
         /// </summary>
@@ -193,7 +200,6 @@ namespace BacklashBot.Management
         /// Initializes a new instance of the CentralPerformanceMonitor class.
         /// </summary>
         /// <param name="logger">Logger instance for recording performance monitoring operations.</param>
-        /// <param name="serviceFactory">Factory for accessing system services and data caches.</param>
         /// <param name="generalExecutionConfig">Configuration settings for general execution parameters.</param>
         /// <param name="queueMonitoringConfig">Configuration settings for queue monitoring parameters.</param>
         /// <param name="centralPerformanceMonitorConfig">Configuration settings for CentralPerformanceMonitor parameters.</param>
@@ -203,7 +209,6 @@ namespace BacklashBot.Management
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
-            IServiceFactory serviceFactory,
             IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<QueueMonitoringConfig> queueMonitoringConfig,
             IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
@@ -214,7 +219,6 @@ namespace BacklashBot.Management
         {
             _logger = logger;
             _scopeManagerService = scopeManagerService;
-            _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
             _scopeFactory = scopeFactory;
             ApiExecutionTimes = new ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>();
@@ -258,14 +262,16 @@ namespace BacklashBot.Management
         /// </remarks>
         public double CalculateAverageWebsocketEventsReceived(string marketTicker)
         {
-            var dataCache = _serviceFactory.GetDataCache();
+            using var scope = _scopeFactory.CreateScope();
+            var serviceFactory = scope.ServiceProvider.GetRequiredService<IServiceFactory>();
+            var dataCache = serviceFactory.GetDataCache();
             if (dataCache == null || !dataCache.Markets.ContainsKey(marketTicker)) return 0.0;
 
             // Retrieve the last market open time from the data cache
             DateTime lastMarketOpenTime = dataCache.Markets[marketTicker].ChangeTracker.LastMarketOpenTime;
 
             // Retrieve the tuple of three integers representing WebSocket event counts
-            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+            var webSocketClient = serviceFactory.GetKalshiWebSocketClient();
             if (webSocketClient == null) return 0.0;
             (int event1, int event2, int event3) events = webSocketClient.GetEventCountsByMarket(marketTicker);
 
@@ -408,9 +414,11 @@ namespace BacklashBot.Management
             var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             BrainInstanceDTO? dto = await context.GetBrainInstanceByName(BrainInstance ?? "");
 
-            var marketRefreshService = _serviceFactory.GetMarketRefreshService();
-            var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
-            var broadcastService = _serviceFactory.GetBroadcastService();
+            using var serviceScope = _scopeFactory.CreateScope();
+            var serviceFactory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
+            var marketRefreshService = serviceFactory.GetMarketRefreshService();
+            var kalshiWebSocketClient = serviceFactory.GetKalshiWebSocketClient();
+            var broadcastService = serviceFactory.GetBroadcastService();
             string marketServiceName = nameof(IMarketRefreshService);
             TimeSpan frontEndRefreshInterval = TimeSpan.FromSeconds(1); // 1 second for queue polling
             TimeSpan marketRefreshInterval = TimeSpan.FromMinutes(1); // 1 minute for market refresh
@@ -571,7 +579,9 @@ namespace BacklashBot.Management
                 return avg;
             }
 
-            var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+            using var serviceScope = _scopeFactory.CreateScope();
+            var serviceFactory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
+            var kalshiWebSocketClient = serviceFactory.GetKalshiWebSocketClient();
             var timestamp = DateTime.UtcNow;
             var orderBookQueueCount = kalshiWebSocketClient?.OrderBookMessageQueueCount ?? 0;
 
@@ -1560,7 +1570,9 @@ namespace BacklashBot.Management
                 };
 
                 // Get the broadcast service and send the metrics
-                var broadcastService = _serviceFactory.GetBroadcastService() as BroadcastService;
+                using var serviceScope = _scopeFactory.CreateScope();
+                var serviceFactory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
+                var broadcastService = serviceFactory.GetBroadcastService() as BroadcastService;
                 if (broadcastService != null)
                 {
                     await broadcastService.BroadcastPerformanceMetricsAsync(performanceMetrics);

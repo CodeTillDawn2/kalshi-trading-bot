@@ -96,6 +96,17 @@ builder.Services.Configure<HostOptions>(options =>
 });
 
 // ## Service Registrations
+builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
+builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
+    sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
+    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
+    sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
+    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IServiceScopeFactory>(),
+    sp.GetRequiredService<IScopeManagerService>(),
+    sp.GetRequiredService<IStatusTrackerService>()));
+builder.Services.AddSingleton<IScopeManagerService, KalshiBotScopeManagerService>();
 builder.Services.AddSingleton<IServiceFactory, ServiceFactory>();
 builder.Services.AddSingleton<ICentralBrain>(sp => new CentralBrain(
     sp.GetRequiredService<ILogger<ICentralBrain>>(),
@@ -115,18 +126,6 @@ builder.Services.AddSingleton<ICentralBrain>(sp => new CentralBrain(
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IHealthCheckService>(),
     sp.GetRequiredService<Func<BacklashInterfaces.SmokehouseBot.Timers.ITimer>>()));
-builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
-builder.Services.AddSingleton<IScopeManagerService, KalshiBotScopeManagerService>();
-builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
-    sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
-    sp.GetRequiredService<IServiceFactory>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
-    sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
-    sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
-    sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<IScopeManagerService>(),
-    sp.GetRequiredService<IStatusTrackerService>()));
 builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
     (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
