@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -13,20 +15,23 @@ namespace BacklashDTOs.Configuration
         /// Default is 6 hours. Increasing this reduces database queries but may use stale data.
         /// Lower values provide more current data but increase computational overhead.
         /// </summary>
-        public int CacheDurationHours { get; set; } = 6;
+        [JsonRequired]
+        public int CacheDurationHours { get; set; }
 
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection.
         /// When enabled, tracks scoring operation times, cache hit rates, and other performance indicators.
         /// Disabling this improves performance but removes monitoring capabilities.
         /// </summary>
-        public bool EnablePerformanceMetrics { get; set; } = true;
+        [JsonRequired]
+        public bool EnablePerformanceMetrics { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of performance metrics to retain in memory.
         /// Older metrics are discarded when this limit is reached to prevent memory leaks.
         /// Higher values provide better historical analysis but consume more memory.
         /// </summary>
-        public int MaxPerformanceMetricsHistory { get; set; } = 1000;
+        [JsonRequired]
+        public int MaxPerformanceMetricsHistory { get; set; }
     }
 }

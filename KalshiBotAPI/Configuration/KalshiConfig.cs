@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KalshiBotAPI.Configuration;
 
 /// <summary>
@@ -8,17 +10,20 @@ public class KalshiConfig
     /// <summary>
     /// Gets or sets the environment (e.g., "prod" or "dev"). Defaults to "prod".
     /// </summary>
-    public string Environment { get; set; } = "QA";
+    [JsonRequired]
+    public string Environment { get; set; }
 
     /// <summary>
     /// Gets or sets the API key ID.
     /// </summary>
-    public string KeyId { get; set; } = string.Empty;
+    [JsonRequired]
+    public string KeyId { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
-    public string KeyFile { get; set; } = string.Empty;
+    [JsonRequired]
+    public string KeyFile { get; set; }
 }
 
 

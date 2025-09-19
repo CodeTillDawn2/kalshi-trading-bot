@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -8,17 +10,20 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the log level settings.
         /// </summary>
-        public LogLevelSettings LogLevel { get; set; } = new();
+        [JsonRequired]
+        public LogLevelSettings LogLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the environment name.
         /// </summary>
-        public string Environment { get; set; } = "dev";
+        [JsonRequired]
+        public string Environment { get; set; }
 
         /// <summary>
         /// Gets or sets whether to store WebSocket events.
         /// </summary>
-        public bool StoreWebSocketEvents { get; set; } = true;
+        [JsonRequired]
+        public bool StoreWebSocketEvents { get; set; }
     }
 
     /// <summary>
@@ -29,21 +34,25 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the default log level.
         /// </summary>
-        public string Default { get; set; } = "Debug";
+        [JsonRequired]
+        public string Default { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for Microsoft components.
         /// </summary>
-        public string Microsoft { get; set; } = "Warning";
+        [JsonRequired]
+        public string Microsoft { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for SQL database logging.
         /// </summary>
-        public string SqlDatabaseLogLevel { get; set; } = "Information";
+        [JsonRequired]
+        public string SqlDatabaseLogLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for console logging.
         /// </summary>
-        public string ConsoleLogLevel { get; set; } = "Warning";
+        [JsonRequired]
+        public string ConsoleLogLevel { get; set; }
     }
 }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashCommon.Configuration
 {
     /// <summary>
@@ -9,6 +11,7 @@ namespace BacklashCommon.Configuration
         /// Gets or sets the path to the secrets folder relative to the application directory.
         /// Default is "Secrets".
         /// </summary>
-        public string SecretsPath { get; set; } = "Secrets";
+        [JsonRequired]
+        public string SecretsPath { get; set; }
     }
 }

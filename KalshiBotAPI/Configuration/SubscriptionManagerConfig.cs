@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KalshiBotAPI.Configuration;
 
 /// <summary>
@@ -8,35 +10,42 @@ public class SubscriptionManagerConfig
     /// <summary>
     /// Gets or sets whether SubscriptionManager performance metrics collection is enabled.
     /// </summary>
-    public bool EnableSubscriptionManagerMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnableSubscriptionManagerMetrics { get; set; }
 
     /// <summary>
     /// Gets or sets the subscription timeout in milliseconds.
     /// </summary>
-    public int SubscriptionTimeoutMs { get; set; } = 60000;
+    [JsonRequired]
+    public int SubscriptionTimeoutMs { get; set; }
 
     /// <summary>
     /// Gets or sets the confirmation timeout in seconds.
     /// </summary>
-    public int ConfirmationTimeoutSeconds { get; set; } = 60;
+    [JsonRequired]
+    public int ConfirmationTimeoutSeconds { get; set; }
 
     /// <summary>
     /// Gets or sets the retry delay in milliseconds.
     /// </summary>
-    public int RetryDelayMs { get; set; } = 1000;
+    [JsonRequired]
+    public int RetryDelayMs { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum queue size.
     /// </summary>
-    public int MaxQueueSize { get; set; } = 1000;
+    [JsonRequired]
+    public int MaxQueueSize { get; set; }
 
     /// <summary>
     /// Gets or sets the batch size.
     /// </summary>
-    public int BatchSize { get; set; } = 10;
+    [JsonRequired]
+    public int BatchSize { get; set; }
 
     /// <summary>
     /// Gets or sets the health check interval in milliseconds.
     /// </summary>
-    public int HealthCheckIntervalMs { get; set; } = 30000;
+    [JsonRequired]
+    public int HealthCheckIntervalMs { get; set; }
 }

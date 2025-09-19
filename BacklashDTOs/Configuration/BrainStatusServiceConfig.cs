@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the length of the session identifier string.
         /// </summary>
-        public int SessionIdLength { get; set; } = 5;
+        [JsonRequired]
+        public int SessionIdLength { get; set; }
     }
 }

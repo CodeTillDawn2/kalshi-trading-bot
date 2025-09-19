@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -9,6 +11,7 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable performance metrics collection for KalshiBotScopeManagerService operations.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool KalshiBotScopeManagerService_EnableMetrics { get; set; } = true;
+        [JsonRequired]
+        public bool KalshiBotScopeManagerService_EnableMetrics { get; set; }
     }
 }

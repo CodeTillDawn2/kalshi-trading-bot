@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
 
@@ -14,6 +14,6 @@ public class StrategySelectionHelperConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: false (due to performance impact of individual instance tracking)
     /// </summary>
-    [Required]
-    public bool EnablePerformanceMetrics { get; set; } = false;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

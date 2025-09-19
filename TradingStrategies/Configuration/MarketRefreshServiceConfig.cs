@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
 
@@ -15,6 +15,7 @@ public class MarketRefreshServiceConfig
     /// Typical values: 1-15 minutes depending on data freshness requirements and API rate limits.
     /// Used by MarketRefreshService and MarketData for periodic data synchronization.
     /// </summary>
+    [JsonRequired]
     public int RefreshIntervalMinutes { get; set; }
 
     /// <summary>
@@ -23,7 +24,8 @@ public class MarketRefreshServiceConfig
     /// Typical values: 0.1-0.5 (10%-50%) depending on desired refresh coverage.
     /// Used by MarketRefreshService for determining when to initiate additional refresh cycles.
     /// </summary>
-    public double RefreshThresholdRatio { get; set; } = 0.25;
+    [JsonRequired]
+    public double RefreshThresholdRatio { get; set; }
 
     /// <summary>
     /// Time budget ratio for the forced refresh pass relative to the total refresh interval.
@@ -31,7 +33,8 @@ public class MarketRefreshServiceConfig
     /// Typical values: 0.4-0.8 (40%-80%) depending on refresh interval and processing requirements.
     /// Used by MarketRefreshService to prevent forced refresh from delaying the next regular cycle.
     /// </summary>
-    public double TimeBudgetRatio { get; set; } = 0.60;
+    [JsonRequired]
+    public double TimeBudgetRatio { get; set; }
 
     /// <summary>
     /// Enables or disables performance metrics collection in MarketRefreshService.
@@ -39,6 +42,6 @@ public class MarketRefreshServiceConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    [Required]
-    public bool EnablePerformanceMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

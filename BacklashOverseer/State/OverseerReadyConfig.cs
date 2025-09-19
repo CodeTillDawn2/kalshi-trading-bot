@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashOverseer.State
 {
     /// <summary>
@@ -8,11 +10,13 @@ namespace BacklashOverseer.State
         /// <summary>
         /// Gets or sets the default state for initialization completion.
         /// </summary>
-        public bool DefaultInitializationState { get; set; } = false;
+        [JsonRequired]
+        public bool DefaultInitializationState { get; set; }
 
         /// <summary>
         /// Gets or sets the default state for browser readiness.
         /// </summary>
-        public bool DefaultBrowserReadyState { get; set; } = false;
+        [JsonRequired]
+        public bool DefaultBrowserReadyState { get; set; }
     }
 }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KalshiBotAPI.Configuration;
 
 /// <summary>
@@ -8,5 +10,6 @@ public class KalshiWebSocketClientConfig
     /// <summary>
     /// Gets or sets whether KalshiWebSocketClient performance metrics are enabled.
     /// </summary>
-    public bool EnablePerformanceMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

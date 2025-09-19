@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -9,23 +11,27 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets the percentage threshold for queue high count alerts.
         /// When the EventQueue utilization exceeds this percentage, a performance alert is logged.
         /// </summary>
-        public double QueueHighCountAlertThreshold { get; set; } = 80.0;
+        [JsonRequired]
+        public double QueueHighCountAlertThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the percentage threshold for refresh usage alerts.
         /// When the market refresh cycle usage exceeds this percentage, a performance alert is logged.
         /// </summary>
-        public double RefreshUsageAlertThreshold { get; set; } = 90.0;
+        [JsonRequired]
+        public double RefreshUsageAlertThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the absolute count threshold for queue alerts.
         /// When any queue's average count exceeds this value, a performance alert is logged.
         /// </summary>
-        public int QueueCountAlertThreshold { get; set; } = 100;
+        [JsonRequired]
+        public int QueueCountAlertThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets whether to enable database metrics collection in CentralPerformanceMonitor.
         /// </summary>
-        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; } = true;
+        [JsonRequired]
+        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; }
     }
 }

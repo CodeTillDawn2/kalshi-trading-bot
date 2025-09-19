@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashBotData.Configuration;
 
 /// <summary>
@@ -10,35 +12,41 @@ public class BacklashBotDataConfig
     /// Gets or sets the maximum number of retry attempts for database operations.
     /// Used by both SqlDataService and BacklashBotContext for transient error handling.
     /// </summary>
-    public int MaxRetryCount { get; set; } = 3;
+    [JsonRequired]
+    public int MaxRetryCount { get; set; }
 
     /// <summary>
     /// Gets or sets the delay in seconds between retry attempts for database operations.
     /// Used by both SqlDataService and BacklashBotContext for transient error handling.
     /// </summary>
-    public double RetryDelaySeconds { get; set; } = 1.0;
+    [JsonRequired]
+    public double RetryDelaySeconds { get; set; }
 
     /// <summary>
     /// Gets or sets the batch size for database operations.
     /// Used by both SqlDataService and BacklashBotContext for processing multiple operations.
     /// </summary>
-    public int BatchSize { get; set; } = 100;
+    [JsonRequired]
+    public int BatchSize { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum size of the database operation queues.
     /// Specific to SqlDataService for preventing resource exhaustion.
     /// </summary>
-    public int MaxQueueSize { get; set; } = 10000;
+    [JsonRequired]
+    public int MaxQueueSize { get; set; }
 
     /// <summary>
     /// Gets or sets the number of worker tasks per queue type.
     /// Specific to SqlDataService for concurrent processing.
     /// </summary>
-    public int WorkersPerQueue { get; set; } = 1;
+    [JsonRequired]
+    public int WorkersPerQueue { get; set; }
 
     /// <summary>
     /// Gets or sets whether performance metrics collection is enabled.
     /// Specific to SqlDataService for monitoring and optimization.
     /// </summary>
-    public bool EnablePerformanceMetrics { get; set; } = false;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

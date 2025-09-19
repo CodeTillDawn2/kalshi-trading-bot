@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -8,21 +10,25 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the limit for the notification queue.
         /// </summary>
-        public int NotificationQueueLimit { get; set; } = 50;
+        [JsonRequired]
+        public int NotificationQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the orderbook queue.
         /// </summary>
-        public int OrderbookQueueLimit { get; set; } = 50;
+        [JsonRequired]
+        public int OrderbookQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the event queue.
         /// </summary>
-        public int EventQueueLimit { get; set; } = 50;
+        [JsonRequired]
+        public int EventQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the ticker queue.
         /// </summary>
-        public int TickerQueueLimit { get; set; } = 50;
+        [JsonRequired]
+        public int TickerQueueLimit { get; set; }
     }
 }

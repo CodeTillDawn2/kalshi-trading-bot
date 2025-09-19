@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -9,43 +11,50 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets the timeout in seconds for connection attempts to the overseer.
         /// </summary>
         /// <value>Default is 30 seconds.</value>
-        public int OverseerConnectionTimeoutSeconds { get; set; } = 30;
+        [JsonRequired]
+        public int OverseerConnectionTimeoutSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the timeout in seconds for semaphore operations.
         /// </summary>
         /// <value>Default is 10 seconds.</value>
-        public int OverseerSemaphoreTimeoutSeconds { get; set; } = 10;
+        [JsonRequired]
+        public int OverseerSemaphoreTimeoutSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in minutes for overseer discovery operations.
         /// </summary>
         /// <value>Default is 3 minutes.</value>
-        public int OverseerDiscoveryIntervalMinutes { get; set; } = 3;
+        [JsonRequired]
+        public int OverseerDiscoveryIntervalMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in seconds for check-in operations.
         /// </summary>
         /// <value>Default is 30 seconds.</value>
-        public int OverseerCheckInIntervalSeconds { get; set; } = 30;
+        [JsonRequired]
+        public int OverseerCheckInIntervalSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the failure threshold for the circuit breaker pattern.
         /// </summary>
         /// <value>Default is 5 failures.</value>
-        public int OverseerCircuitBreakerFailureThreshold { get; set; } = 5;
+        [JsonRequired]
+        public int OverseerCircuitBreakerFailureThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the timeout in minutes for the circuit breaker to reset.
         /// </summary>
         /// <value>Default is 5 minutes.</value>
-        public int OverseerCircuitBreakerTimeoutMinutes { get; set; } = 5;
+        [JsonRequired]
+        public int OverseerCircuitBreakerTimeoutMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection for OverseerClientService operations.
         /// When disabled, metrics collection is skipped to improve performance.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool EnablePerformanceMetrics { get; set; } = true;
+        [JsonRequired]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

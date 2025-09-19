@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
 
@@ -15,7 +15,8 @@ public class OrderbookChangeTrackerConfig
     /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
     /// Used by OrderbookChangeTracker for periodic cleanup of old events.
     /// </summary>
-    public int CleanupThresholdMinutes { get; set; } = 60;
+    [JsonRequired]
+    public int CleanupThresholdMinutes { get; set; }
 
     /// <summary>
     /// Enables or disables performance metrics collection in OrderbookChangeTracker.
@@ -24,5 +25,6 @@ public class OrderbookChangeTrackerConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    public bool EnablePerformanceMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

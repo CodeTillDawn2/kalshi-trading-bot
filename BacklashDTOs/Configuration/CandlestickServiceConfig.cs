@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -9,12 +11,14 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets the maximum number of parallel tasks for candlestick processing.
         /// </summary>
         /// <value>Default is 4 parallel tasks.</value>
-        public int MaxParallelCandlestickTasks { get; set; } = 4;
+        [JsonRequired]
+        public int MaxParallelCandlestickTasks { get; set; }
 
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection for CandlestickService operations.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool EnablePerformanceMetrics { get; set; } = true;
+        [JsonRequired]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

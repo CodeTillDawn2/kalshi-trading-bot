@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -17,34 +19,39 @@ namespace BacklashDTOs.Configuration
         /// Errors occurring within this window are counted toward the catastrophic threshold.
         /// </summary>
         /// <value>Default is 5 minutes.</value>
-        public int ErrorWindowMinutes { get; set; } = 5;
+        [JsonRequired]
+        public int ErrorWindowMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the threshold number of non-catastrophic errors within the monitoring window
         /// that triggers catastrophic failure detection and system restart.
         /// </summary>
         /// <value>Default is 10 errors.</value>
-        public int ErrorThreshold { get; set; } = 10;
+        [JsonRequired]
+        public int ErrorThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of attempts for internet connectivity checks
         /// before declaring the connection as failed.
         /// </summary>
         /// <value>Default is 100 attempts.</value>
-        public int InternetCheckMaxAttempts { get; set; } = 100;
+        [JsonRequired]
+        public int InternetCheckMaxAttempts { get; set; }
 
         /// <summary>
         /// Gets or sets the initial delay in milliseconds between internet connectivity check attempts.
         /// This delay doubles with each retry attempt until reaching the maximum delay.
         /// </summary>
         /// <value>Default is 1000 milliseconds (1 second).</value>
-        public int InternetCheckInitialDelayMs { get; set; } = 1000;
+        [JsonRequired]
+        public int InternetCheckInitialDelayMs { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum delay in milliseconds between internet connectivity check attempts.
         /// The delay will not exceed this value even after exponential backoff.
         /// </summary>
         /// <value>Default is 60000 milliseconds (60 seconds).</value>
-        public int InternetCheckMaxDelayMs { get; set; } = 60000;
+        [JsonRequired]
+        public int InternetCheckMaxDelayMs { get; set; }
     }
 }

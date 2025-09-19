@@ -1,9 +1,14 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashOverseer.Config
 {
     public class MarketWatchControllerConfig
     {
-        public bool EnableMarketWatchControllerPerformanceMetrics { get; set; } = true;
-        public int MarketsCacheDurationMinutes { get; set; } = 15;
-        public int LogDataCacheDurationMinutes { get; set; } = 5;
+        [JsonRequired]
+        public bool EnableMarketWatchControllerPerformanceMetrics { get; set; }
+        [JsonRequired]
+        public int MarketsCacheDurationMinutes { get; set; }
+        [JsonRequired]
+        public int LogDataCacheDurationMinutes { get; set; }
     }
 }

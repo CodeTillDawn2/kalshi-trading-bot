@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KalshiBotAPI.Configuration;
 
 /// <summary>
@@ -8,15 +10,18 @@ public class WebSocketMonitorConfig
     /// <summary>
     /// Gets or sets the monitoring interval in minutes.
     /// </summary>
-    public int MonitoringIntervalMinutes { get; set; } = 1;
+    [JsonRequired]
+    public int MonitoringIntervalMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the retry delay in minutes.
     /// </summary>
-    public int RetryDelayMinutes { get; set; } = 5;
+    [JsonRequired]
+    public int RetryDelayMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets whether WebSocket monitor metrics are enabled.
     /// </summary>
-    public bool EnableWebSocketMonitorMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnableWebSocketMonitorMetrics { get; set; }
 }

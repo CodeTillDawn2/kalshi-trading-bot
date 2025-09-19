@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BacklashDTOs.Configuration
 {
     /// <summary>
@@ -9,6 +11,7 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable performance metrics collection for MarketDataInitializer operations.
         /// </summary>
         /// <value>Default is false.</value>
-        public bool MarketDataInitializer_EnablePerformanceMetrics { get; set; } = false;
+        [JsonRequired]
+        public bool MarketDataInitializer_EnablePerformanceMetrics { get; set; }
     }
 }

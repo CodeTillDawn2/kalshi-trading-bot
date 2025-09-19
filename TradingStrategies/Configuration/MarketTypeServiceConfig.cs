@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
 
@@ -15,8 +15,8 @@ public class MarketTypeServiceConfig
     /// Typical values: 15-60 minutes depending on market volatility and freshness requirements.
     /// Default: 30 minutes
     /// </summary>
-    [Required]
-    public int? CacheExpirationMinutes { get; set; } = 30;
+    [JsonRequired]
+    public int CacheExpirationMinutes { get; set; }
 
     /// <summary>
     /// Enables or disables performance metrics collection in MarketTypeService.
@@ -24,6 +24,6 @@ public class MarketTypeServiceConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: true
     /// </summary>
-    [Required]
-    public bool EnablePerformanceMetrics { get; set; } = true;
+    [JsonRequired]
+    public bool EnablePerformanceMetrics { get; set; }
 }

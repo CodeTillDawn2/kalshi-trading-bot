@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace BacklashPatterns
 {
@@ -15,49 +16,56 @@ namespace BacklashPatterns
         /// This value is divided by 2.0 and added to the unweighted ratio for smoothing.
         /// Default value: 1.0
         /// </summary>
-        public double SmoothingOffset { get; set; } = 1.0;
+        [JsonRequired]
+        public double SmoothingOffset { get; set; }
 
         /// <summary>
         /// Minimum allowed lookback period for trend calculations.
         /// Prevents calculations with insufficient historical data.
         /// Default value: 1
         /// </summary>
-        public int MinLookback { get; set; } = 1;
+        [JsonRequired]
+        public int MinLookback { get; set; }
 
         /// <summary>
         /// Maximum allowed lookback period for trend calculations.
         /// Limits computational complexity for very long lookbacks.
         /// Default value: 1000
         /// </summary>
-        public int MaxLookback { get; set; } = 1000;
+        [JsonRequired]
+        public int MaxLookback { get; set; }
 
         /// <summary>
         /// Default lookback period when not specified.
         /// Used as fallback for methods that don't require explicit lookback.
         /// Default value: 14
         /// </summary>
-        public int DefaultLookback { get; set; } = 14;
+        [JsonRequired]
+        public int DefaultLookback { get; set; }
 
         /// <summary>
         /// Minimum allowed pattern size.
         /// Ensures pattern size is at least 1 to prevent division by zero.
         /// Default value: 1
         /// </summary>
-        public int MinPatternSize { get; set; } = 1;
+        [JsonRequired]
+        public int MinPatternSize { get; set; }
 
         /// <summary>
         /// Maximum allowed pattern size.
         /// Limits pattern size to reasonable values.
         /// Default value: 10
         /// </summary>
-        public int MaxPatternSize { get; set; } = 10;
+        [JsonRequired]
+        public int MaxPatternSize { get; set; }
 
         /// <summary>
         /// Array of lookback periods used in PatternUtils for multi-period calculations.
         /// These periods are used to compute metrics at different timeframes.
         /// Default values: [1, 2, 3, 4, 5]
         /// </summary>
-        public int[] LookbackPeriods { get; set; } = new int[] { 1, 2, 3, 4, 5 };
+        [JsonRequired]
+        public int[] LookbackPeriods { get; set; }
 
         /// <summary>
         /// Number of lookback periods to use in calculations.
