@@ -167,7 +167,7 @@ namespace KalshiBotAPI.Websockets
             _signatureCacheDuration = TimeSpan.FromMinutes(_websocketConfig.SignatureCacheDurationMinutes);
 
             // Initialize metrics configuration (defaults to true if not specified)
-            EnableMetrics = _websocketConfig.EnablePerformanceMetrics ?? true;
+            EnableMetrics = _websocketConfig.EnablePerformanceMetrics;
 
             // Notify performance monitor of initial metrics status
             _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(EnableMetrics);

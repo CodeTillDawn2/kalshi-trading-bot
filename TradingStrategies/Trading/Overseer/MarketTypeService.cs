@@ -94,7 +94,7 @@ namespace TradingStrategies.Trading.Overseer
         {
             _marketTypeHelper = new MarketTypeHelper();
             _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
-            _cacheExpiration = config != null && config.CacheExpirationMinutes.HasValue ? TimeSpan.FromMinutes(config.CacheExpirationMinutes.Value) : TimeSpan.FromMinutes(30);
+            _cacheExpiration = TimeSpan.FromMinutes(config.CacheExpirationMinutes);
             _enablePerformanceMetrics = config?.EnablePerformanceMetrics ?? true;
         }
 

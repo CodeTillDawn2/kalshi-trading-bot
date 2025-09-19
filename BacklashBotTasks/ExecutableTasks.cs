@@ -865,8 +865,8 @@ namespace KalshiBotTasks
             // Get available market tickers from database
             var markets = await _dbContext.GetMarkets();
             var marketTickers = markets
-                .Where(m => m.Ticker != null)
-                .Select(m => m.Ticker!)
+                .Where(m => m.market_ticker != null)
+                .Select(m => m.market_ticker!)
                 .ToList();
 
             if (!marketTickers.Any())

@@ -125,7 +125,7 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
                 sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
                 sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
-                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics ?? true
+                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
             services.AddScoped<BacklashBotContext>(provider => new BacklashBotContext(Configuration));
