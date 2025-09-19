@@ -32,12 +32,27 @@ namespace BacklashBot.Services
             {
                 _logger.LogInformation("Performing health checks on dependent services...");
 
-                // Check database connectivity
-                if (!await CheckDatabaseHealthAsync())
+                // Check database connectivity with overall timeout
+                _logger.LogDebug("Starting database connectivity check...");
+                var healthCheckTimeout = Task.Delay(TimeSpan.FromSeconds(30)); // Overall timeout for all health checks
+                var healthCheckTask = CheckDatabaseHealthAsync();
+
+                var completedTask = await Task.WhenAny(healthCheckTask, healthCheckTimeout);
+
+                if (completedTask == healthCheckTimeout)
+                {
+                    _logger.LogError("Health check timed out after 30 seconds");
+                    return false;
+                }
+
+                bool dbHealthResult = await healthCheckTask;
+                if (!dbHealthResult)
                 {
                     _logger.LogError("Health check failed: Database is not accessible.");
                     return false;
                 }
+
+                _logger.LogDebug("Database health check completed successfully");
 
                 // Add more health checks here as needed (e.g., external APIs, network connectivity)
 
@@ -46,7 +61,8 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error during health check.");
+                _logger.LogError(ex, "Unexpected error during health check: {Message}", ex.Message);
+                _logger.LogDebug(ex, "Health check exception details");
                 return false;
             }
         }
@@ -59,15 +75,28 @@ namespace BacklashBot.Services
         {
             try
             {
-                // Attempt to execute a simple query to verify database connectivity
-                // For now, assume database is healthy if no exception
-                // TODO: Implement proper database health check
-                await Task.CompletedTask;
+                _logger.LogDebug("Starting database health check...");
+
+                // Execute a simple SELECT 1 query that doesn't depend on any data existing
+                // Add timeout to prevent hanging
+                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(10));
+                var healthCheckTask = _context.TestDbAsync();
+
+                var completedTask = await Task.WhenAny(healthCheckTask, timeoutTask);
+
+                if (completedTask == timeoutTask)
+                {
+                    _logger.LogError("Database health check timed out after 10 seconds");
+                    return false;
+                }
+
+                await healthCheckTask; // Ensure the task completed successfully
+                _logger.LogDebug("Database health check passed - connection successful");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Database health check failed.");
+                _logger.LogError(ex, "Database health check failed: {Message}", ex.Message);
                 return false;
             }
         }

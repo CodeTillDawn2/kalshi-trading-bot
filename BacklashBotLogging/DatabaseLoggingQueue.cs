@@ -119,6 +119,10 @@ namespace KalshiBotLogging
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Console.WriteLine("DatabaseLoggingQueue starting at {0}", DateTime.UtcNow);
+
+            // Add a small delay before starting to process logs to avoid startup contention
+            await Task.Delay(2000, stoppingToken);
+
             var batch = new List<LogEntryDTO>();
 
             while (!stoppingToken.IsCancellationRequested)
@@ -133,12 +137,12 @@ namespace KalshiBotLogging
                 {
                     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                    using (var scope = _serviceProvider.CreateScope())
+                    try
                     {
-                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-
-                        try
+                        using (var scope = _serviceProvider.CreateScope())
                         {
+                            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+
                             // Save batch to the appropriate database table based on context
                             foreach (var logEntry in batch)
                             {
@@ -156,21 +160,21 @@ namespace KalshiBotLogging
                             Interlocked.Add(ref _totalProcessedLogs, batch.Count);
                             Interlocked.Add(ref _totalProcessingTimeMs, stopwatch.ElapsedMilliseconds);
                         }
-                        catch (Exception ex)
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log database failure to console with structured format
+                        var errorMessage = $"DatabaseLoggingQueue: Failed to save batch of {batch.Count} log entries - {ex.Message}";
+                        if (ex.InnerException != null)
                         {
-                            // Log database failure to console with structured format
-                            var errorMessage = $"DatabaseLoggingQueue: Failed to save batch of {batch.Count} log entries - {ex.Message}";
-                            if (ex.InnerException != null)
-                            {
-                                errorMessage += $" | Inner: {ex.InnerException.Message}";
-                            }
-                            Console.WriteLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [ERROR] {errorMessage}");
+                            errorMessage += $" | Inner: {ex.InnerException.Message}";
+                        }
+                        Console.WriteLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [ERROR] {errorMessage}");
 
-                            // Log details of failed entries
-                            foreach (var logEntry in batch)
-                            {
-                                Console.WriteLine($"{logEntry.Timestamp:yyyy-MM-dd HH:mm:ss} [{logEntry.Level}] {logEntry.Source}: {logEntry.Message}");
-                            }
+                        // Log details of failed entries
+                        foreach (var logEntry in batch)
+                        {
+                            Console.WriteLine($"{logEntry.Timestamp:yyyy-MM-dd HH:mm:ss} [{logEntry.Level}] {logEntry.Source}: {logEntry.Message}");
                         }
                     }
 

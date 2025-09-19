@@ -12,6 +12,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashInterfaces.Enums;
+using BacklashCommon.Configuration;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -86,9 +87,14 @@ namespace KalshiBotTests
 
             // Load configuration from appsettings.json
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            _configuration = new ConfigurationBuilder()
+            var baseConfig = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .Build();
+
+            _configuration = new ConfigurationBuilder()
+                .AddConfiguration(baseConfig)
+                .AddSecretsConfiguration(basePath, baseConfig)
                 .Build();
 
             var kalshiConfig = new KalshiConfig();
@@ -107,7 +113,7 @@ namespace KalshiBotTests
             _websocketConfigOptions = Options.Create(websocketConfig);
 
             // Initialize real SqlDataService
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
             _sqlService = new SqlDataService(_configuration, _sqlLoggerMock.Object);
 

@@ -26,7 +26,7 @@ namespace KalshiBotTasks
     /// - Generates a JSON schema from the CacheSnapshot class using NJsonSchema
     /// - Compares the schema against existing versions to determine if deployment is needed
     /// - Saves new schema versions to the database with auto-incremented version numbers
-    /// - Updates the appsettings.local.json configuration file with the latest schema version
+    /// - Updates the appsettings.json configuration file with the latest schema version
     /// - Validates that the schema can be deserialized and matches expected structure
     ///
     /// This ensures that schema versioning works correctly for snapshot data persistence
@@ -68,7 +68,6 @@ namespace KalshiBotTasks
             var tempConfig = new ConfigurationBuilder()
                 .SetBasePath(tempBasePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
                 .Build();
 
             // Read configured basePath
@@ -84,14 +83,13 @@ namespace KalshiBotTasks
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
                 .Build();
 
             // Setup dependency injection
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IConfiguration>(_configuration);
             serviceCollection.AddDbContext<BacklashBotContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(_configuration["DBConnection:DefaultConnection"]));
             serviceCollection.AddLogging(logging => logging.AddConsole());
             serviceCollection.AddScoped<SchemaDeploymentObj>();
             serviceCollection.Configure<GeneralExecutionConfig>(_configuration.GetSection("Central:GeneralExecution"));
@@ -217,7 +215,7 @@ namespace KalshiBotTasks
             /// - Compares the generated schema with the latest existing version
             /// - If schemas match, logs that deployment is skipped
             /// - If schemas differ, creates a new SnapshotSchemaDTO and saves it to the database
-            /// - Updates the appsettings.local.json file with the new schema version
+            /// - Updates the appsettings.json file with the new schema version
             /// - Logs successful deployment with the new version number
             ///
             /// The method handles exceptions gracefully and ensures database consistency.
@@ -256,7 +254,7 @@ namespace KalshiBotTasks
                     // Add to context and save
                     snapshotSchema = await _context.AddSnapshotSchema(snapshotSchema);
 
-                    // Update appsettings.local.json with new SchemaVersion
+                    // Update appsettings.json with new SchemaVersion
                     await UpdateSnapshotSchemaVersionAsync(snapshotSchema.SchemaVersion);
 
                     _logger.LogInformation("Successfully deployed CacheSnapshot schema with version {SchemaVersion}", snapshotSchema.SchemaVersion);
@@ -269,14 +267,14 @@ namespace KalshiBotTasks
             }
 
             /// <summary>
-            /// Updates the appsettings.local.json configuration file with the new snapshot schema version.
+            /// Updates the appsettings.json configuration file with the new snapshot schema version.
             /// Navigates the JSON structure to update the Central:GeneralExecution:SnapshotSchemaVersion setting.
             /// </summary>
             /// <param name="newVersion">The new schema version number to write to the configuration file.</param>
             /// <remarks>
             /// This method performs the following operations:
             /// - Reads the configured base path from Deployment:BasePath configuration with fallback
-            /// - Constructs the path to appsettings.local.json in the configured BacklashBot directory
+            /// - Constructs the path to appsettings.json in the configured BacklashBot directory
             /// - Validates that the file exists, logging a warning if not found
             /// - Reads the JSON content from the file
             /// - Parses the JSON into a JsonNode for manipulation
@@ -296,13 +294,13 @@ namespace KalshiBotTasks
                 {
                     // Read configured basePath from configuration
                     string basePath = _configuration["Deployment:BasePath"] ?? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-                    string fullAppSettingsPath = Path.Combine(basePath, "appsettings.local.json");
+                    string fullAppSettingsPath = Path.Combine(basePath, "appsettings.json");
 
                     var filePath = fullAppSettingsPath;
                     if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                     {
-                        _logger.LogWarning("appsettings.local.json file not found at {FilePath}.", filePath);
-                        Assert.Fail("appsettings.local.json file not found.");
+                        _logger.LogWarning("appsettings.json file not found at {FilePath}.", filePath);
+                        Assert.Fail("appsettings.json file not found.");
                         return;
                     }
 
@@ -312,8 +310,8 @@ namespace KalshiBotTasks
 
                     if (jsonNode == null)
                     {
-                        _logger.LogError("Failed to parse appsettings.local.json.");
-                        Assert.Fail("Failed to parse appsettings.local.json.");
+                        _logger.LogError("Failed to parse appsettings.json.");
+                        Assert.Fail("Failed to parse appsettings.json.");
                         return;
                     }
 
@@ -341,12 +339,12 @@ namespace KalshiBotTasks
                     var updatedJson = jsonNode.ToJsonString(options);
                     await File.WriteAllTextAsync(filePath, updatedJson);
 
-                    _logger.LogInformation("Updated appsettings.local.json with SnapshotSchemaVersion {NewVersion}.", newVersion);
+                    _logger.LogInformation("Updated appsettings.json with SnapshotSchemaVersion {NewVersion}.", newVersion);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to update appsettings.local.json with new SnapshotSchemaVersion {NewVersion}. Exception: {ex}. Stack Trace: {st}", newVersion, ex.Message, ex.StackTrace);
-                    Assert.Fail("Failed to update appsettings.local.json with new SnapshotSchemaVersion.");
+                    _logger.LogError(ex, "Failed to update appsettings.json with new SnapshotSchemaVersion {NewVersion}. Exception: {ex}. Stack Trace: {st}", newVersion, ex.Message, ex.StackTrace);
+                    Assert.Fail("Failed to update appsettings.json with new SnapshotSchemaVersion.");
                     // Do not throw; allow deployment to succeed even if JSON update fails
                 }
             }

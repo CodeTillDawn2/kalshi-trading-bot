@@ -151,7 +151,7 @@ namespace KalshiBotData.Data
                              IEnumerable<ISqlDataServicePerformanceMetrics>? performanceMetricsReceivers = null)
         {
             _logger = logger;
-            _connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+            _connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(configuration) ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
             _startTime = DateTime.UtcNow;
             _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
@@ -182,6 +182,24 @@ namespace KalshiBotData.Data
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_marketLifecycleQueue, "market_lifecycle", _cts.Token)));
             }
             _workerTasks = workerTasks.ToArray();
+        }
+
+        /// <summary>
+        /// Tests basic database connectivity by executing a simple SELECT query.
+        /// This method is used for health checks and doesn't depend on any existing data.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="SqlException">Thrown when database connection fails.</exception>
+        public async Task TestDbAsync()
+        {
+            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(_retryCount, i => _retryDelay * i);
+            await retryPolicy.ExecuteAsync(async () =>
+            {
+                await using var conn = new SqlConnection(_connectionString);
+                await conn.OpenAsync();
+                await using var cmd = new SqlCommand("SELECT 1", conn);
+                await cmd.ExecuteScalarAsync();
+            });
         }
 
         /// <summary>

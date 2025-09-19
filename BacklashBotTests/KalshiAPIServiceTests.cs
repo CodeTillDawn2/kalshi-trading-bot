@@ -38,7 +38,7 @@ namespace KalshiBotTests
         private Mock<ILogger<IKalshiAPIService>> _loggerMock;
 
         /// <summary>
-        /// Configuration instance loaded from appsettings.local.json for real API credentials.
+        /// Configuration instance loaded from appsettings.json for real API credentials.
         /// </summary>
         private IConfiguration _configuration;
 
@@ -153,14 +153,14 @@ namespace KalshiBotTests
 
         /// <summary>
         /// Performs one-time setup for the entire test fixture.
-        /// Loads real configuration from appsettings.local.json, initializes a real database context,
+        /// Loads real configuration from appsettings.json, initializes a real database context,
         /// and queries for active market data to use in tests. This setup runs once before all tests
         /// in the fixture to provide consistent test data across all test methods.
         /// </summary>
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            // Load configuration from appsettings.local.json (real credentials)
+            // Load configuration from appsettings.json (real credentials)
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)

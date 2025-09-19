@@ -276,6 +276,14 @@ namespace BacklashBotData.Data.Interfaces
         Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName);
         #endregion
 
+        #region Database Health Check
+        /// <summary>
+        /// Tests basic database connectivity by executing a simple SELECT query.
+        /// This method is used for health checks and doesn't depend on any existing data.
+        /// </summary>
+        Task TestDbAsync();
+        #endregion
+
         #region Performance Metrics
         IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics();
         void ResetPerformanceMetrics();

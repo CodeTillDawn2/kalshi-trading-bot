@@ -14,6 +14,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using System.Data;
 using BacklashBotData.Configuration;
+using BacklashDTOs.Configuration;
 
 namespace BacklashBotData.Data
 {
@@ -87,10 +88,10 @@ namespace BacklashBotData.Data
         {
             _config = config;
             _logger = logger;
-            _connectionString = _config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+            _connectionString = ConfigurationHelper.BuildConnectionString(_config) ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
 
             // Initialize configuration options with defaults
-            var dataConfig = _config.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
+            var dataConfig = _config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
             _maxRetryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
             _batchSize = dataConfig.BatchSize;
@@ -1785,6 +1786,17 @@ namespace BacklashBotData.Data
         {
             var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
             return transientErrors.Contains(ex.Number);
+        }
+        #endregion
+
+        #region Database Health Check
+        /// <summary>
+        /// Tests basic database connectivity by executing a simple SELECT query.
+        /// This method is used for health checks and doesn't depend on any existing data.
+        /// </summary>
+        public async Task TestDbAsync()
+        {
+            await Database.ExecuteSqlRawAsync("SELECT 1");
         }
         #endregion
 

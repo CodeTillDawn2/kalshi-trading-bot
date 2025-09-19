@@ -78,11 +78,6 @@
     <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     <CopyToPublishDirectory>Never</CopyToPublishDirectory>
   </None>
-  <None Include="appsettings.local.json" Condition="Exists('appsettings.local.json')">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-  </None>
 </ItemGroup>
 
   <ItemGroup>

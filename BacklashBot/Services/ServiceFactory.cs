@@ -74,9 +74,9 @@ namespace BacklashBot.Services
 
                 if (kalshiConfig.Value.KeyFile == null || !File.Exists(kalshiConfig.Value.KeyFile))
                 {
-                    _logger.LogWarning(new KalshiKeyFileNotFoundException($"Kalshi key file not found: {kalshiConfig.Value.KeyFile}")
-                        , "Kalshi key file not found: {KeyFile}", kalshiConfig.Value.KeyFile);
-                    throw new FileNotFoundException("Kalshi key file not found", kalshiConfig.Value.KeyFile);
+                    var errorMessage = $"Kalshi Key file not found at {kalshiConfig.Value.KeyFile}";
+                    _logger.LogError(errorMessage);
+                    throw new FileNotFoundException(errorMessage, kalshiConfig.Value.KeyFile);
                 }
 
                 var marketDataService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>();

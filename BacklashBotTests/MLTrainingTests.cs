@@ -6,6 +6,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashDTOs.Configuration;
+using BacklashDTOs.Configuration;
 /// <summary>
 /// Comprehensive NUnit test fixture for validating machine learning training and evaluation workflows
 /// in the Kalshi trading bot system. This class tests the complete pipeline from real market data
@@ -27,6 +28,7 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using TradingSimulator.ML;
 using TradingStrategies.Configuration;
+using BacklashCommon.Configuration;
 
 namespace KalshiBotTests
 {
@@ -93,15 +95,20 @@ namespace KalshiBotTests
             // Locate BacklashBot/appsettings.json exactly like your other tests
             var basePath = Path.GetFullPath(
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var config = new ConfigurationBuilder()
+            var baseConfig = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .Build();
+
+            var config = new ConfigurationBuilder()
+                .AddConfiguration(baseConfig)
+                .AddSecretsConfiguration(basePath, baseConfig)
                 .Build();
 
             // DI: EF context for real snapshot fetching
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(ConfigurationHelper.BuildConnectionString(config)));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             _sp = services.BuildServiceProvider();
             _scopeFactory = _sp.GetRequiredService<IServiceScopeFactory>();

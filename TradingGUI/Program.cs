@@ -7,6 +7,7 @@ using BacklashInterfaces.PerformanceMetrics;
 using TradingStrategies.Configuration;
 using TradingStrategies.Trading.Helpers;
 using BacklashDTOs.Configuration;
+using BacklashCommon.Configuration;
 
 namespace TradingGUI
 {
@@ -18,9 +19,13 @@ namespace TradingGUI
             if (IsUnderTestHost()) return;
 
             // Set up configuration
-            var configuration = new ConfigurationBuilder()
+            var baseConfig = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            var configuration = new ConfigurationBuilder()
+                .AddConfiguration(baseConfig)
+                .AddSecretsConfiguration(AppDomain.CurrentDomain.BaseDirectory, baseConfig)
                 .Build();
 
             // Set up DI container
@@ -29,7 +34,7 @@ namespace TradingGUI
             services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
 
             // Add connection string access (matching BacklashBot pattern)
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = ConfigurationHelper.BuildConnectionString(configuration);
             if (!string.IsNullOrEmpty(connectionString))
             {
                 services.AddSingleton(connectionString);

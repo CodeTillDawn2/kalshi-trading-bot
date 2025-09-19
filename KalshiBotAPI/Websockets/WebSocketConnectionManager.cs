@@ -145,12 +145,18 @@ namespace KalshiBotAPI.Websockets
             ILogger<WebSocketConnectionManager> logger,
             ICentralPerformanceMonitor? performanceMonitor = null)
         {
+            _logger.LogInformation("WebSocketConnectionManager: Constructor called");
             _kalshiConfig = kalshiConfig.Value;
             _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
+
+            _logger.LogInformation("WebSocketConnectionManager: Creating RSA key");
             _privateKey = RSA.Create();
+
+            _logger.LogInformation("WebSocketConnectionManager: Loading key file: {KeyFile}", _kalshiConfig.KeyFile);
             _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
+            _logger.LogInformation("WebSocketConnectionManager: Key file loaded successfully");
 
             // Warn if metrics are enabled but no performance monitor is provided
             if (EnableMetrics && _performanceMonitor == null)

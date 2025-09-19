@@ -58,6 +58,27 @@ namespace BacklashCommon.Configuration
         }
 
         /// <summary>
+        /// Builds a connection string by interpolating secrets into the template.
+        /// This method retrieves the connection string template and replaces placeholders with actual secret values.
+        /// </summary>
+        /// <param name="configuration">The configuration instance containing the connection string template and secrets.</param>
+        /// <returns>The fully interpolated connection string, or null if not configured.</returns>
+        public static string BuildConnectionString(IConfiguration configuration)
+        {
+            var connectionString = configuration["DBConnection:DefaultConnection"];
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return null;
+            }
+
+            // Replace placeholders with actual secret values
+            connectionString = connectionString.Replace("{Database:Username}", configuration["Database:Username"]);
+            connectionString = connectionString.Replace("{Database:Password}", configuration["Database:Password"]);
+
+            return connectionString;
+        }
+
+        /// <summary>
         /// Creates a configuration builder with standard settings including secrets support.
         /// This is a convenience method that sets up the complete configuration pipeline.
         /// </summary>

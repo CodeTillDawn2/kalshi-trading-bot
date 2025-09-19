@@ -39,6 +39,8 @@ using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
 using BacklashCommon.Services;
 using BacklashCommon.Helpers;
+using BacklashDTOs.Configuration;
+using BacklashCommon.Configuration;
 
 namespace TradingSimulator
 {
@@ -161,7 +163,7 @@ namespace TradingSimulator
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(ConfigurationHelper.BuildConnectionString(config)));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             var serviceProvider = services.BuildServiceProvider();
 

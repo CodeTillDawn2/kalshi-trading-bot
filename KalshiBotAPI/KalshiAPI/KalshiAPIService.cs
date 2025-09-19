@@ -83,7 +83,7 @@ namespace KalshiBotAPI.KalshiAPI
             _enablePerformanceMetrics = _apiConfig.KalshiAPIService.EnablePerformanceMetrics;
 
             // Initialize connection string from configuration
-            _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
+            _connectionString = ConfigurationHelper.BuildConnectionString(config) ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
 
             _httpClient = new HttpClient
             {

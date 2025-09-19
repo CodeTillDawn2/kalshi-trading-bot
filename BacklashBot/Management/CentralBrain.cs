@@ -139,22 +139,41 @@ namespace BacklashBot.Management
         {
             try
             {
+                _logger.LogInformation("BRAIN: StartAsync called at {Time}", DateTime.UtcNow);
+
                 // Perform health checks on dependent services before starting
-                if (!await _healthCheckService.CheckHealthAsync())
+                _logger.LogInformation("BRAIN: Starting health check...");
+                try
                 {
-                    _logger.LogError("BRAIN: Health check failed. Aborting startup.");
-                    throw new Exception("Health check failed for dependent services.");
+                    if (!await _healthCheckService.CheckHealthAsync())
+                    {
+                        _logger.LogWarning("BRAIN: Health check failed. Continuing startup anyway.");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("BRAIN: Health check passed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "BRAIN: Health check threw exception. Continuing startup anyway.");
                 }
 
+                _logger.LogInformation("BRAIN: Ensuring brain status initialized...");
                 await _brainStatus.EnsureInitializedAsync();
                 _logger.LogInformation("BRAIN: Created SmokehouseBrain instance {InstanceName}", _brainInstance);
                 _logger.LogInformation("BRAIN: {InstanceName} Waking up, Session {1}", _brainInstance, _brainStatus.SessionIdentifier);
+
+                _logger.LogInformation("BRAIN: Initializing brain...");
                 InitializeBrain();
+
                 if (!_centralBrainConfig.LaunchDataDashboard)
                 {
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
                     return;
                 }
+
+                _logger.LogInformation("BRAIN: Setting up error check timer...");
                 _errorCheckTimer = _timerFactory();
                 _errorCheckTimer.Interval = _centralBrainConfig.ErrorCheckInterval.TotalMilliseconds;
                 _errorCheckTimer.AutoReset = true;
@@ -165,6 +184,7 @@ namespace BacklashBot.Management
                     _errorCheckTimer.Start();
                 });
 
+                _logger.LogInformation("BRAIN: Starting complete startup sequence...");
                 _=Task.Run(() => CompleteStartupSequence(), cancellationToken);
 
                 _logger.LogInformation("BRAIN: SmokehouseBrain running...");

@@ -25,6 +25,7 @@ using BacklashBot.Management;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
 using BacklashCommon.Helpers;
+using BacklashCommon.Configuration;
 
 
 namespace KalshiBotTasks
@@ -146,9 +147,14 @@ namespace KalshiBotTasks
         public void Setup()
         {
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var configuration = new ConfigurationBuilder()
+            var baseConfig = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .Build();
+
+            var configuration = new ConfigurationBuilder()
+                .AddConfiguration(baseConfig)
+                .AddSecretsConfiguration(basePath, baseConfig)
                 .Build();
             this.config = configuration;
 
@@ -199,8 +205,8 @@ namespace KalshiBotTasks
             services.AddSingleton<IOptions<KalshiConfig>>(kalshiOptions);
 
 
-            var connectionString = config.GetConnectionString("DefaultConnection");
-            Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.local.json");
+            var connectionString = ConfigurationHelper.BuildConnectionString(config);
+            Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
             _sqlDataService = new SqlDataService(config, _sqlLoggerMock.Object);
 

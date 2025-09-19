@@ -33,6 +33,8 @@ using BacklashCommon.Services;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotLogging;
 using BacklashCommon.Helpers;
+using BacklashDTOs.Configuration;
+using BacklashCommon.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +55,14 @@ builder.Services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLogg
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
 // ## Configuration Setup
-builder.Configuration
+var baseConfig = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
+
+builder.Configuration
+    .AddConfiguration(baseConfig)
+    .AddSecretsConfiguration(AppDomain.CurrentDomain.BaseDirectory, baseConfig)
+    .AddEnvironmentVariables()
     .AddCommandLine(args);
 
 // Bind configurations to respective models
@@ -221,7 +229,12 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
 
 // Database context
 builder.Services.AddDbContext<BacklashBotContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(ConfigurationHelper.BuildConnectionString(builder.Configuration),
+        sqlOptions =>
+        {
+            sqlOptions.CommandTimeout(30); // 30 second timeout
+            sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null); // Retry failed connections
+        }));
 
 builder.Services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
@@ -459,16 +472,39 @@ app.MapGet("/restart-services", async (ICentralBrain brain) =>
 
 // Start the application
 Console.WriteLine("Starting application at {0}", DateTime.UtcNow);
+
+// Pre-startup database connectivity check
+Console.WriteLine("Performing pre-startup database connectivity check...");
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+        await context.TestDbAsync();
+        Console.WriteLine("Database connectivity check passed");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Database connectivity check failed: {0}", ex.Message);
+    Console.WriteLine("Exception type: {0}", ex.GetType().Name);
+    throw new Exception("Database connectivity check failed during startup", ex);
+}
+
 using (var scope = app.Services.CreateScope())
 {
     try
     {
+        Console.WriteLine("About to call app.StartAsync() at {0}", DateTime.UtcNow);
         await app.StartAsync();
+        Console.WriteLine("app.StartAsync() completed at {0}", DateTime.UtcNow);
         Console.WriteLine("Application started successfully at {0}", DateTime.UtcNow);
     }
     catch (Exception ex)
     {
         Console.WriteLine("Application startup failed: {0}", ex.Message);
+        Console.WriteLine("Exception type: {0}", ex.GetType().Name);
+        Console.WriteLine("Stack trace: {0}", ex.StackTrace);
         throw;
     }
 }
