@@ -20,6 +20,7 @@ using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Configuration;
+using TradingStrategies.ML.SpikePrediction;
 using BacklashBot.Management;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
@@ -56,6 +57,7 @@ namespace KalshiBotTasks
         private IConfigurationRoot config;
         private IServiceScopeFactory _scopeFactory;
         private SqlDataService _sqlDataService;
+        private Mock<ILogger<SpikePredictionModel>> _spikeLoggerMock;
 
 
         /// <summary>
@@ -165,6 +167,7 @@ namespace KalshiBotTasks
             var interestLoggerMock = new Mock<ILogger<InterestScoreService>>();
             var tradingLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
+            _spikeLoggerMock = new Mock<ILogger<SpikePredictionModel>>();
 
             // Add mocks for missing dependencies
             var scopeManagerMock = new Mock<IScopeManagerService>();
@@ -836,6 +839,93 @@ namespace KalshiBotTasks
                 }
                 await orderbookWriter.WriteLineAsync($"Total Markets Affected: {_missingOrderbooks.Keys.Count}");
                 await orderbookWriter.WriteLineAsync($"Total Missing Orderbooks: {_missingOrderbookCount}");
+            }
+        }
+
+        /// <summary>
+        /// Test method that creates and trains the spike prediction ML model.
+        /// This method loads historical market data, trains the model using ML.NET,
+        /// evaluates performance, and saves the trained model to disk.
+        /// </summary>
+        [Test]
+        public async Task CreateSpikePredictionModel()
+        {
+            TestContext.Out.WriteLine("Starting spike prediction model creation...");
+
+            // Get available market tickers from database
+            var markets = await _dbContext.GetMarkets();
+            var marketTickers = markets
+                .Where(m => m.Ticker != null)
+                .Select(m => m.Ticker!)
+                .ToList();
+
+            if (!marketTickers.Any())
+            {
+                TestContext.Out.WriteLine("No market tickers found in database. Skipping model creation.");
+                return;
+            }
+
+            TestContext.Out.WriteLine($"Found {marketTickers.Count} markets for training data");
+
+            // Create model configuration
+            var config = new SpikePredictionConfig
+            {
+                SpikeThreshold = 0.15, // 15% price spike threshold
+                PredictionWindow = TimeSpan.FromMinutes(10),
+                LagMinutes = 5,
+                ModelPath = "spike_prediction_model.zip",
+                PredictionThreshold = 0.7,
+                NumberOfTrees = 100,
+                MinimumLeafSize = 10,
+                MaximumDepth = 10
+            };
+
+            // Create model instance
+            var model = new SpikePredictionModel(_spikeLoggerMock.Object, _snapshotService, config);
+
+            try
+            {
+                // Load training data
+                TestContext.Out.WriteLine("Loading training data...");
+                var trainingData = await model.LoadTrainingDataAsync(
+                    marketTickers,
+                    DateTime.UtcNow.AddDays(-30), // Last 30 days
+                    DateTime.UtcNow);
+
+                if (!trainingData.Any())
+                {
+                    TestContext.Out.WriteLine("No training data available. Skipping model training.");
+                    return;
+                }
+
+                TestContext.Out.WriteLine($"Loaded {trainingData.Count} training samples");
+
+                // Split data for training and testing
+                var splitIndex = (int)(trainingData.Count * 0.8);
+                var trainData = trainingData.Take(splitIndex).ToList();
+                var testData = trainingData.Skip(splitIndex).ToList();
+
+                TestContext.Out.WriteLine($"Training set: {trainData.Count} samples, Test set: {testData.Count} samples");
+
+                // Train model
+                TestContext.Out.WriteLine("Training model...");
+                model.TrainModel(trainData);
+
+                // Evaluate model
+                TestContext.Out.WriteLine("Evaluating model performance...");
+                model.EvaluateModel(testData);
+
+                // Save model
+                TestContext.Out.WriteLine("Saving trained model...");
+                model.SaveModel();
+
+                TestContext.Out.WriteLine("Spike prediction model creation completed successfully!");
+                TestContext.Out.WriteLine($"Model saved to: {config.ModelPath}");
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine($"Error during model creation: {ex.Message}");
+                throw;
             }
         }
 
