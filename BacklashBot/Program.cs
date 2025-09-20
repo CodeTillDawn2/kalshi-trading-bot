@@ -35,7 +35,6 @@ using Microsoft.Extensions.Options;
 using System.Text.Json;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
-using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -111,20 +110,12 @@ builder.Services.AddOptions<TradingSnapshotServiceConfig>()
     .Bind(builder.Configuration.GetSection(TradingSnapshotServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<SnapshotPeriodHelperConfig>()
-    .Bind(builder.Configuration.GetSection(SnapshotPeriodHelperConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
 builder.Services.AddOptions<OrderbookChangeTrackerConfig>()
     .Bind(builder.Configuration.GetSection(OrderbookChangeTrackerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<MarketRefreshServiceConfig>()
     .Bind(builder.Configuration.GetSection(MarketRefreshServiceConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-builder.Services.AddOptions<PseudoCandlestickExtensionsConfig>()
-    .Bind(builder.Configuration.GetSection(PseudoCandlestickExtensionsConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<GeneralExecutionConfig>()

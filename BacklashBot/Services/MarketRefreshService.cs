@@ -4,7 +4,7 @@ using BacklashBot.State.Interfaces;
 using BacklashDTOs.Exceptions;
 using System.Diagnostics;
 using System.Threading;
-using TradingStrategies.Configuration;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {

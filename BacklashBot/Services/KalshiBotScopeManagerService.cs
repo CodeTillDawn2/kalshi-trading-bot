@@ -7,7 +7,6 @@ using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashDTOs.Data;
-using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 using System.Diagnostics;
 using System.Threading;

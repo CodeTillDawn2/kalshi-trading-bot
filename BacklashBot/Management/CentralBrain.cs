@@ -13,7 +13,6 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using System.Diagnostics;
-using TradingStrategies.Configuration;
 using BacklashBot.Configuration;
 
 namespace BacklashBot.Management

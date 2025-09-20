@@ -4,15 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TradingStrategies.Classification.Interfaces;
-using TradingStrategies.Configuration;
-using TradingStrategies.Trading.Helpers;
 
-namespace TradingStrategies.Classification
+
+namespace BacklashCommon.Helpers
 {
     /// <summary>
     /// Provides functionality for processing and grouping market snapshots into valid analysis periods.

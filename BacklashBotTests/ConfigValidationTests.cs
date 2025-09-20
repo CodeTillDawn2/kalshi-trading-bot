@@ -231,6 +231,92 @@ namespace BacklashBotTests
         }
 
         [Test]
+        public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
+        {
+            var configInstances = new Dictionary<string, object>();
+
+            // Get all config types with SectionName from assemblies referenced by BacklashBot.csproj
+            var assemblies = new[]
+            {
+                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
+                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
+                typeof(TradingStrategies.Configuration.SimulationConfig).Assembly, // TradingStrategies
+                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(MarketDataConfig).Assembly // BacklashBot itself
+            };
+
+            var configTypes = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.GetField("SectionName", BindingFlags.Public | BindingFlags.Static) != null)
+                .ToList();
+
+            foreach (var configType in configTypes)
+            {
+                var sectionName = GetSectionName(configType);
+                var section = _configuration.GetSection(sectionName);
+                var instance = Activator.CreateInstance(configType);
+                section.Bind(instance);
+                configInstances[sectionName] = instance;
+                ValidateConfig(instance, section);
+            }
+
+            // Special handling for nested configs
+            if (configInstances.TryGetValue(MarketDataConfig.SectionName, out var marketDataInstance) &&
+                configInstances.TryGetValue(CalculationsConfig.SectionName, out var calculationsInstance))
+            {
+                ((MarketDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
+                ValidateConfig(marketDataInstance, _configuration.GetSection(MarketDataConfig.SectionName));
+            }
+        }
+
+        [Test]
+        public void ValidateNoUnusedSections_InAppsettings_Reflective()
+        {
+            var usedSections = new HashSet<string>();
+
+            // Automatically collect all SectionName values from assemblies referenced by BacklashBot.csproj
+            var assemblies = new[]
+            {
+                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
+                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
+                typeof(TradingStrategies.Configuration.SimulationConfig).Assembly, // TradingStrategies
+                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(MarketDataConfig).Assembly // BacklashBot itself
+            };
+
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    var sectionNameField = type.GetField("SectionName", BindingFlags.Public | BindingFlags.Static);
+                    if (sectionNameField != null)
+                    {
+                        usedSections.Add((string)sectionNameField.GetValue(null));
+                    }
+                }
+            }
+
+            // Add hardcoded sections not tied to configs
+            usedSections.Add("DBConnection:DefaultConnection");
+
+            var allConfigurationKeys = GetAllConfigurationKeys(_configuration);
+
+            var unusedKeys = allConfigurationKeys.Where(key =>
+                !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
+            ).ToList();
+
+            TestContext.WriteLine("Unused configuration keys found:");
+            foreach (var key in unusedKeys)
+            {
+                TestContext.WriteLine($"  {key}");
+            }
+
+            Assert.That(unusedKeys, Is.Empty, $"Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
+        }
+
+        [Test]
         public void ValidateNoUnusedSections_InAppsettings()
         {
             var usedSections = new HashSet<string>

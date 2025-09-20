@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace TradingStrategies.Configuration
+namespace BacklashCommon.Configuration
 {
     /// <summary>
     /// Configuration class for SnapshotPeriodHelper settings.

@@ -16,7 +16,6 @@ using BacklashInterfaces.Enums;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
-using TradingStrategies.Configuration;
 
 using Polly;
 using Polly.Retry;

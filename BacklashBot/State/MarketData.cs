@@ -45,7 +45,6 @@ using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using System.Collections.Concurrent;
-using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 using BacklashDTOs.Configuration;
 using BacklashBot.Configuration;

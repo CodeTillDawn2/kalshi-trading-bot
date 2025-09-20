@@ -7,7 +7,7 @@ using BacklashDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;
-using TradingStrategies.Configuration;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {

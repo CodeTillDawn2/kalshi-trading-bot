@@ -1,7 +1,7 @@
 using BacklashDTOs;
 using static BacklashInterfaces.Enums.StrategyEnums;
 
-namespace TradingStrategies.Trading.Helpers
+namespace BacklashCommon.Helpers
 {
     /// <summary>
     /// Provides functionality to classify market types based on various trading conditions extracted from market snapshots.

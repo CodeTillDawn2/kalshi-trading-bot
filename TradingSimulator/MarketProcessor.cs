@@ -14,6 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashCommon.Helpers;
 
 namespace TradingSimulator
 {
