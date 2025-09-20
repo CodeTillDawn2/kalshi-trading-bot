@@ -114,12 +114,6 @@ namespace BacklashBotTests
             marketRefreshServiceSection.Bind(marketRefreshServiceConfig);
             ValidateConfig(marketRefreshServiceConfig, marketRefreshServiceSection);
 
-            // PseudoCandlestickExtensionsConfig - "WatchedMarkets:PseudoCandlestickExtensions"
-            var pseudoCandlestickExtensionsConfig = new PseudoCandlestickExtensionsConfig();
-            var pseudoCandlestickExtensionsSection = _configuration.GetSection("WatchedMarkets:PseudoCandlestickExtensions");
-            pseudoCandlestickExtensionsSection.Bind(pseudoCandlestickExtensionsConfig);
-            ValidateConfig(pseudoCandlestickExtensionsConfig, pseudoCandlestickExtensionsSection);
-
             // GeneralExecutionConfig - "Central:GeneralExecution"
             var generalExecutionConfig = new GeneralExecutionConfig();
             var generalExecutionSection = _configuration.GetSection("Central:GeneralExecution");
@@ -305,13 +299,13 @@ namespace BacklashBotTests
                 !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
             ).ToList();
 
-            TestContext.WriteLine("Unused configuration keys found:");
+            TestContext.WriteLine("Reflective: Unused configuration keys found:");
             foreach (var key in unusedKeys)
             {
                 TestContext.WriteLine($"  {key}");
             }
 
-            Assert.That(unusedKeys, Is.Empty, $"Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
+            Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
         }
 
         [Test]
@@ -350,6 +344,7 @@ namespace BacklashBotTests
                 ErrorHandlerConfig.SectionName,
                 OrderBookServiceConfig.SectionName,
                 BacklashBotDataConfig.SectionName,
+                QueueMonitoringConfig.SectionName,
                 "DBConnection:DefaultConnection"
             };
 
@@ -359,13 +354,13 @@ namespace BacklashBotTests
                 !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
             ).ToList();
 
-            TestContext.WriteLine("Unused configuration keys found:");
+            TestContext.WriteLine("Manual: Unused configuration keys found:");
             foreach (var key in unusedKeys)
             {
                 TestContext.WriteLine($"  {key}");
             }
 
-            Assert.That(unusedKeys, Is.Empty, $"Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
+            Assert.That(unusedKeys, Is.Empty, $"Manual: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
         }
 
         private void ValidateConfig(object config, IConfigurationSection section)
