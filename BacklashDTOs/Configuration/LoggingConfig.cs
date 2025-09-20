@@ -14,12 +14,6 @@ namespace BacklashDTOs.Configuration
         public const string SectionName = "Communications:Logging";
 
         /// <summary>
-        /// Gets or sets the log level settings.
-        /// </summary>
-        [Required(ErrorMessage = "The 'LogLevel' is missing in the configuration.")]
-        public LogLevelSettings LogLevel { get; set; } = null!;
-
-        /// <summary>
         /// Gets or sets the environment name.
         /// </summary>
         [Required(ErrorMessage = "The 'Environment' is missing in the configuration.")]
@@ -30,24 +24,6 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'StoreWebSocketEvents' is missing in the configuration.")]
         public bool StoreWebSocketEvents { get; set; }
-    }
-
-    /// <summary>
-    /// Configuration class for log level settings.
-    /// </summary>
-    public class LogLevelSettings
-    {
-        /// <summary>
-        /// Gets or sets the default log level.
-        /// </summary>
-        [Required(ErrorMessage = "The 'Default' is missing in the configuration.")]
-        public string Default { get; set; } = null!;
-
-        /// <summary>
-        /// Gets or sets the log level for Microsoft components.
-        /// </summary>
-        [Required(ErrorMessage = "The 'Microsoft' is missing in the configuration.")]
-        public string Microsoft { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the log level for SQL database logging.
@@ -61,4 +37,5 @@ namespace BacklashDTOs.Configuration
         [Required(ErrorMessage = "The 'ConsoleLogLevel' is missing in the configuration.")]
         public string ConsoleLogLevel { get; set; } = null!;
     }
+
 }

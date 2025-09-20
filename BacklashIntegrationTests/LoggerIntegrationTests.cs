@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using KalshiBotLogging;
 using BacklashDTOs.Configuration;
+using System;
+using System.Threading;
 
 namespace BacklashIntegrationTests
 {
@@ -39,23 +41,19 @@ namespace BacklashIntegrationTests
         [Test]
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
-            // Arrange
-            var loggingConfig = new LoggingConfig
-            {
-                LogLevel = _configuration.GetSection("Communications:Logging:LogLevel").Get<LogLevelSettings>(),
-                Environment = _configuration["Kalshi:Environment"] ?? "prd",
-                StoreWebSocketEvents = bool.Parse(_configuration["Communications:Logging:StoreWebSocketEvents"] ?? "false")
-            };
-            _configuration.GetSection("Communications:Logging").Bind(loggingConfig);
+            // Arrange - Load configs from appsettings.json
+            var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
+            var executionConfig = _configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
 
             // Act & Assert
             Assert.DoesNotThrow(() =>
             {
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueue,
-                    LogLevel.Warning, // minLevel
                     loggingConfig,
-                    null, // IBrainStatusService
+                    executionConfig,
+                    LogLevel.Warning, // minLevel
+                    null, // brainStatus
                     "BacklashBot", // defaultEnvironment
                     "BacklashInstance" // defaultInstance
                 );
@@ -72,20 +70,16 @@ namespace BacklashIntegrationTests
         [Test]
         public void DatabaseLoggerProvider_CanLogEntry()
         {
-            // Arrange
-            var loggingConfig = new LoggingConfig
-            {
-                LogLevel = _configuration.GetSection("Communications:Logging:LogLevel").Get<LogLevelSettings>(),
-                Environment = _configuration["Kalshi:Environment"] ?? "prd",
-                StoreWebSocketEvents = bool.Parse(_configuration["Communications:Logging:StoreWebSocketEvents"] ?? "false")
-            };
-            _configuration.GetSection("Communications:Logging").Bind(loggingConfig);
+            // Arrange - Load configs from appsettings.json
+            var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
+            var executionConfig = _configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
 
             var provider = new DatabaseLoggerProvider(
                 _loggingQueue,
-                LogLevel.Information, // minLevel set to Information to allow the log
                 loggingConfig,
-                null, // IBrainStatusService
+                executionConfig,
+                LogLevel.Information, // minLevel set to Information to allow the log
+                null, // brainStatus
                 "BacklashBot", // defaultEnvironment
                 "BacklashInstance" // defaultInstance
             );

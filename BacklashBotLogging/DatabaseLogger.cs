@@ -44,7 +44,7 @@ namespace KalshiBotLogging
             string categoryName,
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel,
-            LoggingConfig? loggingConfig = null,
+            LoggingConfig loggingConfig,
             GeneralExecutionConfig? executionConfig = null,
             object? brainStatus = null,
             string defaultEnvironment = "KalshiBot",
@@ -60,11 +60,11 @@ namespace KalshiBotLogging
             _defaultInstance = defaultInstance;
 
             // Parse configurable log levels with defaults
-            if (_loggingConfig?.LogLevel?.ConsoleLogLevel != null)
+            if (_loggingConfig.ConsoleLogLevel != null)
             {
                 try
                 {
-                    _minConsoleLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.ConsoleLogLevel, true);
+                    _minConsoleLogLevel = Enum.Parse<LogLevel>(_loggingConfig.ConsoleLogLevel, true);
                 }
                 catch (ArgumentException)
                 {
@@ -76,21 +76,7 @@ namespace KalshiBotLogging
                 _minConsoleLogLevel = LogLevel.Information; // Default when not configured
             }
 
-            if (_loggingConfig?.LogLevel?.SqlDatabaseLogLevel != null)
-            {
-                try
-                {
-                    _minSqlLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
-                }
-                catch (ArgumentException)
-                {
-                    _minSqlLogLevel = LogLevel.Warning; // Default fallback
-                }
-            }
-            else
-            {
-                _minSqlLogLevel = LogLevel.Warning; // Default when not configured
-            }
+            _minSqlLogLevel = Enum.Parse<LogLevel>(_loggingConfig.SqlDatabaseLogLevel, true);
         }
 
         /// <summary>

@@ -80,17 +80,38 @@ namespace BacklashOverseer
 
             // Add database logging services
             services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), true)); // isOverseer = true
+            services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
+
+            // Create default configs for Overseer
+            var overseerLoggingConfig = new LoggingConfig
+            {
+                Environment = "Overseer",
+                StoreWebSocketEvents = false,
+                SqlDatabaseLogLevel = "Information",
+                ConsoleLogLevel = "Information"
+            };
+            var overseerExecutionConfig = new GeneralExecutionConfig
+            {
+                BrainInstance = "OverseerInstance",
+                QueuesTargetCount = 100,
+                RetryDelayMs = 1000,
+                AuthTokenValidityHours = 24,
+                HardDataStorageLocation = "Data",
+                DecisionFrequencySeconds = 60,
+                RefreshIntervalMinutes = 5,
+                SnapshotSchemaVersion = 1
+            };
+
             services.AddSingleton<ILoggerProvider>(provider =>
                 new DatabaseLoggerProvider(
                     provider.GetRequiredService<DatabaseLoggingQueue>(),
+                    overseerLoggingConfig,
+                    overseerExecutionConfig,
                     LogLevel.Information, // Allow Information level and above
-                    null, // loggingConfig
-                    null, // executionConfig
                     null, // brainStatus
                     "Overseer", // defaultEnvironment
                     "OverseerInstance" // defaultInstance
                 ));
-            services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();

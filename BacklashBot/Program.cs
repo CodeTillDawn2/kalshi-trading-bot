@@ -1,41 +1,42 @@
-using KalshiBotAPI.Configuration;
-using KalshiBotAPI.KalshiAPI;
-using KalshiBotAPI.Websockets;
-using KalshiBotAPI.WebSockets.Interfaces;
-using Microsoft.Extensions.Logging;
-using BacklashBotData.Data;
-using BacklashBotData.Data.Interfaces;
-using BacklashBotData.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using BacklashDTOs.Configuration;
 using BacklashBot.Configuration;
-using BacklashBot.Services;
 using BacklashBot.Hubs;
+using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Middleware;
+using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;
-using BacklashInterfaces.SmokehouseBot.Services;
-using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Helpers;
+using BacklashCommon.Services;
+using BacklashDTOs.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
+using BacklashInterfaces.SmokehouseBot.Services;
+using KalshiBotAPI.Configuration;
+using KalshiBotAPI.KalshiAPI;
+using KalshiBotAPI.Websockets;
+using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotLogging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using BacklashCommon.Services;
-using BacklashInterfaces.PerformanceMetrics;
-using KalshiBotLogging;
-using BacklashCommon.Helpers;
-using BacklashDTOs.Configuration;
-using BacklashCommon.Configuration;
-using BacklashBotData.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -312,26 +313,17 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentr
 builder.Services.AddSingleton<ILoggerProvider>(provider =>
 {
     var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
-    var minLevel = LogLevel.Warning; // Default
-    if (!string.IsNullOrEmpty(loggingConfig.LogLevel?.SqlDatabaseLogLevel))
-    {
-        try
-        {
-            minLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
-        }
-        catch (ArgumentException ex)
-        {
-            Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.LogLevel.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
-        }
-    }
+    var executionConfig = provider.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value;
+    var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
 
     return new DatabaseLoggerProvider(
         provider.GetRequiredService<DatabaseLoggingQueue>(),
-        minLevel,
         loggingConfig,
-        null, // IBrainStatusService - avoid circular dependency
+        executionConfig,
+        minLevel,
+        null, // brainStatus - avoid circular dependency
         "prd", // defaultEnvironment
-        provider.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value.BrainInstance); // defaultInstance
+        executionConfig.BrainInstance); // defaultInstance
 });
 
 // Register OrderbookChangeTracker with transient lifetime
@@ -548,23 +540,8 @@ builder.Services.AddSignalR(options =>
 builder.WebHost.ConfigureKestrel(options => { });
 
 var loggingConfig = builder.Configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-if (!string.IsNullOrEmpty(loggingConfig?.LogLevel?.ConsoleLogLevel))
-{
-    try
-    {
-        var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.ConsoleLogLevel, true);
-        builder.Logging.SetMinimumLevel(consoleLogLevel);
-    }
-    catch (ArgumentException ex)
-    {
-        builder.Logging.SetMinimumLevel(LogLevel.Information);
-        Console.WriteLine($"Invalid ConsoleLogLevel '{loggingConfig.LogLevel.ConsoleLogLevel}' in LoggingConfig. Falling back to Information. Error: {ex.Message}");
-    }
-}
-else
-{
-    builder.Logging.SetMinimumLevel(LogLevel.Information);
-}
+var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.ConsoleLogLevel, true);
+builder.Logging.SetMinimumLevel(consoleLogLevel);
 
 Console.WriteLine($"Building application at {DateTime.UtcNow}");
 var app = builder.Build();

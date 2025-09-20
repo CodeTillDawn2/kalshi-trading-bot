@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using KalshiBotLogging;
 using BacklashDTOs.Configuration;
+using System;
 
 namespace BacklashBotTests
 {
@@ -16,26 +17,25 @@ namespace BacklashBotTests
     {
         private Mock<DatabaseLoggingQueue> _loggingQueueMock;
         private LoggingConfig _loggingConfig;
+        private GeneralExecutionConfig _executionConfig;
 
         /// <summary>
-        /// Sets up the test environment by creating mocked dependencies.
+        /// Sets up the test environment by loading configuration and creating mocked dependencies.
         /// </summary>
         [SetUp]
         public void Setup()
         {
+            // Load configuration from appsettings.json
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .Build();
+
+            // Load configs from configuration
+            _loggingConfig = configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
+            _executionConfig = configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
+
             _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);
-            _loggingConfig = new LoggingConfig
-            {
-                LogLevel = new LogLevelSettings
-                {
-                    Default = "Warning",
-                    Microsoft = "Warning",
-                    SqlDatabaseLogLevel = "Warning",
-                    ConsoleLogLevel = "Warning"
-                },
-                Environment = "Test",
-                StoreWebSocketEvents = false
-            };
         }
 
         /// <summary>
@@ -50,9 +50,10 @@ namespace BacklashBotTests
             {
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueueMock.Object,
-                    LogLevel.Warning, // minLevel
                     _loggingConfig,
-                    null, // IBrainStatusService
+                    _executionConfig,
+                    LogLevel.Warning, // minLevel
+                    null, // brainStatus
                     "BacklashBot", // defaultEnvironment
                     "BacklashInstance" // defaultInstance
                 );
@@ -72,9 +73,10 @@ namespace BacklashBotTests
             // Arrange
             var provider = new DatabaseLoggerProvider(
                 _loggingQueueMock.Object,
-                LogLevel.Warning,
                 _loggingConfig,
-                null,
+                _executionConfig,
+                LogLevel.Warning,
+                null, // brainStatus
                 "BacklashBot",
                 "BacklashInstance"
             );
