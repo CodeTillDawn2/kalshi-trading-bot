@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -32,13 +33,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BacklashOverseer\BacklashOverseer.csproj" />
+    <ProjectReference Include="..\TradingGUI\TradingGUI.csproj" />
     <ProjectReference Include="..\KalshiBotAPI\KalshiBotAPI.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
+    <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
     <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
-    <ProjectReference Include="..\BacklashBotLogging\BacklashBotLogging.csproj" />
     <ProjectReference Include="..\BacklashCommon\BacklashCommon.csproj" />
+    <ProjectReference Include="..\BacklashBot\BacklashBot.csproj" />
   </ItemGroup>
 
   <ItemGroup>
