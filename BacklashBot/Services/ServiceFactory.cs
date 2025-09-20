@@ -24,7 +24,6 @@ namespace BacklashBot.Services
 
         private readonly object _lock = new();
         private readonly ILogger<IServiceFactory> _logger;
-        private readonly IOptions<SecretsConfig> _secretsConfig;
         private IScopeManagerService _scopeManager;
         private Guid _brainLock;
         private readonly ConcurrentDictionary<Type, object> _serviceCache = new();
@@ -34,12 +33,10 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="logger">Logger instance for recording service factory operations and errors.</param>
         /// <param name="scopeManagerService">Service responsible for managing dependency injection scopes.</param>
-        /// <param name="secretsConfig">Configuration for secrets paths.</param>
-        public ServiceFactory(ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService, IOptions<SecretsConfig> secretsConfig)
+        public ServiceFactory(ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService)
         {
             _scopeManager = scopeManagerService;
             _logger = logger;
-            _secretsConfig = secretsConfig;
         }
 
         /// <summary>
@@ -87,23 +84,7 @@ namespace BacklashBot.Services
                 _scopeManager.InitializeScope();
                 _logger.LogInformation("SF: Scope initialized");
 
-                var kalshiConfig = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOptions<KalshiConfig>>();
-
-
                 _brainLock = brainLock;
-
-
-                _logger.LogInformation("SF: About to resolve key file path");
-                var resolvedKeyFile = ConfigurationHelper.ResolveSecretsFilePath(kalshiConfig.Value.KeyFile, _secretsConfig.Value, AppDomain.CurrentDomain.BaseDirectory);
-                _logger.LogInformation("SF: Key file resolved to: {ResolvedKeyFile}", resolvedKeyFile);
-
-                if (string.IsNullOrEmpty(resolvedKeyFile) || !File.Exists(resolvedKeyFile))
-                {
-                    var errorMessage = $"Kalshi Key file not found at {resolvedKeyFile}";
-                    _logger.LogError(errorMessage);
-                    throw new FileNotFoundException(errorMessage, resolvedKeyFile);
-                }
-                _logger.LogInformation("SF: Key file validation passed");
 
                 var marketDataService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>();
                 var orderBookService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOrderBookService>();

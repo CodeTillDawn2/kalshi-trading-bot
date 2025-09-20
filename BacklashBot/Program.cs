@@ -441,18 +441,28 @@ builder.Services.AddScoped<IWebSocketConnectionManager>(sp =>
 {
     var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
     var secretsConfig = sp.GetRequiredService<IOptions<SecretsConfig>>();
+    var configuration = sp.GetRequiredService<IConfiguration>();
+
+    // Interpolate placeholders in the key file path and key id
+    string interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyFile, configuration);
+    string interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyId, configuration);
 
     // Resolve the key file path to the secrets directory
     var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        kalshiConfig.Value.KeyFile,
+        interpolatedKeyFile,
         secretsConfig.Value,
         AppDomain.CurrentDomain.BaseDirectory);
 
-    // Update the config with the resolved path
-    kalshiConfig.Value.KeyFile = resolvedKeyFile;
+    // Create a new config instance with interpolated values
+    var interpolatedConfig = new KalshiConfig
+    {
+        Environment = kalshiConfig.Value.Environment,
+        KeyId = interpolatedKeyId,
+        KeyFile = resolvedKeyFile
+    };
 
     return new WebSocketConnectionManager(
-        kalshiConfig,
+        Options.Create(interpolatedConfig),
         sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
         sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
         sp.GetRequiredService<ICentralPerformanceMonitor>()
@@ -479,18 +489,28 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp =>
 {
     var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
     var secretsConfig = sp.GetRequiredService<IOptions<SecretsConfig>>();
+    var configuration = sp.GetRequiredService<IConfiguration>();
+
+    // Interpolate placeholders in the key file path and key id
+    string interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyFile, configuration);
+    string interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyId, configuration);
 
     // Resolve the key file path to the secrets directory
     var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        kalshiConfig.Value.KeyFile,
+        interpolatedKeyFile,
         secretsConfig.Value,
         AppDomain.CurrentDomain.BaseDirectory);
 
-    // Update the config with the resolved path
-    kalshiConfig.Value.KeyFile = resolvedKeyFile;
+    // Create a new config instance with interpolated values
+    var interpolatedConfig = new KalshiConfig
+    {
+        Environment = kalshiConfig.Value.Environment,
+        KeyId = interpolatedKeyId,
+        KeyFile = resolvedKeyFile
+    };
 
     return new KalshiWebSocketClient(
-        kalshiConfig,
+        Options.Create(interpolatedConfig),
         sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
         sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
         sp.GetRequiredService<IStatusTrackerService>(),

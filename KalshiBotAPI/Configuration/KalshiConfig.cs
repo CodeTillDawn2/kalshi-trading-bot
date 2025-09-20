@@ -28,7 +28,7 @@ public class KalshiConfig
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
-    [Required(ErrorMessage = "The 'BotKeyFile' is missing in the configuration.")]
+    [Required(ErrorMessage = "The 'KeyFile' is missing in the configuration.")]
     public string KeyFile { get; set; } = null!;
 }
 

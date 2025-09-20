@@ -223,12 +223,12 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
             // Resolve KeyFile path - combine secrets path with filename from secrets
             services.PostConfigure<KalshiConfig>(config =>
             {
-                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:BotKeyFile}"))
+                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
                 {
                     // Get the key file name from secrets
-                    var keyFileName = Configuration.GetValue<string>("Kalshi:BotKeyFile");
+                    var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
                     if (!string.IsNullOrEmpty(keyFileName))
-                    {
+                    { 
                         // Get secrets path from configuration
                         var secretsPath = Configuration.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
                         // Combine secrets directory path with filename

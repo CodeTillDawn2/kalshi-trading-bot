@@ -1,6 +1,10 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace BacklashCommon.Configuration
 {
@@ -23,7 +27,19 @@ namespace BacklashCommon.Configuration
             IConfiguration baseConfig)
         {
             var secretsPath = baseConfig.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-            var secretsDir = Path.Combine(currentDir, secretsPath);
+
+            // Handle both absolute and relative paths
+            string secretsDir;
+            if (Path.IsPathRooted(secretsPath))
+            {
+                // Absolute path
+                secretsDir = secretsPath;
+            }
+            else
+            {
+                // Relative path
+                secretsDir = Path.Combine(currentDir, secretsPath);
+            }
 
             Console.WriteLine($"Secrets path: {secretsPath}");
             Console.WriteLine($"Secrets directory: {secretsDir}");
@@ -84,6 +100,41 @@ namespace BacklashCommon.Configuration
             connectionString = connectionString.Replace("{Database:Password}", configuration["Database:Password"]);
 
             return connectionString;
+        }
+
+        /// <summary>
+        /// Interpolates placeholders in a configuration value with actual values from the configuration.
+        /// This method replaces placeholders like {Section:Key} with the corresponding values from the configuration.
+        /// </summary>
+        /// <param name="value">The configuration value that may contain placeholders.</param>
+        /// <param name="configuration">The configuration instance to retrieve replacement values from.</param>
+        /// <returns>The interpolated value with placeholders replaced, or the original value if no placeholders are found.</returns>
+        public static string InterpolateConfigurationValue(string value, IConfiguration configuration)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            // Find all placeholders in the format {Section:Key}
+            var result = value;
+            var placeholderPattern = @"{([^:}]+):([^}]+)}";
+            var matches = System.Text.RegularExpressions.Regex.Matches(value, placeholderPattern);
+
+            foreach (System.Text.RegularExpressions.Match match in matches)
+            {
+                var section = match.Groups[1].Value;
+                var key = match.Groups[2].Value;
+                var configKey = $"{section}:{key}";
+                var replacementValue = configuration[configKey];
+
+                if (!string.IsNullOrEmpty(replacementValue))
+                {
+                    result = result.Replace(match.Value, replacementValue);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
