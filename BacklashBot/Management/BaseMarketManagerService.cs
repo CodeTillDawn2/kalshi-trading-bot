@@ -362,7 +362,8 @@ namespace BacklashBot.Management
 
             }
 
-            await context.RemoveMarketWatches(finalizedWatches);
+            if (finalizedWatches.Count > 0)
+                await context.RemoveMarketWatches(finalizedWatches);
             return marketsRemoved;
         }
 

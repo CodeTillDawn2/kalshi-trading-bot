@@ -318,8 +318,6 @@ namespace BacklashBot.Management
             try
             {
                 var dataCache = _serviceFactory.GetDataCache();
-                _statusTrackerService.ResetAll();
-                _readyStatus.ResetAll();
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 var snapshotService = _serviceFactory.GetTradingSnapshotService();
                 var marketDataService = _serviceFactory.GetMarketDataService();

@@ -37,8 +37,8 @@ namespace BacklashBot.State
         private readonly Counter<long> _resetOperations;
         private readonly Histogram<double> _operationTiming;
 
-        private DateTime _lastCancellationTime;
-        private int _cancellationCount;
+        private DateTime _lastCancellationTime = DateTime.MinValue;
+        private int _cancellationCount = 0;
 
         /// <summary>
         /// Initializes a new instance of the KalshiBotStatusTracker class.
@@ -56,7 +56,6 @@ namespace BacklashBot.State
             _operationTiming = _meter.CreateHistogram<double>("operation_timing", "ms", "Time taken for operations");
 
             _logger.LogInformation("KalshiBotStatusTracker initialized");
-            ResetAll();
         }
 
         /// <summary>

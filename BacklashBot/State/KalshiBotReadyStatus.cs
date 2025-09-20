@@ -27,8 +27,8 @@ namespace BacklashBot.State
         private readonly Counter<long> _readinessStateChanges;
         private readonly Histogram<double> _readinessTiming;
 
-        private DateTime _initializationStartTime;
-        private DateTime _browserStartTime;
+        private DateTime _initializationStartTime = DateTime.UtcNow;
+        private DateTime _browserStartTime = DateTime.UtcNow;
 
         /// <summary>
         /// Gets or sets the TaskCompletionSource that signals when the bot's core initialization is complete.
@@ -59,7 +59,6 @@ namespace BacklashBot.State
             _readinessTiming = _meter.CreateHistogram<double>("readiness_timing", "ms", "Time taken for readiness operations");
 
             _logger.LogInformation("KalshiBotReadyStatus initialized");
-            ResetAll();
         }
 
         /// <summary>

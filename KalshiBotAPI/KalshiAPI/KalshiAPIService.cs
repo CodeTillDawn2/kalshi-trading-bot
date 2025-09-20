@@ -1,28 +1,29 @@
-using KalshiBotAPI.Configuration;
-using BacklashBotData.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
-using BacklashInterfaces.PerformanceMetrics;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
-using BacklashCommon.Configuration;
+using BacklashInterfaces.PerformanceMetrics;
+using KalshiBotAPI.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace KalshiBotAPI.KalshiAPI
 {
@@ -706,18 +707,19 @@ namespace KalshiBotAPI.KalshiAPI
         /// <exception cref="ArgumentNullException">Thrown when eventTicker is null or empty.</exception>
         public async Task<EventResponse?> FetchEventAsync(string eventTicker, bool withNestedMarkets = false)
         {
+
+            string url = $"events/{Uri.EscapeDataString(eventTicker)}";
+            if (withNestedMarkets)
+            {
+                url += "?with_nested_markets=true";
+            }
+
             var stopwatch = Stopwatch.StartNew();
             try
             {
                 if (string.IsNullOrEmpty(eventTicker))
                 {
                     throw new ArgumentNullException(nameof(eventTicker), "Event ticker is required");
-                }
-
-                string url = $"events/{Uri.EscapeDataString(eventTicker)}";
-                if (withNestedMarkets)
-                {
-                    url += "?with_nested_markets=true";
                 }
 
                 var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/events/{eventTicker}");
@@ -844,8 +846,8 @@ namespace KalshiBotAPI.KalshiAPI
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogWarning("Unexpected error in FetchEventAsync for ticker: {EventTicker}: {ExceptionType} - {Message}, Inner {0}"
-                    , eventTicker, ex.GetType().Name, ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
+                _logger.LogWarning("Unexpected error in FetchEventAsync for ticker: {EventTicker}: {ExceptionType} - {Message}, Url: {0} Inner {1}"
+                    , eventTicker, ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
                 return null;
             }
         }
@@ -1150,9 +1152,8 @@ namespace KalshiBotAPI.KalshiAPI
                         var endDateTime = DateTimeOffset.FromUnixTimeSeconds(apiCandlestick.EndPeriodTs).UtcDateTime;
                         if (endDateTime > now)
                         {
-                            _logger.LogWarning("Future candlestick timestamp detected for {MarketTicker}, {Interval}: Original={Original}, Adjusting to={Adjusted}",
+                            _logger.LogError("Future candlestick timestamp detected for {MarketTicker}, {Interval}: Original={Original}, Adjusting to={Adjusted}",
                                 marketTicker, interval, endDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-                            apiCandlestick.EndPeriodTs = UnixHelper.ConvertToUnixTimestamp(now);
                         }
 
                         if (apiCandlestick == null) continue;
