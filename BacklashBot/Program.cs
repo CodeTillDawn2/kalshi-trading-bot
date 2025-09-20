@@ -370,7 +370,7 @@ builder.Services.AddScoped<IBacklashBotContext>(provider =>
 });
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
     sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
-    sp.GetRequiredService<IConfiguration>(),
+    sp.GetRequiredService<string>(), // connectionString
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<KalshiConfig>>(),

@@ -61,7 +61,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// Initializes a new instance of the KalshiAPIService class.
         /// </summary>
         /// <param name="logger">Logger instance for recording API operations and errors.</param>
-        /// <param name="config">Configuration instance for accessing connection strings and settings.</param>
+        /// <param name="connectionString">Database connection string for database operations.</param>
         /// <param name="scopeFactory">Factory for creating service scopes for database operations.</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         /// <param name="kalshiConfig">Configuration options specific to Kalshi core settings.</param>
@@ -69,7 +69,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="performanceMonitor">Central performance monitor for unified metrics collection.</param>
         public KalshiAPIService(
             ILogger<IKalshiAPIService> logger,
-            IConfiguration config,
+            string connectionString,
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTrackerService,
             IOptions<KalshiConfig> kalshiConfig,
@@ -83,8 +83,8 @@ namespace KalshiBotAPI.KalshiAPI
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = _apiConfig.EnablePerformanceMetrics;
 
-            // Initialize connection string from configuration
-            _connectionString = ConfigurationHelper.BuildConnectionString(config) ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
+            // Initialize connection string
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
             _httpClient = new HttpClient
             {

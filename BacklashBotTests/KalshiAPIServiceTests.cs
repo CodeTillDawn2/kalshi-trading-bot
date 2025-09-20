@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework.Interfaces;
 using System.Diagnostics;
+using System.Text.Json;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
@@ -41,9 +42,24 @@ namespace KalshiBotTests
         private Mock<ILogger<IKalshiAPIService>> _loggerMock;
 
         /// <summary>
-        /// Configuration instance loaded from appsettings.json for real API credentials.
+        /// Connection string loaded from appsettings.json.
         /// </summary>
-        private IConfiguration _configuration;
+        private string _connectionString;
+
+        /// <summary>
+        /// Kalshi configuration loaded from appsettings.json.
+        /// </summary>
+        private KalshiConfig _kalshiConfig;
+
+        /// <summary>
+        /// BacklashBotData configuration loaded from appsettings.json.
+        /// </summary>
+        private BacklashBotDataConfig _dataConfig;
+
+        /// <summary>
+        /// Secrets configuration loaded from appsettings.json.
+        /// </summary>
+        private SecretsConfig _secretsConfig;
 
         /// <summary>
         /// Mock service scope factory for dependency injection in tests.
@@ -163,33 +179,21 @@ namespace KalshiBotTests
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            // Load configuration using the same pattern as BacklashBot/Program.cs
+            // Load configuration from appsettings.json
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var baseConfig = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+            var appsettingsPath = Path.Combine(basePath, "appsettings.json");
+            var json = File.ReadAllText(appsettingsPath);
+            var doc = JsonDocument.Parse(json);
 
-            var configBuilder = new ConfigurationBuilder()
-                .AddConfiguration(baseConfig)
-                .AddSecretsConfiguration(basePath, baseConfig)
-                .AddEnvironmentVariables();
-
-            _configuration = configBuilder.Build();
+            // Parse configs from JSON
+            _connectionString = doc.RootElement.GetProperty("DBConnection").GetProperty("DefaultConnection").GetString();
+            _dataConfig = JsonSerializer.Deserialize<BacklashBotDataConfig>(doc.RootElement.GetProperty("DBConnection").GetProperty("BacklashBotData"));
+            _kalshiConfig = JsonSerializer.Deserialize<KalshiConfig>(doc.RootElement.GetProperty("Kalshi"));
+            _secretsConfig = JsonSerializer.Deserialize<SecretsConfig>(doc.RootElement.GetProperty("Secrets"));
 
             // Initialize real context to query for dynamic test data
-            var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             var logger = new Mock<ILogger<BacklashBotContext>>().Object;
-            var dataConfig = new BacklashBotDataConfig
-            {
-                MaxRetryCount = int.Parse(_configuration["DBConnection:BacklashBotData:MaxRetryCount"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:MaxRetryCount is missing")),
-                RetryDelaySeconds = double.Parse(_configuration["DBConnection:BacklashBotData:RetryDelaySeconds"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:RetryDelaySeconds is missing")),
-                BatchSize = int.Parse(_configuration["DBConnection:BacklashBotData:BatchSize"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:BatchSize is missing")),
-                MaxQueueSize = int.Parse(_configuration["DBConnection:BacklashBotData:MaxQueueSize"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:MaxQueueSize is missing")),
-                WorkersPerQueue = int.Parse(_configuration["DBConnection:BacklashBotData:WorkersPerQueue"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:WorkersPerQueue is missing")),
-                EnablePerformanceMetrics = bool.Parse(_configuration["DBConnection:BacklashBotData:EnablePerformanceMetrics"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:EnablePerformanceMetrics is missing"))
-            };
-            _realContext = new BacklashBotContext(connectionString, logger, dataConfig);
+            _realContext = new BacklashBotContext(_connectionString, logger, _dataConfig);
 
             // Query for an active market
             var activeMarket = await _realContext.GetMarketsFiltered(
@@ -240,27 +244,18 @@ namespace KalshiBotTests
         [SetUp]
         public void Setup()
         {
-            var kalshiConfig = new KalshiConfig
-            {
-                Environment = _configuration["Kalshi:Environment"] ?? throw new InvalidOperationException("Kalshi:Environment is missing"),
-                KeyId = _configuration["Kalshi:KeyId"] ?? throw new InvalidOperationException("Kalshi:KeyId is missing"),
-                KeyFile = _configuration["Kalshi:KeyFile"] ?? throw new InvalidOperationException("Kalshi:KeyFile is missing")
-            };
+            // Use the loaded kalshi config
+            var kalshiConfig = _kalshiConfig;
 
             // Validate configuration
             Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
             Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
-            // Resolve the key file path using the same method as the working applications
-            var secretsConfig = new SecretsConfig
-            {
-                SecretsPath = _configuration["Secrets:SecretsPath"] ?? throw new InvalidOperationException("Secrets:SecretsPath is missing")
-            };
-
+            // Resolve the key file path using the loaded secrets config
             var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
                 kalshiConfig.KeyFile,
-                secretsConfig,
+                _secretsConfig,
                 Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot")));
 
             kalshiConfig.KeyFile = resolvedKeyFile;
@@ -365,7 +360,7 @@ namespace KalshiBotTests
 
             _apiService = new KalshiAPIService(
                 _loggerMock.Object,
-                _configuration,
+                _connectionString,
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
                 _kalshiConfigOptions,
