@@ -59,7 +59,7 @@ namespace KalshiBotTests
         /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).
         /// </summary>
-        private IOptions<CalculationConfig> _calculationOptions;
+        private IOptions<CalculationsConfig> _calculationOptions;
 
         /// <summary>
         /// Configuration options for general execution parameters.

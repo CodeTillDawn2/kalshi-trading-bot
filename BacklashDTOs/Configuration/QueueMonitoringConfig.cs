@@ -11,7 +11,7 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// The configuration section name for QueueMonitoringConfig.
         /// </summary>
-        public const string SectionName = "Central:CentralPerformanceMonitor";
+        public const string SectionName = "Central:QueueMonitoring";
 
         /// <summary>
         /// Gets or sets the percentage threshold for queue high count alerts.
@@ -38,6 +38,6 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable database metrics collection in CentralPerformanceMonitor.
         /// </summary>
         [Required(ErrorMessage = "The 'CentralPerformanceMonitor_EnableDatabaseMetrics' is missing in the configuration.")]
-        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; }
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

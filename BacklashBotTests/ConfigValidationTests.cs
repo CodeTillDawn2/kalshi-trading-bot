@@ -48,9 +48,9 @@ namespace BacklashBotTests
             loggingSection.Bind(loggingConfig);
             ValidateConfig(loggingConfig, loggingSection);
 
-            // KalshiConfig - "Kalshi"
+            // KalshiConfig
             var kalshiConfig = new KalshiConfig();
-            var kalshiSection = _configuration.GetSection("Kalshi");
+            var kalshiSection = _configuration.GetSection(GetSectionName(typeof(KalshiConfig)));
             kalshiSection.Bind(kalshiConfig);
             ValidateConfig(kalshiConfig, kalshiSection);
 
@@ -60,9 +60,9 @@ namespace BacklashBotTests
             kalshiAPIServiceSection.Bind(kalshiAPIServiceConfig);
             ValidateConfig(kalshiAPIServiceConfig, kalshiAPIServiceSection);
 
-            // WebSocketConnectionManagerConfig - "Websockets:WebSocketConnectionManager"
+            // WebSocketConnectionManagerConfig
             var webSocketConnectionManagerConfig = new WebSocketConnectionManagerConfig();
-            var webSocketConnectionManagerSection = _configuration.GetSection("Websockets:WebSocketConnectionManager");
+            var webSocketConnectionManagerSection = _configuration.GetSection(GetSectionName(typeof(WebSocketConnectionManagerConfig)));
             webSocketConnectionManagerSection.Bind(webSocketConnectionManagerConfig);
             ValidateConfig(webSocketConnectionManagerConfig, webSocketConnectionManagerSection);
 
@@ -162,9 +162,9 @@ namespace BacklashBotTests
             kalshiBotScopeManagerServiceSection.Bind(kalshiBotScopeManagerServiceConfig);
             ValidateConfig(kalshiBotScopeManagerServiceConfig, kalshiBotScopeManagerServiceSection);
 
-            // CalculationConfig - "WatchedMarkets:Calculations" (note: JSON uses "Calculations", not "CalculationConfig")
-            var calculationConfig = new CalculationConfig();
-            var calculationSection = _configuration.GetSection("WatchedMarkets:Calculations");
+            // CalculationsConfig
+            var calculationConfig = new CalculationsConfig();
+            var calculationSection = _configuration.GetSection(GetSectionName(typeof(CalculationsConfig)));
             calculationSection.Bind(calculationConfig);
             ValidateConfig(calculationConfig, calculationSection);
 
@@ -199,9 +199,9 @@ namespace BacklashBotTests
             snapshotGroupHelperSection.Bind(snapshotGroupHelperConfig);
             ValidateConfig(snapshotGroupHelperConfig, snapshotGroupHelperSection);
 
-            // QueueMonitoringConfig - "Central:CentralPerformanceMonitor" (same as CentralPerformanceMonitorConfig)
+            // QueueMonitoringConfig
             var queueMonitoringConfig = new QueueMonitoringConfig();
-            var queueMonitoringSection = _configuration.GetSection("Central:CentralPerformanceMonitor");
+            var queueMonitoringSection = _configuration.GetSection(GetSectionName(typeof(QueueMonitoringConfig)));
             queueMonitoringSection.Bind(queueMonitoringConfig);
             ValidateConfig(queueMonitoringConfig, queueMonitoringSection);
 
@@ -235,37 +235,37 @@ namespace BacklashBotTests
         {
             var usedSections = new HashSet<string>
             {
-                "Secrets",
-                "Communications:Logging",
-                "Kalshi",
-                "API:KalshiAPIService",
-                "Websockets:WebSocketConnectionManager",
-                "Websockets:MessageProcessor",
-                "Websockets:SubscriptionManager",
-                "Websockets:WebSocketMonitor",
-                "Websockets:KalshiWebSocketClient",
-                "WatchedMarkets:TradingSnapshotService",
-                "WatchedMarkets:SnapshotPeriodHelper",
-                "WatchedMarkets:OrderbookChangeTracker",
-                "WatchedMarkets:MarketRefreshService",
-                "WatchedMarkets:PseudoCandlestickExtensions",
-                "Central:GeneralExecution",
-                "Communications:OverseerClientService",
-                "WatchedMarkets:CandlestickService",
-                "Communications:BroadcastService",
-                "WatchedMarkets:MarketDataInitializer",
-                "Central:CentralPerformanceMonitor",
-                "Central:KalshiBotScopeManagerService",
-                "WatchedMarkets:Calculations",
-                "WatchedMarkets:MarketData",
-                "Central:CentralBrain",
-                "WatchedMarkets:TargetCalculationService",
-                "Central:BrainStatusService",
-                "SnapshotGroupHelper",
-                "WatchedMarkets:InterestScore",
-                "Central:ErrorHandler",
-                "WatchedMarkets:OrderBookService",
-                "DBConnection:BacklashBotData",
+                SecretsConfig.SectionName,
+                LoggingConfig.SectionName,
+                KalshiConfig.SectionName,
+                KalshiAPIServiceConfig.SectionName,
+                WebSocketConnectionManagerConfig.SectionName,
+                MessageProcessorConfig.SectionName,
+                SubscriptionManagerConfig.SectionName,
+                WebSocketMonitorConfig.SectionName,
+                KalshiWebSocketClientConfig.SectionName,
+                TradingSnapshotServiceConfig.SectionName,
+                SnapshotPeriodHelperConfig.SectionName,
+                OrderbookChangeTrackerConfig.SectionName,
+                MarketRefreshServiceConfig.SectionName,
+                PseudoCandlestickExtensionsConfig.SectionName,
+                GeneralExecutionConfig.SectionName,
+                OverseerClientServiceConfig.SectionName,
+                CandlestickServiceConfig.SectionName,
+                BroadcastServiceConfig.SectionName,
+                MarketDataInitializerConfig.SectionName,
+                CentralPerformanceMonitorConfig.SectionName,
+                KalshiBotScopeManagerServiceConfig.SectionName,
+                CalculationsConfig.SectionName,
+                MarketDataConfig.SectionName,
+                CentralBrainConfig.SectionName,
+                TargetCalculationServiceConfig.SectionName,
+                BrainStatusServiceConfig.SectionName,
+                SnapshotGroupHelperConfig.SectionName,
+                InterestScoreConfig.SectionName,
+                ErrorHandlerConfig.SectionName,
+                OrderBookServiceConfig.SectionName,
+                BacklashBotDataConfig.SectionName,
                 "DBConnection:DefaultConnection"
             };
 
@@ -293,7 +293,10 @@ namespace BacklashBotTests
             var properties = config.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in properties)
             {
-                if (section[prop.Name] == null)
+                var subSection = section.GetSection(prop.Name);
+                bool isMissing = subSection.Value == null && !subSection.GetChildren().Any();
+
+                if (isMissing)
                 {
                     var requiredAttr = prop.GetCustomAttribute<RequiredAttribute>();
                     var message = requiredAttr != null
@@ -304,6 +307,11 @@ namespace BacklashBotTests
             }
 
             Assert.That(isValid && validationResults.Count == 0, Is.True, $"Validation failed for {config.GetType().Name}: {string.Join(", ", validationResults.Select(r => r.ErrorMessage))}");
+        }
+
+        private string GetSectionName(Type configType)
+        {
+            return (string)configType.GetField("SectionName")?.GetValue(null) ?? throw new InvalidOperationException($"SectionName not found for {configType.Name}");
         }
 
         private List<string> GetAllConfigurationKeys(IConfiguration config, string prefix = "")

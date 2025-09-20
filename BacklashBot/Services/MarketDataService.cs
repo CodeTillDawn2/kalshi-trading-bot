@@ -49,7 +49,7 @@ namespace BacklashBot.Services
         private readonly ILogger<IMarketDataService> _logger;
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
         private readonly IConfiguration _configuration;
-        private readonly CalculationConfig _calculationConfig;
+        private readonly CalculationsConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketDataConfig _marketDataConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketLocks = new();

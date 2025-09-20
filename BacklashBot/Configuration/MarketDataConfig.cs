@@ -44,7 +44,7 @@ public class MarketDataConfig
     [Required(ErrorMessage = "The 'PseudoCandlestickLookbackPeriods' is missing in the configuration.")]
     public int PseudoCandlestickLookbackPeriods { get; set; }
     [Required(ErrorMessage = "The 'CalculationConfig' is missing in the configuration.")]
-    public CalculationConfig Calculations { get; set; } 
+    public CalculationsConfig Calculations { get; set; } 
 }
 
 

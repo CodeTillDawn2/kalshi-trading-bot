@@ -191,8 +191,8 @@ builder.Services.AddOptions<OrderBookServiceConfig>()
     .Bind(builder.Configuration.GetSection(OrderBookServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<BacklashBot.State.CalculationConfig>()
-    .Bind(builder.Configuration.GetSection(BacklashBot.State.CalculationConfig.SectionName))
+builder.Services.AddOptions<BacklashBot.State.CalculationsConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBot.State.CalculationsConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<BacklashBotDataConfig>()

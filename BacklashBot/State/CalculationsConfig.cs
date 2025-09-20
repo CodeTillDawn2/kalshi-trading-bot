@@ -8,9 +8,9 @@ namespace BacklashBot.State
     /// Configuration class for calculation parameters used in MarketData.
     /// This replaces the eliminated CalculationConfig from TradingStrategies.
     /// </summary>
-    public class CalculationConfig
+    public class CalculationsConfig
     {
-        public const string SectionName = "WatchedMarkets:CalculationConfig";
+        public const string SectionName = "WatchedMarkets:MarketData:Calculations";
 
         [Required(ErrorMessage = "The 'TolerancePercentage' is missing in the configuration.")]
         public double TolerancePercentage { get; set; }

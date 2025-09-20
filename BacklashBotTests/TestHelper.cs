@@ -51,9 +51,9 @@ namespace KalshiBotTests
         /// The returned options object enables consistent testing of calculation logic without external configuration dependencies.
         /// </summary>
         /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured with comprehensive test values for technical indicators.</returns>
-        public static IOptions<CalculationConfig> GetCalculationConfig()
+        public static IOptions<CalculationsConfig> GetCalculationConfig()
         {
-            var config = GetConfiguration().GetSection("WatchedMarkets:CalculationConfig").Get<CalculationConfig>();
+            var config = GetConfiguration().GetSection("WatchedMarkets:CalculationConfig").Get<CalculationsConfig>();
             ValidateCalculationConfig(config);
             return Options.Create(config);
         }
@@ -65,7 +65,7 @@ namespace KalshiBotTests
         /// </summary>
         /// <param name="config">The CalculationConfig instance to validate.</param>
         /// <exception cref="ArgumentException">Thrown when any configuration property has an invalid value.</exception>
-        private static void ValidateCalculationConfig(CalculationConfig config)
+        private static void ValidateCalculationConfig(CalculationsConfig config)
         {
             if (config.RSI_Short_Periods <= 0) throw new ArgumentException("RSI_Short_Periods must be positive");
             if (config.RSI_Medium_Periods <= 0) throw new ArgumentException("RSI_Medium_Periods must be positive");

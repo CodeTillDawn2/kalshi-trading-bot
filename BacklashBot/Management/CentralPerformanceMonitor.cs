@@ -304,7 +304,7 @@ namespace BacklashBot.Management
         public void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)
         {
             // Check if performance metrics are enabled
-            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -330,7 +330,7 @@ namespace BacklashBot.Management
         public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled)
         {
             // Check if performance metrics are enabled
-            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -363,7 +363,7 @@ namespace BacklashBot.Management
             Dictionary<string, long>? itemCheckTimes = null)
         {
             // Check if performance metrics are enabled
-            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true))
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true))
             {
                 return;
             }
@@ -644,7 +644,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics, bool metricsEnabled)
         {
-            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -673,7 +673,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics, bool metricsEnabled)
         {
-            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -724,7 +724,7 @@ namespace BacklashBot.Management
             if (!metricsEnabled) return;
 
             // Record execution time for broadcast operations with proper enablement status
-            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
 
             // Log broadcast performance summary
             _logger.LogInformation(
@@ -778,7 +778,7 @@ namespace BacklashBot.Management
             if (!metricsEnabled) return;
 
             // Record execution time with proper enablement status
-            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(
@@ -815,7 +815,7 @@ namespace BacklashBot.Management
             var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
 
             // Record execution time with proper enablement status
-            RecordExecutionTime("OvernightActivities", totalTime, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("OvernightActivities", totalTime, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
 
             // Log comprehensive overnight performance summary
             _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
@@ -997,7 +997,7 @@ namespace BacklashBot.Management
         /// <param name="success">Whether the task was successful.</param>
         public void RecordOvernightTask(string taskName, long duration, bool success)
         {
-            RecordExecutionTime(taskName, duration, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime(taskName, duration, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
             if (!success)
             {
                 _logger.LogWarning("Overnight task '{TaskName}' failed after {Duration}ms", taskName, duration);
@@ -1056,7 +1056,7 @@ namespace BacklashBot.Management
         public void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)
         {
             // Record execution time with proper enablement status
-            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(

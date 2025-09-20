@@ -92,7 +92,7 @@ namespace BacklashBot.Services
             // Resolve critical services to validate scope initialization
             var configuration = sp.GetRequiredService<IConfiguration>();
             var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
-            var calculationConfig = sp.GetRequiredService<IOptions<CalculationConfig>>();
+            var calculationConfig = sp.GetRequiredService<IOptions<CalculationsConfig>>();
             var serviceScopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
             var marketDataLogger = sp.GetRequiredService<ILogger<IMarketDataService>>();
             var marketDataInitializerLogger = sp.GetRequiredService<ILogger<IMarketDataInitializer>>();

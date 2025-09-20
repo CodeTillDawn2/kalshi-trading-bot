@@ -23,7 +23,7 @@ namespace BacklashBot.Services
     public class TradingCalculator : ITradingCalculator
     {
         private readonly ILogger<ITradingCalculator> _logger;
-        private readonly CalculationConfig _config;
+        private readonly CalculationsConfig _config;
 
         /// <summary>
         /// Initializes a new instance of the TradingCalculator class with the specified logger and configuration.
@@ -32,7 +32,7 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording calculation events and errors.</param>
         /// <param name="config">The CalculationConfig instance containing parameters for technical indicator calculations.</param>
         /// <exception cref="ArgumentNullException">Thrown when logger or config is null.</exception>
-        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.State.CalculationConfig> config)
+        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.State.CalculationsConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
