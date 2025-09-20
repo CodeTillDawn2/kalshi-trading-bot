@@ -7,18 +7,6 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashDTOs.Configuration;
 using BacklashDTOs.Configuration;
-/// <summary>
-/// Comprehensive NUnit test fixture for validating machine learning training and evaluation workflows
-/// in the Kalshi trading bot system. This class tests the complete pipeline from real market data
-/// retrieval through ML model training, evaluation, and prediction for price flattening scenarios.
-/// </summary>
-/// <remarks>
-/// As a developer working on the ML components, this test class serves as the primary validation
-/// mechanism for ensuring that the price prediction models can be trained on real market data
-/// and produce reliable predictions. It integrates with the actual database and snapshot services
-/// to provide end-to-end testing of the ML pipeline, helping catch issues in data loading,
-/// feature engineering, model training, and prediction accuracy before they affect production.
-/// </remarks>
 using KalshiBotData.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -66,8 +54,6 @@ namespace KalshiBotTests
         /// Provides access to historical market data for ML training and evaluation.
         /// </summary>
         private ITradingSnapshotService _snapshotService;
-
-        /// <summary>
 
         /// <summary>
         /// Configuration options for general execution parameters, including decision frequencies

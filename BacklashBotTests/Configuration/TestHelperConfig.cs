@@ -9,6 +9,9 @@ namespace BacklashBotTests.Configuration
     /// </summary>
     public class TestHelperConfig
     {
+        /// <summary>
+        /// The configuration section name for TestHelperConfig in appsettings.json.
+        /// </summary>
         public const string SectionName = "TestHelper";
 
         /// <summary>

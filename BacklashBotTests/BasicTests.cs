@@ -57,8 +57,6 @@ namespace KalshiBotTests
         private Mock<ILogger<TradingCalculator>> _tradingCalculatorLoggerMock;
 
         /// <summary>
-
-        /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).
         /// </summary>
         private IOptions<CalculationConfig> _calculationOptions;
@@ -670,7 +668,7 @@ namespace KalshiBotTests
                 if (!scenario.ExpectedVWAP.HasValue)
                     throw new InvalidOperationException($"{scenario.Name}: Expected VWAP value is null");
                 var expected = scenario.ExpectedVWAP.Value;
-                var absoluteDiff = Math.Abs((result.Value - (decimal)expected));
+                var absoluteDiff = Math.Abs(result.Value - (decimal)expected);
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedVWAP.Value))) * 100 : absoluteDiff;
                 Console.WriteLine($"{scenario.Name}: VWAP Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedVWAP.Value);
