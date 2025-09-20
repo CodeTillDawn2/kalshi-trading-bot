@@ -45,13 +45,34 @@ namespace TradingGUI
             services.AddScoped<TradingSimulatorService>();
 
             // Add configuration bindings
-            services.Configure<MarketTypeServiceConfig>(configuration.GetSection("Simulator:MarketTypeService"));
-            services.Configure<EquityCalculatorConfig>(configuration.GetSection("Simulator:EquityCalculator"));
-            services.Configure<StrategySelectionHelperConfig>(configuration.GetSection("Simulator:StrategySelectionHelper"));
-            services.Configure<SimulationEngineConfig>(configuration.GetSection("Simulator:SimulationEngine"));
-            services.Configure<PatternDetectionServiceConfig>(configuration.GetSection("Simulator:PatternDetectionService"));
-            services.Configure<DataLoaderConfig>(configuration.GetSection("SnapshotHandling:DataLoader"));
-            services.Configure<SnapshotViewerConfig>(configuration.GetSection("GUI:SnapshotViewer"));
+            services.AddOptions<MarketTypeServiceConfig>()
+                .Bind(configuration.GetSection(MarketTypeServiceConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<EquityCalculatorConfig>()
+                .Bind(configuration.GetSection(EquityCalculatorConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<StrategySelectionHelperConfig>()
+                .Bind(configuration.GetSection(StrategySelectionHelperConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<SimulationEngineConfig>()
+                .Bind(configuration.GetSection(SimulationEngineConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<PatternDetectionServiceConfig>()
+                .Bind(configuration.GetSection(PatternDetectionServiceConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<DataLoaderConfig>()
+                .Bind(configuration.GetSection(DataLoaderConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<SnapshotViewerConfig>()
+                .Bind(configuration.GetSection(SnapshotViewerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Register SnapshotViewer with dependencies
             services.AddTransient<SnapshotViewer>(sp =>

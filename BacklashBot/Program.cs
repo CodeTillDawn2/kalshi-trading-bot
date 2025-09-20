@@ -70,38 +70,134 @@ builder.Configuration
     .AddCommandLine(args);
 
 // Bind configurations to respective models
-builder.Services.Configure<SecretsConfig>(builder.Configuration.GetSection("Secrets"));
-builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Communications:Logging"));
-builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
-builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API:KalshiAPIService"));
-builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websockets:WebSocketConnectionManager"));
-builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websockets:MessageProcessor"));
-builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websockets:SubscriptionManager"));
-builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websockets:WebSocketMonitor"));
-builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websockets:KalshiWebSocketClient"));
-builder.Services.Configure<TradingSnapshotServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TradingSnapshotService"));
-builder.Services.Configure<SnapshotPeriodHelperConfig>(builder.Configuration.GetSection("WatchedMarkets:SnapshotPeriodHelper"));
-builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderbookChangeTracker"));
-builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketRefreshService"));
-builder.Services.Configure<PseudoCandlestickExtensionsConfig>(builder.Configuration.GetSection("WatchedMarkets:PseudoCandlestickExtensions"));
-builder.Services.Configure<GeneralExecutionConfig>(builder.Configuration.GetSection("Central:GeneralExecution"));
-builder.Services.Configure<OverseerClientServiceConfig>(builder.Configuration.GetSection("Communications:OverseerClientService"));
-builder.Services.Configure<CandlestickServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:CandlestickService"));
-builder.Services.Configure<BroadcastServiceConfig>(builder.Configuration.GetSection("Communications:BroadcastService"));
-builder.Services.Configure<MarketDataInitializerConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketDataInitializer"));
-builder.Services.Configure<CentralPerformanceMonitorConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
-builder.Services.Configure<KalshiBotScopeManagerServiceConfig>(builder.Configuration.GetSection("Central:KalshiBotScopeManagerService"));
-builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketData"));
-builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("Central:CentralBrain"));
-builder.Services.Configure<TargetCalculationServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TargetCalculationService"));
-builder.Services.Configure<BrainStatusServiceConfig>(builder.Configuration.GetSection("Central:BrainStatusService"));
-builder.Services.Configure<SnapshotGroupHelperConfig>(builder.Configuration.GetSection("SnapshotGroupHelper"));
-builder.Services.Configure<QueueMonitoringConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
-builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("WatchedMarkets:InterestScore"));
-builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("Central:ErrorHandler"));
-builder.Services.Configure<OrderBookServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderBookService"));
-builder.Services.Configure<BacklashBot.State.CalculationConfig>(builder.Configuration.GetSection("WatchedMarkets:CalculationConfig"));
-builder.Services.Configure<BacklashBotDataConfig>(builder.Configuration.GetSection("DBConnection:BacklashBotData"));
+builder.Services.AddOptions<SecretsConfig>()
+    .Bind(builder.Configuration.GetSection(SecretsConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<LoggingConfig>()
+    .Bind(builder.Configuration.GetSection(LoggingConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiAPIServiceConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiAPIServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<WebSocketConnectionManagerConfig>()
+    .Bind(builder.Configuration.GetSection(WebSocketConnectionManagerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<MessageProcessorConfig>()
+    .Bind(builder.Configuration.GetSection(MessageProcessorConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<SubscriptionManagerConfig>()
+    .Bind(builder.Configuration.GetSection(SubscriptionManagerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<WebSocketMonitorConfig>()
+    .Bind(builder.Configuration.GetSection(WebSocketMonitorConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiWebSocketClientConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiWebSocketClientConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<TradingSnapshotServiceConfig>()
+    .Bind(builder.Configuration.GetSection(TradingSnapshotServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<SnapshotPeriodHelperConfig>()
+    .Bind(builder.Configuration.GetSection(SnapshotPeriodHelperConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<OrderbookChangeTrackerConfig>()
+    .Bind(builder.Configuration.GetSection(OrderbookChangeTrackerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<MarketRefreshServiceConfig>()
+    .Bind(builder.Configuration.GetSection(MarketRefreshServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<PseudoCandlestickExtensionsConfig>()
+    .Bind(builder.Configuration.GetSection(PseudoCandlestickExtensionsConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<GeneralExecutionConfig>()
+    .Bind(builder.Configuration.GetSection(GeneralExecutionConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<OverseerClientServiceConfig>()
+    .Bind(builder.Configuration.GetSection(OverseerClientServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<CandlestickServiceConfig>()
+    .Bind(builder.Configuration.GetSection(CandlestickServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<BroadcastServiceConfig>()
+    .Bind(builder.Configuration.GetSection(BroadcastServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<MarketDataInitializerConfig>()
+    .Bind(builder.Configuration.GetSection(MarketDataInitializerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<CentralPerformanceMonitorConfig>()
+    .Bind(builder.Configuration.GetSection(CentralPerformanceMonitorConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiBotScopeManagerServiceConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiBotScopeManagerServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<MarketDataConfig>()
+    .Bind(builder.Configuration.GetSection(MarketDataConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<CentralBrainConfig>()
+    .Bind(builder.Configuration.GetSection(CentralBrainConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<TargetCalculationServiceConfig>()
+    .Bind(builder.Configuration.GetSection(TargetCalculationServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<BrainStatusServiceConfig>()
+    .Bind(builder.Configuration.GetSection(BrainStatusServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<SnapshotGroupHelperConfig>()
+    .Bind(builder.Configuration.GetSection(SnapshotGroupHelperConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<QueueMonitoringConfig>()
+    .Bind(builder.Configuration.GetSection(QueueMonitoringConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<InterestScoreConfig>()
+    .Bind(builder.Configuration.GetSection(InterestScoreConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<ErrorHandlerConfig>()
+    .Bind(builder.Configuration.GetSection(ErrorHandlerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<OrderBookServiceConfig>()
+    .Bind(builder.Configuration.GetSection(OrderBookServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<BacklashBot.State.CalculationConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBot.State.CalculationConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<BacklashBotDataConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBotDataConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(builder.Configuration);
 builder.Services.AddSingleton(connectionString);

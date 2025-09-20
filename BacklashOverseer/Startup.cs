@@ -145,30 +145,60 @@ namespace BacklashOverseer
             services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();
 
             // Configure Kalshi settings with fallback
-            services.Configure<KalshiConfig>(Configuration.GetSection("Kalshi"));
+            services.AddOptions<KalshiConfig>()
+                .Bind(Configuration.GetSection(KalshiConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Configure OverseerHub settings
-            services.Configure<OverseerHubConfig>(Configuration.GetSection("Endpoints:OverseerHub"));
+            services.AddOptions<OverseerHubConfig>()
+                .Bind(Configuration.GetSection(OverseerHubConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Configure Overseer settings
-            services.Configure<OverseerConfig>(Configuration.GetSection("Endpoints:Overseer"));
+            services.AddOptions<OverseerConfig>()
+                .Bind(Configuration.GetSection(OverseerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Configure MarketWatchController settings
-            services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("Endpoints:MarketWatchController"));
+            services.AddOptions<MarketWatchControllerConfig>()
+                .Bind(Configuration.GetSection(MarketWatchControllerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Configure OverseerReadyConfig settings
-            services.Configure<OverseerReadyConfig>(Configuration.GetSection("OverseerReadyConfig"));
+            services.AddOptions<OverseerReadyConfig>()
+                .Bind(Configuration.GetSection(OverseerReadyConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+// Configure SubscriptionManager settings
+services.AddOptions<SubscriptionManagerConfig>()
+    .Bind(Configuration.GetSection(SubscriptionManagerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+services.AddOptions<MessageProcessorConfig>()
+    .Bind(Configuration.GetSection(MessageProcessorConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
-            // Configure SubscriptionManager settings
-            services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("Websockets:SubscriptionManager"));
-            services.Configure<MessageProcessorConfig>(Configuration.GetSection("Websockets:MessageProcessor"));
-            services.Configure<WebSocketConnectionManagerConfig>(Configuration.GetSection("Websockets:WebSocketConnectionManager"));
-            services.Configure<KalshiWebSocketClientConfig>(Configuration.GetSection("Websockets:KalshiWebSocketClient"));
+services.AddOptions<WebSocketConnectionManagerConfig>()
+    .Bind(Configuration.GetSection(WebSocketConnectionManagerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+services.AddOptions<KalshiWebSocketClientConfig>()
+    .Bind(Configuration.GetSection(KalshiWebSocketClientConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 
-            // Configure Secrets settings
-            services.Configure<BacklashCommon.Configuration.SecretsConfig>(Configuration.GetSection("Secrets"));
-
+// Configure Secrets settings
+services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
+    .Bind(Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
             // Resolve KeyFile path - combine secrets path with filename from secrets
             services.PostConfigure<KalshiConfig>(config =>
             {
@@ -243,7 +273,10 @@ namespace BacklashOverseer
                 (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
             // Register GeneralExecutionConfig
-            services.Configure<GeneralExecutionConfig>(Configuration.GetSection("GeneralExecution"));
+            services.AddOptions<GeneralExecutionConfig>()
+                .Bind(Configuration.GetSection(GeneralExecutionConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Register services needed for OvernightActivitiesHelper
             services.AddScoped<IInterestScoreService, InterestScoreService>();
