@@ -220,22 +220,20 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
     .Bind(Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-            // Resolve KeyFile path - combine secrets path with filename from secrets
+            // Interpolate placeholders in KalshiConfig
             services.PostConfigure<KalshiConfig>(config =>
             {
-                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
-                {
-                    // Get the key file name from secrets
-                    var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
-                    if (!string.IsNullOrEmpty(keyFileName))
-                    { 
-                        // Get secrets path from configuration
-                        var secretsPath = Configuration.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-                        // Combine secrets directory path with filename
-                        var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsPath);
-                        config.KeyFile = Path.Combine(secretsDir, keyFileName);
-                    }
-                }
+                // Interpolate KeyId and KeyFile
+                var interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(config.KeyId, Configuration);
+                var interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(config.KeyFile, Configuration);
+
+                // Resolve the key file path to the secrets directory
+                var secretsConfig = Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName).Get<BacklashCommon.Configuration.SecretsConfig>();
+                var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(interpolatedKeyFile, secretsConfig, Directory.GetCurrentDirectory());
+
+                // Update the config with interpolated values
+                config.KeyId = interpolatedKeyId;
+                config.KeyFile = resolvedKeyFile;
             });
 
             // Optional: Manual override if configuration binding fails

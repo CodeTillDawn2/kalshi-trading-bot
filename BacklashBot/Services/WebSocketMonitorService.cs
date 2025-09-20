@@ -76,6 +76,7 @@ namespace BacklashBot.Services
         private readonly List<TimeSpan> _timeBetweenFailures = new List<TimeSpan>();
         private readonly List<TimeSpan> _timeToRecovery = new List<TimeSpan>();
 
+
         /// <summary>
         /// Initializes a new instance of the WebSocketMonitorService with required dependencies.
         /// </summary>
@@ -127,6 +128,7 @@ namespace BacklashBot.Services
         public void StartServices(CancellationToken cancellationToken)
         {
             _logger.LogDebug("WebSocketMonitorService starting...");
+
             try
             {
                 _logger.LogDebug("Initial cache state: InitializationCompleted.IsCompleted={IsCompleted}", _readyStatus.InitializationCompleted.Task.IsCompleted);
@@ -146,7 +148,6 @@ namespace BacklashBot.Services
             }
             _logger.LogDebug("WebSocketMonitorService started.");
         }
-
         /// <summary>
         /// Stops the WebSocket monitoring services gracefully by closing any active WebSocket connection
         /// and waiting for the monitoring task to complete.
@@ -418,6 +419,7 @@ namespace BacklashBot.Services
             if (totalTime.TotalMilliseconds == 0) return 0;
             return (_totalUptime.TotalMilliseconds / totalTime.TotalMilliseconds) * 100;
         }
+
 
         /// <summary>
         /// Gets the current WebSocket connection status.

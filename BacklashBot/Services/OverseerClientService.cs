@@ -170,8 +170,8 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Exception: {0}, ST:{1}"
-                    , ex.Message, ex.StackTrace);
+                _logger.LogInformation("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Exception: {0}"
+                    , ex.Message);
             }
         }
 
@@ -502,7 +502,6 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogInformation("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
-                _logger.LogInformation("OVERSEER- Stack trace: {StackTrace}", ex.StackTrace);
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)

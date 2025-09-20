@@ -571,8 +571,16 @@ namespace BacklashBotData.Data
             }
 
             TrackPerformanceMetric("AddOrUpdateMarkets", successCount > failureCount, stopwatch.Elapsed);
-            _logger?.LogInformation("AddOrUpdateMarkets completed: {SuccessCount} successes, {FailureCount} failures",
-                successCount, failureCount);
+            if (failureCount > 0)
+            {
+                _logger?.LogDebug("AddOrUpdateMarkets completed: {SuccessCount} successes, {FailureCount} failures",
+                    successCount, failureCount);
+            }
+            else
+            {
+                _logger?.LogWarning("AddOrUpdateMarkets completed with failures: {SuccessCount} successes, {FailureCount} failures",
+                    successCount, failureCount);
+            }
         }
 
         /// <summary>

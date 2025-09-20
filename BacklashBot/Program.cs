@@ -82,6 +82,22 @@ builder.Services.AddOptions<KalshiConfig>()
     .Bind(builder.Configuration.GetSection(KalshiConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+// Interpolate placeholders in KalshiConfig
+builder.Services.PostConfigure<KalshiConfig>(config =>
+{
+    // Interpolate KeyId and KeyFile
+    var interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(config.KeyId, builder.Configuration);
+    var interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(config.KeyFile, builder.Configuration);
+
+    // Resolve the key file path to the secrets directory
+    var secretsConfig = builder.Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName).Get<BacklashCommon.Configuration.SecretsConfig>();
+    var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(interpolatedKeyFile, secretsConfig, AppDomain.CurrentDomain.BaseDirectory);
+
+    // Update the config with interpolated values
+    config.KeyId = interpolatedKeyId;
+    config.KeyFile = resolvedKeyFile;
+});
 builder.Services.AddOptions<KalshiAPIServiceConfig>()
     .Bind(builder.Configuration.GetSection(KalshiAPIServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -437,37 +453,12 @@ builder.Services.AddSingleton<IOverseerClientService>(sp => new OverseerClientSe
     sp.GetRequiredService<IOptions<OverseerClientServiceConfig>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>()));
-builder.Services.AddScoped<IWebSocketConnectionManager>(sp =>
-{
-    var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
-    var secretsConfig = sp.GetRequiredService<IOptions<SecretsConfig>>();
-    var configuration = sp.GetRequiredService<IConfiguration>();
-
-    // Interpolate placeholders in the key file path and key id
-    string interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyFile, configuration);
-    string interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyId, configuration);
-
-    // Resolve the key file path to the secrets directory
-    var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        interpolatedKeyFile,
-        secretsConfig.Value,
-        AppDomain.CurrentDomain.BaseDirectory);
-
-    // Create a new config instance with interpolated values
-    var interpolatedConfig = new KalshiConfig
-    {
-        Environment = kalshiConfig.Value.Environment,
-        KeyId = interpolatedKeyId,
-        KeyFile = resolvedKeyFile
-    };
-
-    return new WebSocketConnectionManager(
-        Options.Create(interpolatedConfig),
-        sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
-        sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
-        sp.GetRequiredService<ICentralPerformanceMonitor>()
-    );
-});
+builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConnectionManager(
+    sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
+    sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>()
+));
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<ILogger<MessageProcessor>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
@@ -485,45 +476,20 @@ builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
 ));
-builder.Services.AddScoped<IKalshiWebSocketClient>(sp =>
-{
-    var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
-    var secretsConfig = sp.GetRequiredService<IOptions<SecretsConfig>>();
-    var configuration = sp.GetRequiredService<IConfiguration>();
-
-    // Interpolate placeholders in the key file path and key id
-    string interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyFile, configuration);
-    string interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.Value.KeyId, configuration);
-
-    // Resolve the key file path to the secrets directory
-    var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        interpolatedKeyFile,
-        secretsConfig.Value,
-        AppDomain.CurrentDomain.BaseDirectory);
-
-    // Create a new config instance with interpolated values
-    var interpolatedConfig = new KalshiConfig
-    {
-        Environment = kalshiConfig.Value.Environment,
-        KeyId = interpolatedKeyId,
-        KeyFile = resolvedKeyFile
-    };
-
-    return new KalshiWebSocketClient(
-        Options.Create(interpolatedConfig),
-        sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
-        sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
-        sp.GetRequiredService<IStatusTrackerService>(),
-        sp.GetRequiredService<IBotReadyStatus>(),
-        sp.GetRequiredService<ISqlDataService>(),
-        sp.GetRequiredService<IWebSocketConnectionManager>(),
-        sp.GetRequiredService<ISubscriptionManager>(),
-        sp.GetRequiredService<IMessageProcessor>(),
-        sp.GetRequiredService<IDataCache>(),
-        sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
-        sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
-    );
-});
+builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
+    sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
+    sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<IBotReadyStatus>(),
+    sp.GetRequiredService<ISqlDataService>(),
+    sp.GetRequiredService<IWebSocketConnectionManager>(),
+    sp.GetRequiredService<ISubscriptionManager>(),
+    sp.GetRequiredService<IMessageProcessor>(),
+    sp.GetRequiredService<IDataCache>(),
+    sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+    sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
+));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
     new OvernightActivitiesHelper(
