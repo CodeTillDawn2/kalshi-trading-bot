@@ -53,7 +53,8 @@ namespace OverseerTests
                 ApiFetchIntervalMinutes = 10,
                 SystemInfoLogIntervalMinutes = 1,
                 SignalRBatchSize = 10,
-                BrainBatchSize = 50
+                BrainBatchSize = 50,
+                EnableOverseerPerformanceMetrics = true
             };
 
             var configOptions = Options.Create(_config);

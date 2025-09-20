@@ -26,7 +26,16 @@ namespace KalshiBotTests
         public void Setup()
         {
             _loggerMock = new Mock<ILogger>();
-            _config = new TrendCalculationConfig();
+            _config = new TrendCalculationConfig
+            {
+                SmoothingOffset = 0.1,
+                MinLookback = 5,
+                MaxLookback = 50,
+                DefaultLookback = 20,
+                MinPatternSize = 1,
+                MaxPatternSize = 10,
+                LookbackPeriods = new[] { 1, 2, 3, 4, 5 }
+            };
             TrendCalcs.SetConfig(_config);
             TrendCalcs.SetLogger(_loggerMock.Object);
         }

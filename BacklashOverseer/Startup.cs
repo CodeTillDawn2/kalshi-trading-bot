@@ -133,7 +133,7 @@ namespace BacklashOverseer
             {
                 var connectionString = ConfigurationHelper.BuildConnectionString(Configuration);
                 var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
-                var dataConfig = Configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+                var dataConfig = Configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
                 return new BacklashBotContext(connectionString, logger, dataConfig);
             });
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
@@ -155,6 +155,9 @@ namespace BacklashOverseer
 
             // Configure MarketWatchController settings
             services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("Endpoints:MarketWatchController"));
+
+            // Configure OverseerReadyConfig settings
+            services.Configure<OverseerReadyConfig>(Configuration.GetSection("OverseerReadyConfig"));
 
             // Configure SubscriptionManager settings
             services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("Websockets:SubscriptionManager"));

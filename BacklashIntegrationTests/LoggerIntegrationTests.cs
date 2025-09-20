@@ -40,7 +40,12 @@ namespace BacklashIntegrationTests
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
             // Arrange
-            var loggingConfig = new LoggingConfig();
+            var loggingConfig = new LoggingConfig
+            {
+                LogLevel = _configuration.GetSection("Communications:Logging:LogLevel").Get<LogLevelSettings>(),
+                Environment = _configuration["Kalshi:Environment"] ?? "prd",
+                StoreWebSocketEvents = bool.Parse(_configuration["Communications:Logging:StoreWebSocketEvents"] ?? "false")
+            };
             _configuration.GetSection("Communications:Logging").Bind(loggingConfig);
 
             // Act & Assert
@@ -68,7 +73,12 @@ namespace BacklashIntegrationTests
         public void DatabaseLoggerProvider_CanLogEntry()
         {
             // Arrange
-            var loggingConfig = new LoggingConfig();
+            var loggingConfig = new LoggingConfig
+            {
+                LogLevel = _configuration.GetSection("Communications:Logging:LogLevel").Get<LogLevelSettings>(),
+                Environment = _configuration["Kalshi:Environment"] ?? "prd",
+                StoreWebSocketEvents = bool.Parse(_configuration["Communications:Logging:StoreWebSocketEvents"] ?? "false")
+            };
             _configuration.GetSection("Communications:Logging").Bind(loggingConfig);
 
             var provider = new DatabaseLoggerProvider(

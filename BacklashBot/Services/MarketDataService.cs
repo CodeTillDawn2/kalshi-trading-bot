@@ -86,7 +86,7 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _configuration = config;
             _loggingConfig = loggingConfig.Value;
-            _marketDataConfig = marketDataConfigOptions?.Value ?? new MarketDataConfig();
+            _marketDataConfig = marketDataConfigOptions?.Value;
             _marketDataFactory = marketDataFactory;
             _statusTracker = statusTracker;
             _readyStatus = readyStatus;

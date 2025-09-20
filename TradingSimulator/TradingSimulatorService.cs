@@ -141,8 +141,8 @@ namespace TradingSimulator
         /// </summary>
         public void Setup()
         {
-            // Use the current directory (TradingGUI's directory) for configuration
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
+            // Use the BacklashOverseer directory for configuration
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "BacklashOverseer"));
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
@@ -156,11 +156,15 @@ namespace TradingSimulator
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
-            _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>());
+            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>()!);
             _simulatorOptions = Options.Create(simulatorConfig);
 
             // Configure DataLoaderConfig
-            var dataLoaderConfig = config.GetSection("SnapshotHandling:DataLoader").Get<DataLoaderConfig>() ?? new DataLoaderConfig();
+            var dataLoaderConfig = new DataLoaderConfig
+            {
+                EnableSnapshotValidation = bool.Parse(config["SnapshotHandling:DataLoader:EnableSnapshotValidation"] ?? "true"),
+                MinSnapshotCountForValidation = int.Parse(config["SnapshotHandling:DataLoader:MinSnapshotCountForValidation"] ?? "10")
+            };
             var dataLoaderOptions = Options.Create(dataLoaderConfig);
 
             var connectionString = ConfigurationHelper.BuildConnectionString(config);
@@ -188,10 +192,10 @@ namespace TradingSimulator
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, 
+            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object,
                 Options.Create(
-                    new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }), 
-                Options.Create(new BacklashDTOs.Configuration.GeneralExecutionConfig { HardDataStorageLocation = @"C:\Temp\Storage" }), _scopeFactory, config, null);
+                    new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }),
+                _executionConfig, _scopeFactory, config, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();

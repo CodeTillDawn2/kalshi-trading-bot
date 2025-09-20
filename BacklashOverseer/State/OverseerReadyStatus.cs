@@ -54,7 +54,11 @@ namespace BacklashOverseer.State
         public OverseerReadyStatus(ILogger<OverseerReadyStatus> logger, IOptions<OverseerReadyConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config?.Value ?? new OverseerReadyConfig();
+            _config = config?.Value ?? new OverseerReadyConfig
+            {
+                DefaultInitializationState = false,
+                DefaultBrowserReadyState = false
+            };
             _meter = new Meter("BacklashOverseer.ReadyStatus");
             _readinessTimingHistogram = _meter.CreateHistogram<double>("readiness_timing", unit: "ms", description: "Timing for readiness state changes");
             ResetAll();
