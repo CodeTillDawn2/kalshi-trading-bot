@@ -241,7 +241,6 @@ namespace BacklashBotTests
                 typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
                 typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
-                typeof(TradingStrategies.Configuration.SimulationConfig).Assembly, // TradingStrategies
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
                 typeof(MarketDataConfig).Assembly // BacklashBot itself
             };
@@ -281,7 +280,6 @@ namespace BacklashBotTests
                 typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
                 typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
-                typeof(TradingStrategies.Configuration.SimulationConfig).Assembly, // TradingStrategies
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
                 typeof(MarketDataConfig).Assembly // BacklashBot itself
             };

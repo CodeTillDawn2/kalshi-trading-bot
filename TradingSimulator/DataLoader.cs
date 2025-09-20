@@ -6,6 +6,7 @@ using BacklashDTOs;
 using BacklashDTOs.Configuration;
 using Microsoft.Extensions.Options;
 using BacklashBotData.Data.Interfaces;
+using TradingStrategies.Configuration;
 
 namespace TradingSimulator
 {
