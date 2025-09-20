@@ -10,6 +10,7 @@ using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashBot.Management;
 using OverseerBotShared;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -35,6 +36,11 @@ namespace BacklashBot.Services
         private Timer? _checkInTimer;
         private Timer? _overseerDiscoveryTimer;
         private bool _isConnected = false;
+
+        /// <summary>
+        /// Gets a value indicating whether the service is currently connected to an Overseer.
+        /// </summary>
+        public bool IsConnected => _isConnected;
         private string _clientId;
         private string _clientName = "BacklashBot";
         private string _clientType = "TradingBot";
@@ -86,7 +92,8 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
-        /// <param name="executionConfig">Configuration options including the brain instance name.</param>
+        /// <param name="overseerConfig">Configuration options for the overseer.</param>
+        /// <param name="generalConfig">Configuration options for general execution settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
         public OverseerClientService(
             ILogger<OverseerClientService> logger,

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace BacklashDTOs.Configuration
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for CentralPerformanceMonitor settings.

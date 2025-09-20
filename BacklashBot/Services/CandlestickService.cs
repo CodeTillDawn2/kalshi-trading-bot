@@ -13,6 +13,7 @@ using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {

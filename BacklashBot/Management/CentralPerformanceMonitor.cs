@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using OverseerBotShared;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Management
 {
@@ -202,7 +203,6 @@ namespace BacklashBot.Management
         /// <param name="generalExecutionConfig">Configuration settings for general execution parameters.</param>
         /// <param name="queueMonitoringConfig">Configuration settings for queue monitoring parameters.</param>
         /// <param name="centralPerformanceMonitorConfig">Configuration settings for CentralPerformanceMonitor parameters.</param>
-        /// <param name="tradingConfig">Configuration settings for trading parameters.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         public CentralPerformanceMonitor(
@@ -210,7 +210,6 @@ namespace BacklashBot.Management
             IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<QueueMonitoringConfig> queueMonitoringConfig,
             IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
-            IOptions<GeneralExecutionConfig> generalExecutionConfig2,
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTrackerService)
         {
@@ -1568,6 +1567,12 @@ namespace BacklashBot.Management
                 // Get the broadcast service and send the metrics
                 using var serviceScope = _scopeFactory.CreateScope();
                 var serviceFactory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
+                var overseerClientService = serviceFactory.GetOverseerClientService();
+                if (!overseerClientService.IsConnected)
+                {
+                    _logger.LogDebug("No Overseer connected, skipping performance metrics broadcast.");
+                    return;
+                }
                 var broadcastService = serviceFactory.GetBroadcastService() as BroadcastService;
                 if (broadcastService != null)
                 {

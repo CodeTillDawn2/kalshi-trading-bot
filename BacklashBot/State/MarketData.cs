@@ -47,12 +47,14 @@ using BacklashDTOs.Data;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
+using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.State
 {
     public class MarketData : IMarketData
     {
-        private readonly CalculationConfig _calculationConfig;
+        private readonly MarketDataConfig _marketDataConfig;
 
         private readonly ILogger<IMarketData> _logger;
         private readonly IOrderbookChangeTracker _changeTracker;
@@ -159,17 +161,17 @@ namespace BacklashBot.State
         /// <param name="logger">Logger instance for recording market data operations and events.</param>
         /// <param name="tradingCalculator">Calculator service for technical indicators and trading metrics.</param>
         /// <param name="changeTracker">Tracker for monitoring order book changes and velocities.</param>
-        /// <param name="calculationConfig">Configuration options for calculation parameters and thresholds, allowing runtime customization.</param>
+        /// <param name="marketDataConfig">Configuration options for calculation parameters and thresholds, allowing runtime customization.</param>
         /// <exception cref="ArgumentNullException">Thrown when any required dependency is null.</exception>
         public MarketData(
             MarketDTO market,
             ILogger<IMarketData> logger,
             ITradingCalculator tradingCalculator,
             IOrderbookChangeTracker changeTracker,
-            IOptions<CalculationConfig> calculationConfig)
+            IOptions<MarketDataConfig> marketDataConfig)
         {
-            _calculationConfig = calculationConfig?.Value ?? throw new ArgumentNullException(nameof(calculationConfig));
-            _tolerancePercentage = _calculationConfig.TolerancePercentage;
+            _marketDataConfig = marketDataConfig?.Value ?? throw new ArgumentNullException(nameof(marketDataConfig));
+            _tolerancePercentage = _marketDataConfig.Calculations.TolerancePercentage;
             _marketTicker = market.market_ticker ?? "";
             _marketCategory = market.category ?? "";
             _marketInfo = market;
@@ -602,7 +604,7 @@ namespace BacklashBot.State
                 if (candle != null) _allTimeLowNoBid = (candle.AskHigh, candle.Date);
 
 
-                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-_calculationConfig.RecentCandlestickDays)).ToList();
+                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-_marketDataConfig.Calculations.RecentCandlestickDays)).ToList();
                 candle = recentCandlesticks.MaxBy(x => x.BidHigh);
                 if (candle != null) _recentHighYesBid = (candle.BidHigh, candle.Date);
                 candle = recentCandlesticks.MaxBy(x => 100 - x.AskHigh);
@@ -649,8 +651,8 @@ namespace BacklashBot.State
         private void CalculateSlope()
         {
             var now = DateTime.UtcNow;
-            var shortMinAgo = now.AddMinutes(-_calculationConfig.SlopeShortMinutes);
-            var mediumMinAgo = now.AddMinutes(-_calculationConfig.SlopeMediumMinutes);
+            var shortMinAgo = now.AddMinutes(-_marketDataConfig.Calculations.SlopeShortMinutes);
+            var mediumMinAgo = now.AddMinutes(-_marketDataConfig.Calculations.SlopeMediumMinutes);
 
             var recentTickers = _tickers
                 .Where(t => t.LoggedDate >= shortMinAgo && t.LoggedDate <= now)
@@ -741,35 +743,35 @@ namespace BacklashBot.State
         public async Task UpdateTradingMetrics()
         {
             _logger.LogDebug("**Started updating trading metrics for {marketTicker}**", _marketTicker);
-            _minutePseudoCandlesticks = await BuildPseudoCandlesticks("minute");
-            _hourPseudoCandlesticks = await BuildPseudoCandlesticks("hour");
-            _dayPseudoCandlesticks = await BuildPseudoCandlesticks("day");
+            _minutePseudoCandlesticks = await BuildPseudoCandlesticks("minute", _marketDataConfig.PseudoCandlestickLookbackPeriods);
+            _hourPseudoCandlesticks = await BuildPseudoCandlesticks("hour", _marketDataConfig.PseudoCandlestickLookbackPeriods);
+            _dayPseudoCandlesticks = await BuildPseudoCandlesticks("day", _marketDataConfig.PseudoCandlestickLookbackPeriods);
             var minuteCopy = _minutePseudoCandlesticks.ToList();
             var hourCopy = _hourPseudoCandlesticks.ToList();
             var dayCopy = _dayPseudoCandlesticks.ToList();
 
             await Task.Run(() =>
             {
-                _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _calculationConfig.RSI_Short_Periods);
+                _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _marketDataConfig.Calculations.RSI_Short_Periods);
             if (_rsi_Short != null) _rsi_Short = Math.Round((double)_rsi_Short, 2);
-            _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _calculationConfig.RSI_Medium_Periods);
+            _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _marketDataConfig.Calculations.RSI_Medium_Periods);
             if (_rsi_Medium != null) _rsi_Medium = Math.Round((double)_rsi_Medium, 2);
-            _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _calculationConfig.RSI_Long_Periods);
+            _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _marketDataConfig.Calculations.RSI_Long_Periods);
             if (_rsi_Long != null) _rsi_Long = Math.Round((double)_rsi_Long, 2);
 
             _macd_Medium = _tradingCalculator.CalculateMACD(hourCopy,
-                _calculationConfig.MACD_Medium_FastPeriod,
-                _calculationConfig.MACD_Medium_SlowPeriod,
-                _calculationConfig.MACD_Medium_SignalPeriod);
+                _marketDataConfig.Calculations.MACD_Medium_FastPeriod,
+                _marketDataConfig.Calculations.MACD_Medium_SlowPeriod,
+                _marketDataConfig.Calculations.MACD_Medium_SignalPeriod);
 
             if (_macd_Medium.MACD != null) _macd_Medium.MACD = Math.Round((double)_macd_Medium.MACD, 2);
             if (_macd_Medium.Signal != null) _macd_Medium.Signal = Math.Round((double)_macd_Medium.Signal, 2);
             if (_macd_Medium.Histogram != null) _macd_Medium.Histogram = Math.Round((double)_macd_Medium.Histogram, 2);
 
             _macd_Long = _tradingCalculator.CalculateMACD(dayCopy,
-                _calculationConfig.MACD_Long_FastPeriod,
-                _calculationConfig.MACD_Long_SlowPeriod,
-                _calculationConfig.MACD_Long_SignalPeriod);
+                _marketDataConfig.Calculations.MACD_Long_FastPeriod,
+                _marketDataConfig.Calculations.MACD_Long_SlowPeriod,
+                _marketDataConfig.Calculations.MACD_Long_SignalPeriod);
 
             if (_macd_Long.MACD != null) _macd_Long.MACD = Math.Round((double)_macd_Long.MACD, 2);
             if (_macd_Long.Signal != null) _macd_Long.Signal = Math.Round((double)_macd_Long.Signal, 2);
@@ -777,50 +779,50 @@ namespace BacklashBot.State
 
 
             _ema_Medium = TradingCalculations.CalculateEMA(hourCopy.Select(c => c.MidClose).ToList(),
-            _calculationConfig.EMA_Medium_Periods);
+            _marketDataConfig.Calculations.EMA_Medium_Periods);
             if (_ema_Medium != null) _ema_Medium = Math.Round((double)_ema_Medium, 2);
 
 
             _ema_Long = TradingCalculations.CalculateEMA(dayCopy.Select(c => c.MidClose).ToList(),
-                _calculationConfig.EMA_Long_Periods);
+                _marketDataConfig.Calculations.EMA_Long_Periods);
             if (_ema_Long != null) _ema_Long = Math.Round((double)_ema_Long, 2);
 
             _bollingerbands_Medium = _tradingCalculator.CalculateBollingerBands(hourCopy,
-                _calculationConfig.BollingerBands_Medium_Periods,
-                _calculationConfig.BollingerBands_Medium_StdDev);
+                _marketDataConfig.Calculations.BollingerBands_Medium_Periods,
+                _marketDataConfig.Calculations.BollingerBands_Medium_StdDev);
 
             if (_bollingerbands_Medium.lower != null) _bollingerbands_Medium.lower = Math.Round((double)_bollingerbands_Medium.lower, 2);
             if (_bollingerbands_Medium.middle != null) _bollingerbands_Medium.middle = Math.Round((double)_bollingerbands_Medium.middle, 2);
             if (_bollingerbands_Medium.upper != null) _bollingerbands_Medium.upper = Math.Round((double)_bollingerbands_Medium.upper, 2);
 
             _bollingerbands_Long = _tradingCalculator.CalculateBollingerBands(dayCopy,
-                _calculationConfig.BollingerBands_Long_Periods,
-                _calculationConfig.BollingerBands_Long_StdDev);
+                _marketDataConfig.Calculations.BollingerBands_Long_Periods,
+                _marketDataConfig.Calculations.BollingerBands_Long_StdDev);
             if (_bollingerbands_Long.lower != null) _bollingerbands_Long.lower = Math.Round((double)_bollingerbands_Long.lower, 2);
             if (_bollingerbands_Long.middle != null) _bollingerbands_Long.middle = Math.Round((double)_bollingerbands_Long.middle, 2);
             if (_bollingerbands_Long.upper != null) _bollingerbands_Long.upper = Math.Round((double)_bollingerbands_Long.upper, 2);
 
-            _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _calculationConfig.ATR_Medium_Periods);
+            _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _marketDataConfig.Calculations.ATR_Medium_Periods);
             if (_atr_Medium != null) _atr_Medium = Math.Round((double)_atr_Medium, 2);
-            _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _calculationConfig.ATR_Long_Periods);
+            _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _marketDataConfig.Calculations.ATR_Long_Periods);
             if (_atr_Long != null) _atr_Long = Math.Round((double)_atr_Long, 2);
-            _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _calculationConfig.VWAP_Short_Periods);
+            _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _marketDataConfig.Calculations.VWAP_Short_Periods);
             if (_vwap_Short != null) _vwap_Short = Math.Round((double)_vwap_Short, 2);
-            _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _calculationConfig.VWAP_Medium_Periods);
+            _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _marketDataConfig.Calculations.VWAP_Medium_Periods);
             if (_vwap_Medium != null) _vwap_Medium = Math.Round((double)_vwap_Medium, 2);
             _stochasticoscilator_Short = _tradingCalculator.CalculateStochastic(minuteCopy,
-                _calculationConfig.Stochastic_Short_Periods,
-                _calculationConfig.Stochastic_Short_DPeriods);
+                _marketDataConfig.Calculations.Stochastic_Short_Periods,
+                _marketDataConfig.Calculations.Stochastic_Short_DPeriods);
             if (_stochasticoscilator_Short.K != null) _stochasticoscilator_Short.K = Math.Round((double)_stochasticoscilator_Short.K, 2);
             if (_stochasticoscilator_Short.D != null) _stochasticoscilator_Short.D = Math.Round((double)_stochasticoscilator_Short.D, 2);
             _stochasticoscilator_Medium = _tradingCalculator.CalculateStochastic(hourCopy,
-                _calculationConfig.Stochastic_Medium_Periods,
-                _calculationConfig.Stochastic_Medium_DPeriods);
+                _marketDataConfig.Calculations.Stochastic_Medium_Periods,
+                _marketDataConfig.Calculations.Stochastic_Medium_DPeriods);
             if (_stochasticoscilator_Medium.K != null) _stochasticoscilator_Medium.K = Math.Round((double)_stochasticoscilator_Medium.K, 2);
             if (_stochasticoscilator_Medium.D != null) _stochasticoscilator_Medium.D = Math.Round((double)_stochasticoscilator_Medium.D, 2);
             _stochasticoscilator_Long = _tradingCalculator.CalculateStochastic(dayCopy,
-                _calculationConfig.Stochastic_Long_Periods,
-                _calculationConfig.Stochastic_Long_DPeriods);
+                _marketDataConfig.Calculations.Stochastic_Long_Periods,
+                _marketDataConfig.Calculations.Stochastic_Long_DPeriods);
             if (_stochasticoscilator_Long.K != null) _stochasticoscilator_Long.K = Math.Round((double)_stochasticoscilator_Long.K, 2);
             if (_stochasticoscilator_Long.D != null) _stochasticoscilator_Long.D = Math.Round((double)_stochasticoscilator_Long.D, 2);
             _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
@@ -838,7 +840,7 @@ namespace BacklashBot.State
 
             CalculateSlope();
 
-            RecentCandlesticks = minuteCopy.TakeLast(_calculationConfig.RecentCandlesticksCount).ToList();
+            RecentCandlesticks = minuteCopy.TakeLast(_marketDataConfig.Calculations.RecentCandlesticksCount).ToList();
             var psarValue = _tradingCalculator.CalculatePSAR(minuteCopy);
             PSAR = psarValue.HasValue ? Math.Round((double)psarValue.Value, 2) : null;
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
@@ -1034,7 +1036,7 @@ namespace BacklashBot.State
         private double CalculateTradingFees(int contracts, double priceInDollars)
         {
             // fees = roundup(fee_rate * C * P * (1-P))
-            double fee = _calculationConfig.TradingFeeRate * contracts * priceInDollars * (1 - priceInDollars);
+            double fee = _marketDataConfig.Calculations.TradingFeeRate * contracts * priceInDollars * (1 - priceInDollars);
             return Math.Ceiling(fee * 100) / 100; // Round up to the next cent
         }
 
@@ -1117,7 +1119,7 @@ namespace BacklashBot.State
                 // Use default lookback if not specified
                 if (lookbackPeriods == 0)
                 {
-                    lookbackPeriods = _calculationConfig.PseudoCandlestickLookbackPeriods;
+                    lookbackPeriods = _marketDataConfig.Calculations.PseudoCandlestickLookbackPeriods;
                 }
 
                 // Retrieve and sort data once (ascending for binary search efficiency)

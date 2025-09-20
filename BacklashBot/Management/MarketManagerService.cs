@@ -9,6 +9,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashBot.State.Interfaces;
 using TradingStrategies.Configuration;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Management
 {

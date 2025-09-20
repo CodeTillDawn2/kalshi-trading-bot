@@ -216,7 +216,6 @@ builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerfo
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
     sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>()));
 builder.Services.AddSingleton<IPerformanceMonitor>(provider =>
@@ -366,7 +365,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ICentralPerformanceMonitor>()
             ),
-            sp.GetRequiredService<IOptions<BacklashBot.State.CalculationConfig>>()
+            sp.GetRequiredService<IOptions<MarketDataConfig>>()
         );
     };
 });
