@@ -152,7 +152,7 @@ namespace BacklashBot.Services
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning("OVERSEER- Failed to connect to overseer. Exception: {0}", ex.Message);
+                            _logger.LogInformation("OVERSEER- Failed to connect to overseer. Exception: {0}", ex.Message);
                         }
                     });
                 }
@@ -163,7 +163,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Exception: {0}, ST:{1}"
+                _logger.LogInformation("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Exception: {0}, ST:{1}"
                     , ex.Message, ex.StackTrace);
             }
         }
@@ -206,7 +206,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Error stopping overseer client. Error: {0}", ex.Message);
+                _logger.LogInformation("Error stopping overseer client. Error: {0}", ex.Message);
             }
         }
 
@@ -255,7 +255,7 @@ namespace BacklashBot.Services
                         }
                         catch (Exception stopEx)
                         {
-                            _logger.LogWarning("OVERSEER- Error stopping connection during cleanup: {Error}", stopEx.Message);
+                            _logger.LogInformation("OVERSEER- Error stopping connection during cleanup: {Error}", stopEx.Message);
                         }
                     }
                     else
@@ -271,7 +271,7 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning("OVERSEER- Error during connection cleanup: {Error}", ex.Message);
+                    _logger.LogInformation("OVERSEER- Error during connection cleanup: {Error}", ex.Message);
                     // Force null the connection even if disposal failed
                     _hubConnection = null;
                 }
@@ -384,7 +384,7 @@ namespace BacklashBot.Services
             // Check circuit breaker
             if (IsCircuitBreakerOpen())
             {
-                _logger.LogWarning("OVERSEER- Circuit breaker is open, skipping connection attempt to {Url}", overseerUrl);
+                _logger.LogInformation("OVERSEER- Circuit breaker is open, skipping connection attempt to {Url}", overseerUrl);
                 return;
             }
 
@@ -433,7 +433,7 @@ namespace BacklashBot.Services
                 // Verify connection is in correct state before starting
                 if (_hubConnection.State != HubConnectionState.Disconnected)
                 {
-                    _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State);
+                    _logger.LogInformation("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State);
                     await CleanupConnectionAsync();
 
                     _hubConnection = new HubConnectionBuilder()
@@ -482,7 +482,7 @@ namespace BacklashBot.Services
             }
             catch (TaskCanceledException)
             {
-                _logger.LogWarning("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
+                _logger.LogInformation("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -494,8 +494,8 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
-                _logger.LogWarning("OVERSEER- Stack trace: {StackTrace}", ex.StackTrace);
+                _logger.LogInformation("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
+                _logger.LogInformation("OVERSEER- Stack trace: {StackTrace}", ex.StackTrace);
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -612,7 +612,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
+                _logger.LogInformation("OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
             }
             finally
             {
@@ -646,7 +646,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("OVERSEER- Failed during overseer discovery process. Will retry on next cycle. Error: {Error}", ex.Message);
+                _logger.LogInformation("OVERSEER- Failed during overseer discovery process. Will retry on next cycle. Error: {Error}", ex.Message);
             }
         }
 
@@ -744,7 +744,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("OVERSEER- Failed to refresh auth token: {Error}", ex.Message);
+                _logger.LogInformation("OVERSEER- Failed to refresh auth token: {Error}", ex.Message);
                 _authToken = null;
                 _authTokenExpiry = DateTime.MinValue;
             }
@@ -920,7 +920,7 @@ namespace BacklashBot.Services
         {
             if (_hubConnection == null)
             {
-                _logger.LogWarning("OVERSEER- Cannot send handshake: HubConnection is null");
+                _logger.LogInformation("OVERSEER- Cannot send handshake: HubConnection is null");
                 return;
             }
 
@@ -929,7 +929,7 @@ namespace BacklashBot.Services
 
             if (!IsConnectionActive())
             {
-                _logger.LogWarning("OVERSEER- Cannot send handshake: Connection not active (IsConnected={IsConnected}, State={State})",
+                _logger.LogInformation("OVERSEER- Cannot send handshake: Connection not active (IsConnected={IsConnected}, State={State})",
                     _isConnected, _hubConnection.State);
                 return;
             }
@@ -960,7 +960,7 @@ namespace BacklashBot.Services
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
             {
-                _logger.LogWarning("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
+                _logger.LogInformation("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
                     _isConnected = false;

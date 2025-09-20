@@ -1114,7 +1114,7 @@ namespace KalshiBotAPI.Websockets
 
         /// <summary>
         /// Background task that monitors subscription health and detects stale subscriptions.
-        /// Periodically checks for subscriptions that may have become unresponsive and attempts recovery.
+        /// Only runs health checks infrequently and only when there are genuine issues.
         /// </summary>
         /// <returns>A task representing the background operation.</returns>
         private async Task MonitorSubscriptionHealthAsync()
@@ -1124,8 +1124,13 @@ namespace KalshiBotAPI.Websockets
             {
                 try
                 {
+                    // Only check health every 10 minutes instead of every 30 seconds
+                    // The API doesn't require frequent health checks for active subscriptions
+                    await Task.Delay(TimeSpan.FromMinutes(10), _processingCancellationToken);
+
                     var now = DateTime.UtcNow;
-                    var staleThreshold = TimeSpan.FromMinutes(5); // Configurable?
+                    var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
+                    bool hasStaleSubscriptions = false;
 
                     _subscriptionLock.EnterReadLock();
                     try
@@ -1137,13 +1142,14 @@ namespace KalshiBotAPI.Websockets
                             if (sid != 0)
                             {
                                 // Check if this subscription has been active recently
-                                // For simplicity, check if we have recent confirmations or messages
-                                var hasRecentActivity = _pendingSubscriptionConfirmations.Any(c => c.Value.Channel == channel && (now - c.Value.SentTime) < staleThreshold);
+                                // Look for recent subscription activity (not pending confirmations since they're removed after confirmation)
+                                var hasRecentActivity = _recentSubscriptions.Any(r => r.Key.StartsWith($"{GetActionFromChannel(channel)}:") && (now - r.Value) < staleThreshold);
+
                                 if (!hasRecentActivity)
                                 {
-                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, initiating health check", channel, sid);
-                                    // Could send a ping or resubscribe
-                                    await ResubscribeAsync(true); // Force resubscribe
+                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, will resubscribe all", channel, sid);
+                                    hasStaleSubscriptions = true;
+                                    break; // No need to check further, we'll resubscribe all
                                 }
                             }
                         }
@@ -1152,13 +1158,17 @@ namespace KalshiBotAPI.Websockets
                     {
                         _subscriptionLock.ExitReadLock();
                     }
+
+                    if (hasStaleSubscriptions)
+                    {
+                        _logger.LogInformation("Resubscribing to all subscriptions due to detected stale subscriptions");
+                        await ResubscribeAsync(true); // Force resubscribe to all
+                    }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error during subscription health monitoring");
                 }
-
-                await Task.Delay(_healthCheckIntervalMs, _processingCancellationToken);
             }
             _logger.LogDebug("Subscription health monitor stopped");
         }

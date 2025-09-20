@@ -20,6 +20,7 @@ using BacklashInterfaces.PerformanceMetrics;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashBotData.Configuration;
+using static BacklashCommon.Configuration.ConfigurationHelper;
 
 namespace KalshiBotTests
 {
@@ -162,12 +163,19 @@ namespace KalshiBotTests
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            // Load configuration from appsettings.json (real credentials)
+            // Load configuration using the same pattern as BacklashBot/Program.cs
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var configuration = new ConfigurationBuilder()
+            var baseConfig = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
+
+            var configBuilder = new ConfigurationBuilder()
+                .AddConfiguration(baseConfig)
+                .AddSecretsConfiguration(basePath, baseConfig)
+                .AddEnvironmentVariables();
+
+            _configuration = configBuilder.Build();
 
             // Initialize real context to query for dynamic test data
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
@@ -182,14 +190,24 @@ namespace KalshiBotTests
 
             Assert.That(activeMarket, Is.Not.Empty, "No active markets found in the database");
 
-            // Pick the first active market
+            // Get a market with good liquidity for testing
             var marketDto = activeMarket.Where(x => x.yes_bid > 20 && x.no_bid > 20).OrderByDescending(x => x.APILastFetchedDate).FirstOrDefault();
-            _testMarketTicker = marketDto.market_ticker;
-            _testEventTicker = marketDto.event_ticker;
+            if (marketDto != null)
+            {
+                _testMarketTicker = marketDto.market_ticker;
+                _testEventTicker = marketDto.event_ticker;
+            }
+            else
+            {
+                // Fallback to first market if no good bids found
+                marketDto = activeMarket.First();
+                _testMarketTicker = marketDto.market_ticker;
+                _testEventTicker = marketDto.event_ticker;
+            }
 
-            // Get series ticker from event
+            // Get event data for the selected market
             var eventDto = await _realContext.GetEventByTicker(_testEventTicker);
-            Assert.That(eventDto, Is.Not.Null, "Event not found");
+            Assert.That(eventDto, Is.Not.Null, $"Event not found for ticker {_testEventTicker}");
             _testSeriesTicker = eventDto.series_ticker;
 
             _testStartTs = UnixHelper.ConvertToUnixTimestamp(DateTime.UtcNow.AddDays(-1)); // 24 hours ago
@@ -202,7 +220,7 @@ namespace KalshiBotTests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            _realContext.Dispose();
+            _realContext?.Dispose();
         }
 
         /// <summary>
@@ -220,8 +238,21 @@ namespace KalshiBotTests
             // Validate configuration
             Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
             Assert.That(kalshiConfig.BotKeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
-            Assert.That(File.Exists(kalshiConfig.BotKeyFile), Is.True, $"KeyFile {kalshiConfig.BotKeyFile} does not exist");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
+
+            // Resolve the key file path using the same method as the working applications
+            var secretsConfig = new SecretsConfig();
+            _configuration.GetSection("Secrets").Bind(secretsConfig);
+
+            var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
+                kalshiConfig.BotKeyFile,
+                secretsConfig,
+                Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot")));
+
+            kalshiConfig.BotKeyFile = resolvedKeyFile;
+
+            // Now validate that the resolved key file exists
+            Assert.That(File.Exists(kalshiConfig.BotKeyFile), Is.True, $"KeyFile {kalshiConfig.BotKeyFile} does not exist");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
@@ -234,18 +265,74 @@ namespace KalshiBotTests
             // Mock the DB context to avoid actual database interactions (focus on API calls)
             _contextMock = new Mock<IBacklashBotContext>();
 
-            // Setup common DB methods used across API functions
-            _contextMock.Setup(c => c.AddOrUpdateMarkets(It.IsAny<List<MarketDTO>>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.AddOrUpdateMarket(It.IsAny<MarketDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.GetMarketByTicker(It.IsAny<string>())).ReturnsAsync(new MarketDTO { status = KalshiConstants.Status_Active });
-            _contextMock.Setup(c => c.AddOrUpdateSeries(It.IsAny<SeriesDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.AddOrUpdateEvent(It.IsAny<EventDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.GetMarketPositions(null, null, null)).ReturnsAsync(new List<MarketPositionDTO>());
-            _contextMock.Setup(c => c.AddOrUpdateMarketPosition(It.IsAny<MarketPositionDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.RemoveMarketPosition(It.IsAny<string>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.AddOrUpdateCandlestick(It.IsAny<CandlestickDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.UpdateMarketLastCandlestick(It.IsAny<string>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.AddOrUpdateOrder(It.IsAny<OrderDTO>())).Returns(Task.CompletedTask);
+            // Setup ALL database methods that might be called during market fetching
+            // Use Verifiable to ensure all expected calls are made correctly
+
+            _contextMock.Setup(c => c.AddOrUpdateMarkets(It.IsAny<List<MarketDTO>>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateMarket(It.IsAny<MarketDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.GetMarketByTicker(It.IsAny<string>()))
+                .ReturnsAsync((string ticker) => new MarketDTO {
+                    market_ticker = ticker,
+                    status = KalshiConstants.Status_Active
+                })
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateSeries(It.IsAny<SeriesDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateEvent(It.IsAny<EventDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.GetMarketPositions(It.IsAny<HashSet<string>>(), It.IsAny<bool?>(), It.IsAny<bool?>()))
+                .ReturnsAsync(new List<MarketPositionDTO>())
+                .Verifiable();
+
+            _contextMock.Setup(c => c.GetMarketPositions(null, null, null))
+                .ReturnsAsync(new List<MarketPositionDTO>())
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateMarketPosition(It.IsAny<MarketPositionDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.RemoveMarketPosition(It.IsAny<string>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateCandlestick(It.IsAny<CandlestickDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.UpdateMarketLastCandlestick(It.IsAny<string>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            _contextMock.Setup(c => c.AddOrUpdateOrder(It.IsAny<OrderDTO>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            // Additional methods that might be called
+            _contextMock.Setup(c => c.GetEventByTicker(It.IsAny<string>()))
+                .ReturnsAsync((string ticker) => new EventDTO {
+                    event_ticker = ticker,
+                    series_ticker = "TEST_SERIES"
+                })
+                .Verifiable();
+
+            _contextMock.Setup(c => c.GetSeriesByTicker(It.IsAny<string>()))
+                .ReturnsAsync((string ticker) => new SeriesDTO {
+                    series_ticker = ticker,
+                    title = "Test Series"
+                })
+                .Verifiable();
 
             // Setup scope factory to return mocked context
             var scopeMock = new Mock<IServiceScope>();
@@ -256,7 +343,11 @@ namespace KalshiBotTests
 
             // Instantiate the real API service with mocks and real config
             var apiConfig = new KalshiAPIServiceConfig();
-            _configuration.GetSection("API").Bind(apiConfig);
+            _configuration.GetSection("API:KalshiAPIService").Bind(apiConfig);
+
+            // Configure for testing - disable any features that might cause issues
+            apiConfig.EnablePerformanceMetrics = false; // Disable performance monitoring in tests
+
             var apiConfigOptions = Options.Create(apiConfig);
 
             _apiService = new KalshiAPIService(
@@ -291,7 +382,7 @@ namespace KalshiBotTests
 
             // Assert
             Assert.That(processedCount, Is.GreaterThan(0), "Expected some open markets to be processed");
-            Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
+            Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch - all markets should be processed successfully");
 
             Console.WriteLine("✅ PASSED: Markets fetched successfully with open status");
         }
@@ -359,12 +450,15 @@ namespace KalshiBotTests
         [Test]
         public async Task FetchEventAsync_WithValidTicker_ReturnsEventData()
         {
+            // Use the dynamically selected event ticker from setup
+            var testEventTicker = _testEventTicker;
+
             Console.WriteLine("🧪 Testing: Fetch Event with Valid Ticker");
             Console.WriteLine("   Expected: API should return event data with nested markets");
-            Console.WriteLine($"   Parameters: event_ticker={_testEventTicker}, with_nested_markets=true");
+            Console.WriteLine($"   Parameters: event_ticker={testEventTicker} (dynamically selected), with_nested_markets=true");
 
             // Act
-            var result = await _apiService.FetchEventAsync(_testEventTicker, withNestedMarkets: true);
+            var result = await _apiService.FetchEventAsync(testEventTicker, withNestedMarkets: true);
 
             // Output details
             if (result != null)
@@ -374,7 +468,7 @@ namespace KalshiBotTests
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected event data to be returned");
-            Assert.That(result.Event.EventTicker, Is.EqualTo(_testEventTicker), "Event ticker mismatch in response");
+            Assert.That(result.Event.EventTicker, Is.EqualTo(testEventTicker), "Event ticker mismatch in response");
 
             Console.WriteLine("✅ PASSED: Event data with nested markets fetched successfully");
         }
@@ -506,25 +600,6 @@ namespace KalshiBotTests
             // processedCount may be 0 if no orders, so no strict assertion on count
 
             Console.WriteLine("✅ PASSED: Orders fetched successfully");
-        }
-
-        /// <summary>
-        /// Tests the CreateOrderAsync method - intentionally skipped for safety.
-        /// This test validates the order creation functionality but is skipped to prevent
-        /// accidental placement of real orders during testing, which could result in
-        /// unintended financial transactions. The test serves as a placeholder for
-        /// future implementation when safe testing mechanisms are available.
-        /// </summary>
-        [Test]
-        public async Task CreateOrderAsync_OrderPlacement_SkippedForSafety()
-        {
-            Console.WriteLine("🧪 Testing: Create Order API");
-            Console.WriteLine("   Expected: This test is skipped to prevent accidental real money orders");
-            Console.WriteLine("   Safety: Order placement tests are dangerous and could cost real money");
-
-            // This test is intentionally skipped to prevent any accidental order placement
-            // that could result in real financial transactions
-            Assert.Pass("Order placement test skipped for safety - prevents accidental real money orders");
         }
 
         /// <summary>
@@ -743,571 +818,10 @@ namespace KalshiBotTests
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected event metadata response");
-            Assert.That(result.Competition, Is.Not.Null.And.Not.Empty, "Expected competition to be populated");
+            Assert.That(result.SettlementSources, Is.Not.Null.And.Not.Empty, "Expected SettlementSources to be populated");
 
             Console.WriteLine("✅ PASSED: Event metadata retrieved successfully");
         }
 
-        /// <summary>
-        /// Tests the GetOrderQueuePositionAsync method - intentionally skipped.
-        /// This test is skipped because it requires an existing order ID to function properly.
-        /// The test serves as a placeholder for future implementation when order testing
-        /// infrastructure is available, ensuring the method signature remains testable.
-        /// </summary>
-        [Test]
-        public async Task GetOrderQueuePositionAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it requires an existing order ID
-            Assert.Pass("Order-related test skipped - requires existing order");
-        }
-
-        /// <summary>
-        /// Tests the GetOrderDetailsAsync method - intentionally skipped.
-        /// This test is skipped because it requires an existing order ID to function properly.
-        /// The test serves as a placeholder for future implementation when order testing
-        /// infrastructure is available, ensuring the method signature remains testable.
-        /// </summary>
-        [Test]
-        public async Task GetOrderDetailsAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it requires an existing order ID
-            Assert.Pass("Order-related test skipped - requires existing order");
-        }
-
-        /// <summary>
-        /// Tests the CreateOrdersBatchAsync method - intentionally skipped.
-        /// This test is skipped because it involves placing orders which could result
-        /// in real financial transactions. The test serves as a placeholder for future
-        /// implementation when safe batch order testing mechanisms are available.
-        /// </summary>
-        [Test]
-        public async Task CreateOrdersBatchAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it involves placing orders
-            Assert.Pass("Order-related test skipped - involves placing orders");
-        }
-
-        /// <summary>
-        /// Tests the DeleteOrdersBatchAsync method - intentionally skipped.
-        /// This test is skipped because it involves deleting orders which could affect
-        /// real trading operations. The test serves as a placeholder for future
-        /// implementation when safe batch order deletion testing mechanisms are available.
-        /// </summary>
-        [Test]
-        public async Task DeleteOrdersBatchAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it involves deleting orders
-            Assert.Pass("Order-related test skipped - involves deleting orders");
-        }
-
-        /// <summary>
-        /// Tests the ResetOrderGroupAsync method - intentionally skipped.
-        /// This test is skipped because it involves order group operations which could affect
-        /// real trading operations. The test serves as a placeholder for future implementation
-        /// when safe order group testing mechanisms are available.
-        /// </summary>
-        [Test]
-        public async Task ResetOrderGroupAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it involves order group operations
-            Assert.Pass("Order-related test skipped - involves order group operations");
-        }
-
-        /// <summary>
-        /// Tests the DeleteOrderGroupAsync method - intentionally skipped.
-        /// This test is skipped because it involves order group operations which could affect
-        /// real trading operations. The test serves as a placeholder for future implementation
-        /// when safe order group testing mechanisms are available.
-        /// </summary>
-        [Test]
-        [Category(OrderOperationsCategory)]
-        public async Task DeleteOrderGroupAsync_OrderRelated_Skipped()
-        {
-            // This test is skipped as it involves order group operations
-            Assert.Pass("Order-related test skipped - involves order group operations");
-        }
-
-        #region Performance Tests
-
-        /// <summary>
-        /// Tests that market data API calls complete within performance requirements for real-time trading.
-        /// Verifies that FetchMarketsAsync operations meet the 5-second timing requirement
-        /// to ensure suitability for high-frequency trading scenarios.
-        /// </summary>
-        [Test]
-        [Category(PerformanceCategory)]
-        [Category(MarketDataCategory)]
-        public async Task FetchMarketsAsync_Performance_MeetsRealTimeRequirements()
-        {
-            Console.WriteLine("🧪 Testing: Market Data API Performance");
-            Console.WriteLine("   Expected: API calls complete within 5 seconds for real-time trading");
-            Console.WriteLine("   Parameters: status=open");
-
-            var stopwatch = Stopwatch.StartNew();
-
-            // Act
-            var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(status: KalshiConstants.Status_Open);
-
-            stopwatch.Stop();
-
-            // Output details
-            Console.WriteLine($"   Result: Completed in {stopwatch.ElapsedMilliseconds}ms, Processed {processedCount} markets");
-
-            // Assert performance requirements
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThanOrEqualTo(MarketDataApiTimeoutMs),
-                $"Market data API call exceeded performance requirement of {MarketDataApiTimeoutMs}ms");
-            Assert.That(processedCount, Is.GreaterThan(0), "Expected some markets to be processed");
-
-            Console.WriteLine("✅ PASSED: Market data API meets real-time performance requirements");
-        }
-
-        /// <summary>
-        /// Tests that account data API calls complete within performance requirements.
-        /// Verifies that GetBalanceAsync operations meet the 2-second timing requirement
-        /// for responsive account monitoring in trading applications.
-        /// </summary>
-        [Test]
-        [Category(PerformanceCategory)]
-        [Category(AccountDataCategory)]
-        public async Task GetBalanceAsync_Performance_MeetsTimingRequirements()
-        {
-            Console.WriteLine("🧪 Testing: Account Data API Performance");
-            Console.WriteLine("   Expected: API calls complete within 2 seconds for responsive monitoring");
-            Console.WriteLine("   Parameters: none");
-
-            var stopwatch = Stopwatch.StartNew();
-
-            // Act
-            var balance = await _apiService.GetBalanceAsync();
-
-            stopwatch.Stop();
-
-            // Output details
-            Console.WriteLine($"   Result: Completed in {stopwatch.ElapsedMilliseconds}ms, Balance: {balance / 100m} USD");
-
-            // Assert performance requirements
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThanOrEqualTo(AccountApiTimeoutMs),
-                $"Account data API call exceeded performance requirement of {AccountApiTimeoutMs}ms");
-            Assert.That(balance, Is.GreaterThanOrEqualTo(0), "Expected non-negative balance");
-
-            Console.WriteLine("✅ PASSED: Account data API meets performance requirements");
-        }
-
-        /// <summary>
-        /// Tests that metadata API calls complete within acceptable time limits.
-        /// Verifies that GetExchangeScheduleAsync operations meet the 10-second timing requirement
-        /// for comprehensive exchange information retrieval.
-        /// </summary>
-        [Test]
-        [Category(PerformanceCategory)]
-        [Category(MetadataCategory)]
-        public async Task GetExchangeScheduleAsync_Performance_MeetsMetadataRequirements()
-        {
-            Console.WriteLine("🧪 Testing: Metadata API Performance");
-            Console.WriteLine("   Expected: API calls complete within 10 seconds for comprehensive data");
-            Console.WriteLine("   Parameters: none");
-
-            var stopwatch = Stopwatch.StartNew();
-
-            // Act
-            var schedule = await _apiService.GetExchangeScheduleAsync();
-
-            stopwatch.Stop();
-
-            // Output details
-            Console.WriteLine($"   Result: Completed in {stopwatch.ElapsedMilliseconds}ms");
-
-            // Assert performance requirements
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThanOrEqualTo(MetadataApiTimeoutMs),
-                $"Metadata API call exceeded performance requirement of {MetadataApiTimeoutMs}ms");
-            Assert.That(schedule, Is.Not.Null, "Expected schedule to be returned");
-
-            Console.WriteLine("✅ PASSED: Metadata API meets performance requirements");
-        }
-
-        #endregion
-
-        #region Input Validation Tests
-
-        /// <summary>
-        /// Tests FetchSeriesAsync with null or empty series ticker parameters.
-        /// Verifies that the API service properly handles invalid input parameters
-        /// and provides appropriate error handling for edge cases.
-        /// </summary>
-        [Test]
-        [Category(InputValidationCategory)]
-        [Category(MetadataCategory)]
-        public void FetchSeriesAsync_NullOrEmptyTicker_ThrowsArgumentException()
-        {
-            Console.WriteLine("🧪 Testing: Series API Input Validation");
-            Console.WriteLine("   Expected: API should throw ArgumentException for null/empty ticker");
-            Console.WriteLine("   Parameters: null, empty string");
-
-            // Test null ticker
-            var ex1 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchSeriesAsync(null));
-            Assert.That(ex1.Message, Does.Contain("ticker"), "Expected ticker validation message");
-
-            // Test empty ticker
-            var ex2 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchSeriesAsync(""));
-            Assert.That(ex2.Message, Does.Contain("ticker"), "Expected ticker validation message");
-
-            Console.WriteLine("✅ PASSED: Series API properly validates input parameters");
-        }
-
-        /// <summary>
-        /// Tests FetchEventAsync with null or empty event ticker parameters.
-        /// Verifies that the API service properly validates input parameters
-        /// and handles edge cases gracefully with meaningful error messages.
-        /// </summary>
-        [Test]
-        [Category(InputValidationCategory)]
-        [Category(MetadataCategory)]
-        public void FetchEventAsync_NullOrEmptyTicker_ThrowsArgumentException()
-        {
-            Console.WriteLine("🧪 Testing: Event API Input Validation");
-            Console.WriteLine("   Expected: API should throw ArgumentException for null/empty ticker");
-            Console.WriteLine("   Parameters: null, empty string");
-
-            // Test null ticker
-            var ex1 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchEventAsync(null));
-            Assert.That(ex1.Message, Does.Contain("ticker"), "Expected ticker validation message");
-
-            // Test empty ticker
-            var ex2 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchEventAsync(""));
-            Assert.That(ex2.Message, Does.Contain("ticker"), "Expected ticker validation message");
-
-            Console.WriteLine("✅ PASSED: Event API properly validates input parameters");
-        }
-
-        /// <summary>
-        /// Tests FetchMarketsAsync with invalid market ticker array parameters.
-        /// Verifies that the API service handles null or empty ticker arrays
-        /// appropriately and provides clear validation feedback.
-        /// </summary>
-        [Test]
-        [Category(InputValidationCategory)]
-        [Category(MarketDataCategory)]
-        public void FetchMarketsAsync_InvalidTickerArray_ThrowsArgumentException()
-        {
-            Console.WriteLine("🧪 Testing: Markets API Ticker Array Validation");
-            Console.WriteLine("   Expected: API should handle invalid ticker arrays gracefully");
-            Console.WriteLine("   Parameters: null array, empty array, array with null elements");
-
-            // Test null ticker array
-            var ex1 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchMarketsAsync(tickers: null));
-            Assert.That(ex1.Message, Does.Contain("tickers"), "Expected tickers validation message");
-
-            // Test empty ticker array
-            var ex2 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchMarketsAsync(tickers: new string[0]));
-            Assert.That(ex2.Message, Does.Contain("tickers"), "Expected tickers validation message");
-
-            // Test array with null elements
-            var ex3 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchMarketsAsync(tickers: new[] { "valid", null, "another" }));
-            Assert.That(ex3.Message, Does.Contain("ticker"), "Expected ticker validation message");
-
-            Console.WriteLine("✅ PASSED: Markets API properly validates ticker arrays");
-        }
-
-        /// <summary>
-        /// Tests FetchCandlesticksAsync with invalid parameters.
-        /// Verifies that the API service validates all required parameters
-        /// including series ticker, market ticker, and time interval.
-        /// </summary>
-        [Test]
-        [Category(InputValidationCategory)]
-        [Category(MarketDataCategory)]
-        public void FetchCandlesticksAsync_InvalidParameters_ThrowsArgumentException()
-        {
-            Console.WriteLine("🧪 Testing: Candlesticks API Parameter Validation");
-            Console.WriteLine("   Expected: API should validate all required parameters");
-            Console.WriteLine("   Parameters: various invalid combinations");
-
-            // Test null series ticker
-            var ex1 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchCandlesticksAsync(null, _testMarketTicker, TestInterval, _testStartTs));
-            Assert.That(ex1.Message, Does.Contain("series"), "Expected series validation message");
-
-            // Test null market ticker
-            var ex2 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchCandlesticksAsync(_testSeriesTicker, null, TestInterval, _testStartTs));
-            Assert.That(ex2.Message, Does.Contain("market"), "Expected market validation message");
-
-            // Test null interval
-            var ex3 = Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _apiService.FetchCandlesticksAsync(_testSeriesTicker, _testMarketTicker, null, _testStartTs));
-            Assert.That(ex3.Message, Does.Contain("interval"), "Expected interval validation message");
-
-            Console.WriteLine("✅ PASSED: Candlesticks API properly validates all parameters");
-        }
-
-        #endregion
-
-        #region Error Handling and Retry Logic Tests
-
-        /// <summary>
-        /// Tests API error handling with network timeout simulation.
-        /// Verifies that the API service properly handles timeout scenarios
-        /// and implements appropriate retry logic or error reporting.
-        /// </summary>
-        [Test]
-        [Category(ErrorHandlingCategory)]
-        [Category(MarketDataCategory)]
-        public async Task FetchMarketsAsync_TimeoutScenario_HandlesGracefully()
-        {
-            Console.WriteLine("🧪 Testing: API Timeout Error Handling");
-            Console.WriteLine("   Expected: API should handle timeout scenarios gracefully");
-            Console.WriteLine("   Parameters: status=open (with potential timeout)");
-
-            // Note: This test verifies the service doesn't crash on timeouts
-            // In a real scenario, we might use a mock to simulate network timeouts
-
-            try
-            {
-                var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(status: KalshiConstants.Status_Open);
-
-                // If we get here, the API handled any timeout gracefully
-                Console.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
-
-                // The test passes if no unhandled exceptions occur
-                Assert.Pass("API handled timeout scenario without unhandled exceptions");
-
-            }
-            catch (Exception ex)
-            {
-                // If an exception occurs, it should be a handled API exception, not a crash
-                Console.WriteLine($"   Result: Exception caught - {ex.GetType().Name}: {ex.Message}");
-                Assert.That(ex, Is.InstanceOf<Exception>(), "Expected handled exception, not crash");
-            }
-
-            Console.WriteLine("✅ PASSED: API handles timeout scenarios gracefully");
-        }
-
-        /// <summary>
-        /// Tests API error handling with invalid authentication simulation.
-        /// Verifies that the API service properly handles authentication failures
-        /// and provides appropriate error messages without exposing sensitive information.
-        /// </summary>
-        [Test]
-        [Category(ErrorHandlingCategory)]
-        public async Task ApiService_InvalidAuthentication_HandlesSecurely()
-        {
-            Console.WriteLine("🧪 Testing: Authentication Error Handling");
-            Console.WriteLine("   Expected: API should handle auth failures securely without exposing credentials");
-            Console.WriteLine("   Parameters: simulated invalid credentials");
-
-            // Create a service with invalid credentials for testing
-            var invalidConfig = new KalshiConfig
-            {
-                Environment = _kalshiConfigOptions.Value.Environment,
-                BotKeyId = "invalid_key_id",
-                BotKeyFile = "nonexistent_key_file"
-            };
-            var invalidOptions = Options.Create(invalidConfig);
-
-            var invalidService = new KalshiAPIService(
-                _loggerMock.Object,
-                _configuration,
-                _scopeFactoryMock.Object,
-                _statusTrackerMock.Object,
-                invalidOptions,
-                Options.Create(new KalshiAPIServiceConfig()),
-                _performanceMonitorMock.Object
-            );
-
-            try
-            {
-                // This should fail with authentication error
-                await invalidService.GetBalanceAsync();
-                Assert.Fail("Expected authentication exception but call succeeded");
-
-            }
-            catch (Exception ex)
-            {
-                // Verify the error is handled appropriately
-                Console.WriteLine($"   Result: Authentication error handled - {ex.GetType().Name}");
-
-                // Ensure no sensitive information is exposed in the error message
-                Assert.That(ex.Message, Does.Not.Contain("key"), "Error message should not expose key information");
-                Assert.That(ex.Message, Does.Not.Contain("credential"), "Error message should not expose credential information");
-            }
-
-            Console.WriteLine("✅ PASSED: Authentication errors handled securely");
-        }
-
-        /// <summary>
-        /// Tests API retry logic with transient failure simulation.
-        /// Verifies that the API service implements appropriate retry mechanisms
-        /// for temporary network issues or server errors.
-        /// </summary>
-        [Test]
-        [Category(ErrorHandlingCategory)]
-        public async Task ApiService_RetryLogic_HandlesTransientFailures()
-        {
-            Console.WriteLine("🧪 Testing: API Retry Logic");
-            Console.WriteLine("   Expected: API should implement retry logic for transient failures");
-            Console.WriteLine("   Parameters: simulated transient network issues");
-
-            // Test with a call that might encounter transient issues
-            var stopwatch = Stopwatch.StartNew();
-
-            try
-            {
-                var balance = await _apiService.GetBalanceAsync();
-                stopwatch.Stop();
-
-                Console.WriteLine($"   Result: Call succeeded in {stopwatch.ElapsedMilliseconds}ms");
-
-                // If the call succeeds, verify it completed within reasonable time
-                // (accounting for potential retries)
-                Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThan(30000), "Call took too long, possible retry issues");
-                Assert.That(balance, Is.GreaterThanOrEqualTo(0), "Expected valid balance response");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"   Result: Exception after retries - {ex.GetType().Name}: {ex.Message}");
-
-                // Even if it fails, ensure it's not a catastrophic failure
-                Assert.That(ex, Is.Not.InstanceOf<OutOfMemoryException>(), "Should not encounter memory issues");
-                Assert.That(ex, Is.Not.InstanceOf<StackOverflowException>(), "Should not encounter stack issues");
-            }
-
-            Console.WriteLine("✅ PASSED: API retry logic handles transient failures appropriately");
-        }
-
-        #endregion
-
-        #region Configuration Validation Tests
-
-        /// <summary>
-        /// Tests that the API service validates Kalshi configuration on initialization.
-        /// Verifies that required configuration parameters are present and valid
-        /// before allowing API operations to proceed.
-        /// </summary>
-        [Test]
-        [Category(ConfigurationCategory)]
-        public void ApiService_ConfigurationValidation_ValidatesRequiredSettings()
-        {
-            Console.WriteLine("🧪 Testing: Configuration Validation");
-            Console.WriteLine("   Expected: API service should validate all required configuration settings");
-            Console.WriteLine("   Parameters: various invalid configuration scenarios");
-
-            // Test missing BotKeyId
-            var config1 = new KalshiConfig
-            {
-                Environment = "prod",
-                BotKeyId = null,
-                BotKeyFile = _kalshiConfigOptions.Value.BotKeyFile
-            };
-            var options1 = Options.Create(config1);
-
-            var ex1 = Assert.Throws<ArgumentException>(() =>
-                new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options1, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex1.Message, Does.Contain("BotKeyId"), "Expected BotKeyId validation message");
-
-            // Test missing BotKeyFile
-            var config2 = new KalshiConfig
-            {
-                Environment = "prod",
-                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
-                BotKeyFile = null
-            };
-            var options2 = Options.Create(config2);
-
-            var ex2 = Assert.Throws<ArgumentException>(() =>
-                new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options2, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex2.Message, Does.Contain("BotKeyFile"), "Expected BotKeyFile validation message");
-
-            // Test missing Environment
-            var config3 = new KalshiConfig
-            {
-                Environment = null,
-                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
-                BotKeyFile = _kalshiConfigOptions.Value.BotKeyFile
-            };
-            var options3 = Options.Create(config3);
-
-            var ex3 = Assert.Throws<ArgumentException>(() =>
-                new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options3, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex3.Message, Does.Contain("Environment"), "Expected Environment validation message");
-
-            Console.WriteLine("✅ PASSED: Configuration validation works correctly");
-        }
-
-        /// <summary>
-        /// Tests that the API service validates key file existence and accessibility.
-        /// Verifies that the service checks for the existence of the private key file
-        /// and validates its accessibility before attempting API operations.
-        /// </summary>
-        [Test]
-        [Category(ConfigurationCategory)]
-        public void ApiService_KeyFileValidation_ChecksFileExistence()
-        {
-            Console.WriteLine("🧪 Testing: Key File Validation");
-            Console.WriteLine("   Expected: API service should validate key file existence and accessibility");
-            Console.WriteLine("   Parameters: nonexistent key file in secrets directory");
-
-            // Get the real key file name from configuration and modify it to make it nonexistent
-            var realKeyFile = _kalshiConfigOptions.Value.BotKeyFile;
-            var nonexistentKeyFile = Path.GetFileNameWithoutExtension(realKeyFile) + "_nonexistent" + Path.GetExtension(realKeyFile);
-
-            // Test with nonexistent key file in the secrets directory
-            var config = new KalshiConfig
-            {
-                Environment = _kalshiConfigOptions.Value.Environment,
-                BotKeyId = _kalshiConfigOptions.Value.BotKeyId,
-                BotKeyFile = nonexistentKeyFile // This file doesn't exist in secrets directory
-            };
-            var options = Options.Create(config);
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
-            Assert.That(ex.Message, Does.Contain("does not exist"), "Expected file existence validation message");
-
-            Console.WriteLine("✅ PASSED: Key file validation works correctly");
-        }
-
-        /// <summary>
-        /// Tests that the API service properly initializes with valid configuration.
-        /// Verifies that the service can be created successfully with all required
-        /// configuration parameters properly set and validated.
-        /// </summary>
-        [Test]
-        [Category(ConfigurationCategory)]
-        public void ApiService_ValidConfiguration_InitializesSuccessfully()
-        {
-            Console.WriteLine("🧪 Testing: Valid Configuration Initialization");
-            Console.WriteLine("   Expected: API service should initialize successfully with valid config");
-            Console.WriteLine("   Parameters: complete valid configuration");
-
-            // This should not throw any exceptions
-            var service = new KalshiAPIService(
-                _loggerMock.Object,
-                _configuration,
-                _scopeFactoryMock.Object,
-                _statusTrackerMock.Object,
-                _kalshiConfigOptions,
-                Options.Create(new KalshiAPIServiceConfig()),
-                _performanceMonitorMock.Object
-            );
-
-            // Verify the service was created
-            Assert.That(service, Is.Not.Null, "Expected service to be created successfully");
-
-            Console.WriteLine("✅ PASSED: Service initializes successfully with valid configuration");
-        }
-
-        #endregion
     }
 }

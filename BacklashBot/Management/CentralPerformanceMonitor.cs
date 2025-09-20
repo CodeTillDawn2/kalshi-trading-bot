@@ -1576,7 +1576,7 @@ namespace BacklashBot.Management
                 }
                 else
                 {
-                    _logger.LogWarning("Unable to get BroadcastService for sending performance metrics");
+                    _logger.LogDebug("BroadcastService not available - no Overseer connection detected");
                 }
             }
             catch (Exception ex)

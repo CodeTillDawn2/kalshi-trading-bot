@@ -49,7 +49,7 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
 
 // Add console logging provider
-builder.Logging.AddConsole();
+// builder.Logging.AddConsole(); // Disabled to use only custom formatted logging
 
 // Register ILoggerFactory
 builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
@@ -73,7 +73,7 @@ builder.Configuration
 builder.Services.Configure<SecretsConfig>(builder.Configuration.GetSection("Secrets"));
 builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Communications:Logging"));
 builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
-builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API"));
+builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API:KalshiAPIService"));
 builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websockets:WebSocketConnectionManager"));
 builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websockets:MessageProcessor"));
 builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websockets:SubscriptionManager"));
@@ -212,32 +212,31 @@ builder.Services.AddTransient<BacklashInterfaces.SmokehouseBot.Timers.ITimer, Ba
 builder.Services.AddSingleton<Func<BacklashInterfaces.SmokehouseBot.Timers.ITimer>>(sp => () => sp.GetRequiredService<BacklashInterfaces.SmokehouseBot.Timers.ITimer>());
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentralBrain>());
 
-// Temporarily disable custom logger provider to fix startup issue
-// TODO: Re-enable custom logging after fixing the integration
-// builder.Services.AddSingleton<ILoggerProvider>(provider =>
-// {
-//     var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
-//     var minLevel = LogLevel.Warning; // Default
-//     if (!string.IsNullOrEmpty(loggingConfig.LogLevel?.SqlDatabaseLogLevel))
-//     {
-//         try
-//         {
-//             minLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
-//         }
-//         catch (ArgumentException ex)
-//         {
-//             Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.LogLevel.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
-//         }
-//     }
-//
-//     return new DatabaseLoggerProvider(
-//         provider.GetRequiredService<DatabaseLoggingQueue>(),
-//         minLevel,
-//         loggingConfig,
-//         null, // IBrainStatusService - avoid circular dependency
-//         "prd", // defaultEnvironment
-//         provider.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value.BrainInstance); // defaultInstance
-// });
+// Re-enable custom logger provider
+builder.Services.AddSingleton<ILoggerProvider>(provider =>
+{
+    var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+    var minLevel = LogLevel.Warning; // Default
+    if (!string.IsNullOrEmpty(loggingConfig.LogLevel?.SqlDatabaseLogLevel))
+    {
+        try
+        {
+            minLevel = Enum.Parse<LogLevel>(loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.LogLevel.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
+        }
+    }
+
+    return new DatabaseLoggerProvider(
+        provider.GetRequiredService<DatabaseLoggingQueue>(),
+        minLevel,
+        loggingConfig,
+        null, // IBrainStatusService - avoid circular dependency
+        "prd", // defaultEnvironment
+        provider.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value.BrainInstance); // defaultInstance
+});
 
 // Register OrderbookChangeTracker with transient lifetime
 builder.Services.AddTransient(provider =>

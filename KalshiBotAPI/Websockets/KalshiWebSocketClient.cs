@@ -633,6 +633,7 @@ namespace KalshiBotAPI.Websockets
                                 if (result.EndOfMessage)
                                 {
                                     var fullMessage = messageBuilder.ToString();
+                                    _logger.LogInformation("Received WebSocket message: {Message}", fullMessage);
                                     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                                     await _messageProcessor.ProcessMessageAsync(fullMessage);
                                     stopwatch.Stop();

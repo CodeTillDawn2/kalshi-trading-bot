@@ -8,18 +8,6 @@ namespace KalshiBotAPI.Configuration;
 public class KalshiAPIServiceConfig
 {
     /// <summary>
-    /// Gets or sets the KalshiAPIService configuration settings.
-    /// </summary>
-    [JsonRequired]
-    public KalshiAPIServiceSettings KalshiAPIService { get; set; }
-}
-
-/// <summary>
-/// Configuration settings for KalshiAPIService operations.
-/// </summary>
-public class KalshiAPIServiceSettings
-{
-    /// <summary>
     /// Gets or sets whether KalshiAPIService performance metrics collection is enabled.
     /// When disabled, method execution times, API response times, and error counts are not tracked to reduce overhead. Defaults to true.
     /// </summary>
@@ -46,5 +34,4 @@ public class KalshiAPIServiceSettings
     /// </summary>
     [JsonRequired]
     public int CandlestickMandatoryOverlapDaysDay { get; set; }
-
 }

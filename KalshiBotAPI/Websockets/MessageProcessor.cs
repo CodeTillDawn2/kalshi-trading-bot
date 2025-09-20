@@ -1001,12 +1001,30 @@ namespace KalshiBotAPI.Websockets
                 if (msg.TryGetProperty("sid", out var sidProp))
                 {
                     var sid = sidProp.GetInt32();
-                    _logger.LogInformation("Subscription confirmed with SID: {Sid}", sid);
+                    var channel = "";
+                    var marketInfo = "";
 
-                    // Update subscription state in subscription manager
+                    // Extract channel information
                     if (msg.TryGetProperty("channel", out var channelProp))
                     {
-                        var channel = channelProp.GetString() ?? "";
+                        channel = channelProp.GetString() ?? "";
+                    }
+
+                    // Try to extract market information from the message
+                    if (msg.TryGetProperty("market_ticker", out var marketProp))
+                    {
+                        marketInfo = $" for market {marketProp.GetString()}";
+                    }
+                    else if (msg.TryGetProperty("event_ticker", out var eventProp))
+                    {
+                        marketInfo = $" for event {eventProp.GetString()}";
+                    }
+
+                    _logger.LogInformation("Subscription confirmed with SID: {Sid} for channel '{Channel}'{MarketInfo} | Source: {Source}", sid, channel, marketInfo, "MessageProcessor");
+
+                    // Update subscription state in subscription manager
+                    if (!string.IsNullOrEmpty(channel))
+                    {
                         await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
                     }
                     else
@@ -1052,7 +1070,29 @@ namespace KalshiBotAPI.Websockets
                 if (data.TryGetProperty("sid", out var sidProp))
                 {
                     var sid = sidProp.GetInt32();
-                    _logger.LogInformation("Unsubscription confirmed for SID: {Sid}", sid);
+                    var channel = "";
+                    var marketInfo = "";
+
+                    // Try to extract channel information from the message
+                    if (data.TryGetProperty("msg", out var msg) && msg.TryGetProperty("channel", out var channelProp))
+                    {
+                        channel = channelProp.GetString() ?? "";
+                    }
+
+                    // Try to extract market information
+                    if (data.TryGetProperty("msg", out msg))
+                    {
+                        if (msg.TryGetProperty("market_ticker", out var marketProp))
+                        {
+                            marketInfo = $" for market {marketProp.GetString()}";
+                        }
+                        else if (msg.TryGetProperty("event_ticker", out var eventProp))
+                        {
+                            marketInfo = $" for event {eventProp.GetString()}";
+                        }
+                    }
+
+                    _logger.LogInformation("Unsubscription confirmed for SID: {Sid} from channel '{Channel}'{MarketInfo} | Source: {Source}", sid, channel, marketInfo, "MessageProcessor");
                 }
             }
             catch (Exception ex)
@@ -1086,19 +1126,30 @@ namespace KalshiBotAPI.Websockets
                     if (data.TryGetProperty("sid", out var sidProp))
                     {
                         var sid = sidProp.GetInt32();
-                        _logger.LogInformation("Subscribe confirmed with SID: {Sid} for ID: {Id}", sid, id);
+                        var channel = "";
+                        var marketInfo = "";
 
                         // Get channel from pending confirmation since it's not in the message
                         var pending = _subscriptionManager.GetPendingConfirm(id);
                         if (pending.HasValue)
                         {
-                            var channel = pending.Value.Channel;
+                            channel = pending.Value.Channel;
+
+                            // Try to extract market information from the pending confirmation data
+                            if (pending.Value.MarketTickers != null && pending.Value.MarketTickers.Length > 0)
+                            {
+                                var markets = string.Join(", ", pending.Value.MarketTickers);
+                                marketInfo = $" for markets: {markets}";
+                            }
+
                             await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
                         }
                         else
                         {
                             _logger.LogWarning("No pending confirmation found for subscribe confirmation ID: {Id}", id);
                         }
+
+                        _logger.LogInformation("Subscribe confirmed with SID: {Sid} for ID: {Id} on channel '{Channel}'{MarketInfo} | Source: {Source}", sid, id, channel, marketInfo, "MessageProcessor");
                     }
                     else
                     {
@@ -1170,7 +1221,22 @@ namespace KalshiBotAPI.Websockets
                         if (data.TryGetProperty("id", out var idProp))
                         {
                             var id = idProp.GetInt32();
-                            _logger.LogInformation("Received 'Already subscribed' for ID {Id}, treating as successful subscription", id);
+                            var channel = "";
+                            var marketInfo = "";
+
+                            // Try to get channel information from pending confirmation
+                            var pending = _subscriptionManager.GetPendingConfirm(id);
+                            if (pending.HasValue)
+                            {
+                                channel = pending.Value.Channel;
+                                if (pending.Value.MarketTickers != null && pending.Value.MarketTickers.Length > 0)
+                                {
+                                    var markets = string.Join(", ", pending.Value.MarketTickers);
+                                    marketInfo = $" for markets: {markets}";
+                                }
+                            }
+
+                            _logger.LogInformation("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
 
                             // Remove from pending confirmations since it's already subscribed
                             _subscriptionManager.RemovePendingConfirmation(id);

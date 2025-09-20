@@ -79,9 +79,18 @@ namespace BacklashBot.Management
             }
 
             // Helper function to calculate target and validate result
-            int CalculateAndValidateTarget(double limit, double avg, int count)
+            int CalculateAndValidateTarget(double limit, double avg, int count, string metricName)
             {
-                if (count == 0 || avg == 0) return MaxValidValue; // Skip invalid cases
+                if (count == 0)
+                {
+                    _logger.LogDebug("Skipping {MetricName} target calculation: no markets currently being watched", metricName);
+                    return MaxValidValue; // Skip when no markets
+                }
+                if (avg == 0)
+                {
+                    _logger.LogDebug("Skipping {MetricName} target calculation: no average metrics available", metricName);
+                    return MaxValidValue; // Skip when no metrics
+                }
                 double perEachUsage = avg / count;
                 if (perEachUsage == 0) return MaxValidValue; // Avoid division by zero
                 double result = limit / perEachUsage;
@@ -91,19 +100,19 @@ namespace BacklashBot.Management
             }
 
             // Target count by usage
-            int targetCountUsage = CalculateAndValidateTarget(brain.UsageTarget, metrics.CurrentUsage, metrics.CurrentCount);
+            int targetCountUsage = CalculateAndValidateTarget(brain.UsageTarget, metrics.CurrentUsage, metrics.CurrentCount, "Usage");
 
             // Target count by Notification Queue
-            int targetCountNotificationQueue = CalculateAndValidateTarget(_targetCalculationConfig.NotificationQueueLimit, metrics.NotificationQueueAvg, metrics.CurrentCount);
+            int targetCountNotificationQueue = CalculateAndValidateTarget(_targetCalculationConfig.NotificationQueueLimit, metrics.NotificationQueueAvg, metrics.CurrentCount, "NotificationQueue");
 
             // Target count by Orderbook Queue
-            int targetCountOrderbookQueue = CalculateAndValidateTarget(_targetCalculationConfig.OrderbookQueueLimit, metrics.OrderbookQueueAvg, metrics.CurrentCount);
+            int targetCountOrderbookQueue = CalculateAndValidateTarget(_targetCalculationConfig.OrderbookQueueLimit, metrics.OrderbookQueueAvg, metrics.CurrentCount, "OrderbookQueue");
 
             // Target count by Event Queue
-            int targetCountEventQueue = CalculateAndValidateTarget(_targetCalculationConfig.EventQueueLimit, metrics.EventQueueAvg, metrics.CurrentCount);
+            int targetCountEventQueue = CalculateAndValidateTarget(_targetCalculationConfig.EventQueueLimit, metrics.EventQueueAvg, metrics.CurrentCount, "EventQueue");
 
             // Target count by Ticker Queue
-            int targetCountTickerQueue = CalculateAndValidateTarget(_targetCalculationConfig.TickerQueueLimit, metrics.TickerQueueAvg, metrics.CurrentCount);
+            int targetCountTickerQueue = CalculateAndValidateTarget(_targetCalculationConfig.TickerQueueLimit, metrics.TickerQueueAvg, metrics.CurrentCount, "TickerQueue");
 
             // Collect valid targets
             var validTargets = new List<int>();
