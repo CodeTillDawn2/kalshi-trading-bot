@@ -215,6 +215,7 @@ namespace KalshiBotAPI.Websockets
         {
             var startTime = DateTime.UtcNow;
             bool success = false;
+            bool lockExitedEarly = false;
             _logger.LogInformation("Subscribing to channel: action={Action}, markets={Markets}, current subscriptions count: {Count}", action, string.Join(", ", marketTickers), _channelSubscriptions.Count);
 
                 // Check for subscription deduplication
@@ -288,6 +289,7 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogDebug("Channel {Channel} already has SID {Sid}, using update_subscription for new markets", channel, subscription.Sid);
                     // Release lock before calling UpdateSubscriptionAsync to avoid deadlock
                     _subscriptionLock.ExitWriteLock();
+                    lockExitedEarly = true;
                     await UpdateSubscriptionAsync("add_markets", marketTickers, action);
                     return;
                 }
@@ -409,7 +411,11 @@ namespace KalshiBotAPI.Websockets
             }
             finally
             {
-                _subscriptionLock.ExitWriteLock();
+                // Only exit the lock if it wasn't already exited early
+                if (!lockExitedEarly)
+                {
+                    _subscriptionLock.ExitWriteLock();
+                }
                 _channelSubscriptionSynchronizationSemaphore.Release();
                 var duration = DateTime.UtcNow - startTime;
                 RecordOperationMetrics("Subscribe", duration, success);

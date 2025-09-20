@@ -134,14 +134,6 @@ namespace BacklashBot.Services
         {
             if (!_candlestickConfig.EnablePerformanceMetrics) return;
 
-            var message = $"Performance: {operationName} completed in {elapsedMilliseconds}ms";
-            if (!string.IsNullOrEmpty(additionalData))
-            {
-                message += $" - {additionalData}";
-            }
-
-            _logger.LogInformation(message);
-
             // Record execution time in CentralPerformanceMonitor
             var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
             if (performanceMonitor != null)

@@ -1749,9 +1749,6 @@ namespace BacklashBotData.Data
                     _performanceMetrics[operationName] = (current.SuccessCount, current.FailureCount + 1, current.TotalTime + duration);
                 }
             }
-
-            _logger?.LogInformation("Operation {OperationName} completed in {Duration}ms, Success: {Success}",
-                operationName, duration.TotalMilliseconds, success);
         }
 
         /// <summary>
