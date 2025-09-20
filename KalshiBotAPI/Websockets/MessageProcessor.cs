@@ -46,7 +46,7 @@ namespace KalshiBotAPI.Websockets
         private readonly Dictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions;
         private readonly object _sequenceNumberSynchronizationLock = new object();
         private long _latestProcessedSequenceNumber = 0;
-        private readonly HashSet<long> _processedSequenceNumbers = new HashSet<long>();
+        private readonly ConcurrentDictionary<string, HashSet<long>> _processedSequenceNumbersByChannel = new ConcurrentDictionary<string, HashSet<long>>();
         /// <summary>
         /// Total count of duplicate messages detected and skipped.
         /// </summary>
@@ -454,13 +454,17 @@ namespace KalshiBotAPI.Websockets
                 var data = JsonSerializer.Deserialize<JsonElement>(message);
                 var msgType = data.GetProperty("type").GetString() ?? "unknown";
 
-                // Check for message deduplication based on sequence number
+                // Check for message deduplication based on sequence number per channel
                 long sequenceNumber = 0;
+                string channelKey = msgType; // Use message type as channel identifier
                 if (data.TryGetProperty("seq", out var seqProp) && seqProp.TryGetInt64(out sequenceNumber))
                 {
                     lock (_sequenceNumberSynchronizationLock)
                     {
-                        if (_processedSequenceNumbers.Contains(sequenceNumber))
+                        // Get or create sequence number set for this channel
+                        var channelSequences = _processedSequenceNumbersByChannel.GetOrAdd(channelKey, _ => new HashSet<long>());
+
+                        if (channelSequences.Contains(sequenceNumber))
                         {
                             if (_enablePerformanceMonitoring)
                             {
@@ -468,10 +472,10 @@ namespace KalshiBotAPI.Websockets
                                 _duplicateMessagesInWindow++;
                                 CheckDuplicateMessageWarnings();
                             }
-                            _logger.LogWarning("Duplicate message detected with sequence number {SequenceNumber}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, _duplicateMessageCount);
+                            _logger.LogWarning("Duplicate message detected with sequence number {SequenceNumber} for channel {Channel}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, channelKey, _duplicateMessageCount);
                             return; // Skip processing duplicate messages
                         }
-                        _processedSequenceNumbers.Add(sequenceNumber);
+                        channelSequences.Add(sequenceNumber);
 
                         // Update latest processed sequence number
                         if (sequenceNumber > _latestProcessedSequenceNumber)
@@ -480,10 +484,10 @@ namespace KalshiBotAPI.Websockets
                         }
 
                         // Periodic cleanup of old sequence numbers to prevent memory leaks
-                        if (_processedSequenceNumbers.Count > _config.MaxSequenceNumbersToKeep)
+                        if (channelSequences.Count > _config.MaxSequenceNumbersToKeep)
                         {
                             var oldestToKeep = _latestProcessedSequenceNumber - (_config.MaxSequenceNumbersToKeep / 2);
-                            _processedSequenceNumbers.RemoveWhere(seq => seq < oldestToKeep);
+                            channelSequences.RemoveWhere(seq => seq < oldestToKeep);
                         }
                     }
                 }
@@ -566,6 +570,8 @@ namespace KalshiBotAPI.Websockets
         public void ResetEventCounts()
         {
             _messageTypeCounts.Clear();
+            // Also clear per-channel sequence numbers to prevent stale data
+            _processedSequenceNumbersByChannel.Clear();
         }
 
         /// <summary>

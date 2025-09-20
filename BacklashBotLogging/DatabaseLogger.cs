@@ -149,7 +149,7 @@ namespace KalshiBotLogging
                 {
                     consoleMessage += $" | Exception: {logEntry.Exception}";
                 }
-                consoleMessage += $" | Source: {logEntry.Source}";
+                // Removed source information from console output as requested
                 Console.WriteLine(consoleMessage);
             }
 

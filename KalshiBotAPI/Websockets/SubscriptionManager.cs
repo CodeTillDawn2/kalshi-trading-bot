@@ -981,6 +981,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "lifecycle" => "market_lifecycle_v2",
+            "event_lifecycle" => "market_lifecycle_v2",
             _ => throw new ArgumentException($"Invalid action: {action}")
         };
 

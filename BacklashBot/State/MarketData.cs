@@ -839,7 +839,8 @@ namespace BacklashBot.State
             CalculateSlope();
 
             RecentCandlesticks = minuteCopy.TakeLast(_calculationConfig.RecentCandlesticksCount).ToList();
-            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(minuteCopy), 2);
+            var psarValue = _tradingCalculator.CalculatePSAR(minuteCopy);
+            PSAR = psarValue.HasValue ? Math.Round((double)psarValue.Value, 2) : null;
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
             });
         }

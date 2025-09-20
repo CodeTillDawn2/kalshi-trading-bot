@@ -188,7 +188,7 @@ namespace BacklashBot.Services
                                 totalMarketTime += DateTime.UtcNow - marketStart;
                                 successfulInitializations++;
                             }
-                            _logger.LogDebug("Completed initialization for {MarketTicker}", ticker);
+                            _logger.LogInformation("Completed initialization for {MarketTicker}", ticker);
 
                             // Add 100ms delay between market initializations to prevent rate limiting
                             if (_enablePerformanceMetrics) totalWaitTime += TimeSpan.FromMilliseconds(100);

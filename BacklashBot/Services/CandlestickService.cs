@@ -192,7 +192,7 @@ namespace BacklashBot.Services
                     lastHourTimestamp = lastCandle.end_period_ts;
                 }
                 _logger.LogDebug("Last hour candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                       marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                   marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
 
                 lastCandle = await context.GetLastCandlestick(marketTicker, 3);
                 if (lastCandle != null)
