@@ -16,7 +16,7 @@ namespace BacklashPatterns
         /// This value is divided by 2.0 and added to the unweighted ratio for smoothing.
         /// Default value: 1.0
         /// </summary>
-        [JsonRequired]
+        required
         public double SmoothingOffset { get; set; }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace BacklashPatterns
         /// Prevents calculations with insufficient historical data.
         /// Default value: 1
         /// </summary>
-        [JsonRequired]
+        required
         public int MinLookback { get; set; }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace BacklashPatterns
         /// Limits computational complexity for very long lookbacks.
         /// Default value: 1000
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxLookback { get; set; }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace BacklashPatterns
         /// Used as fallback for methods that don't require explicit lookback.
         /// Default value: 14
         /// </summary>
-        [JsonRequired]
+        required
         public int DefaultLookback { get; set; }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace BacklashPatterns
         /// Ensures pattern size is at least 1 to prevent division by zero.
         /// Default value: 1
         /// </summary>
-        [JsonRequired]
+        required
         public int MinPatternSize { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace BacklashPatterns
         /// Limits pattern size to reasonable values.
         /// Default value: 10
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxPatternSize { get; set; }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace BacklashPatterns
         /// These periods are used to compute metrics at different timeframes.
         /// Default values: [1, 2, 3, 4, 5]
         /// </summary>
-        [JsonRequired]
+        required
         public int[] LookbackPeriods { get; set; }
 
         /// <summary>

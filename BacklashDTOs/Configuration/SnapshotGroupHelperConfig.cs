@@ -10,7 +10,6 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection for MarketAnalysisHelper operations.
         /// </summary>
-        [JsonRequired]
-        public bool EnablePerformanceMetrics { get; set; }
+        public required bool EnablePerformanceMetrics { get; set; }
     }
 }

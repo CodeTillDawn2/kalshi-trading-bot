@@ -11,35 +11,35 @@ namespace BacklashOverseer.Config
         /// Gets or sets the timeout in seconds for connection health monitoring.
         /// Default is 300 seconds (5 minutes).
         /// </summary>
-        [JsonRequired]
+        required
         public int ConnectionHealthTimeoutSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in seconds between health checks.
         /// Default is 60 seconds (1 minute).
         /// </summary>
-        [JsonRequired]
+        required
         public int HealthCheckIntervalSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the validity duration for authentication tokens in hours.
         /// Default is 24 hours (1 day).
         /// </summary>
-        [JsonRequired]
+        required
         public int AuthTokenValidityHours { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of handshake requests allowed per minute per IP.
         /// Default is 10.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxHandshakeRequestsPerMinute { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of check-in requests allowed per minute per client.
         /// Default is 60.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxCheckInRequestsPerMinute { get; set; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace BacklashOverseer.Config
         /// When disabled, only essential operations are performed with minimal overhead.
         /// Default is false for performance reasons.
         /// </summary>
-        [JsonRequired]
+        required
         public bool EnablePerformanceMetrics { get; set; }
     }
 }

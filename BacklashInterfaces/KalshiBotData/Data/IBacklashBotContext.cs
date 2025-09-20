@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashBotData.Data;
 

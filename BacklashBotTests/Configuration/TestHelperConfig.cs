@@ -8,7 +8,7 @@ namespace BacklashBotTests.Configuration
     /// </summary>
     public class TestHelperConfig
     {
-        [JsonRequired]
+        required
         /// <summary>
         /// Duration in minutes over which price changes are analyzed for trend detection and momentum calculations.
         /// This window defines the lookback period for identifying significant price movements and volatility patterns.
@@ -18,7 +18,7 @@ namespace BacklashBotTests.Configuration
         /// </summary>
         public double ChangeWindowDurationMinutes { get; set; }
 
-        [JsonRequired]
+        required
         /// <summary>
         /// Time window in seconds for matching trades to orderbook changes during analysis.
         /// This tolerance allows for slight timing discrepancies between trade execution and orderbook updates.
@@ -28,7 +28,7 @@ namespace BacklashBotTests.Configuration
         /// </summary>
         public double TradeMatchingWindowSeconds { get; set; }
 
-        [JsonRequired]
+        required
         /// <summary>
         /// Time window in seconds for detecting order cancellations in the orderbook.
         /// This defines how long to wait before considering an orderbook level change as a cancellation rather than a fill.

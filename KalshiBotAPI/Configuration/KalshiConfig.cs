@@ -10,19 +10,19 @@ public class KalshiConfig
     /// <summary>
     /// Gets or sets the environment (e.g., "prod" or "dev"). Defaults to "prod".
     /// </summary>
-    [JsonRequired]
+    required
     public string Environment { get; set; }
 
     /// <summary>
     /// Gets or sets the API key ID.
     /// </summary>
-    [JsonRequired]
+    required
     public string BotKeyId { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
-    [JsonRequired]
+    required
     public string BotKeyFile { get; set; }
 }
 

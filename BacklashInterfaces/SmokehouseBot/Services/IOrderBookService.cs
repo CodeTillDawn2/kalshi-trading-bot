@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 
 namespace BacklashBot.Services.Interfaces
 {

@@ -49,7 +49,7 @@ namespace KalshiBotTests
         private SqlDataService _sqlService;
         private KalshiWebSocketClient _client;
         private IOptions<KalshiConfig> _kalshiConfigOptions;
-        private IOptions<KalshiBotAPI.Configuration.KalshiWebSocketClientConfig> _websocketConfigOptions;
+        private IOptions<KalshiWebSocketClientConfig> _websocketConfigOptions;
         private IConfiguration _configuration;
 
         // New mocks for refactored components
@@ -98,8 +98,8 @@ namespace KalshiBotTests
                 .AddSecretsConfiguration(basePath, baseConfig)
                 .Build();
 
-            var kalshiConfig = new KalshiConfig();
-            _configuration.GetSection("Kalshi").Bind(kalshiConfig);
+            var kalshiConfig = _configuration.GetSection("Kalshi").Get<KalshiConfig>();
+
 
             // Validate configuration
             Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
@@ -109,14 +109,12 @@ namespace KalshiBotTests
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
-            var websocketConfig = new KalshiBotAPI.Configuration.KalshiWebSocketClientConfig();
-            _configuration.GetSection("KalshiWebSocketClient").Bind(websocketConfig);
-            _websocketConfigOptions = Options.Create(websocketConfig);
+            var websocketConfig = _configuration.GetSection("KalshiWebSocketClient");
 
             // Initialize real SqlDataService
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
-            var dataConfig = _configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+            var dataConfig = _configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
             _sqlService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
 
             // Create mock objects for the new refactored dependencies

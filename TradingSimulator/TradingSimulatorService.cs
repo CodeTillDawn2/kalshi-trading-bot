@@ -188,7 +188,10 @@ namespace TradingSimulator
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }), Options.Create(new BacklashDTOs.Configuration.GeneralExecutionConfig { HardDataStorageLocation = @"C:\Temp\Storage" }), _scopeFactory, config, null);
+            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, 
+                Options.Create(
+                    new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }), 
+                Options.Create(new BacklashDTOs.Configuration.GeneralExecutionConfig { HardDataStorageLocation = @"C:\Temp\Storage" }), _scopeFactory, config, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();

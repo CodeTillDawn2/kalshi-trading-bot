@@ -10,7 +10,6 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the length of the session identifier string.
         /// </summary>
-        [JsonRequired]
-        public int SessionIdLength { get; set; }
+        public required int SessionIdLength { get; set; }
     }
 }

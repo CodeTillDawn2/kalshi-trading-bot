@@ -4,11 +4,11 @@ namespace BacklashOverseer.Config
 {
     public class MarketWatchControllerConfig
     {
-        [JsonRequired]
+        required
         public bool EnableMarketWatchControllerPerformanceMetrics { get; set; }
-        [JsonRequired]
+        required
         public int MarketsCacheDurationMinutes { get; set; }
-        [JsonRequired]
+        required
         public int LogDataCacheDurationMinutes { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.Shared;
+namespace BacklashBot.Shared;
 
 public class Class1
 {

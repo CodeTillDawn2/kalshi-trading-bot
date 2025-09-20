@@ -1,4 +1,4 @@
-﻿using BacklashDTOs.Data;
+using BacklashDTOs.Data;
 
 namespace TradingStrategies.Classification.Interfaces
 {

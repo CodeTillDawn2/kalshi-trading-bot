@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 using System.Diagnostics;
 using static BacklashPatterns.PatternUtils;
 using static BacklashPatterns.TrendCalcs;

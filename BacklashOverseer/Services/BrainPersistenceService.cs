@@ -53,7 +53,7 @@ namespace BacklashOverseer.Services
             ILogger<BrainPersistenceService>? logger = null,
             PerformanceMetricsService? performanceMetricsService = null)
         {
-            _config = config?.Value ?? new BrainPersistenceServiceConfig();
+            _config = config.Value;
             _context = context;
             _logger = logger;
             _performanceMetricsService = performanceMetricsService;

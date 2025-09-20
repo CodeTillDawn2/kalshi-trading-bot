@@ -1,4 +1,4 @@
-﻿using BacklashDTOs.KalshiAPI;
+using BacklashDTOs.KalshiAPI;
 
 namespace BacklashBot.KalshiAPI.Interfaces
 {

@@ -180,7 +180,15 @@ namespace KalshiBotTests
             // Initialize real context to query for dynamic test data
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             var logger = new Mock<ILogger<BacklashBotContext>>().Object;
-            var dataConfig = _configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+            var dataConfig = new BacklashBotDataConfig
+            {
+                MaxRetryCount = int.Parse(_configuration["DBConnection:BacklashBotData:MaxRetryCount"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:MaxRetryCount is missing")),
+                RetryDelaySeconds = double.Parse(_configuration["DBConnection:BacklashBotData:RetryDelaySeconds"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:RetryDelaySeconds is missing")),
+                BatchSize = int.Parse(_configuration["DBConnection:BacklashBotData:BatchSize"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:BatchSize is missing")),
+                MaxQueueSize = int.Parse(_configuration["DBConnection:BacklashBotData:MaxQueueSize"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:MaxQueueSize is missing")),
+                WorkersPerQueue = int.Parse(_configuration["DBConnection:BacklashBotData:WorkersPerQueue"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:WorkersPerQueue is missing")),
+                EnablePerformanceMetrics = bool.Parse(_configuration["DBConnection:BacklashBotData:EnablePerformanceMetrics"] ?? throw new InvalidOperationException("DBConnection:BacklashBotData:EnablePerformanceMetrics is missing"))
+            };
             _realContext = new BacklashBotContext(connectionString, logger, dataConfig);
 
             // Query for an active market
@@ -232,8 +240,12 @@ namespace KalshiBotTests
         [SetUp]
         public void Setup()
         {
-            var kalshiConfig = new KalshiConfig();
-            _configuration.GetSection("Kalshi").Bind(kalshiConfig);
+            var kalshiConfig = new KalshiConfig
+            {
+                Environment = _configuration["Kalshi:Environment"] ?? throw new InvalidOperationException("Kalshi:Environment is missing"),
+                BotKeyId = _configuration["Kalshi:KeyId"] ?? throw new InvalidOperationException("Kalshi:KeyId is missing"),
+                BotKeyFile = _configuration["Kalshi:KeyFile"] ?? throw new InvalidOperationException("Kalshi:KeyFile is missing")
+            };
 
             // Validate configuration
             Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
@@ -241,8 +253,10 @@ namespace KalshiBotTests
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             // Resolve the key file path using the same method as the working applications
-            var secretsConfig = new SecretsConfig();
-            _configuration.GetSection("Secrets").Bind(secretsConfig);
+            var secretsConfig = new SecretsConfig
+            {
+                SecretsPath = _configuration["Secrets:SecretsPath"] ?? throw new InvalidOperationException("Secrets:SecretsPath is missing")
+            };
 
             var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
                 kalshiConfig.BotKeyFile,
@@ -342,11 +356,13 @@ namespace KalshiBotTests
             _scopeFactoryMock.Setup(f => f.CreateScope()).Returns(scopeMock.Object);
 
             // Instantiate the real API service with mocks and real config
-            var apiConfig = new KalshiAPIServiceConfig();
-            _configuration.GetSection("API:KalshiAPIService").Bind(apiConfig);
-
-            // Configure for testing - disable any features that might cause issues
-            apiConfig.EnablePerformanceMetrics = false; // Disable performance monitoring in tests
+            var apiConfig = new KalshiAPIServiceConfig
+            {
+                EnablePerformanceMetrics = false, // Disable performance monitoring in tests
+                CandlestickMandatoryOverlapDaysMinute = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysMinute"] ?? "3"),
+                CandlestickMandatoryOverlapDaysHour = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysHour"] ?? "7"),
+                CandlestickMandatoryOverlapDaysDay = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysDay"] ?? "15")
+            };
 
             var apiConfigOptions = Options.Create(apiConfig);
 

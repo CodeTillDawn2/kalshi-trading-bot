@@ -20,7 +20,16 @@ namespace BacklashPatterns
     /// </summary>
     public static class TrendCalcs
     {
-        private static TrendCalculationConfig _config = new TrendCalculationConfig();
+        private static TrendCalculationConfig _config = new TrendCalculationConfig
+        {
+            SmoothingOffset = 1.0,
+            MinLookback = 1,
+            MaxLookback = 1000,
+            DefaultLookback = 14,
+            MinPatternSize = 1,
+            MaxPatternSize = 10,
+            LookbackPeriods = [1, 2, 3, 4, 5]
+        };
         private static ILogger _logger;
 
         /// <summary>
@@ -29,7 +38,16 @@ namespace BacklashPatterns
         /// <param name="config">The configuration options.</param>
         public static void SetConfig(TrendCalculationConfig config)
         {
-            _config = config ?? new TrendCalculationConfig();
+            _config = config ?? new TrendCalculationConfig
+            {
+                SmoothingOffset = 1.0,
+                MinLookback = 1,
+                MaxLookback = 1000,
+                DefaultLookback = 14,
+                MinPatternSize = 1,
+                MaxPatternSize = 10,
+                LookbackPeriods = [1, 2, 3, 4, 5]
+            };
         }
 
         /// <summary>

@@ -11,43 +11,43 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// The lookback window in periods for trend context and pattern validation.
         /// </summary>
-        [JsonRequired]
+        required
         public int LookbackWindow { get; set; }
 
         /// <summary>
         /// The types of patterns to detect. If empty, all patterns are detected.
         /// </summary>
-        [JsonRequired]
+        required
         public List<string> PatternTypes { get; set; } = new List<string>();
 
         /// <summary>
         /// Minimum price change threshold for significance check.
         /// </summary>
-        [JsonRequired]
+        required
         public double SignificancePriceThreshold { get; set; }
 
         /// <summary>
         /// Minimum volume increase multiplier for context check.
         /// </summary>
-        [JsonRequired]
+        required
         public double VolumeIncreaseMultiplier { get; set; }
 
         /// <summary>
         /// Initial capacity for patterns array per candle.
         /// </summary>
-        [JsonRequired]
+        required
         public int InitialPatternCapacity { get; set; }
 
         /// <summary>
         /// Whether to enable parallel processing for pattern detection.
         /// </summary>
-        [JsonRequired]
+        required
         public bool EnableParallelProcessing { get; set; }
 
         /// <summary>
         /// Maximum degree of parallelism for pattern checks.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxDegreeOfParallelism { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace TradingStrategies.Configuration
         /// metrics including execution time, candles processed, patterns found, and per-pattern
         /// timing are collected and logged.
         /// </summary>
-        [JsonRequired]
+        required
         public bool EnablePatternDetectionMetrics { get; set; }
     }
 }

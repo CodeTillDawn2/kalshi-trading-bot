@@ -1,4 +1,4 @@
-﻿namespace BacklashInterfaces.Enums
+namespace BacklashInterfaces.Enums
 {
     /// <summary>
     /// Contains enumeration types used throughout the trading strategy system

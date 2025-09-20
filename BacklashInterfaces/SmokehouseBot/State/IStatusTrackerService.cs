@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.State.Interfaces
+namespace BacklashBot.State.Interfaces
 {
 /// <summary>IStatusTrackerService</summary>
 /// <summary>IStatusTrackerService</summary>

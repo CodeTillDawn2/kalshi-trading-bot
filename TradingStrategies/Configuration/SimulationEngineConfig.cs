@@ -12,7 +12,7 @@ namespace TradingStrategies.Configuration
         /// Gets or sets whether performance metrics collection is enabled.
         /// </summary>
         /// <value>Default is true.</value>
-        [JsonRequired]
+        required
         public bool EnablePerformanceMetrics { get; set; } = true;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.Management.Interfaces
+namespace BacklashBot.Management.Interfaces
 {
 /// <summary>IMarketAnalysisHelper</summary>
 /// <summary>IMarketAnalysisHelper</summary>

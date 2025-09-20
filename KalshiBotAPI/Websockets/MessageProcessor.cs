@@ -1,4 +1,4 @@
-﻿using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs;

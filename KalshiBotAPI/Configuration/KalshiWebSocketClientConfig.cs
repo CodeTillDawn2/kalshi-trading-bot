@@ -10,6 +10,6 @@ public class KalshiWebSocketClientConfig
     /// <summary>
     /// Gets or sets whether KalshiWebSocketClient performance metrics are enabled.
     /// </summary>
-    [JsonRequired]
+    required
     public bool EnablePerformanceMetrics { get; set; }
 }

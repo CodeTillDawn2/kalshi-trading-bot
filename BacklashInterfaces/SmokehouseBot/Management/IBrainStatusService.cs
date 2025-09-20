@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.Management.Interfaces
+namespace BacklashBot.Management.Interfaces
 {
 /// <summary>IBrainStatusService</summary>
 /// <summary>IBrainStatusService</summary>

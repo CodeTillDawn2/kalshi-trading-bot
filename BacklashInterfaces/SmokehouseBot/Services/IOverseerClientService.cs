@@ -1,4 +1,4 @@
-﻿namespace BacklashInterfaces.SmokehouseBot.Services
+namespace BacklashInterfaces.SmokehouseBot.Services
 {
     /// <summary>
     /// Interface for overseeing client service operations in the trading bot system.

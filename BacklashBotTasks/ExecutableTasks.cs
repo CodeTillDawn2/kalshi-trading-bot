@@ -235,10 +235,8 @@ namespace KalshiBotTasks
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            var centralBrainConfig = new CentralBrainConfig
-            {
-                HardDataStorageLocation = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestData")
-            };
+            var centralBrainConfig = config.GetSection("Central:CentralBrain").Get<CentralBrainConfig>() ?? throw new InvalidOperationException("Central:CentralBrain configuration section is missing or invalid");
+            centralBrainConfig.HardDataStorageLocation = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestData");
             var centralBrainOptions = Options.Create(centralBrainConfig);
 
             var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig
@@ -362,7 +360,15 @@ namespace KalshiBotTasks
                     try
                     {
                         var connectionString = ConfigurationHelper.BuildConnectionString(config);
-                        var dataConfig = config.GetSection("BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig();
+                        var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig
+                        {
+                            MaxRetryCount = 3,
+                            RetryDelaySeconds = 1.0,
+                            BatchSize = 100,
+                            MaxQueueSize = 10000,
+                            WorkersPerQueue = 1,
+                            EnablePerformanceMetrics = false
+                        };
                         var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
                         using var dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
 

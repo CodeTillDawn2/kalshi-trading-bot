@@ -1,4 +1,4 @@
-﻿namespace KalshiBotData.Models
+namespace KalshiBotData.Models
 {
 /// <summary>Series</summary>
 /// <summary>Series</summary>

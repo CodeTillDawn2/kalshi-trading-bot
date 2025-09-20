@@ -16,21 +16,21 @@ namespace TradingStrategies.Configuration
         /// Represents the taker fee percentage charged by the exchange.
         /// Expressed as decimal (e.g., 0.07 for 7%).
         /// </summary>
-        [JsonRequired]
+        required
         public double TakerFeeRate { get; set; }
 
         /// <summary>
         /// Minimum valid price for YES/NO contracts in the simulation.
         /// Used for price validation and order book bounds checking.
         /// </summary>
-        [JsonRequired]
+        required
         public int MinContractPrice { get; set; }
 
         /// <summary>
         /// Maximum valid price for YES/NO contracts in the simulation.
         /// Used for price validation and order book bounds checking.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxContractPrice { get; set; }
 
         /// <summary>
@@ -38,14 +38,14 @@ namespace TradingStrategies.Configuration
         /// Determines what percentage of current position to rest after market execution.
         /// Expressed as decimal (e.g., 1.0 for 100%).
         /// </summary>
-        [JsonRequired]
+        required
         public double ComboPositionSizePercentage { get; set; }
 
         /// <summary>
         /// Maximum number of resting orders allowed per simulation.
         /// Prevents memory issues with excessive order accumulation.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxRestingOrders { get; set; }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace TradingStrategies.Configuration
         /// If ProcessSnapshot takes longer than this threshold (in milliseconds),
         /// additional performance metrics will be collected.
         /// </summary>
-        [JsonRequired]
+        required
         public int PerformanceThresholdMs { get; set; }
 
         /// <summary>
@@ -61,28 +61,28 @@ namespace TradingStrategies.Configuration
         /// If peak memory usage exceeds this threshold (in MB),
         /// the system may suggest optimization measures.
         /// </summary>
-        [JsonRequired]
+        required
         public int MemoryThresholdMB { get; set; }
 
         /// <summary>
         /// Enable detailed performance logging for high-frequency scenarios.
         /// When enabled, collects timing data for each simulation step.
         /// </summary>
-        [JsonRequired]
+        required
         public bool EnableDetailedPerformanceLogging { get; set; }
 
         /// <summary>
         /// Batch size for processing multiple snapshots asynchronously.
         /// Controls how many snapshots are processed concurrently in async operations.
         /// </summary>
-        [JsonRequired]
+        required
         public int AsyncBatchSize { get; set; }
 
         /// <summary>
         /// Timeout for async operations in seconds.
         /// Prevents hanging operations during large dataset processing.
         /// </summary>
-        [JsonRequired]
+        required
         public int AsyncTimeoutSeconds { get; set; }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace TradingStrategies.Configuration
         /// Used as fallback quantity for Long/Short actions. Controls the base contract count
         /// for market executions in simulation scenarios.
         /// </summary>
-        [JsonRequired]
+        required
         public int DefaultMarketOrderQuantity { get; set; }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace TradingStrategies.Configuration
         /// Prevents excessive trading activity and potential performance degradation
         /// in high-frequency trading scenarios. Acts as a circuit breaker for runaway strategies.
         /// </summary>
-        [JsonRequired]
+        required
         public int MaxTradesPerSnapshot { get; set; }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace TradingStrategies.Configuration
         /// and logs warnings when thresholds are exceeded. Useful for performance optimization
         /// and bottleneck identification in high-frequency scenarios.
         /// </summary>
-        [JsonRequired]
+        required
         public bool EnableDecisionTiming { get; set; }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace TradingStrategies.Configuration
         /// detailed performance warnings will be logged to help identify bottlenecks.
         /// Lower values provide more sensitive monitoring for high-performance requirements.
         /// </summary>
-        [JsonRequired]
+        required
         public int DecisionThresholdMs { get; set; }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace TradingStrategies.Configuration
         /// Represents the minimum band width ratio required to trigger certain trading conditions.
         /// Expressed as decimal (e.g., 0.1 for 10% band width ratio).
         /// </summary>
-        [JsonRequired]
+        required
         public double BandWidthRatioThreshold { get; set; }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace TradingStrategies.Configuration
         /// snapshot processing cycle. Helps prevent market impact and maintains
         /// realistic trading behavior under high-frequency conditions.
         /// </summary>
-        [JsonRequired]
+        required
         public int TradeRateLimitPerSnapshot { get; set; }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace TradingStrategies.Configuration
         /// When disabled, skips collection of execution timing, memory usage, trade counts, and apply timing
         /// to improve performance in high-throughput scenarios. Decision timing is controlled separately.
         /// </summary>
-        [JsonRequired]
+        required
         public bool Simulation_EnablePerformanceMetrics { get; set; }
     }
 }

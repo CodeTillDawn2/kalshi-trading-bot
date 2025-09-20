@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.Services.Interfaces
+namespace BacklashBot.Services.Interfaces
 {
 /// <summary>IMarketRefreshService</summary>
 /// <summary>IMarketRefreshService</summary>

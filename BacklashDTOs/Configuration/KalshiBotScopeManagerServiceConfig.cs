@@ -11,7 +11,6 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable performance metrics collection for KalshiBotScopeManagerService operations.
         /// </summary>
         /// <value>Default is true.</value>
-        [JsonRequired]
-        public bool EnablePerformanceMetrics { get; set; }
+        public required bool EnablePerformanceMetrics { get; set; }
     }
 }

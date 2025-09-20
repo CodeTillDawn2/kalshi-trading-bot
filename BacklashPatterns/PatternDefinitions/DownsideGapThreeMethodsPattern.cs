@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;

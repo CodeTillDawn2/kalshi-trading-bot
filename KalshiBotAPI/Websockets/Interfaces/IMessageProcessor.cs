@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 using System.Collections.Concurrent;
 
 namespace KalshiBotAPI.WebSockets.Interfaces

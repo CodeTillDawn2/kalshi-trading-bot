@@ -10,13 +10,13 @@ namespace BacklashOverseer.State
         /// <summary>
         /// Gets or sets the default state for initialization completion.
         /// </summary>
-        [JsonRequired]
+        required
         public bool DefaultInitializationState { get; set; }
 
         /// <summary>
         /// Gets or sets the default state for browser readiness.
         /// </summary>
-        [JsonRequired]
+        required
         public bool DefaultBrowserReadyState { get; set; }
     }
 }

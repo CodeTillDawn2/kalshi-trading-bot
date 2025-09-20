@@ -1,4 +1,4 @@
-﻿namespace KalshiBotData.Models
+namespace KalshiBotData.Models
 {
 /// <summary>Event</summary>
 /// <summary>Event</summary>

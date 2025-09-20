@@ -1,4 +1,4 @@
-﻿using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BacklashBot.Management.Interfaces

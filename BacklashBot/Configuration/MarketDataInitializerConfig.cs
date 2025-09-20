@@ -11,7 +11,6 @@ namespace BacklashBot.Configuration
         /// Gets or sets whether to enable performance metrics collection for MarketDataInitializer operations.
         /// </summary>
         /// <value>Default is false.</value>
-        [JsonRequired]
-        public bool EnablePerformanceMetrics { get; set; }
+        public required bool EnablePerformanceMetrics { get; set; }
     }
 }

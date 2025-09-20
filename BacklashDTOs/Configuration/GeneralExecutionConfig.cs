@@ -10,31 +10,31 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the brain instance identifier.
         /// </summary>
-        [JsonRequired]
+        required
         public string BrainInstance { get; set; }
 
         /// <summary>
         /// Gets or sets the target count for queues.
         /// </summary>
-        [JsonRequired]
+        required
         public int QueuesTargetCount { get; set; }
 
         /// <summary>
         /// Gets or sets the retry delay in milliseconds for operations that require retries.
         /// </summary>
-        [JsonRequired]
+        required
         public int RetryDelayMs { get; set; }
 
         /// <summary>
         /// Gets or sets the authentication token validity duration in hours.
         /// </summary>
-        [JsonRequired]
+        required
         public int AuthTokenValidityHours { get; set; }
 
         /// <summary>
         /// Gets or sets the hard data storage location.
         /// </summary>
-        [JsonRequired]
+        required
         public string HardDataStorageLocation { get; set; }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace BacklashDTOs.Configuration
         /// Typical values: 30-300 seconds depending on strategy requirements and market volatility.
         /// Used by TradingStrategy to determine snapshot intervals and decision timing.
         /// </summary>
-        [JsonRequired]
+        required
         public int DecisionFrequencySeconds { get; set; }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace BacklashDTOs.Configuration
         /// Typical values: 1-15 minutes depending on data freshness requirements and API rate limits.
         /// Used by MarketRefreshService and MarketData for periodic data synchronization.
         /// </summary>
-        [JsonRequired]
+        required
         public int RefreshIntervalMinutes { get; set; }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace BacklashDTOs.Configuration
         /// Incremented when schema changes require migration logic or backward compatibility handling.
         /// Used by TradingSnapshotService for schema validation and snapshot upgrading during loading.
         /// </summary>
-        [JsonRequired]
+        required
         public int SnapshotSchemaVersion { get; set; }
     }
 }

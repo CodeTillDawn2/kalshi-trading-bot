@@ -10,25 +10,21 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the limit for the notification queue.
         /// </summary>
-        [JsonRequired]
-        public int NotificationQueueLimit { get; set; }
+        public required int NotificationQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the orderbook queue.
         /// </summary>
-        [JsonRequired]
-        public int OrderbookQueueLimit { get; set; }
+        public required int OrderbookQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the event queue.
         /// </summary>
-        [JsonRequired]
-        public int EventQueueLimit { get; set; }
+        public required int EventQueueLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the limit for the ticker queue.
         /// </summary>
-        [JsonRequired]
-        public int TickerQueueLimit { get; set; }
+        public required int TickerQueueLimit { get; set; }
     }
 }

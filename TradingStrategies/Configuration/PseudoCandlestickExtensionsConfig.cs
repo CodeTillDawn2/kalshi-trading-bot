@@ -14,6 +14,6 @@ public class PseudoCandlestickExtensionsConfig
     /// Typical values: 0-4 depending on required precision and data source.
     /// Used by PseudoCandlestickExtensions for volume precision in ToCandleMids method.
     /// </summary>
-    [JsonRequired]
+    required
     public int VolumePrecisionDigits { get; set; }
 }

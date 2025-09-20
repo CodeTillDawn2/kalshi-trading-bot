@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using BacklashBot.State;
 using BacklashDTOs.Configuration;
 using TradingStrategies.Configuration;
@@ -15,29 +17,18 @@ namespace KalshiBotTests
     /// </summary>
     public static class TestHelper
     {
+
+
         /// <summary>
-        /// Enumeration of predefined test scenarios for configuration testing.
-        /// Each scenario provides different parameter values optimized for specific testing needs.
+        /// Gets the configuration from the appsettings.json file in the BacklashBot directory.
         /// </summary>
-        public enum TestScenario
+        /// <returns>An IConfiguration instance loaded from the appsettings.json file.</returns>
+        private static IConfiguration GetConfiguration()
         {
-            /// <summary>
-            /// Standard configuration values suitable for most testing scenarios.
-            /// Uses balanced periods and intervals for reliable test execution.
-            /// </summary>
-            Default,
-
-            /// <summary>
-            /// Fast configuration with shorter periods and intervals for rapid testing.
-            /// Ideal for quick unit tests and performance-critical scenarios.
-            /// </summary>
-            Fast,
-
-            /// <summary>
-            /// Slow configuration with longer periods for stable, extended testing.
-            /// Suitable for integration tests and scenarios requiring more data points.
-            /// </summary>
-            Slow
+            return new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "BacklashBot"))
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .Build();
         }
 
         /// <summary>
@@ -48,30 +39,10 @@ namespace KalshiBotTests
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured with standard test values.</returns>
         public static IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> GetGeneralExecutionConfig()
         {
-            var generalExecutionConfig = new BacklashDTOs.Configuration.GeneralExecutionConfig
-            {
-                DecisionFrequencySeconds = 60,
-                HardDataStorageLocation = @"C:\Temp\Storage",
-            };
-            return Options.Create(generalExecutionConfig);
+            var config = GetConfiguration().GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>();
+            return Options.Create(config);
         }
 
-        /// <summary>
-        /// Creates and returns an IOptions&lt;TestHelperConfig&gt; instance with predefined test values for test-specific settings.
-        /// These values represent configuration parameters used only in test scenarios.
-        /// The returned options object can be injected into services that depend on TestHelperConfig for isolated testing.
-        /// </summary>
-        /// <returns>An IOptions&lt;TestHelperConfig&gt; instance configured with standard test values.</returns>
-        public static IOptions<TestHelperConfig> GetTestHelperConfig()
-        {
-            var testHelperConfig = new TestHelperConfig
-            {
-                ChangeWindowDurationMinutes = 5,
-                TradeMatchingWindowSeconds = 5,
-                OrderbookCancelWindowSeconds = 10,
-            };
-            return Options.Create(testHelperConfig);
-        }
 
         /// <summary>
         /// Creates and returns an IOptions&lt;CalculationConfig&gt; instance with predefined test values for technical indicator and calculation settings.
@@ -82,35 +53,9 @@ namespace KalshiBotTests
         /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured with comprehensive test values for technical indicators.</returns>
         public static IOptions<CalculationConfig> GetCalculationConfig()
         {
-            var calculationConfig = new CalculationConfig
-            {
-                RSI_Short_Periods = 14,
-                RSI_Medium_Periods = 14,
-                RSI_Long_Periods = 14,
-                MACD_Medium_FastPeriod = 12,
-                MACD_Medium_SlowPeriod = 26,
-                MACD_Medium_SignalPeriod = 9,
-                MACD_Long_FastPeriod = 12,
-                MACD_Long_SlowPeriod = 26,
-                MACD_Long_SignalPeriod = 9,
-                EMA_Medium_Periods = 14,
-                EMA_Long_Periods = 14,
-                BollingerBands_Medium_Periods = 20,
-                BollingerBands_Medium_StdDev = 2,
-                BollingerBands_Long_Periods = 20,
-                BollingerBands_Long_StdDev = 2,
-                ATR_Medium_Periods = 14,
-                ATR_Long_Periods = 14,
-                Stochastic_Short_Periods = 14,
-                Stochastic_Medium_Periods = 14,
-                Stochastic_Long_Periods = 14,
-                ResistanceLevels_MinCandlestickPercentage = 0.1,
-                ResistanceLevels_MaxLevels = 6,
-                ResistanceLevels_Sigma = 2.0,
-                ResistanceLevels_MinDistance = 3
-            };
-            ValidateCalculationConfig(calculationConfig);
-            return Options.Create(calculationConfig);
+            var config = GetConfiguration().GetSection("WatchedMarkets:CalculationConfig").Get<CalculationConfig>();
+            ValidateCalculationConfig(config);
+            return Options.Create(config);
         }
 
 
@@ -158,156 +103,6 @@ namespace KalshiBotTests
             if (config.RecentCandlestickDays <= 0) throw new ArgumentException("RecentCandlestickDays must be positive");
             if (config.PseudoCandlestickLookbackPeriods <= 0) throw new ArgumentException("PseudoCandlestickLookbackPeriods must be positive");
             if (config.RecentCandlesticksCount <= 0) throw new ArgumentException("RecentCandlesticksCount must be positive");
-        }
-
-        /// <summary>
-        /// Creates and returns an TradingConfig instance with scenario-based test values.
-        /// </summary>
-        /// <param name="scenario">The test scenario to use for configuration values.</param>
-        /// <returns>An IOptions&lt;TradingConfig&gt; instance configured for the specified scenario.</returns>
-        public static BacklashDTOs.Configuration.GeneralExecutionConfig GetGeneralExecutionConfig(TestScenario scenario)
-        {
-            var config = new BacklashDTOs.Configuration.GeneralExecutionConfig
-            {
-                HardDataStorageLocation = @"C:\Temp\Storage"
-            };
-            switch (scenario)
-            {
-                case TestScenario.Fast:
-                    config.DecisionFrequencySeconds = 30;
-                    break;
-                case TestScenario.Slow:
-                    config.DecisionFrequencySeconds = 300;
-                    break;
-                default:
-                    config.DecisionFrequencySeconds = 60;
-                    break;
-            }
-            return config;
-        }
-        /// <summary>
-        /// Creates and returns an TestHelperConfig instance with scenario-based test values.
-        /// </summary>
-        /// <param name="scenario">The test scenario to use for configuration values.</param>
-        /// <returns>An IOptions&lt;TestHelperConfig&gt; instance configured for the specified scenario.</returns>
-        public static TestHelperConfig GetTestHelperConfig(TestScenario scenario)
-        {
-            var config = new TestHelperConfig();
-            switch (scenario)
-            {
-                case TestScenario.Fast:
-                    config.ChangeWindowDurationMinutes = 2;
-                    config.TradeMatchingWindowSeconds = 2;
-                    config.OrderbookCancelWindowSeconds = 5;
-                    break;
-                case TestScenario.Slow:
-                    config.ChangeWindowDurationMinutes = 10;
-                    config.TradeMatchingWindowSeconds = 10;
-                    config.OrderbookCancelWindowSeconds = 30;
-                    break;
-                default:
-                    config.ChangeWindowDurationMinutes = 5;
-                    config.TradeMatchingWindowSeconds = 5;
-                    config.OrderbookCancelWindowSeconds = 10;
-                    break;
-            }
-            return Options.Create(config).Value;
-        }
-
-        /// <summary>
-        /// Creates and returns an CalculationConfig instance with scenario-based test values.
-        /// </summary>
-        /// <param name="scenario">The test scenario to use for configuration values.</param>
-        /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured for the specified scenario.</returns>
-        public static CalculationConfig GetCalculationConfig(TestScenario scenario)
-        {
-            var config = new CalculationConfig();
-            switch (scenario)
-            {
-                case TestScenario.Fast:
-                    config.RSI_Short_Periods = 7;
-                    config.RSI_Medium_Periods = 7;
-                    config.RSI_Long_Periods = 7;
-                    config.MACD_Medium_FastPeriod = 6;
-                    config.MACD_Medium_SlowPeriod = 13;
-                    config.MACD_Medium_SignalPeriod = 5;
-                    config.EMA_Medium_Periods = 7;
-                    config.EMA_Long_Periods = 7;
-                    config.BollingerBands_Medium_Periods = 10;
-                    config.BollingerBands_Medium_StdDev = 2;
-                    config.ATR_Medium_Periods = 7;
-                    config.ATR_Long_Periods = 7;
-                    config.Stochastic_Short_Periods = 7;
-                    config.Stochastic_Short_DPeriods = 3;
-                    config.ResistanceLevels_MaxLevels = 3;
-                    config.ResistanceLevels_MinDistance = 1;
-                    break;
-                case TestScenario.Slow:
-                    config.RSI_Short_Periods = 21;
-                    config.RSI_Medium_Periods = 21;
-                    config.RSI_Long_Periods = 21;
-                    config.MACD_Medium_FastPeriod = 18;
-                    config.MACD_Medium_SlowPeriod = 39;
-                    config.MACD_Medium_SignalPeriod = 13;
-                    config.EMA_Medium_Periods = 21;
-                    config.EMA_Long_Periods = 21;
-                    config.BollingerBands_Medium_Periods = 30;
-                    config.BollingerBands_Medium_StdDev = 2;
-                    config.ATR_Medium_Periods = 21;
-                    config.ATR_Long_Periods = 21;
-                    config.Stochastic_Short_Periods = 21;
-                    config.Stochastic_Short_DPeriods = 3;
-                    config.ResistanceLevels_MaxLevels = 10;
-                    config.ResistanceLevels_MinDistance = 5;
-                    break;
-                default:
-                    config.RSI_Short_Periods = 14;
-                    config.RSI_Medium_Periods = 14;
-                    config.RSI_Long_Periods = 14;
-                    config.MACD_Medium_FastPeriod = 12;
-                    config.MACD_Medium_SlowPeriod = 26;
-                    config.MACD_Medium_SignalPeriod = 9;
-                    config.EMA_Medium_Periods = 14;
-                    config.EMA_Long_Periods = 14;
-                    config.BollingerBands_Medium_Periods = 20;
-                    config.BollingerBands_Medium_StdDev = 2;
-                    config.ATR_Medium_Periods = 14;
-                    config.ATR_Long_Periods = 14;
-                    config.Stochastic_Short_Periods = 14;
-                    config.Stochastic_Short_DPeriods = 3;
-                    config.ResistanceLevels_MaxLevels = 6;
-                    config.ResistanceLevels_MinDistance = 3;
-                    break;
-            }
-            ValidateCalculationConfig(config);
-            return Options.Create(config).Value;
-        }
-
-        /// <summary>
-        /// Loads TradingConfig from a JSON file.
-        /// </summary>
-        /// <param name="filePath">Path to the JSON configuration file.</param>
-        /// <returns>An IOptions&lt;TradingConfig&gt; instance loaded from the file.</returns>
-        public static IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> LoadGeneralExecutionConfigFromFile(string filePath)
-        {
-            if (!File.Exists(filePath)) throw new FileNotFoundException("Configuration file not found", filePath);
-            var json = File.ReadAllText(filePath);
-            var config = JsonSerializer.Deserialize<BacklashDTOs.Configuration.GeneralExecutionConfig>(json);
-            return Options.Create(config);
-        }
-
-        /// <summary>
-        /// Loads CalculationConfig from a JSON file.
-        /// </summary>
-        /// <param name="filePath">Path to the JSON configuration file.</param>
-        /// <returns>An IOptions&lt;CalculationConfig&gt; instance loaded from the file.</returns>
-        public static IOptions<CalculationConfig> LoadCalculationConfigFromFile(string filePath)
-        {
-            if (!File.Exists(filePath)) throw new FileNotFoundException("Configuration file not found", filePath);
-            var json = File.ReadAllText(filePath);
-            var config = JsonSerializer.Deserialize<CalculationConfig>(json);
-            ValidateCalculationConfig(config);
-            return Options.Create(config);
         }
 
     }

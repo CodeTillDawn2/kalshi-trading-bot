@@ -1,4 +1,4 @@
-﻿using BacklashBot.State.Interfaces;
+using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 
 namespace BacklashBot.Services.Interfaces

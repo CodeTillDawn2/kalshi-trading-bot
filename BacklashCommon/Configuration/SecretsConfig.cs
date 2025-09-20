@@ -11,7 +11,7 @@ namespace BacklashCommon.Configuration
         /// Gets or sets the path to the secrets folder relative to the application directory.
         /// Default is "Secrets".
         /// </summary>
-        [JsonRequired]
+        required
         public string SecretsPath { get; set; }
     }
 }

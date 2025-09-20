@@ -19,39 +19,34 @@ namespace BacklashDTOs.Configuration
         /// Errors occurring within this window are counted toward the catastrophic threshold.
         /// </summary>
         /// <value>Default is 5 minutes.</value>
-        [JsonRequired]
-        public int ErrorWindowMinutes { get; set; }
+        public required int ErrorWindowMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the threshold number of non-catastrophic errors within the monitoring window
         /// that triggers catastrophic failure detection and system restart.
         /// </summary>
         /// <value>Default is 10 errors.</value>
-        [JsonRequired]
-        public int ErrorThreshold { get; set; }
+        public required int ErrorThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of attempts for internet connectivity checks
         /// before declaring the connection as failed.
         /// </summary>
         /// <value>Default is 100 attempts.</value>
-        [JsonRequired]
-        public int InternetCheckMaxAttempts { get; set; }
+        public required int InternetCheckMaxAttempts { get; set; }
 
         /// <summary>
         /// Gets or sets the initial delay in milliseconds between internet connectivity check attempts.
         /// This delay doubles with each retry attempt until reaching the maximum delay.
         /// </summary>
         /// <value>Default is 1000 milliseconds (1 second).</value>
-        [JsonRequired]
-        public int InternetCheckInitialDelayMs { get; set; }
+        public required int InternetCheckInitialDelayMs { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum delay in milliseconds between internet connectivity check attempts.
         /// The delay will not exceed this value even after exponential backoff.
         /// </summary>
         /// <value>Default is 60000 milliseconds (60 seconds).</value>
-        [JsonRequired]
-        public int InternetCheckMaxDelayMs { get; set; }
+        public required int InternetCheckMaxDelayMs { get; set; }
     }
 }

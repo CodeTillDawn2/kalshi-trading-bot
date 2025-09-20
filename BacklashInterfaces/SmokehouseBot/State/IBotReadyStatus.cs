@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.State.Interfaces
+namespace BacklashBot.State.Interfaces
 {
 /// <summary>IBotReadyStatus</summary>
 /// <summary>IBotReadyStatus</summary>

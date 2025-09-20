@@ -2,10 +2,10 @@ using BacklashDTOs;
 using BacklashPatterns;
 using TradingStrategies.Extensions;
 using TradingStrategies.Configuration;
-using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using BacklashInterfaces.PerformanceMetrics;
 
 /// <summary>
 /// Represents the comprehensive result of pattern detection including patterns and performance metrics.
@@ -59,30 +59,15 @@ namespace TradingStrategies.Trading.Overseer
         private readonly PatternDetectionServiceConfig _config;
         private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? _performanceMonitor;
 
-        /// <summary>
-        /// Initializes a new instance of the PatternDetectionService with configuration from appsettings.json.
-        /// </summary>
-        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
-        /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
-        public PatternDetectionService(IConfiguration configuration, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
-        {
-            _config = new PatternDetectionServiceConfig();
-            _performanceMonitor = performanceMonitor;
-
-            // Bind PatternDetectionServiceConfig section (service-specific settings)
-            var serviceConfig = configuration.GetSection("PatternDetectionServiceConfig");
-            serviceConfig.Bind(_config);
-        }
 
         /// <summary>
         /// Initializes a new instance of the PatternDetectionService with the specified configuration.
-        /// This constructor is for backward compatibility and testing purposes.
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
-        public PatternDetectionService(PatternDetectionServiceConfig config, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
+        public PatternDetectionService(PatternDetectionServiceConfig config, IPerformanceMonitor? performanceMonitor = null)
         {
-            _config = config ?? new PatternDetectionServiceConfig();
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _performanceMonitor = performanceMonitor;
         }
 

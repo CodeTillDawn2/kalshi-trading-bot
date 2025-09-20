@@ -14,6 +14,5 @@ public class EquityCalculatorConfig
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: true
     /// </summary>
-    [JsonRequired]
-    public bool EnablePerformanceMetrics { get; set; }
+    public required bool EnablePerformanceMetrics { get; set; }
 }

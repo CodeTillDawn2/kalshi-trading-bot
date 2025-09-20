@@ -1,4 +1,4 @@
-﻿using BacklashDTOs;
+using BacklashDTOs;
 using BacklashInterfaces.Enums;
 using System.Collections.Concurrent;
 

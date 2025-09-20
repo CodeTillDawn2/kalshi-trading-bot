@@ -1,4 +1,4 @@
-﻿namespace BacklashBot.Services.Interfaces
+namespace BacklashBot.Services.Interfaces
 {
 /// <summary>IBroadcastService</summary>
 /// <summary>IBroadcastService</summary>

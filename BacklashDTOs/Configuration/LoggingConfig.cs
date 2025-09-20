@@ -10,20 +10,17 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the log level settings.
         /// </summary>
-        [JsonRequired]
-        public LogLevelSettings LogLevel { get; set; }
+        public required LogLevelSettings LogLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the environment name.
         /// </summary>
-        [JsonRequired]
-        public string Environment { get; set; }
+        public required string Environment { get; set; }
 
         /// <summary>
         /// Gets or sets whether to store WebSocket events.
         /// </summary>
-        [JsonRequired]
-        public bool StoreWebSocketEvents { get; set; }
+        public required bool StoreWebSocketEvents { get; set; }
     }
 
     /// <summary>
@@ -34,25 +31,21 @@ namespace BacklashDTOs.Configuration
         /// <summary>
         /// Gets or sets the default log level.
         /// </summary>
-        [JsonRequired]
-        public string Default { get; set; }
+        public required string Default { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for Microsoft components.
         /// </summary>
-        [JsonRequired]
-        public string Microsoft { get; set; }
+        public required string Microsoft { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for SQL database logging.
         /// </summary>
-        [JsonRequired]
-        public string SqlDatabaseLogLevel { get; set; }
+        public required string SqlDatabaseLogLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the log level for console logging.
         /// </summary>
-        [JsonRequired]
-        public string ConsoleLogLevel { get; set; }
+        public required string ConsoleLogLevel { get; set; }
     }
 }

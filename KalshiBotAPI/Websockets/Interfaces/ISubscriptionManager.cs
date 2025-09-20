@@ -1,4 +1,4 @@
-﻿using BacklashInterfaces.Enums;
+using BacklashInterfaces.Enums;
 using System.Collections.Concurrent;
 
 namespace KalshiBotAPI.WebSockets.Interfaces

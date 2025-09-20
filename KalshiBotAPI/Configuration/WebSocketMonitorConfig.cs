@@ -10,18 +10,15 @@ public class WebSocketMonitorConfig
     /// <summary>
     /// Gets or sets the monitoring interval in minutes.
     /// </summary>
-    [JsonRequired]
-    public int MonitoringIntervalMinutes { get; set; }
+    public required int MonitoringIntervalMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the retry delay in minutes.
     /// </summary>
-    [JsonRequired]
-    public int RetryDelayMinutes { get; set; }
+    public required int RetryDelayMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets whether WebSocket monitor metrics are enabled.
     /// </summary>
-    [JsonRequired]
-    public bool EnableWebSocketMonitorMetrics { get; set; }
+    public required bool EnableWebSocketMonitorMetrics { get; set; }
 }

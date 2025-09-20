@@ -15,7 +15,7 @@ public class OrderbookChangeTrackerConfig
     /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
     /// Used by OrderbookChangeTracker for periodic cleanup of old events.
     /// </summary>
-    [JsonRequired]
+    required
     public int CleanupThresholdMinutes { get; set; }
 
     /// <summary>
@@ -25,6 +25,6 @@ public class OrderbookChangeTrackerConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    [JsonRequired]
+    required
     public bool EnablePerformanceMetrics { get; set; }
 }

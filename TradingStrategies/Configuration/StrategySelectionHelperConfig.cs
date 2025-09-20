@@ -11,6 +11,7 @@ namespace TradingStrategies.Configuration
         /// metrics including instantiation time, memory allocation, and instance counts are collected.
         /// Defaults to false for performance reasons (individual instance tracking has overhead).
         /// </summary>
-        public bool EnablePerformanceMetrics { get; set; } = false;
+        required
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

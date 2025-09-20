@@ -1,4 +1,4 @@
-﻿
+
 namespace BacklashBot.Services.Interfaces
 {
 /// <summary>IMarketDataInitializer</summary>
