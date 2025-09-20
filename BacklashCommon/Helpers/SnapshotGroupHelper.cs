@@ -19,7 +19,6 @@ namespace BacklashCommon.Helpers
     public class SnapshotGroupHelper : ISnapshotGroupHelper
     {
         private readonly GeneralExecutionConfig _generalExecutionConfig;
-        private readonly CentralBrainConfig _centralBrainConfig;
         private readonly SnapshotGroupHelperConfig _snapshotGroupHelperConfig;
         private readonly ISnapshotPeriodHelper _snapshotPeriodHelper;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -38,17 +37,17 @@ namespace BacklashCommon.Helpers
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
         /// <param name="snapshotService">Service for managing trading snapshots.</param>
         /// <param name="generalExecutionConfig">Configuration options for general execution settings.</param>
-        /// <param name="centralBrainConfig">Configuration options for central brain settings.</param>
         /// <param name="marketAnalysisHelperConfig">Configuration options for market analysis helper settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
-        public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, IOptions<CentralBrainConfig> centralBrainConfig, IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<SnapshotGroupHelper> logger)
+        public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, 
+            ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, 
+            IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor centralPerformanceMonitor, ILogger<SnapshotGroupHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
             ArgumentNullException.ThrowIfNull(snapshotService);
             ArgumentNullException.ThrowIfNull(generalExecutionConfig);
-            ArgumentNullException.ThrowIfNull(centralBrainConfig);
             ArgumentNullException.ThrowIfNull(marketAnalysisHelperConfig);
             ArgumentNullException.ThrowIfNull(logger);
 
@@ -56,14 +55,8 @@ namespace BacklashCommon.Helpers
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
             _generalExecutionConfig = generalExecutionConfig.Value ?? throw new ArgumentNullException(nameof(generalExecutionConfig.Value));
-            _centralBrainConfig = centralBrainConfig.Value ?? throw new ArgumentNullException(nameof(centralBrainConfig.Value));
             _snapshotGroupHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
             _centralPerformanceMonitor = centralPerformanceMonitor;
-
-            if (string.IsNullOrWhiteSpace(_centralBrainConfig.HardDataStorageLocation))
-            {
-                throw new ArgumentException("HardDataStorageLocation must be specified in CentralBrainConfig.", nameof(_centralBrainConfig.HardDataStorageLocation));
-            }
 
             _logger = logger;
             _metricsEnabled = _snapshotGroupHelperConfig.EnablePerformanceMetrics;
@@ -174,7 +167,7 @@ namespace BacklashCommon.Helpers
                     continue;
                 }
 
-                string snapshotDirectory = Path.Combine(_centralBrainConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
+                string snapshotDirectory = Path.Combine(_generalExecutionConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
 
                 // Process valid snapshots into snapshot groups
                 var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);

@@ -20,6 +20,7 @@ using TradingStrategies.Configuration;
 
 using Polly;
 using Polly.Retry;
+using BacklashBot.Configuration;
 namespace BacklashBot.Services
 {
     /// <summary>

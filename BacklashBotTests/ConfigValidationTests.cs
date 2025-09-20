@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 using BacklashBot.Configuration;
@@ -16,374 +20,302 @@ namespace BacklashBotTests
     [TestFixture]
     public class ConfigValidationTests
     {
-        [Test]
-        public void ValidateAllConfigs_Populated_Valid()
+        private IConfiguration _configuration;
+
+        [SetUp]
+        public void SetUp()
         {
-            // SecretsConfig
-            var secretsConfig = new SecretsConfig
-            {
-                SecretsPath = "test/path"
-            };
-            ValidateConfig(secretsConfig);
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 
-            // LoggingConfig
-            var loggingConfig = new LoggingConfig
-            {
-                Environment = "test",
-                StoreWebSocketEvents = true,
-                SqlDatabaseLogLevel = "Information",
-                ConsoleLogLevel = "Debug"
-            };
-            ValidateConfig(loggingConfig);
-
-            // KalshiConfig
-            var kalshiConfig = new KalshiConfig
-            {
-                Environment = "test",
-                BotKeyId = "test-key-id",
-                BotKeyFile = "test/path/to/key"
-            };
-            ValidateConfig(kalshiConfig);
-
-            // KalshiAPIServiceConfig
-            var kalshiAPIServiceConfig = new KalshiAPIServiceConfig
-            {
-                EnablePerformanceMetrics = true,
-                CandlestickMandatoryOverlapDaysMinute = 1,
-                CandlestickMandatoryOverlapDaysHour = 1,
-                CandlestickMandatoryOverlapDaysDay = 1
-            };
-            ValidateConfig(kalshiAPIServiceConfig);
-
-            // WebSocketConnectionManagerConfig
-            var webSocketConnectionManagerConfig = new WebSocketConnectionManagerConfig
-            {
-                BufferSize = 16384,
-                MaxRetryAttempts = 5,
-                RetryDelays = new int[] { 1000, 2000, 4000, 8000, 16000 },
-                SignatureCacheDurationMinutes = 5,
-                ResetDelayMs = 5000,
-                SemaphoreTimeoutMs = 60000,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(webSocketConnectionManagerConfig);
-
-            // MessageProcessorConfig
-            var messageProcessorConfig = new MessageProcessorConfig
-            {
-                EnableMessageBatching = true,
-                MaxBatchSize = 100,
-                BatchProcessingIntervalMs = 100,
-                MaxSequenceNumbersToKeep = 10000,
-                EnablePerformanceMetrics = true,
-                PerformanceMetricsLogIntervalMs = 5000,
-                DuplicateMessageWarningThreshold = 10,
-                DuplicateMessageTimeWindowMs = 60000,
-                UseAdvancedLocking = true
-            };
-            ValidateConfig(messageProcessorConfig);
-
-            // SubscriptionManagerConfig
-            var subscriptionManagerConfig = new SubscriptionManagerConfig
-            {
-                EnableSubscriptionManagerMetrics = true,
-                SubscriptionTimeoutMs = 30000,
-                ConfirmationTimeoutSeconds = 30,
-                RetryDelayMs = 1000,
-                MaxQueueSize = 1000,
-                BatchSize = 50,
-                HealthCheckIntervalMs = 5000
-            };
-            ValidateConfig(subscriptionManagerConfig);
-
-            // WebSocketMonitorConfig
-            var webSocketMonitorConfig = new WebSocketMonitorConfig
-            {
-                MonitoringIntervalMinutes = 5,
-                RetryDelayMinutes = 1,
-                EnableWebSocketMonitorMetrics = true
-            };
-            ValidateConfig(webSocketMonitorConfig);
-
-            // KalshiWebSocketClientConfig
-            var kalshiWebSocketClientConfig = new KalshiWebSocketClientConfig
-            {
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(kalshiWebSocketClientConfig);
-
-            // TradingSnapshotServiceConfig
-            var tradingSnapshotServiceConfig = new TradingSnapshotServiceConfig
-            {
-                SnapshotToleranceSeconds = 60,
-                StorageDirectory = "test/storage",
-                MaxParallelism = 4,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(tradingSnapshotServiceConfig);
-
-            // SnapshotPeriodHelperConfig
-            var snapshotPeriodHelperConfig = new SnapshotPeriodHelperConfig
-            {
-                SmallGapMinutes = 5.0,
-                MaxActiveGapHours = 1.0,
-                PriceChangeThreshold = 10
-            };
-            ValidateConfig(snapshotPeriodHelperConfig);
-
-            // OrderbookChangeTrackerConfig
-            var orderbookChangeTrackerConfig = new OrderbookChangeTrackerConfig
-            {
-                CleanupThresholdMinutes = 60,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(orderbookChangeTrackerConfig);
-
-            // MarketRefreshServiceConfig
-            var marketRefreshServiceConfig = new MarketRefreshServiceConfig
-            {
-                RefreshIntervalMinutes = 5,
-                RefreshThresholdRatio = 0.5,
-                TimeBudgetRatio = 0.5,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(marketRefreshServiceConfig);
-
-            // PseudoCandlestickExtensionsConfig
-            var pseudoCandlestickExtensionsConfig = new PseudoCandlestickExtensionsConfig
-            {
-                VolumePrecisionDigits = 2
-            };
-            ValidateConfig(pseudoCandlestickExtensionsConfig);
-
-            // GeneralExecutionConfig
-            var generalExecutionConfig = new GeneralExecutionConfig
-            {
-                BrainInstance = "test-instance",
-                QueuesTargetCount = 10,
-                RetryDelayMs = 1000,
-                AuthTokenValidityHours = 24,
-                HardDataStorageLocation = "test/storage",
-                DecisionFrequencySeconds = 60,
-                RefreshIntervalMinutes = 5,
-                SnapshotSchemaVersion = 1
-            };
-            ValidateConfig(generalExecutionConfig);
-
-            // OverseerClientServiceConfig
-            var overseerClientServiceConfig = new OverseerClientServiceConfig
-            {
-                OverseerConnectionTimeoutSeconds = 30,
-                OverseerSemaphoreTimeoutSeconds = 10,
-                OverseerDiscoveryIntervalMinutes = 3,
-                OverseerCheckInIntervalSeconds = 30,
-                OverseerCircuitBreakerFailureThreshold = 5,
-                OverseerCircuitBreakerTimeoutMinutes = 5,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(overseerClientServiceConfig);
-
-            // CandlestickServiceConfig
-            var candlestickServiceConfig = new CandlestickServiceConfig
-            {
-                MaxParallelCandlestickTasks = 4,
-                EnablePerformanceMetrics = true,
-                CandlestickMandatoryOverlapDaysMinute = 1,
-                CandlestickMandatoryOverlapDaysHour = 1,
-                CandlestickMandatoryOverlapDaysDay = 1,
-                HardDataStorageLocation = "test/storage"
-            };
-            ValidateConfig(candlestickServiceConfig);
-
-            // BroadcastServiceConfig
-            var broadcastServiceConfig = new BroadcastServiceConfig
-            {
-                BroadcastIntervalSeconds = 30,
-                BroadcastMaxRetryAttempts = 3,
-                BroadcastRetryDelaySeconds = 1,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(broadcastServiceConfig);
-
-            // MarketDataInitializerConfig
-            var marketDataInitializerConfig = new MarketDataInitializerConfig
-            {
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(marketDataInitializerConfig);
-
-            // CentralPerformanceMonitorConfig
-            var centralPerformanceMonitorConfig = new CentralPerformanceMonitorConfig
-            {
-                QueueHighCountAlertThreshold = 80.0,
-                RefreshUsageAlertThreshold = 90.0,
-                QueueCountAlertThreshold = 100,
-                CentralPerformanceMonitor_EnableDatabaseMetrics = true
-            };
-            ValidateConfig(centralPerformanceMonitorConfig);
-
-            // KalshiBotScopeManagerServiceConfig
-            var kalshiBotScopeManagerServiceConfig = new KalshiBotScopeManagerServiceConfig
-            {
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(kalshiBotScopeManagerServiceConfig);
-
-            // MarketDataConfig with nested CalculationConfig
-            var calculationConfig = new CalculationConfig
-            {
-                TolerancePercentage = 0.01,
-                RecentCandlestickDays = 7,
-                SlopeShortMinutes = 5,
-                SlopeMediumMinutes = 15,
-                RSI_Short_Periods = 14,
-                RSI_Medium_Periods = 21,
-                RSI_Long_Periods = 50,
-                MACD_Medium_FastPeriod = 12,
-                MACD_Medium_SlowPeriod = 26,
-                MACD_Medium_SignalPeriod = 9,
-                MACD_Long_FastPeriod = 26,
-                MACD_Long_SlowPeriod = 52,
-                MACD_Long_SignalPeriod = 18,
-                EMA_Medium_Periods = 21,
-                EMA_Long_Periods = 50,
-                BollingerBands_Medium_Periods = 20,
-                BollingerBands_Medium_StdDev = 2.0,
-                BollingerBands_Long_Periods = 50,
-                BollingerBands_Long_StdDev = 2.0,
-                ATR_Medium_Periods = 14,
-                ATR_Long_Periods = 21,
-                VWAP_Short_Periods = 5,
-                VWAP_Medium_Periods = 20,
-                Stochastic_Short_Periods = 5,
-                Stochastic_Short_DPeriods = 3,
-                Stochastic_Medium_Periods = 14,
-                Stochastic_Medium_DPeriods = 3,
-                Stochastic_Long_Periods = 21,
-                Stochastic_Long_DPeriods = 3,
-                TradingFeeRate = 0.001,
-                PseudoCandlestickLookbackPeriods = 10,
-                RecentCandlesticksCount = 100,
-                PSAR_InitialAF = 0.02,
-                PSAR_MaxAF = 0.2,
-                PSAR_AFStep = 0.02,
-                ADX_Periods = 14,
-                ResistanceLevels_ExponentialMultiplier = 1.5,
-                ResistanceLevels_MinCandlestickPercentage = 0.1,
-                ResistanceLevels_MaxLevels = 5,
-                ResistanceLevels_Sigma = 2.0,
-                ResistanceLevels_MinDistance = 10
-            };
-            ValidateConfig(calculationConfig);
-
-            var marketDataConfig = new MarketDataConfig
-            {
-                SemaphoreTimeoutMs = 5000,
-                TickerBatchSize = 100,
-                ApiRetryTimeoutMs = 30000,
-                EnablePerformanceMetrics = true,
-                PseudoCandlestickLookbackPeriods = 10,
-                Calculations = calculationConfig
-            };
-            ValidateConfig(marketDataConfig);
-
-            // CentralBrainConfig
-            var centralBrainConfig = new CentralBrainConfig
-            {
-                ErrorCheckInterval = TimeSpan.FromMinutes(1),
-                StartupRetryInterval = TimeSpan.FromSeconds(30),
-                SnapshotInitialDelay = TimeSpan.FromSeconds(10),
-                OvernightStart = TimeSpan.FromHours(22),
-                OvernightTaskDelay = TimeSpan.FromMinutes(5),
-                LaunchDataDashboard = true,
-                RunOvernightActivities = true,
-                MaxMarketsPerSubscriptionAction = 50,
-                HardDataStorageLocation = "test/storage"
-            };
-            ValidateConfig(centralBrainConfig);
-
-            // TargetCalculationServiceConfig
-            var targetCalculationServiceConfig = new TargetCalculationServiceConfig
-            {
-                NotificationQueueLimit = 100,
-                OrderbookQueueLimit = 100,
-                EventQueueLimit = 100,
-                TickerQueueLimit = 100
-            };
-            ValidateConfig(targetCalculationServiceConfig);
-
-            // BrainStatusServiceConfig
-            var brainStatusServiceConfig = new BrainStatusServiceConfig
-            {
-                SessionIdLength = 32
-            };
-            ValidateConfig(brainStatusServiceConfig);
-
-            // SnapshotGroupHelperConfig
-            var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig
-            {
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(snapshotGroupHelperConfig);
-
-            // QueueMonitoringConfig
-            var queueMonitoringConfig = new QueueMonitoringConfig
-            {
-                QueueHighCountAlertThreshold = 80.0,
-                RefreshUsageAlertThreshold = 90.0,
-                QueueCountAlertThreshold = 100,
-                CentralPerformanceMonitor_EnableDatabaseMetrics = true
-            };
-            ValidateConfig(queueMonitoringConfig);
-
-            // InterestScoreConfig
-            var interestScoreConfig = new InterestScoreConfig
-            {
-                CacheDurationHours = 6,
-                EnablePerformanceMetrics = true,
-                MaxPerformanceMetricsHistory = 1000
-            };
-            ValidateConfig(interestScoreConfig);
-
-            // ErrorHandlerConfig
-            var errorHandlerConfig = new ErrorHandlerConfig
-            {
-                ErrorWindowMinutes = 5,
-                ErrorThreshold = 10,
-                InternetCheckMaxAttempts = 100,
-                InternetCheckInitialDelayMs = 1000,
-                InternetCheckMaxDelayMs = 60000
-            };
-            ValidateConfig(errorHandlerConfig);
-
-            // OrderBookServiceConfig
-            var orderBookServiceConfig = new OrderBookServiceConfig
-            {
-                SemaphoreTimeoutMs = 5000,
-                QueueLimit = 1000,
-                EventQueueSemaphoreTimeoutMs = 5000,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(orderBookServiceConfig);
-
-            // BacklashBotDataConfig
-            var backlashBotDataConfig = new BacklashBotDataConfig
-            {
-                MaxRetryCount = 3,
-                RetryDelaySeconds = 1.0,
-                BatchSize = 100,
-                MaxQueueSize = 1000,
-                WorkersPerQueue = 4,
-                EnablePerformanceMetrics = true
-            };
-            ValidateConfig(backlashBotDataConfig);
+            _configuration = builder.Build();
         }
 
-        private void ValidateConfig(object config)
+        [Test]
+        public void ValidateAllConfigs_FromAppsettings_Valid()
+        {
+            // SecretsConfig - "Secrets"
+            var secretsConfig = new SecretsConfig();
+            var secretsSection = _configuration.GetSection("Secrets");
+            secretsSection.Bind(secretsConfig);
+            ValidateConfig(secretsConfig, secretsSection);
+
+            // LoggingConfig - "Communications:Logging"
+            var loggingConfig = new LoggingConfig();
+            var loggingSection = _configuration.GetSection("Communications:Logging");
+            loggingSection.Bind(loggingConfig);
+            ValidateConfig(loggingConfig, loggingSection);
+
+            // KalshiConfig - "Kalshi"
+            var kalshiConfig = new KalshiConfig();
+            var kalshiSection = _configuration.GetSection("Kalshi");
+            kalshiSection.Bind(kalshiConfig);
+            ValidateConfig(kalshiConfig, kalshiSection);
+
+            // KalshiAPIServiceConfig - "API:KalshiAPIService"
+            var kalshiAPIServiceConfig = new KalshiAPIServiceConfig();
+            var kalshiAPIServiceSection = _configuration.GetSection("API:KalshiAPIService");
+            kalshiAPIServiceSection.Bind(kalshiAPIServiceConfig);
+            ValidateConfig(kalshiAPIServiceConfig, kalshiAPIServiceSection);
+
+            // WebSocketConnectionManagerConfig - "Websockets:WebSocketConnectionManager"
+            var webSocketConnectionManagerConfig = new WebSocketConnectionManagerConfig();
+            var webSocketConnectionManagerSection = _configuration.GetSection("Websockets:WebSocketConnectionManager");
+            webSocketConnectionManagerSection.Bind(webSocketConnectionManagerConfig);
+            ValidateConfig(webSocketConnectionManagerConfig, webSocketConnectionManagerSection);
+
+            // MessageProcessorConfig - "Websockets:MessageProcessor"
+            var messageProcessorConfig = new MessageProcessorConfig();
+            var messageProcessorSection = _configuration.GetSection("Websockets:MessageProcessor");
+            messageProcessorSection.Bind(messageProcessorConfig);
+            ValidateConfig(messageProcessorConfig, messageProcessorSection);
+
+            // SubscriptionManagerConfig - "Websockets:SubscriptionManager"
+            var subscriptionManagerConfig = new SubscriptionManagerConfig();
+            var subscriptionManagerSection = _configuration.GetSection("Websockets:SubscriptionManager");
+            subscriptionManagerSection.Bind(subscriptionManagerConfig);
+            ValidateConfig(subscriptionManagerConfig, subscriptionManagerSection);
+
+            // WebSocketMonitorConfig - "Websockets:WebSocketMonitor"
+            var webSocketMonitorConfig = new WebSocketMonitorConfig();
+            var webSocketMonitorSection = _configuration.GetSection("Websockets:WebSocketMonitor");
+            webSocketMonitorSection.Bind(webSocketMonitorConfig);
+            ValidateConfig(webSocketMonitorConfig, webSocketMonitorSection);
+
+            // KalshiWebSocketClientConfig - "Websockets:KalshiWebSocketClient"
+            var kalshiWebSocketClientConfig = new KalshiWebSocketClientConfig();
+            var kalshiWebSocketClientSection = _configuration.GetSection("Websockets:KalshiWebSocketClient");
+            kalshiWebSocketClientSection.Bind(kalshiWebSocketClientConfig);
+            ValidateConfig(kalshiWebSocketClientConfig, kalshiWebSocketClientSection);
+
+            // TradingSnapshotServiceConfig - "WatchedMarkets:TradingSnapshotService"
+            var tradingSnapshotServiceConfig = new TradingSnapshotServiceConfig();
+            var tradingSnapshotServiceSection = _configuration.GetSection("WatchedMarkets:TradingSnapshotService");
+            tradingSnapshotServiceSection.Bind(tradingSnapshotServiceConfig);
+            ValidateConfig(tradingSnapshotServiceConfig, tradingSnapshotServiceSection);
+
+            // SnapshotPeriodHelperConfig - "WatchedMarkets:SnapshotPeriodHelper"
+            var snapshotPeriodHelperConfig = new SnapshotPeriodHelperConfig();
+            var snapshotPeriodHelperSection = _configuration.GetSection("WatchedMarkets:SnapshotPeriodHelper");
+            snapshotPeriodHelperSection.Bind(snapshotPeriodHelperConfig);
+            ValidateConfig(snapshotPeriodHelperConfig, snapshotPeriodHelperSection);
+
+            // OrderbookChangeTrackerConfig - "WatchedMarkets:OrderbookChangeTracker"
+            var orderbookChangeTrackerConfig = new OrderbookChangeTrackerConfig();
+            var orderbookChangeTrackerSection = _configuration.GetSection("WatchedMarkets:OrderbookChangeTracker");
+            orderbookChangeTrackerSection.Bind(orderbookChangeTrackerConfig);
+            ValidateConfig(orderbookChangeTrackerConfig, orderbookChangeTrackerSection);
+
+            // MarketRefreshServiceConfig - "WatchedMarkets:MarketRefreshService"
+            var marketRefreshServiceConfig = new MarketRefreshServiceConfig();
+            var marketRefreshServiceSection = _configuration.GetSection("WatchedMarkets:MarketRefreshService");
+            marketRefreshServiceSection.Bind(marketRefreshServiceConfig);
+            ValidateConfig(marketRefreshServiceConfig, marketRefreshServiceSection);
+
+            // PseudoCandlestickExtensionsConfig - "WatchedMarkets:PseudoCandlestickExtensions"
+            var pseudoCandlestickExtensionsConfig = new PseudoCandlestickExtensionsConfig();
+            var pseudoCandlestickExtensionsSection = _configuration.GetSection("WatchedMarkets:PseudoCandlestickExtensions");
+            pseudoCandlestickExtensionsSection.Bind(pseudoCandlestickExtensionsConfig);
+            ValidateConfig(pseudoCandlestickExtensionsConfig, pseudoCandlestickExtensionsSection);
+
+            // GeneralExecutionConfig - "Central:GeneralExecution"
+            var generalExecutionConfig = new GeneralExecutionConfig();
+            var generalExecutionSection = _configuration.GetSection("Central:GeneralExecution");
+            generalExecutionSection.Bind(generalExecutionConfig);
+            ValidateConfig(generalExecutionConfig, generalExecutionSection);
+
+            // OverseerClientServiceConfig - "Communications:OverseerClientService"
+            var overseerClientServiceConfig = new OverseerClientServiceConfig();
+            var overseerClientServiceSection = _configuration.GetSection("Communications:OverseerClientService");
+            overseerClientServiceSection.Bind(overseerClientServiceConfig);
+            ValidateConfig(overseerClientServiceConfig, overseerClientServiceSection);
+
+            // CandlestickServiceConfig - "WatchedMarkets:CandlestickService"
+            var candlestickServiceConfig = new CandlestickServiceConfig();
+            var candlestickServiceSection = _configuration.GetSection("WatchedMarkets:CandlestickService");
+            candlestickServiceSection.Bind(candlestickServiceConfig);
+            ValidateConfig(candlestickServiceConfig, candlestickServiceSection);
+
+            // BroadcastServiceConfig - "Communications:BroadcastService"
+            var broadcastServiceConfig = new BroadcastServiceConfig();
+            var broadcastServiceSection = _configuration.GetSection("Communications:BroadcastService");
+            broadcastServiceSection.Bind(broadcastServiceConfig);
+            ValidateConfig(broadcastServiceConfig, broadcastServiceSection);
+
+            // MarketDataInitializerConfig - "WatchedMarkets:MarketDataInitializer"
+            var marketDataInitializerConfig = new MarketDataInitializerConfig();
+            var marketDataInitializerSection = _configuration.GetSection("WatchedMarkets:MarketDataInitializer");
+            marketDataInitializerSection.Bind(marketDataInitializerConfig);
+            ValidateConfig(marketDataInitializerConfig, marketDataInitializerSection);
+
+            // CentralPerformanceMonitorConfig - "Central:CentralPerformanceMonitor"
+            var centralPerformanceMonitorConfig = new CentralPerformanceMonitorConfig();
+            var centralPerformanceMonitorSection = _configuration.GetSection("Central:CentralPerformanceMonitor");
+            centralPerformanceMonitorSection.Bind(centralPerformanceMonitorConfig);
+            ValidateConfig(centralPerformanceMonitorConfig, centralPerformanceMonitorSection);
+
+            // KalshiBotScopeManagerServiceConfig - "Central:KalshiBotScopeManagerService"
+            var kalshiBotScopeManagerServiceConfig = new KalshiBotScopeManagerServiceConfig();
+            var kalshiBotScopeManagerServiceSection = _configuration.GetSection("Central:KalshiBotScopeManagerService");
+            kalshiBotScopeManagerServiceSection.Bind(kalshiBotScopeManagerServiceConfig);
+            ValidateConfig(kalshiBotScopeManagerServiceConfig, kalshiBotScopeManagerServiceSection);
+
+            // CalculationConfig - "WatchedMarkets:Calculations" (note: JSON uses "Calculations", not "CalculationConfig")
+            var calculationConfig = new CalculationConfig();
+            var calculationSection = _configuration.GetSection("WatchedMarkets:Calculations");
+            calculationSection.Bind(calculationConfig);
+            ValidateConfig(calculationConfig, calculationSection);
+
+            // MarketDataConfig - "WatchedMarkets:MarketData"
+            var marketDataConfig = new MarketDataConfig();
+            var marketDataSection = _configuration.GetSection("WatchedMarkets:MarketData");
+            marketDataSection.Bind(marketDataConfig);
+            marketDataConfig.Calculations = calculationConfig; // Set nested after binding
+            ValidateConfig(marketDataConfig, marketDataSection);
+
+            // CentralBrainConfig - "Central:CentralBrain"
+            var centralBrainConfig = new CentralBrainConfig();
+            var centralBrainSection = _configuration.GetSection("Central:CentralBrain");
+            centralBrainSection.Bind(centralBrainConfig);
+            ValidateConfig(centralBrainConfig, centralBrainSection);
+
+            // TargetCalculationServiceConfig - "WatchedMarkets:TargetCalculationService"
+            var targetCalculationServiceConfig = new TargetCalculationServiceConfig();
+            var targetCalculationServiceSection = _configuration.GetSection("WatchedMarkets:TargetCalculationService");
+            targetCalculationServiceSection.Bind(targetCalculationServiceConfig);
+            ValidateConfig(targetCalculationServiceConfig, targetCalculationServiceSection);
+
+            // BrainStatusServiceConfig - "Central:BrainStatusService"
+            var brainStatusServiceConfig = new BrainStatusServiceConfig();
+            var brainStatusServiceSection = _configuration.GetSection("Central:BrainStatusService");
+            brainStatusServiceSection.Bind(brainStatusServiceConfig);
+            ValidateConfig(brainStatusServiceConfig, brainStatusServiceSection);
+
+            // SnapshotGroupHelperConfig - "SnapshotGroupHelper"
+            var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig();
+            var snapshotGroupHelperSection = _configuration.GetSection("SnapshotGroupHelper");
+            snapshotGroupHelperSection.Bind(snapshotGroupHelperConfig);
+            ValidateConfig(snapshotGroupHelperConfig, snapshotGroupHelperSection);
+
+            // QueueMonitoringConfig - "Central:CentralPerformanceMonitor" (same as CentralPerformanceMonitorConfig)
+            var queueMonitoringConfig = new QueueMonitoringConfig();
+            var queueMonitoringSection = _configuration.GetSection("Central:CentralPerformanceMonitor");
+            queueMonitoringSection.Bind(queueMonitoringConfig);
+            ValidateConfig(queueMonitoringConfig, queueMonitoringSection);
+
+            // InterestScoreConfig - "WatchedMarkets:InterestScore"
+            var interestScoreConfig = new InterestScoreConfig();
+            var interestScoreSection = _configuration.GetSection("WatchedMarkets:InterestScore");
+            interestScoreSection.Bind(interestScoreConfig);
+            ValidateConfig(interestScoreConfig, interestScoreSection);
+
+            // ErrorHandlerConfig - "Central:ErrorHandler"
+            var errorHandlerConfig = new ErrorHandlerConfig();
+            var errorHandlerSection = _configuration.GetSection("Central:ErrorHandler");
+            errorHandlerSection.Bind(errorHandlerConfig);
+            ValidateConfig(errorHandlerConfig, errorHandlerSection);
+
+            // OrderBookServiceConfig - "WatchedMarkets:OrderBookService"
+            var orderBookServiceConfig = new OrderBookServiceConfig();
+            var orderBookServiceSection = _configuration.GetSection("WatchedMarkets:OrderBookService");
+            orderBookServiceSection.Bind(orderBookServiceConfig);
+            ValidateConfig(orderBookServiceConfig, orderBookServiceSection);
+
+            // BacklashBotDataConfig - "DBConnection:BacklashBotData"
+            var backlashBotDataConfig = new BacklashBotDataConfig();
+            var backlashBotDataSection = _configuration.GetSection("DBConnection:BacklashBotData");
+            backlashBotDataSection.Bind(backlashBotDataConfig);
+            ValidateConfig(backlashBotDataConfig, backlashBotDataSection);
+        }
+
+        [Test]
+        public void ValidateNoUnusedSections_InAppsettings()
+        {
+            var usedSections = new HashSet<string>
+            {
+                "Secrets",
+                "Communications:Logging",
+                "Kalshi",
+                "API:KalshiAPIService",
+                "Websockets:WebSocketConnectionManager",
+                "Websockets:MessageProcessor",
+                "Websockets:SubscriptionManager",
+                "Websockets:WebSocketMonitor",
+                "Websockets:KalshiWebSocketClient",
+                "WatchedMarkets:TradingSnapshotService",
+                "WatchedMarkets:SnapshotPeriodHelper",
+                "WatchedMarkets:OrderbookChangeTracker",
+                "WatchedMarkets:MarketRefreshService",
+                "WatchedMarkets:PseudoCandlestickExtensions",
+                "Central:GeneralExecution",
+                "Communications:OverseerClientService",
+                "WatchedMarkets:CandlestickService",
+                "Communications:BroadcastService",
+                "WatchedMarkets:MarketDataInitializer",
+                "Central:CentralPerformanceMonitor",
+                "Central:KalshiBotScopeManagerService",
+                "WatchedMarkets:Calculations",
+                "WatchedMarkets:MarketData",
+                "Central:CentralBrain",
+                "WatchedMarkets:TargetCalculationService",
+                "Central:BrainStatusService",
+                "SnapshotGroupHelper",
+                "WatchedMarkets:InterestScore",
+                "Central:ErrorHandler",
+                "WatchedMarkets:OrderBookService",
+                "DBConnection:BacklashBotData",
+                "DBConnection:DefaultConnection"
+            };
+
+            var allConfigurationKeys = GetAllConfigurationKeys(_configuration);
+
+            var unusedKeys = allConfigurationKeys.Where(key =>
+                !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
+            ).ToList();
+
+            TestContext.WriteLine("Unused configuration keys found:");
+            foreach (var key in unusedKeys)
+            {
+                TestContext.WriteLine($"  {key}");
+            }
+
+            Assert.That(unusedKeys, Is.Empty, $"Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
+        }
+
+        private void ValidateConfig(object config, IConfigurationSection section)
         {
             var validationResults = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(config, new ValidationContext(config), validationResults, true);
-            Assert.IsTrue(isValid, $"Validation failed for {config.GetType().Name}: {string.Join(", ", validationResults.Select(r => r.ErrorMessage))}");
+
+            // Check for missing properties in the configuration section
+            var properties = config.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in properties)
+            {
+                if (section[prop.Name] == null)
+                {
+                    var requiredAttr = prop.GetCustomAttribute<RequiredAttribute>();
+                    var message = requiredAttr != null
+                        ? $"Required property '{prop.Name}' is missing in the configuration section '{section.Path}'."
+                        : $"Property '{prop.Name}' is defined in the config class but missing in the configuration section '{section.Path}'.";
+                    validationResults.Add(new ValidationResult(message, new[] { prop.Name }));
+                }
+            }
+
+            Assert.That(isValid && validationResults.Count == 0, Is.True, $"Validation failed for {config.GetType().Name}: {string.Join(", ", validationResults.Select(r => r.ErrorMessage))}");
+        }
+
+        private List<string> GetAllConfigurationKeys(IConfiguration config, string prefix = "")
+        {
+            var keys = new List<string>();
+            foreach (var child in config.GetChildren())
+            {
+                var currentPath = string.IsNullOrEmpty(prefix) ? child.Key : $"{prefix}:{child.Key}";
+                keys.Add(currentPath);
+                keys.AddRange(GetAllConfigurationKeys(child, currentPath));
+            }
+            return keys;
         }
     }
 }

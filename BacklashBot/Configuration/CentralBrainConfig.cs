@@ -62,10 +62,5 @@ namespace BacklashBot.Configuration
         [Required(ErrorMessage = "The 'MaxMarketsPerSubscriptionAction' is missing in the configuration.")]
         public int MaxMarketsPerSubscriptionAction { get; set; }
 
-        /// <summary>
-        /// Gets or sets the hard data storage location.
-        /// </summary>
-        [Required(ErrorMessage = "The 'HardDataStorageLocation' is missing in the configuration.")]
-        public string HardDataStorageLocation { get; set; } = null!;
     }
 }

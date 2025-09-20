@@ -4,6 +4,7 @@ using BacklashDTOs;
 using BacklashBot.Management.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using BacklashBot.Configuration;
 
 namespace BacklashBot.Management
 {

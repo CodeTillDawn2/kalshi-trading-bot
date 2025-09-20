@@ -235,9 +235,6 @@ namespace KalshiBotTasks
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-            var centralBrainConfig = config.GetSection("Central:CentralBrain").Get<CentralBrainConfig>() ?? throw new InvalidOperationException("Central:CentralBrain configuration section is missing or invalid");
-            centralBrainConfig.HardDataStorageLocation = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestData");
-            var centralBrainOptions = Options.Create(centralBrainConfig);
 
             var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig
             {
@@ -245,7 +242,7 @@ namespace KalshiBotTasks
             };
             var snapshotGroupHelperOptions = Options.Create(snapshotGroupHelperConfig);
 
-            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, centralBrainOptions, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
+            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 

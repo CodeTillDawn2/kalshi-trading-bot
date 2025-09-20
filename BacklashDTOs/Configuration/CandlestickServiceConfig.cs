@@ -26,7 +26,6 @@ namespace BacklashDTOs.Configuration
         /// <value>Default is true.</value>
         [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
         public bool EnablePerformanceMetrics { get; set; }
-
         /// <summary>
         /// Gets or sets the mandatory overlap period in days for minute-interval candlesticks.
         /// This ensures sufficient historical data is available for reliable minute-level analysis.
@@ -47,11 +46,5 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'CandlestickMandatoryOverlapDaysDay' is missing in the configuration.")]
         public int CandlestickMandatoryOverlapDaysDay { get; set; }
-
-        /// <summary>
-        /// Gets or sets the hard data storage location path for storing candlestick data.
-        /// </summary>
-        [Required(ErrorMessage = "The 'HardDataStorageLocation' is missing in the configuration.")]
-        public string HardDataStorageLocation { get; set; } = null!;
     }
 }

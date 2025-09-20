@@ -23,13 +23,13 @@ public class KalshiConfig
     /// Gets or sets the API key ID.
     /// </summary>
     [Required(ErrorMessage = "The 'BotKeyId' is missing in the configuration.")]
-    public string BotKeyId { get; set; } = null!;
+    public string KeyId { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
     [Required(ErrorMessage = "The 'BotKeyFile' is missing in the configuration.")]
-    public string BotKeyFile { get; set; } = null!;
+    public string KeyFile { get; set; } = null!;
 }
 
 

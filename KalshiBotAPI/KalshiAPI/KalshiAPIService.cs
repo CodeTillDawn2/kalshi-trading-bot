@@ -55,7 +55,7 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly ConcurrentDictionary<string, ConcurrentBag<int>> _errorCounts = new();
         private readonly bool _enablePerformanceMetrics;
 
-        private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)> _intervals;
+        private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays)> _intervals;
 
         /// <summary>
         /// Initializes a new instance of the KalshiAPIService class.
@@ -92,18 +92,18 @@ namespace KalshiBotAPI.KalshiAPI
                 Timeout = TimeSpan.FromSeconds(30)
             };
 
-            string keyFile = _kalshiConfig.BotKeyFile ?? throw new ArgumentNullException("Kalshi:BotKeyFile not configured");
-            _keyId = _kalshiConfig.BotKeyId ?? throw new ArgumentNullException("Kalshi:BotKeyId not configured");
+            string keyFile = _kalshiConfig.KeyFile ?? throw new ArgumentNullException("Kalshi:BotKeyFile not configured");
+            _keyId = _kalshiConfig.KeyId ?? throw new ArgumentNullException("Kalshi:BotKeyId not configured");
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(keyFile));
             _scopeFactory = scopeFactory;
 
             // Initialize intervals from configuration (cushion values are constants)
-            _intervals = new Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)>
+            _intervals = new Dictionary<string, (int Minutes, int DbType, int MaxDays)>
             {
-                ["minute"] = (1, 1, 3, _apiConfig.CandlestickMandatoryOverlapDaysMinute * 60),
-                ["hour"] = (60, 2, 7, _apiConfig.CandlestickMandatoryOverlapDaysHour * 3600),
-                ["day"] = (1440, 3, 25, _apiConfig.CandlestickMandatoryOverlapDaysDay * 86400)
+                ["minute"] = (1, 1, 3),
+                ["hour"] = (60, 2, 7),
+                ["day"] = (1440, 3, 25)
             };
         }
 
@@ -1039,7 +1039,7 @@ namespace KalshiBotAPI.KalshiAPI
                     return (0, 1);
                 }
 
-                var (minutes, dbType, maxDays, cushionSeconds) = _intervals[interval];
+                var (minutes, dbType, maxDays) = _intervals[interval];
                 long maxSeconds = maxDays * 24 * 60 * 60;
                 long currentStart = startTs;
                 DateTime now = DateTime.UtcNow;
@@ -1047,13 +1047,13 @@ namespace KalshiBotAPI.KalshiAPI
                 switch (interval)
                 {
                     case "minute":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddMinutes(-1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddMinutes(1));
                         break;
                     case "hour":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddHours(-1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddHours(1));
                         break;
                     case "day":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddDays(-1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddDays(1));
                         break;
                 }
                 var candlesticks = new List<APICandlestick>();
@@ -1104,18 +1104,7 @@ namespace KalshiBotAPI.KalshiAPI
                         if (responseData?.Candlesticks != null && responseData.Candlesticks.Count > 0)
                         {
                             candlesticks.AddRange(responseData.Candlesticks);
-                            // Apply cushion only on first iteration to ensure overlap for forward filling
-                            if (isFirstIteration)
-                            {
-                                long effectiveCushion = Math.Min(cushionSeconds, maxSeconds);
-                                currentStart = currentEnd - effectiveCushion;
-                                isFirstIteration = false;
-                            }
-                            else
-                            {
-                                // Move to next batch without cushion
-                                currentStart = currentEnd;
-                            }
+                            currentStart = currentEnd;
                         }
                         else
                         {

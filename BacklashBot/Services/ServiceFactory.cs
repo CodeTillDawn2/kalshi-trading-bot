@@ -94,7 +94,7 @@ namespace BacklashBot.Services
 
 
                 _logger.LogInformation("SF: About to resolve key file path");
-                var resolvedKeyFile = ConfigurationHelper.ResolveSecretsFilePath(kalshiConfig.Value.BotKeyFile, _secretsConfig.Value, AppDomain.CurrentDomain.BaseDirectory);
+                var resolvedKeyFile = ConfigurationHelper.ResolveSecretsFilePath(kalshiConfig.Value.KeyFile, _secretsConfig.Value, AppDomain.CurrentDomain.BaseDirectory);
                 _logger.LogInformation("SF: Key file resolved to: {ResolvedKeyFile}", resolvedKeyFile);
 
                 if (string.IsNullOrEmpty(resolvedKeyFile) || !File.Exists(resolvedKeyFile))

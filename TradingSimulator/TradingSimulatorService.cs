@@ -203,7 +203,7 @@ namespace TradingSimulator
             var simulationEngine = serviceProvider.GetRequiredService<SimulationEngine>();
             var equityCalculator = serviceProvider.GetRequiredService<EquityCalculator>();
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, simulationEngine, equityCalculator, config, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();

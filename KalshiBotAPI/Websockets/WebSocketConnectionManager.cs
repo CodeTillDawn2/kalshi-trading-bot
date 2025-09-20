@@ -156,7 +156,7 @@ namespace KalshiBotAPI.Websockets
             _privateKey = RSA.Create();
 
             // Use the resolved key file path from configuration
-            var keyFilePath = _kalshiConfig.BotKeyFile;
+            var keyFilePath = _kalshiConfig.KeyFile;
             _logger.LogInformation("WebSocketConnectionManager: Loading key file: {KeyFile}", keyFilePath);
 
             if (!File.Exists(keyFilePath))
@@ -261,7 +261,7 @@ namespace KalshiBotAPI.Websockets
                 var newWebSocket = new ClientWebSocket();
                 newWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(10);
                 var (timestamp, signature) = GenerateAuthHeaders("GET", "/trade-api/ws/v2");
-                newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-KEY", _kalshiConfig.BotKeyId);
+                newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-KEY", _kalshiConfig.KeyId);
                 newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-SIGNATURE", signature);
                 newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-TIMESTAMP", timestamp);
 

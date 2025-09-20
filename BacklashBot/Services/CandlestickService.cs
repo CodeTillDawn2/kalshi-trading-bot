@@ -1,19 +1,20 @@
-using BacklashBotData.Data.Interfaces;
-using Microsoft.Extensions.Options;
-using Parquet;
-using Parquet.Data;
-using Parquet.Schema;
-using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
+using BacklashDTOs.Configuration;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
+using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
+using Parquet;
+using Parquet.Data;
+using Parquet.Schema;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -28,6 +29,7 @@ namespace BacklashBot.Services
         private readonly ILogger<ICandlestickService> _logger;
         private readonly CandlestickServiceConfig _candlestickConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
+        private readonly GeneralExecutionConfig _generalExecutionConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -52,6 +54,7 @@ namespace BacklashBot.Services
             IOptions<CandlestickServiceConfig> candlestickConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<LoggingConfig> loggingConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService)
         {
@@ -59,6 +62,7 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _statusTracker = statusTracker;
             _scopeFactory = scopeFactory;
+            _generalExecutionConfig = generalExecutionConfig.Value;
             _candlestickConfig = candlestickConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _loggingConfig = loggingConfig.Value;
@@ -220,8 +224,12 @@ namespace BacklashBot.Services
                         marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastDayTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
                 }
 
-                foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp), ("hour", lastHourTimestamp), ("day", lastDayTimestamp) })
+                // Last applicable candlestick, plus some cushion time
+                foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysMinute * 60), 
+                    ("hour", lastHourTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysHour * 3600), 
+                    ("day", lastDayTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysDay * 86400) })
                 {
+
                     _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                     var (processed, errors) = await marketService.FetchCandlesticksAsync(
                         market.Event.Series.series_ticker, marketTicker, intervalData.Item1, intervalData.Item2, null, false);
@@ -329,7 +337,7 @@ namespace BacklashBot.Services
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                             _logger.LogDebug("Processing {Interval} candlesticks for market {MarketTicker}", interval, marketTicker);
 
-                            string hardDataStorageLocation = _centralBrainConfig.HardDataStorageLocation;
+                            string hardDataStorageLocation = Path.Combine(_generalExecutionConfig.HardDataStorageLocation,"Tests");
                             var existingCandlesticks = marketData.Candlesticks[interval];
                             var latestExistingDate = existingCandlesticks.Any() ? existingCandlesticks.Max(c => c.Date) : (DateTime?)null;
 

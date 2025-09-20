@@ -417,6 +417,7 @@ builder.Services.AddScoped<ICandlestickService>(sp => new CandlestickService(
     sp.GetRequiredService<IOptions<CandlestickServiceConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>(),
+    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IScopeManagerService>()));
 builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
@@ -452,12 +453,12 @@ builder.Services.AddScoped<IWebSocketConnectionManager>(sp =>
 
     // Resolve the key file path to the secrets directory
     var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        kalshiConfig.Value.BotKeyFile,
+        kalshiConfig.Value.KeyFile,
         secretsConfig.Value,
         AppDomain.CurrentDomain.BaseDirectory);
 
     // Update the config with the resolved path
-    kalshiConfig.Value.BotKeyFile = resolvedKeyFile;
+    kalshiConfig.Value.KeyFile = resolvedKeyFile;
 
     return new WebSocketConnectionManager(
         kalshiConfig,
@@ -490,12 +491,12 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp =>
 
     // Resolve the key file path to the secrets directory
     var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-        kalshiConfig.Value.BotKeyFile,
+        kalshiConfig.Value.KeyFile,
         secretsConfig.Value,
         AppDomain.CurrentDomain.BaseDirectory);
 
     // Update the config with the resolved path
-    kalshiConfig.Value.BotKeyFile = resolvedKeyFile;
+    kalshiConfig.Value.KeyFile = resolvedKeyFile;
 
     return new KalshiWebSocketClient(
         kalshiConfig,

@@ -243,13 +243,13 @@ namespace KalshiBotTests
             var kalshiConfig = new KalshiConfig
             {
                 Environment = _configuration["Kalshi:Environment"] ?? throw new InvalidOperationException("Kalshi:Environment is missing"),
-                BotKeyId = _configuration["Kalshi:KeyId"] ?? throw new InvalidOperationException("Kalshi:KeyId is missing"),
-                BotKeyFile = _configuration["Kalshi:KeyFile"] ?? throw new InvalidOperationException("Kalshi:KeyFile is missing")
+                KeyId = _configuration["Kalshi:KeyId"] ?? throw new InvalidOperationException("Kalshi:KeyId is missing"),
+                KeyFile = _configuration["Kalshi:KeyFile"] ?? throw new InvalidOperationException("Kalshi:KeyFile is missing")
             };
 
             // Validate configuration
-            Assert.That(kalshiConfig.BotKeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
-            Assert.That(kalshiConfig.BotKeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
+            Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
+            Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             // Resolve the key file path using the same method as the working applications
@@ -259,14 +259,14 @@ namespace KalshiBotTests
             };
 
             var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-                kalshiConfig.BotKeyFile,
+                kalshiConfig.KeyFile,
                 secretsConfig,
                 Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot")));
 
-            kalshiConfig.BotKeyFile = resolvedKeyFile;
+            kalshiConfig.KeyFile = resolvedKeyFile;
 
             // Now validate that the resolved key file exists
-            Assert.That(File.Exists(kalshiConfig.BotKeyFile), Is.True, $"KeyFile {kalshiConfig.BotKeyFile} does not exist");
+            Assert.That(File.Exists(kalshiConfig.KeyFile), Is.True, $"KeyFile {kalshiConfig.KeyFile} does not exist");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
@@ -358,10 +358,7 @@ namespace KalshiBotTests
             // Instantiate the real API service with mocks and real config
             var apiConfig = new KalshiAPIServiceConfig
             {
-                EnablePerformanceMetrics = false, // Disable performance monitoring in tests
-                CandlestickMandatoryOverlapDaysMinute = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysMinute"] ?? "3"),
-                CandlestickMandatoryOverlapDaysHour = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysHour"] ?? "7"),
-                CandlestickMandatoryOverlapDaysDay = int.Parse(_configuration["API:KalshiAPIService:CandlestickMandatoryOverlapDaysDay"] ?? "15")
+                EnablePerformanceMetrics = false // Disable performance monitoring in tests
             };
 
             var apiConfigOptions = Options.Create(apiConfig);
