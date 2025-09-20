@@ -101,9 +101,9 @@ namespace KalshiBotAPI.KalshiAPI
             // Initialize intervals from configuration (cushion values are constants)
             _intervals = new Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)>
             {
-                ["minute"] = (1, 1, _apiConfig.CandlestickMandatoryOverlapDaysMinute, 60),
-                ["hour"] = (60, 2, _apiConfig.CandlestickMandatoryOverlapDaysHour, 3600),
-                ["day"] = (1440, 3, _apiConfig.CandlestickMandatoryOverlapDaysDay, 86400)
+                ["minute"] = (1, 1, 3, _apiConfig.CandlestickMandatoryOverlapDaysMinute * 60),
+                ["hour"] = (60, 2, 7, _apiConfig.CandlestickMandatoryOverlapDaysHour * 3600),
+                ["day"] = (1440, 3, 25, _apiConfig.CandlestickMandatoryOverlapDaysDay * 86400)
             };
         }
 
@@ -354,6 +354,13 @@ namespace KalshiBotAPI.KalshiAPI
 
                         cursor = responseData?.Cursor ?? "";
                         if (string.IsNullOrEmpty(cursor)) break;
+                    }
+
+                    // Add rate limiting delay between batches to avoid "too many requests" errors
+                    if (batches.Count() > 1)
+                    {
+                        _logger.LogDebug("Rate limiting: Delaying 0.25 seconds before next batch");
+                        await Task.Delay(250, _statusTrackerService.GetCancellationToken());
                     }
                 }
 
@@ -1052,6 +1059,7 @@ namespace KalshiBotAPI.KalshiAPI
                 var candlesticks = new List<APICandlestick>();
                 int processedCount = 0;
                 int errorCount = 0;
+                bool isFirstIteration = true;
 
                 while (currentStart < finalEndTs)
                 {
@@ -1096,9 +1104,25 @@ namespace KalshiBotAPI.KalshiAPI
                         if (responseData?.Candlesticks != null && responseData.Candlesticks.Count > 0)
                         {
                             candlesticks.AddRange(responseData.Candlesticks);
+                            // Apply cushion only on first iteration to ensure overlap for forward filling
+                            if (isFirstIteration)
+                            {
+                                long effectiveCushion = Math.Min(cushionSeconds, maxSeconds);
+                                currentStart = currentEnd - effectiveCushion;
+                                isFirstIteration = false;
+                            }
+                            else
+                            {
+                                // Move to next batch without cushion
+                                currentStart = currentEnd;
+                            }
+                        }
+                        else
+                        {
+                            // No data found, move forward completely to avoid infinite loop
+                            currentStart = currentEnd;
                         }
 
-                        currentStart = currentEnd - cushionSeconds;
                         if (currentEnd >= finalEndTs) break;
                     }
                     catch (OperationCanceledException)

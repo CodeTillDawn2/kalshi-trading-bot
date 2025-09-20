@@ -39,7 +39,8 @@ namespace BacklashBot.Services
         /// <param name="logger">Logger for recording service operations and errors</param>
         /// <param name="scopeFactory">Factory for creating service scopes for database operations</param>
         /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
-        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="candlestickConfig">Configuration options for candlestick service parameters</param>
+        /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="loggingConfig">Configuration options for logging behavior</param>
         /// <param name="serviceFactory">Factory for accessing other system services</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
@@ -181,26 +182,50 @@ namespace BacklashBot.Services
                 CandlestickDTO? lastCandle = await context.GetLatestCandlestick(marketTicker, 1);
                 if (lastCandle != null)
                 {
-                    lastMinuteTimestamp = lastCandle.end_period_ts;
+                    // Apply cushion: subtract configured days to get more historical data
+                    DateTime lastMinuteTime = UnixHelper.ConvertFromUnixTimestamp(lastCandle.end_period_ts);
+                    DateTime cushionStart = lastMinuteTime.AddDays(-_candlestickConfig.CandlestickMandatoryOverlapDaysMinute);
+                    lastMinuteTimestamp = UnixHelper.ConvertToUnixTimestamp(cushionStart);
+                    _logger.LogDebug("Last minute candlestick for {MarketTicker}: cushion_applied_ts={Timestamp} (cushion: {CushionDays} days)",
+                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastMinuteTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), _candlestickConfig.CandlestickMandatoryOverlapDaysMinute);
                 }
-                _logger.LogDebug("Last minute candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                    marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastMinuteTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                else
+                {
+                    _logger.LogDebug("No existing minute candlesticks for {MarketTicker}, using market open time: {Timestamp}",
+                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastMinuteTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                }
 
                 lastCandle = await context.GetLatestCandlestick(marketTicker, 2);
                 if (lastCandle != null)
                 {
-                    lastHourTimestamp = lastCandle.end_period_ts;
+                    // Apply cushion: subtract configured days to get more historical data
+                    DateTime lastHourTime = UnixHelper.ConvertFromUnixTimestamp(lastCandle.end_period_ts);
+                    DateTime cushionStart = lastHourTime.AddDays(-_candlestickConfig.CandlestickMandatoryOverlapDaysHour);
+                    lastHourTimestamp = UnixHelper.ConvertToUnixTimestamp(cushionStart);
+                    _logger.LogDebug("Last hour candlestick for {MarketTicker}: cushion_applied_ts={Timestamp} (cushion: {CushionDays} days)",
+                       marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), _candlestickConfig.CandlestickMandatoryOverlapDaysHour);
                 }
-                _logger.LogDebug("Last hour candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                   marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                else
+                {
+                    _logger.LogDebug("No existing hour candlesticks for {MarketTicker}, using market open time: {Timestamp}",
+                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                }
 
                 lastCandle = await context.GetLastCandlestick(marketTicker, 3);
                 if (lastCandle != null)
                 {
-                    lastDayTimestamp = lastCandle.end_period_ts;
+                    // Apply cushion: subtract configured days to get more historical data
+                    DateTime lastDayTime = UnixHelper.ConvertFromUnixTimestamp(lastCandle.end_period_ts);
+                    DateTime cushionStart = lastDayTime.AddDays(-_candlestickConfig.CandlestickMandatoryOverlapDaysDay);
+                    lastDayTimestamp = UnixHelper.ConvertToUnixTimestamp(cushionStart);
+                    _logger.LogDebug("Last day candlestick for {MarketTicker}: cushion_applied_ts={Timestamp} (cushion: {CushionDays} days)",
+                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastDayTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), _candlestickConfig.CandlestickMandatoryOverlapDaysDay);
                 }
-                _logger.LogDebug("Last day candlestick for {MarketTicker}: end_period_ts={Timestamp}",
+                else
+                {
+                    _logger.LogDebug("No existing day candlesticks for {MarketTicker}, using market open time: {Timestamp}",
                         marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastDayTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                }
 
                 foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp), ("hour", lastHourTimestamp), ("day", lastDayTimestamp) })
                 {
