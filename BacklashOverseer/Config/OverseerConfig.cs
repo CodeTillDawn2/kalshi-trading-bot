@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashOverseer.Config
@@ -8,31 +9,36 @@ namespace BacklashOverseer.Config
     public class OverseerConfig
     {
         /// <summary>
+        /// The configuration section name for OverseerConfig.
+        /// </summary>
+        public const string SectionName = "Endpoints:Overseer";
+
+        /// <summary>
         /// Gets or sets the interval in minutes for periodic API data fetching.
         /// Default is 10 minutes.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'ApiFetchIntervalMinutes' is missing in the configuration.")]
         public int ApiFetchIntervalMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in minutes for periodic system info logging.
         /// Default is 1 minute.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'SystemInfoLogIntervalMinutes' is missing in the configuration.")]
         public int SystemInfoLogIntervalMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the batch size for SignalR broadcast operations.
         /// Default is 10 to prevent payload size issues.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'SignalRBatchSize' is missing in the configuration.")]
         public int SignalRBatchSize { get; set; }
 
         /// <summary>
         /// Gets or sets the batch size for brain persistence logging operations.
         /// Default is 50 for better performance with large brain sets.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'BrainBatchSize' is missing in the configuration.")]
         public int BrainBatchSize { get; set; }
 
         /// <summary>
@@ -40,7 +46,7 @@ namespace BacklashOverseer.Config
         /// When enabled, WebSocket events and API fetch operations are recorded.
         /// Default is true.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'EnableOverseerPerformanceMetrics' is missing in the configuration.")]
         public bool EnableOverseerPerformanceMetrics { get; set; }
     }
 }

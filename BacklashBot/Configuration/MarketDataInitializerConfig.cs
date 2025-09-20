@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashBot.Configuration
@@ -7,10 +8,13 @@ namespace BacklashBot.Configuration
     /// </summary>
     public class MarketDataInitializerConfig
     {
+        public const string SectionName = "WatchedMarkets:MarketDataInitializer";
+
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection for MarketDataInitializer operations.
         /// </summary>
         /// <value>Default is false.</value>
-        public required bool EnablePerformanceMetrics { get; set; }
+        [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace KalshiBotAPI.Configuration;
@@ -8,17 +9,25 @@ namespace KalshiBotAPI.Configuration;
 public class WebSocketMonitorConfig
 {
     /// <summary>
+    /// The configuration section name for WebSocketMonitorConfig.
+    /// </summary>
+    public const string SectionName = "Websockets:WebSocketMonitor";
+
+    /// <summary>
     /// Gets or sets the monitoring interval in minutes.
     /// </summary>
-    public required int MonitoringIntervalMinutes { get; set; }
+    [Required(ErrorMessage = "The 'MonitoringIntervalMinutes' is missing in the configuration.")]
+    public int MonitoringIntervalMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the retry delay in minutes.
     /// </summary>
-    public required int RetryDelayMinutes { get; set; }
+    [Required(ErrorMessage = "The 'RetryDelayMinutes' is missing in the configuration.")]
+    public int RetryDelayMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets whether WebSocket monitor metrics are enabled.
     /// </summary>
-    public required bool EnableWebSocketMonitorMetrics { get; set; }
+    [Required(ErrorMessage = "The 'EnableWebSocketMonitorMetrics' is missing in the configuration.")]
+    public bool EnableWebSocketMonitorMetrics { get; set; }
 }

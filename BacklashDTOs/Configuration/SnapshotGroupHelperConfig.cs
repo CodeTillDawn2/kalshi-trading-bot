@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration
@@ -8,8 +9,14 @@ namespace BacklashDTOs.Configuration
     public class SnapshotGroupHelperConfig
     {
         /// <summary>
+        /// The configuration section name for SnapshotGroupHelperConfig.
+        /// </summary>
+        public const string SectionName = "SnapshotGroupHelper";
+
+        /// <summary>
         /// Gets or sets whether to enable performance metrics collection for MarketAnalysisHelper operations.
         /// </summary>
-        public required bool EnablePerformanceMetrics { get; set; }
+        [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

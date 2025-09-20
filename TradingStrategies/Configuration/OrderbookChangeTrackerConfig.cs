@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
@@ -9,13 +10,18 @@ namespace TradingStrategies.Configuration;
 public class OrderbookChangeTrackerConfig
 {
     /// <summary>
+    /// The configuration section name for OrderbookChangeTrackerConfig.
+    /// </summary>
+    public const string SectionName = "WatchedMarkets:OrderbookChangeTracker";
+
+    /// <summary>
     /// Age threshold in minutes for cleaning up old orderbook and trade changes.
     /// Events older than this threshold are automatically removed during cleanup operations.
     /// This helps maintain queue sizes and prevents processing of stale data.
     /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
     /// Used by OrderbookChangeTracker for periodic cleanup of old events.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'CleanupThresholdMinutes' is missing in the configuration.")]
     public int CleanupThresholdMinutes { get; set; }
 
     /// <summary>
@@ -25,6 +31,6 @@ public class OrderbookChangeTrackerConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
     public bool EnablePerformanceMetrics { get; set; }
 }

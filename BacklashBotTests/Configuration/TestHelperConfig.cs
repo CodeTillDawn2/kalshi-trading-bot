@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashBotTests.Configuration
@@ -8,7 +9,8 @@ namespace BacklashBotTests.Configuration
     /// </summary>
     public class TestHelperConfig
     {
-        required
+        public const string SectionName = "TestHelper";
+
         /// <summary>
         /// Duration in minutes over which price changes are analyzed for trend detection and momentum calculations.
         /// This window defines the lookback period for identifying significant price movements and volatility patterns.
@@ -16,9 +18,9 @@ namespace BacklashBotTests.Configuration
         /// Typical values: 5-60 minutes depending on trading timeframe and market characteristics.
         /// Used by MarketData and TradingCalculator for change-over-time metrics and technical indicators.
         /// </summary>
+        [Required(ErrorMessage = "The 'ChangeWindowDurationMinutes' is missing in the configuration.")]
         public double ChangeWindowDurationMinutes { get; set; }
 
-        required
         /// <summary>
         /// Time window in seconds for matching trades to orderbook changes during analysis.
         /// This tolerance allows for slight timing discrepancies between trade execution and orderbook updates.
@@ -26,9 +28,9 @@ namespace BacklashBotTests.Configuration
         /// Typical values: 1-10 seconds depending on market latency and data feed quality.
         /// Used by OrderbookChangeTracker for trade-orderbook correlation and position reconciliation.
         /// </summary>
+        [Required(ErrorMessage = "The 'TradeMatchingWindowSeconds' is missing in the configuration.")]
         public double TradeMatchingWindowSeconds { get; set; }
 
-        required
         /// <summary>
         /// Time window in seconds for detecting order cancellations in the orderbook.
         /// This defines how long to wait before considering an orderbook level change as a cancellation rather than a fill.
@@ -36,6 +38,7 @@ namespace BacklashBotTests.Configuration
         /// Typical values: 5-30 seconds depending on market speed and order book dynamics.
         /// Used by OrderbookChangeTracker for cancellation rate calculations and order flow analysis.
         /// </summary>
+        [Required(ErrorMessage = "The 'OrderbookCancelWindowSeconds' is missing in the configuration.")]
         public double OrderbookCancelWindowSeconds { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration
@@ -8,17 +9,24 @@ namespace BacklashDTOs.Configuration
     public class DataLoaderConfig
     {
         /// <summary>
+        /// The configuration section name for DataLoaderConfig.
+        /// </summary>
+        public const string SectionName = "SnapshotHandling:DataLoader";
+
+        /// <summary>
         /// Gets or sets whether to enable validation of market snapshots before processing.
         /// When enabled, snapshots are checked for data integrity and completeness.
         /// Default is true.
         /// </summary>
-        public required bool EnableSnapshotValidation { get; set; }
+        [Required(ErrorMessage = "The 'EnableSnapshotValidation' is missing in the configuration.")]
+        public bool EnableSnapshotValidation { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum number of snapshots required for validation to be meaningful.
         /// Markets with fewer snapshots will still be processed but with warnings.
         /// Default is 1.
         /// </summary>
-        public required int MinSnapshotCountForValidation { get; set; }
+        [Required(ErrorMessage = "The 'MinSnapshotCountForValidation' is missing in the configuration.")]
+        public int MinSnapshotCountForValidation { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration;
@@ -9,10 +10,16 @@ namespace TradingStrategies.Configuration;
 public class EquityCalculatorConfig
 {
     /// <summary>
+    /// The configuration section name for EquityCalculatorConfig.
+    /// </summary>
+    public const string SectionName = "Simulator:EquityCalculator";
+
+    /// <summary>
     /// Enables or disables performance metrics collection in EquityCalculator.
     /// When enabled, measures execution time for each equity calculation and collects timing statistics.
     /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
     /// Default: true
     /// </summary>
-    public required bool EnablePerformanceMetrics { get; set; }
+    [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+    public bool EnablePerformanceMetrics { get; set; }
 }

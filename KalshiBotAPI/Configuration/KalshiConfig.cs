@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace KalshiBotAPI.Configuration;
@@ -8,22 +9,27 @@ namespace KalshiBotAPI.Configuration;
 public class KalshiConfig
 {
     /// <summary>
+    /// The configuration section name for KalshiConfig.
+    /// </summary>
+    public const string SectionName = "Kalshi";
+
+    /// <summary>
     /// Gets or sets the environment (e.g., "prod" or "dev"). Defaults to "prod".
     /// </summary>
-    required
-    public string Environment { get; set; }
+    [Required(ErrorMessage = "The 'Environment' is missing in the configuration.")]
+    public string Environment { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the API key ID.
     /// </summary>
-    required
-    public string BotKeyId { get; set; }
+    [Required(ErrorMessage = "The 'BotKeyId' is missing in the configuration.")]
+    public string BotKeyId { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the path to the API key file.
     /// </summary>
-    required
-    public string BotKeyFile { get; set; }
+    [Required(ErrorMessage = "The 'BotKeyFile' is missing in the configuration.")]
+    public string BotKeyFile { get; set; } = null!;
 }
 
 

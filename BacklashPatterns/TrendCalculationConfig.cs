@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashPatterns
@@ -12,11 +13,16 @@ namespace BacklashPatterns
     public class TrendCalculationConfig
     {
         /// <summary>
+        /// The configuration section name for TrendCalculationConfig.
+        /// </summary>
+        public const string SectionName = "TrendCalculation";
+
+        /// <summary>
         /// Offset factor used in smoothing calculations for trend ratios.
         /// This value is divided by 2.0 and added to the unweighted ratio for smoothing.
         /// Default value: 1.0
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'SmoothingOffset' is missing in the configuration.")]
         public double SmoothingOffset { get; set; }
 
         /// <summary>
@@ -24,7 +30,7 @@ namespace BacklashPatterns
         /// Prevents calculations with insufficient historical data.
         /// Default value: 1
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'MinLookback' is missing in the configuration.")]
         public int MinLookback { get; set; }
 
         /// <summary>
@@ -32,7 +38,7 @@ namespace BacklashPatterns
         /// Limits computational complexity for very long lookbacks.
         /// Default value: 1000
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'MaxLookback' is missing in the configuration.")]
         public int MaxLookback { get; set; }
 
         /// <summary>
@@ -40,7 +46,7 @@ namespace BacklashPatterns
         /// Used as fallback for methods that don't require explicit lookback.
         /// Default value: 14
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'DefaultLookback' is missing in the configuration.")]
         public int DefaultLookback { get; set; }
 
         /// <summary>
@@ -48,7 +54,7 @@ namespace BacklashPatterns
         /// Ensures pattern size is at least 1 to prevent division by zero.
         /// Default value: 1
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'MinPatternSize' is missing in the configuration.")]
         public int MinPatternSize { get; set; }
 
         /// <summary>
@@ -56,7 +62,7 @@ namespace BacklashPatterns
         /// Limits pattern size to reasonable values.
         /// Default value: 10
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'MaxPatternSize' is missing in the configuration.")]
         public int MaxPatternSize { get; set; }
 
         /// <summary>
@@ -64,8 +70,8 @@ namespace BacklashPatterns
         /// These periods are used to compute metrics at different timeframes.
         /// Default values: [1, 2, 3, 4, 5]
         /// </summary>
-        required
-        public int[] LookbackPeriods { get; set; }
+        [Required(ErrorMessage = "The 'LookbackPeriods' is missing in the configuration.")]
+        public int[] LookbackPeriods { get; set; } = null!;
 
         /// <summary>
         /// Number of lookback periods to use in calculations.

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace TradingStrategies.Configuration
@@ -9,10 +10,15 @@ namespace TradingStrategies.Configuration
     public class SimulationEngineConfig
     {
         /// <summary>
+        /// The configuration section name for SimulationEngineConfig.
+        /// </summary>
+        public const string SectionName = "Simulator:SimulationEngine";
+
+        /// <summary>
         /// Gets or sets whether performance metrics collection is enabled.
         /// </summary>
         /// <value>Default is true.</value>
-        required
-        public bool EnablePerformanceMetrics { get; set; } = true;
+        [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

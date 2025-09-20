@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration
@@ -15,38 +16,48 @@ namespace BacklashDTOs.Configuration
     public class ErrorHandlerConfig
     {
         /// <summary>
+        /// The configuration section name for ErrorHandlerConfig.
+        /// </summary>
+        public const string SectionName = "Central:ErrorHandler";
+
+        /// <summary>
         /// Gets or sets the time window in minutes for monitoring error frequency.
         /// Errors occurring within this window are counted toward the catastrophic threshold.
         /// </summary>
         /// <value>Default is 5 minutes.</value>
-        public required int ErrorWindowMinutes { get; set; }
+        [Required(ErrorMessage = "The 'ErrorWindowMinutes' is missing in the configuration.")]
+        public int ErrorWindowMinutes { get; set; }
 
         /// <summary>
         /// Gets or sets the threshold number of non-catastrophic errors within the monitoring window
         /// that triggers catastrophic failure detection and system restart.
         /// </summary>
         /// <value>Default is 10 errors.</value>
-        public required int ErrorThreshold { get; set; }
+        [Required(ErrorMessage = "The 'ErrorThreshold' is missing in the configuration.")]
+        public int ErrorThreshold { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of attempts for internet connectivity checks
         /// before declaring the connection as failed.
         /// </summary>
         /// <value>Default is 100 attempts.</value>
-        public required int InternetCheckMaxAttempts { get; set; }
+        [Required(ErrorMessage = "The 'InternetCheckMaxAttempts' is missing in the configuration.")]
+        public int InternetCheckMaxAttempts { get; set; }
 
         /// <summary>
         /// Gets or sets the initial delay in milliseconds between internet connectivity check attempts.
         /// This delay doubles with each retry attempt until reaching the maximum delay.
         /// </summary>
         /// <value>Default is 1000 milliseconds (1 second).</value>
-        public required int InternetCheckInitialDelayMs { get; set; }
+        [Required(ErrorMessage = "The 'InternetCheckInitialDelayMs' is missing in the configuration.")]
+        public int InternetCheckInitialDelayMs { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum delay in milliseconds between internet connectivity check attempts.
         /// The delay will not exceed this value even after exponential backoff.
         /// </summary>
         /// <value>Default is 60000 milliseconds (60 seconds).</value>
-        public required int InternetCheckMaxDelayMs { get; set; }
+        [Required(ErrorMessage = "The 'InternetCheckMaxDelayMs' is missing in the configuration.")]
+        public int InternetCheckMaxDelayMs { get; set; }
     }
 }

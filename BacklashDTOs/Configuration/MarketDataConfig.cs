@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration;
@@ -8,34 +9,39 @@ namespace BacklashDTOs.Configuration;
 public class MarketDataConfig
 {
     /// <summary>
+    /// The configuration section name for MarketDataConfig.
+    /// </summary>
+    public const string SectionName = "WatchedMarkets:MarketData";
+
+    /// <summary>
     /// Gets or sets the semaphore timeout in milliseconds. Default is 5000.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'SemaphoreTimeoutMs' is missing in the configuration.")]
     public int SemaphoreTimeoutMs { get; set; }
 
     /// <summary>
     /// Gets or sets the ticker batch size. Default is 100.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'TickerBatchSize' is missing in the configuration.")]
     public int TickerBatchSize { get; set; }
 
     /// <summary>
     /// Gets or sets the API retry timeout in milliseconds. Default is 30000.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'ApiRetryTimeoutMs' is missing in the configuration.")]
     public int ApiRetryTimeoutMs { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether performance metrics logging is enabled for MarketDataService. Default is false.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
     public bool EnablePerformanceMetrics { get; set; }
 
     /// <summary>
     /// Gets or sets the technical analysis configuration.
     /// </summary>
-    required
-    public TechnicalAnalysisConfig TechnicalAnalysis { get; set; }
+    [Required(ErrorMessage = "The 'TechnicalAnalysis' is missing in the configuration.")]
+    public TechnicalAnalysisConfig TechnicalAnalysis { get; set; } = null!;
 }
 
 /// <summary>
@@ -46,74 +52,74 @@ public class TechnicalAnalysisConfig
     /// <summary>
     /// Gets or sets the RSI configuration.
     /// </summary>
-    required
-    public RSIConfig RSI { get; set; }
+    [Required(ErrorMessage = "The 'RSI' is missing in the configuration.")]
+    public RSIConfig RSI { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the MACD configuration.
     /// </summary>
-    required
-    public MACDConfig MACD { get; set; }
+    [Required(ErrorMessage = "The 'MACD' is missing in the configuration.")]
+    public MACDConfig MACD { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the EMA configuration.
     /// </summary>
-    required
-    public EMAConfig EMA { get; set; }
+    [Required(ErrorMessage = "The 'EMA' is missing in the configuration.")]
+    public EMAConfig EMA { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the Bollinger Bands configuration.
     /// </summary>
-    required
-    public BollingerBandsConfig BollingerBands { get; set; }
+    [Required(ErrorMessage = "The 'BollingerBands' is missing in the configuration.")]
+    public BollingerBandsConfig BollingerBands { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the ATR configuration.
     /// </summary>
-    required
-    public ATRConfig ATR { get; set; }
+    [Required(ErrorMessage = "The 'ATR' is missing in the configuration.")]
+    public ATRConfig ATR { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the Stochastic configuration.
     /// </summary>
-    required
-    public StochasticConfig Stochastic { get; set; }
+    [Required(ErrorMessage = "The 'Stochastic' is missing in the configuration.")]
+    public StochasticConfig Stochastic { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the ADX periods.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'ADX_Periods' is missing in the configuration.")]
     public int ADX_Periods { get; set; }
 
     /// <summary>
     /// Gets or sets the volume indicators configuration.
     /// </summary>
-    required
-    public VolumeIndicatorsConfig VolumeIndicators { get; set; }
+    [Required(ErrorMessage = "The 'VolumeIndicators' is missing in the configuration.")]
+    public VolumeIndicatorsConfig VolumeIndicators { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the support resistance configuration.
     /// </summary>
-    required
-    public SupportResistanceConfig SupportResistance { get; set; }
+    [Required(ErrorMessage = "The 'SupportResistance' is missing in the configuration.")]
+    public SupportResistanceConfig SupportResistance { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the momentum indicators configuration.
     /// </summary>
-    required
-    public MomentumIndicatorsConfig MomentumIndicators { get; set; }
+    [Required(ErrorMessage = "The 'MomentumIndicators' is missing in the configuration.")]
+    public MomentumIndicatorsConfig MomentumIndicators { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the candlestick analysis configuration.
     /// </summary>
-    required
-    public CandlestickAnalysisConfig CandlestickAnalysis { get; set; }
+    [Required(ErrorMessage = "The 'CandlestickAnalysis' is missing in the configuration.")]
+    public CandlestickAnalysisConfig CandlestickAnalysis { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the trading parameters configuration.
     /// </summary>
-    required
-    public TradingParametersConfig TradingParameters { get; set; }
+    [Required(ErrorMessage = "The 'TradingParameters' is missing in the configuration.")]
+    public TradingParametersConfig TradingParameters { get; set; } = null!;
 }
 
 /// <summary>
@@ -121,11 +127,13 @@ public class TechnicalAnalysisConfig
 /// </summary>
 public class RSIConfig
 {
-    required
+    [Required(ErrorMessage = "The 'Short_Periods' is missing in the configuration.")]
     public int Short_Periods { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Medium_Periods' is missing in the configuration.")]
     public int Medium_Periods { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_Periods' is missing in the configuration.")]
     public int Long_Periods { get; set; }
 }
 
@@ -134,17 +142,22 @@ public class RSIConfig
 /// </summary>
 public class MACDConfig
 {
-    required
+    [Required(ErrorMessage = "The 'Medium_FastPeriod' is missing in the configuration.")]
     public int Medium_FastPeriod { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Medium_SlowPeriod' is missing in the configuration.")]
     public int Medium_SlowPeriod { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Medium_SignalPeriod' is missing in the configuration.")]
     public int Medium_SignalPeriod { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_FastPeriod' is missing in the configuration.")]
     public int Long_FastPeriod { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_SlowPeriod' is missing in the configuration.")]
     public int Long_SlowPeriod { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_SignalPeriod' is missing in the configuration.")]
     public int Long_SignalPeriod { get; set; }
 }
 
@@ -153,9 +166,10 @@ public class MACDConfig
 /// </summary>
 public class EMAConfig
 {
-    required
+    [Required(ErrorMessage = "The 'Medium_Periods' is missing in the configuration.")]
     public int Medium_Periods { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_Periods' is missing in the configuration.")]
     public int Long_Periods { get; set; }
 }
 
@@ -164,13 +178,16 @@ public class EMAConfig
 /// </summary>
 public class BollingerBandsConfig
 {
-    required
+    [Required(ErrorMessage = "The 'Medium_Periods' is missing in the configuration.")]
     public int Medium_Periods { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Medium_StdDev' is missing in the configuration.")]
     public double Medium_StdDev { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_Periods' is missing in the configuration.")]
     public int Long_Periods { get; set; }
-    required
+
+    [Required(ErrorMessage = "The 'Long_StdDev' is missing in the configuration.")]
     public double Long_StdDev { get; set; }
 }
 

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration
@@ -8,34 +9,39 @@ namespace BacklashDTOs.Configuration
     public class GeneralExecutionConfig
     {
         /// <summary>
+        /// The configuration section name for GeneralExecutionConfig.
+        /// </summary>
+        public const string SectionName = "Central:GeneralExecution";
+
+        /// <summary>
         /// Gets or sets the brain instance identifier.
         /// </summary>
-        required
-        public string BrainInstance { get; set; }
+        [Required(ErrorMessage = "The 'BrainInstance' is missing in the configuration.")]
+        public string BrainInstance { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the target count for queues.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'QueuesTargetCount' is missing in the configuration.")]
         public int QueuesTargetCount { get; set; }
 
         /// <summary>
         /// Gets or sets the retry delay in milliseconds for operations that require retries.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'RetryDelayMs' is missing in the configuration.")]
         public int RetryDelayMs { get; set; }
 
         /// <summary>
         /// Gets or sets the authentication token validity duration in hours.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'AuthTokenValidityHours' is missing in the configuration.")]
         public int AuthTokenValidityHours { get; set; }
 
         /// <summary>
         /// Gets or sets the hard data storage location.
         /// </summary>
-        required
-        public string HardDataStorageLocation { get; set; }
+        [Required(ErrorMessage = "The 'HardDataStorageLocation' is missing in the configuration.")]
+        public string HardDataStorageLocation { get; set; } = null!;
 
         /// <summary>
         /// Frequency in seconds at which trading decisions are evaluated and executed.
@@ -44,7 +50,7 @@ namespace BacklashDTOs.Configuration
         /// Typical values: 30-300 seconds depending on strategy requirements and market volatility.
         /// Used by TradingStrategy to determine snapshot intervals and decision timing.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'DecisionFrequencySeconds' is missing in the configuration.")]
         public int DecisionFrequencySeconds { get; set; }
 
         /// <summary>
@@ -54,7 +60,7 @@ namespace BacklashDTOs.Configuration
         /// Typical values: 1-15 minutes depending on data freshness requirements and API rate limits.
         /// Used by MarketRefreshService and MarketData for periodic data synchronization.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'RefreshIntervalMinutes' is missing in the configuration.")]
         public int RefreshIntervalMinutes { get; set; }
 
         /// <summary>
@@ -63,7 +69,7 @@ namespace BacklashDTOs.Configuration
         /// Incremented when schema changes require migration logic or backward compatibility handling.
         /// Used by TradingSnapshotService for schema validation and snapshot upgrading during loading.
         /// </summary>
-        required
+        [Required(ErrorMessage = "The 'SnapshotSchemaVersion' is missing in the configuration.")]
         public int SnapshotSchemaVersion { get; set; }
     }
 }

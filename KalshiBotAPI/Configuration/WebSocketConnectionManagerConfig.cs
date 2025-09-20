@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace KalshiBotAPI.Configuration;
@@ -8,42 +9,54 @@ namespace KalshiBotAPI.Configuration;
 public class WebSocketConnectionManagerConfig
 {
     /// <summary>
+    /// The configuration section name for WebSocketConnectionManagerConfig.
+    /// </summary>
+    public const string SectionName = "Websockets:WebSocketConnectionManager";
+
+    /// <summary>
     /// Gets or sets the WebSocket buffer size in bytes. Defaults to 16384 (16KB).
     /// </summary>
-    public required int BufferSize { get; set; }
+    [Required(ErrorMessage = "The 'BufferSize' is missing in the configuration.")]
+    public int BufferSize { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum number of WebSocket connection retry attempts. Defaults to 5.
     /// </summary>
-    public required int MaxRetryAttempts { get; set; }
+    [Required(ErrorMessage = "The 'MaxRetryAttempts' is missing in the configuration.")]
+    public int MaxRetryAttempts { get; set; }
 
     /// <summary>
     /// Gets or sets the array of retry delay intervals in milliseconds for WebSocket connections.
     /// Defaults to [1000, 2000, 4000, 8000, 16000].
     /// </summary>
-    public required int[] RetryDelays { get; set; }
+    [Required(ErrorMessage = "The 'RetryDelays' is missing in the configuration.")]
+    public int[] RetryDelays { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the duration in minutes for caching WebSocket authentication signatures.
     /// Defaults to 5 minutes.
     /// </summary>
-    public required int SignatureCacheDurationMinutes { get; set; }
+    [Required(ErrorMessage = "The 'SignatureCacheDurationMinutes' is missing in the configuration.")]
+    public int SignatureCacheDurationMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the delay in milliseconds before resetting WebSocket connection.
     /// Defaults to 5000 (5 seconds).
     /// </summary>
-    public required int ResetDelayMs { get; set; }
+    [Required(ErrorMessage = "The 'ResetDelayMs' is missing in the configuration.")]
+    public int ResetDelayMs { get; set; }
 
     /// <summary>
     /// Gets or sets the timeout in milliseconds for acquiring the connection semaphore.
     /// Defaults to 60000 (60 seconds).
     /// </summary>
-    public required int SemaphoreTimeoutMs { get; set; }
+    [Required(ErrorMessage = "The 'SemaphoreTimeoutMs' is missing in the configuration.")]
+    public int SemaphoreTimeoutMs { get; set; }
 
     /// <summary>
     /// Gets or sets whether WebSocket performance metrics collection is enabled.
     /// When disabled, metric tracking is skipped to reduce overhead. Defaults to true.
     /// </summary>
-    public required bool EnablePerformanceMetrics { get; set; }
+    [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+    public bool EnablePerformanceMetrics { get; set; }
 }

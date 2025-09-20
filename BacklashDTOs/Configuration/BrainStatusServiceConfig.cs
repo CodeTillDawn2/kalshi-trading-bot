@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Configuration
@@ -8,8 +9,14 @@ namespace BacklashDTOs.Configuration
     public class BrainStatusServiceConfig
     {
         /// <summary>
+        /// The configuration section name for BrainStatusServiceConfig.
+        /// </summary>
+        public const string SectionName = "Central:BrainStatusService";
+
+        /// <summary>
         /// Gets or sets the length of the session identifier string.
         /// </summary>
-        public required int SessionIdLength { get; set; }
+        [Required(ErrorMessage = "The 'SessionIdLength' is missing in the configuration.")]
+        public int SessionIdLength { get; set; }
     }
 }

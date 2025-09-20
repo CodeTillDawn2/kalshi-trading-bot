@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace KalshiBotAPI.Configuration;
@@ -8,8 +9,13 @@ namespace KalshiBotAPI.Configuration;
 public class KalshiWebSocketClientConfig
 {
     /// <summary>
+    /// The configuration section name for KalshiWebSocketClientConfig.
+    /// </summary>
+    public const string SectionName = "Websockets:KalshiWebSocketClient";
+
+    /// <summary>
     /// Gets or sets whether KalshiWebSocketClient performance metrics are enabled.
     /// </summary>
-    required
+    [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
     public bool EnablePerformanceMetrics { get; set; }
 }
