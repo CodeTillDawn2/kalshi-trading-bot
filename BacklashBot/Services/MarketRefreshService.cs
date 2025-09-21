@@ -371,9 +371,9 @@ namespace BacklashBot.Services
                 // Determine if a sync is needed
                 var lastTicker = marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault();
                 bool needsSync =
-                    lastTicker == null
+                    (lastTicker == null && marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-5))
                     || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-31)
-                    || (lastTicker.LoggedDate > marketData.LastSuccessfulSync && (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5));
+                    || (lastTicker != null && lastTicker.LoggedDate > marketData.LastSuccessfulSync && (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5));
 
                 if (needsSync)
                 {
