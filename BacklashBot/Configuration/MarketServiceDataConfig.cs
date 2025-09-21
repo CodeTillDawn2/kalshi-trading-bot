@@ -7,7 +7,7 @@ namespace BacklashBot.Configuration;
 /// <summary>
 /// Configuration class for market data settings.
 /// </summary>
-public class MarketDataConfig
+public class MarketServiceDataConfig
 {
     /// <summary>
     /// The configuration section name for MarketDataConfig.
@@ -43,8 +43,17 @@ public class MarketDataConfig
     /// </summary>
     [Required(ErrorMessage = "The 'PseudoCandlestickLookbackPeriods' is missing in the configuration.")]
     public int PseudoCandlestickLookbackPeriods { get; set; }
+
+    /// <summary>
+    /// Gets or sets the delay in seconds for event lifecycle processing. Default is 120 (2 minutes).
+    /// This delay ensures that brand new events are fully ready on the server before attempting to fetch data,
+    /// preventing 404 errors that can occur when the API call is made too quickly after the event_lifecycle event.
+    /// </summary>
+    [Required(ErrorMessage = "The 'EventLifecycleDelaySeconds' is missing in the configuration.")]
+    public int EventLifecycleDelaySeconds { get; set; }
+
     [Required(ErrorMessage = "The 'CalculationConfig' is missing in the configuration.")]
-    public CalculationsConfig Calculations { get; set; } 
+    public CalculationsConfig Calculations { get; set; }
 }
 
 

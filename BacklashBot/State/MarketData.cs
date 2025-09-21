@@ -53,7 +53,7 @@ namespace BacklashBot.State
 {
     public class MarketData : IMarketData
     {
-        private readonly MarketDataConfig _marketDataConfig;
+        private readonly MarketServiceDataConfig _marketDataConfig;
 
         private readonly ILogger<IMarketData> _logger;
         private readonly IOrderbookChangeTracker _changeTracker;
@@ -167,7 +167,7 @@ namespace BacklashBot.State
             ILogger<IMarketData> logger,
             ITradingCalculator tradingCalculator,
             IOrderbookChangeTracker changeTracker,
-            IOptions<MarketDataConfig> marketDataConfig)
+            IOptions<MarketServiceDataConfig> marketDataConfig)
         {
             _marketDataConfig = marketDataConfig?.Value ?? throw new ArgumentNullException(nameof(marketDataConfig));
             _tolerancePercentage = _marketDataConfig.Calculations.TolerancePercentage;
@@ -1163,7 +1163,49 @@ namespace BacklashBot.State
                 }
 
                 var result = new List<PseudoCandlestick>(targetIntervals.Length);
-                PseudoCandlestick previousCandlestick = null;
+
+                // Find the last available data before startTime for forward filling gaps at the beginning
+                PseudoCandlestick initialPrevious = null;
+                DateTime beforeStart = startTime - TimeSpan.FromTicks(1);
+
+                // Find last candlestick before startTime
+                int lastCandleIdx = BinarySearchRightmost(candlesticks, beforeStart, c => c.Date);
+                if (lastCandleIdx >= 0)
+                {
+                    var lastCandle = candlesticks[lastCandleIdx];
+                    initialPrevious = new PseudoCandlestick
+                    {
+                        Timestamp = lastCandle.Date,
+                        MidClose = (lastCandle.AskClose + lastCandle.BidClose) / 2.0,
+                        MidHigh = (lastCandle.AskHigh + lastCandle.BidHigh) / 2.0,
+                        MidLow = (lastCandle.AskLow + lastCandle.BidLow) / 2.0,
+                        Volume = lastCandle.Volume,
+                        IsFromCandlestick = true
+                    };
+                }
+
+                // Find last ticker before startTime
+                int lastTickerIdx = BinarySearchRightmost(tickers, beforeStart, t => t.LoggedDate);
+                if (lastTickerIdx >= 0)
+                {
+                    var lastTicker = tickers[lastTickerIdx];
+                    var tickerPseudo = new PseudoCandlestick
+                    {
+                        Timestamp = lastTicker.LoggedDate,
+                        MidClose = (lastTicker.yes_ask + lastTicker.yes_bid) / 2.0,
+                        MidHigh = (lastTicker.yes_ask + lastTicker.yes_bid) / 2.0,
+                        MidLow = (lastTicker.yes_ask + lastTicker.yes_bid) / 2.0,
+                        Volume = lastTicker.volume,
+                        IsFromCandlestick = false
+                    };
+                    // If both exist, take the more recent
+                    if (initialPrevious == null || tickerPseudo.Timestamp > initialPrevious.Timestamp)
+                    {
+                        initialPrevious = tickerPseudo;
+                    }
+                }
+
+                PseudoCandlestick previousCandlestick = initialPrevious;
 
                 // Process intervals sequentially to maintain carry-forward logic
                 foreach (var periodStart in targetIntervals)

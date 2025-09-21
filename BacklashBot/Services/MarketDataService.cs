@@ -50,7 +50,7 @@ namespace BacklashBot.Services
         private readonly IConfiguration _configuration;
         private readonly CalculationsConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
-        private readonly MarketDataConfig _marketDataConfig;
+        private readonly MarketServiceDataConfig _marketDataConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketLocks = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
@@ -74,7 +74,7 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
-            IOptions<MarketDataConfig> marketDataConfigOptions,
+            IOptions<MarketServiceDataConfig> marketDataConfigOptions,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
             IBotReadyStatus readyStatus,
@@ -270,8 +270,6 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                _logger.LogDebug("Delaying event lifecycle processing for 10 seconds to ensure server is fully ready to provide data");
-                await Task.Delay(10000, _statusTracker.GetCancellationToken());
 
                 if (args.Data.TryGetProperty("msg", out var msgElement) &&
                     msgElement.TryGetProperty("event_ticker", out var tickerElement))
@@ -279,7 +277,11 @@ namespace BacklashBot.Services
                     string eventTicker = tickerElement.GetString();
                     if (!string.IsNullOrEmpty(eventTicker))
                     {
-                        _logger.LogDebug("Processing event lifecycle event for event: {EventTicker}", eventTicker);
+                        if (_marketDataConfig != null && _marketDataConfig.EventLifecycleDelaySeconds > 0)
+                        {
+                            await Task.Delay(_marketDataConfig.EventLifecycleDelaySeconds * 1000, _statusTracker.GetCancellationToken());
+                        }
+                        _logger.LogInformation("Fetching event data for {EventTicker} after delay for server to finish setting up event.", eventTicker);
 
                         using var scope = _scopeFactory.CreateScope();
                         var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
@@ -1335,7 +1337,7 @@ namespace BacklashBot.Services
             if (openInterest < 0) errors.Add($"openInterest < 0 ({openInterest})");
             if (dollarVolume < 0) errors.Add($"dollarVolume < 0 ({dollarVolume})");
             if (dollarOpenInterest < 0) errors.Add($"dollarOpenInterest < 0 ({dollarOpenInterest})");
-            if (ts <= 0) errors.Add($"ts <= 0 ({ts})");
+            if (ts < 0) errors.Add($"ts < 0 ({ts})");
             if (loggedDate == default(DateTime)) errors.Add($"loggedDate is default ({loggedDate})");
             if (processedDate == default(DateTime?)) errors.Add($"processedDate is default ({processedDate})");
 

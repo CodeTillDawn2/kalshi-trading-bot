@@ -164,7 +164,7 @@ namespace BacklashBotTests
             ValidateConfig(calculationConfig, calculationSection);
 
             // MarketDataConfig - "WatchedMarkets:MarketData"
-            var marketDataConfig = new MarketDataConfig();
+            var marketDataConfig = new MarketServiceDataConfig();
             var marketDataSection = _configuration.GetSection("WatchedMarkets:MarketData");
             marketDataSection.Bind(marketDataConfig);
             marketDataConfig.Calculations = calculationConfig; // Set nested after binding
@@ -237,7 +237,7 @@ namespace BacklashBotTests
                 typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
-                typeof(MarketDataConfig).Assembly // BacklashBot itself
+                typeof(MarketServiceDataConfig).Assembly // BacklashBot itself
             };
 
             var configTypes = assemblies
@@ -256,11 +256,11 @@ namespace BacklashBotTests
             }
 
             // Special handling for nested configs
-            if (configInstances.TryGetValue(MarketDataConfig.SectionName, out var marketDataInstance) &&
+            if (configInstances.TryGetValue(MarketServiceDataConfig.SectionName, out var marketDataInstance) &&
                 configInstances.TryGetValue(CalculationsConfig.SectionName, out var calculationsInstance))
             {
-                ((MarketDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
-                ValidateConfig(marketDataInstance, _configuration.GetSection(MarketDataConfig.SectionName));
+                ((MarketServiceDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
+                ValidateConfig(marketDataInstance, _configuration.GetSection(MarketServiceDataConfig.SectionName));
             }
         }
 
@@ -276,7 +276,7 @@ namespace BacklashBotTests
                 typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
-                typeof(MarketDataConfig).Assembly // BacklashBot itself
+                typeof(MarketServiceDataConfig).Assembly // BacklashBot itself
             };
 
             foreach (var assembly in assemblies)
@@ -422,7 +422,7 @@ namespace BacklashBotTests
                 CentralPerformanceMonitorConfig.SectionName,
                 KalshiBotScopeManagerServiceConfig.SectionName,
                 CalculationsConfig.SectionName,
-                MarketDataConfig.SectionName,
+                MarketServiceDataConfig.SectionName,
                 CentralBrainConfig.SectionName,
                 TargetCalculationServiceConfig.SectionName,
                 BrainStatusServiceConfig.SectionName,

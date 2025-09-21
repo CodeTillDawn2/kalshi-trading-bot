@@ -162,8 +162,8 @@ builder.Services.AddOptions<KalshiBotScopeManagerServiceConfig>()
     .Bind(builder.Configuration.GetSection(KalshiBotScopeManagerServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<MarketDataConfig>()
-    .Bind(builder.Configuration.GetSection(MarketDataConfig.SectionName))
+builder.Services.AddOptions<MarketServiceDataConfig>()
+    .Bind(builder.Configuration.GetSection(MarketServiceDataConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<CentralBrainConfig>()
@@ -372,7 +372,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ICentralPerformanceMonitor>()
             ),
-            sp.GetRequiredService<IOptions<MarketDataConfig>>()
+            sp.GetRequiredService<IOptions<MarketServiceDataConfig>>()
         );
     };
 });
