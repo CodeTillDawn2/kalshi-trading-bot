@@ -319,13 +319,6 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
                 sp.GetRequiredService<PerformanceMetricsService>()
             ));
 
-            // Add MVC for controllers
-            services.AddControllers()
-                .AddJsonOptions(o =>
-                {
-                    o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                    o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-                });
 
             // Add CORS
             services.AddCors(options =>
@@ -377,7 +370,6 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
                 endpoints.MapHub<OverseerHub>("/chartHub");
 
                 // Add health check endpoint for overseer discovery
