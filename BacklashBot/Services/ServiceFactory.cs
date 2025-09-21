@@ -84,6 +84,7 @@ namespace BacklashBot.Services
 
                 var marketDataService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>();
                 var orderBookService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOrderBookService>();
+                var subscriptionManager = _scopeManager.Scope?.ServiceProvider.GetRequiredService<ISubscriptionManager>();
 
                 _logger.LogInformation("SF: About to call ConfigureWebSocketEventHandlers on MarketDataService");
                 marketDataService.ConfigureWebSocketEventHandlers();
@@ -92,6 +93,28 @@ namespace BacklashBot.Services
                 _logger.LogInformation("SF: About to call ConfigureWebSocketEventHandlers on OrderBookService");
                 orderBookService.ConfigureWebSocketEventHandlers();
                 _logger.LogInformation("SF: ConfigureWebSocketEventHandlers completed on OrderBookService");
+
+                _logger.LogInformation("SF: Wiring up MarketWebSocketUnhealthy event from SubscriptionManager to MarketDataService");
+                subscriptionManager.MarketWebSocketUnhealthy += async (sender, markets) =>
+                {
+                    _logger.LogInformation("SF: MarketWebSocketUnhealthy event received for markets: {Markets}", string.Join(", ", markets));
+                    foreach (var market in markets)
+                    {
+                        await marketDataService.MarkMarketAsUnhealthyAsync(market);
+                    }
+                };
+                _logger.LogInformation("SF: MarketWebSocketUnhealthy event wired up successfully");
+
+                _logger.LogInformation("SF: Wiring up MarketWebSocketHealthy event from SubscriptionManager to MarketDataService");
+                subscriptionManager.MarketWebSocketHealthy += async (sender, markets) =>
+                {
+                    _logger.LogInformation("SF: MarketWebSocketHealthy event received for markets: {Markets}", string.Join(", ", markets));
+                    foreach (var market in markets)
+                    {
+                        await marketDataService.MarkMarketAsHealthyAsync(market);
+                    }
+                };
+                _logger.LogInformation("SF: MarketWebSocketHealthy event wired up successfully");
             }
         }
 
@@ -190,6 +213,12 @@ namespace BacklashBot.Services
         /// </summary>
         /// <returns>The overseer client service instance, or null if the service scope is not initialized.</returns>
         public IOverseerClientService? GetOverseerClientService() => GetService<IOverseerClientService>();
+
+        /// <summary>
+        /// Retrieves the subscription manager service for managing WebSocket subscriptions.
+        /// </summary>
+        /// <returns>The subscription manager instance, or null if the service scope is not initialized.</returns>
+        public ISubscriptionManager? GetSubscriptionManager() => GetService<ISubscriptionManager>();
 
         /// <summary>
         /// Retrieves the scope manager service for managing dependency injection scopes.

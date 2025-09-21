@@ -27,6 +27,7 @@ namespace KalshiBotAPI.Websockets
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
+        private readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates = new();
         private readonly SemaphoreSlim _subscriptionUpdateSynchronizationSemaphore = new SemaphoreSlim(1, 1);
         private readonly SemaphoreSlim _channelSubscriptionSynchronizationSemaphore = new SemaphoreSlim(1, 1);
@@ -52,6 +53,11 @@ namespace KalshiBotAPI.Websockets
         private readonly int _healthCheckIntervalMs = 30000;
         private readonly bool _enableMetrics = true;
 
+        // Exponential backoff configuration for subscription retries
+        private readonly int _maxSubscriptionRetries = 5;
+        private readonly int _baseRetryDelayMs = 1000;
+        private readonly int _maxRetryDelayMs = 30000;
+
         // Performance metrics
         private readonly ConcurrentDictionary<string, long> _operationTimings = new();
         private readonly ConcurrentDictionary<string, long> _operationCounts = new();
@@ -64,6 +70,16 @@ namespace KalshiBotAPI.Websockets
 
         // Subscription deduplication
         private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
+
+        /// <summary>
+        /// Event raised when WebSocket health becomes unhealthy for specific markets.
+        /// </summary>
+        public event EventHandler<string[]>? MarketWebSocketUnhealthy;
+
+        /// <summary>
+        /// Event raised when WebSocket health is restored for specific markets.
+        /// </summary>
+        public event EventHandler<string[]>? MarketWebSocketHealthy;
 
         // Health monitoring
         private Task _healthMonitorTask = null!;
@@ -837,6 +853,88 @@ namespace KalshiBotAPI.Websockets
         };
 
         /// <summary>
+        /// Calculates the exponential backoff delay for subscription retries.
+        /// Uses exponential backoff with jitter to avoid thundering herd problems.
+        /// </summary>
+        /// <param name="retryCount">The current retry attempt number (0-based).</param>
+        /// <returns>The delay in milliseconds before the next retry attempt.</returns>
+        private int CalculateRetryDelayMs(int retryCount)
+        {
+            if (retryCount >= _maxSubscriptionRetries)
+            {
+                return _maxRetryDelayMs; // Cap at maximum delay
+            }
+
+            // Exponential backoff: baseDelay * 2^retryCount
+            var exponentialDelay = _baseRetryDelayMs * Math.Pow(2, retryCount);
+
+            // Add jitter (±25% randomization) to avoid thundering herd
+            var random = new Random();
+            var jitter = random.NextDouble() * 0.5 - 0.25; // -25% to +25%
+            var delayWithJitter = exponentialDelay * (1 + jitter);
+
+            // Cap at maximum delay
+            return Math.Min((int)delayWithJitter, _maxRetryDelayMs);
+        }
+
+        /// <summary>
+        /// Cleans up subscription state for markets that failed to receive confirmation within the timeout period.
+        /// Marks markets as unsubscribed and removes them from the channel subscription tracking.
+        /// </summary>
+        /// <param name="channel">The channel name where the subscription failed.</param>
+        /// <param name="marketTickers">Array of market tickers that failed to subscribe.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task CleanupExpiredSubscriptionAsync(string channel, string[] marketTickers)
+        {
+            _subscriptionLock.EnterWriteLock();
+            try
+            {
+                _processingCancellationToken.ThrowIfCancellationRequested();
+
+                // Mark each market as unsubscribed
+                foreach (var ticker in marketTickers)
+                {
+                    SetSubscriptionState(ticker, channel, SubscriptionState.Unsubscribed);
+                }
+
+                // Remove markets from channel subscriptions
+                if (_channelSubscriptions.TryGetValue(channel, out var subscription))
+                {
+                    var updatedMarkets = new HashSet<string>(subscription.Markets);
+                    foreach (var ticker in marketTickers)
+                    {
+                        updatedMarkets.Remove(ticker);
+                    }
+
+                    if (updatedMarkets.Any())
+                    {
+                        _channelSubscriptions[channel] = (subscription.Sid, updatedMarkets);
+                    }
+                    else
+                    {
+                        // No markets left, remove the entire channel subscription
+                        ((IDictionary<string, (int Sid, HashSet<string> Markets)>)_channelSubscriptions).Remove(channel);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("CleanupExpiredSubscriptionAsync was cancelled for channel {Channel}", channel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cleaning up expired subscription for channel {Channel}, markets {Markets}",
+                    channel, string.Join(", ", marketTickers));
+            }
+            finally
+            {
+                _subscriptionLock.ExitWriteLock();
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Determines if a market is currently subscribed to a specific channel.
         /// </summary>
         /// <param name="marketTicker">The market ticker to check, or empty string for channel-level subscription.</param>
@@ -1044,7 +1142,7 @@ namespace KalshiBotAPI.Websockets
 
         /// <summary>
         /// Background task that monitors pending subscription confirmations and handles timeouts.
-        /// Removes stale pending confirmations that haven't received responses within the timeout period.
+        /// Removes stale pending confirmations and retries failed subscriptions to maintain connection reliability.
         /// </summary>
         /// <returns>A task representing the background operation.</returns>
         private async Task CheckPendingConfirmationsAsync()
@@ -1060,8 +1158,83 @@ namespace KalshiBotAPI.Websockets
 
                     foreach (var confirm in expiredConfirms)
                     {
-                        _logger.LogWarning("Pending confirmation expired for ID {Id}, channel {Channel}, markets {Markets} after 60 seconds",
-                            confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
+                        var subscriptionKey = $"{confirm.Value.Channel}:{string.Join(",", confirm.Value.MarketTickers.OrderBy(m => m))}";
+                        var retryInfo = _subscriptionRetryInfo.GetOrAdd(subscriptionKey, _ => (0, DateTime.UtcNow));
+                        var currentRetryCount = retryInfo.RetryCount;
+                        var firstRetryTime = retryInfo.FirstRetryTime;
+
+                        // Check if we've been retrying for more than 15 minutes
+                        var totalRetryTime = DateTime.UtcNow - firstRetryTime;
+                        if (totalRetryTime > TimeSpan.FromMinutes(15))
+                        {
+                            _logger.LogError("Subscription retry timeout exceeded (15 minutes) for channel {Channel}, markets {Markets}. Unwatching markets.",
+                                confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
+
+                            // Unwatch the markets - the MarketWebSocketUnhealthy event will be raised to handle this
+                            _logger.LogInformation("Persistent subscription failures detected for markets {Markets}, raising unhealthy event",
+                                string.Join(", ", confirm.Value.MarketTickers));
+
+                            _subscriptionRetryInfo.TryRemove(subscriptionKey, out var _);
+                            _pendingSubscriptionConfirmations.TryRemove(confirm.Key, out var _);
+                            continue;
+                        }
+
+                        if (currentRetryCount >= _maxSubscriptionRetries)
+                        {
+                            _logger.LogError("Max retries ({MaxRetries}) exceeded for subscription to channel {Channel}, markets {Markets}. Giving up.",
+                                _maxSubscriptionRetries, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
+                            _subscriptionRetryInfo.TryRemove(subscriptionKey, out var _);
+                            _pendingSubscriptionConfirmations.TryRemove(confirm.Key, out var _);
+                            continue;
+                        }
+
+                        _logger.LogWarning("Pending confirmation expired for ID {Id}, channel {Channel}, markets {Markets} after {_confirmationTimeoutSeconds} seconds. Retry {RetryCount}/{MaxRetries} with exponential backoff (total retry time: {TotalTime:F1}min).",
+                            confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), _confirmationTimeoutSeconds, currentRetryCount + 1, _maxSubscriptionRetries, totalRetryTime.TotalMinutes);
+
+                        // Raise unhealthy event for affected markets
+                        RaiseMarketWebSocketUnhealthy(confirm.Value.MarketTickers);
+
+                        // Clean up the expired subscription state
+                        await CleanupExpiredSubscriptionAsync(confirm.Value.Channel, confirm.Value.MarketTickers);
+
+                        // Calculate exponential backoff delay
+                        var retryDelayMs = CalculateRetryDelayMs(currentRetryCount);
+                        _logger.LogDebug("Waiting {DelayMs}ms before retrying subscription for channel {Channel}, markets {Markets}",
+                            retryDelayMs, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
+
+                        await Task.Delay(retryDelayMs, _processingCancellationToken);
+
+                        // Retry the subscription if still connected
+                        if (_connectionManager.IsConnected())
+                        {
+                            try
+                            {
+                                // Map channel back to action for retry
+                                var action = GetActionFromChannel(confirm.Value.Channel);
+                                await SubscribeToChannelAsync(action, confirm.Value.MarketTickers);
+
+                                // Reset retry info on successful retry initiation
+                                _subscriptionRetryInfo[subscriptionKey] = (0, DateTime.UtcNow);
+
+                                _logger.LogInformation("Retried subscription for channel {Channel}, markets {Markets} after confirmation timeout (retry {RetryCount}/{MaxRetries})",
+                                    confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), currentRetryCount + 1, _maxSubscriptionRetries);
+                            }
+                            catch (Exception retryEx)
+                            {
+                                // Increment retry count on failure
+                                _subscriptionRetryInfo[subscriptionKey] = (currentRetryCount + 1, firstRetryTime);
+                                _logger.LogError(retryEx, "Failed to retry subscription for channel {Channel}, markets {Markets} after confirmation timeout (retry {RetryCount}/{MaxRetries})",
+                                    confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), currentRetryCount + 1, _maxSubscriptionRetries);
+                            }
+                        }
+                        else
+                        {
+                            // Increment retry count when not connected
+                            _subscriptionRetryInfo[subscriptionKey] = (currentRetryCount + 1, firstRetryTime);
+                            _logger.LogWarning("WebSocket not connected, cannot retry subscription for channel {Channel}, markets {Markets} (retry {RetryCount}/{MaxRetries})",
+                                confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), currentRetryCount + 1, _maxSubscriptionRetries);
+                        }
+
                         _pendingSubscriptionConfirmations.TryRemove(confirm.Key, out var _);
                     }
                 }
@@ -1354,6 +1527,24 @@ namespace KalshiBotAPI.Websockets
                 return (confirm.Channel, confirm.MarketTickers);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Raises the MarketWebSocketUnhealthy event for the specified markets.
+        /// </summary>
+        /// <param name="markets">Array of market tickers that have unhealthy WebSocket connections.</param>
+        public void RaiseMarketWebSocketUnhealthy(string[] markets)
+        {
+            MarketWebSocketUnhealthy?.Invoke(this, markets);
+        }
+
+        /// <summary>
+        /// Raises the MarketWebSocketHealthy event for the specified markets.
+        /// </summary>
+        /// <param name="markets">Array of market tickers that have restored WebSocket connections.</param>
+        public void RaiseMarketWebSocketHealthy(string[] markets)
+        {
+            MarketWebSocketHealthy?.Invoke(this, markets);
         }
     }
 }

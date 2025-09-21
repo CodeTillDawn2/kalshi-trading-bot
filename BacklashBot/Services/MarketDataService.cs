@@ -663,6 +663,96 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Marks a market as unhealthy by setting its interest score to zero and WebSocket health to false.
+        /// This effectively removes it from active watching while keeping the database record.
+        /// Used when WebSocket subscriptions repeatedly fail for a market.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to mark as unhealthy.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task MarkMarketAsUnhealthyAsync(string marketTicker)
+        {
+            _logger.LogInformation("Marking market {MarketTicker} as unhealthy by setting interest score to zero and WebSocket health to false", marketTicker);
+            try
+            {
+                _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                // Set WebSocket health to false in the MarketData instance
+                if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+                {
+                    marketData.WebSocketHealthy = false;
+                    _logger.LogDebug("Set WebSocketHealthy=false for market {MarketTicker}", marketTicker);
+                }
+                else
+                {
+                    _logger.LogWarning("MarketData instance for {MarketTicker} not found in cache, cannot set WebSocket health", marketTicker);
+                }
+
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                MarketWatchDTO? marketWatch = await context.GetMarketWatchByTicker(marketTicker);
+
+                if (marketWatch != null)
+                {
+                    marketWatch.InterestScore = 0;
+                    marketWatch.InterestScoreDate = DateTime.Now;
+                    await context.AddOrUpdateMarketWatch(marketWatch);
+                    _logger.LogInformation("Successfully marked market {MarketTicker} as unhealthy (interest score = 0)", marketTicker);
+                }
+                else
+                {
+                    _logger.LogWarning("Market watch for {MarketTicker} not found in database, cannot mark as unhealthy", marketTicker);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("MarkMarketAsUnhealthyAsync was cancelled for {MarketTicker}", marketTicker);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to mark market {MarketTicker} as unhealthy", marketTicker);
+            }
+        }
+
+        /// <summary>
+        /// Marks a market as healthy by setting WebSocket health to true and logging the restoration of WebSocket connectivity.
+        /// Used when WebSocket subscriptions are successfully restored for a market.
+        /// Note: Interest score is not modified when marking healthy.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to mark as healthy.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task MarkMarketAsHealthyAsync(string marketTicker)
+        {
+            _logger.LogInformation("Marking market {MarketTicker} as healthy - WebSocket connectivity restored", marketTicker);
+            try
+            {
+                _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                // Set WebSocket health to true in the MarketData instance
+                if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+                {
+                    marketData.WebSocketHealthy = true;
+                    _logger.LogDebug("Set WebSocketHealthy=true for market {MarketTicker}", marketTicker);
+                }
+                else
+                {
+                    _logger.LogWarning("MarketData instance for {MarketTicker} not found in cache, cannot set WebSocket health", marketTicker);
+                }
+
+                _logger.LogInformation("Market {MarketTicker} WebSocket connectivity has been restored", marketTicker);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("MarkMarketAsHealthyAsync was cancelled for {MarketTicker}", marketTicker);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to mark market {MarketTicker} as healthy", marketTicker);
+            }
+
+            await Task.CompletedTask;
+        }
+
         public async Task UpdateMarketSubscriptionAsync(string action, string[] marketTickers)
         {
             _logger.LogDebug("Initiating subscription update: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));

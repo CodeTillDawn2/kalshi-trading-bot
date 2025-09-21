@@ -120,6 +120,7 @@ namespace BacklashBot.State.Interfaces
         long OBV_Medium { get; set; }
         long OBV_Long { get; set; }
         bool ReceivedFirstSnapshot { get; set; }
+        bool WebSocketHealthy { get; set; }
         TimeSpan? HoldTime { get; }
         TimeSpan? MarketAge { get; }
         TimeSpan? TimeLeft { get; }

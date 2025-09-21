@@ -44,6 +44,10 @@ namespace BacklashBot.Services.Interfaces
         bool GetTradingStatus();
         /// <summary>UpdateAccountBalanceAsync</summary>
         Task UnwatchMarket(string marketTicker);
+        /// <summary>MarkMarketAsUnhealthyAsync</summary>
+        Task MarkMarketAsUnhealthyAsync(string marketTicker);
+        /// <summary>MarkMarketAsHealthyAsync</summary>
+        Task MarkMarketAsHealthyAsync(string marketTicker);
         /// <summary>NotifyMarketDataUpdated</summary>
         Task UpdateMarketSubscriptionAsync(string action, string[] marketTickers);
         /// <summary>NotifyTickerAdded</summary>

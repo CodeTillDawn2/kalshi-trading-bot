@@ -1028,6 +1028,24 @@ namespace KalshiBotAPI.Websockets
                     if (!string.IsNullOrEmpty(channel))
                     {
                         await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+
+                        // Raise healthy event for the markets that were confirmed
+                        if (msg.TryGetProperty("market_ticker", out var marketTickerProp))
+                        {
+                            var marketTicker = marketTickerProp.GetString();
+                            if (!string.IsNullOrEmpty(marketTicker))
+                            {
+                                _subscriptionManager.RaiseMarketWebSocketHealthy(new[] { marketTicker });
+                            }
+                        }
+                        else if (msg.TryGetProperty("market_tickers", out var marketTickersProp) && marketTickersProp.ValueKind == JsonValueKind.Array)
+                        {
+                            var marketTickers = marketTickersProp.EnumerateArray().Select(t => t.GetString()).Where(t => !string.IsNullOrEmpty(t)).ToArray();
+                            if (marketTickers.Any())
+                            {
+                                _subscriptionManager.RaiseMarketWebSocketHealthy(marketTickers);
+                            }
+                        }
                     }
                     else
                     {

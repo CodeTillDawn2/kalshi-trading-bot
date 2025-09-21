@@ -472,6 +472,12 @@ namespace BacklashBot.State
 
         public bool ReceivedFirstSnapshot { get; set; } = false;
 
+        /// <summary>
+        /// Indicates whether the WebSocket connection is healthy for this market.
+        /// When false, snapshot creation should be skipped to avoid saving incomplete data.
+        /// </summary>
+        public bool WebSocketHealthy { get; set; } = true;
+
         public int DepthAtBestYesBid => GetBids("yes")
             .Where(o => o.Price == BestYesBid)
             .Sum(o => o.RestingContracts);
