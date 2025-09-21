@@ -1049,13 +1049,13 @@ namespace KalshiBotAPI.KalshiAPI
                 switch (interval)
                 {
                     case "minute":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddMinutes(1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddMinutes(-1));
                         break;
                     case "hour":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddHours(1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddHours(-1));
                         break;
                     case "day":
-                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddDays(1));
+                        finalEndTs = UnixHelper.ConvertToUnixTimestamp(now.AddDays(-1));
                         break;
                 }
                 var candlesticks = new List<APICandlestick>();
