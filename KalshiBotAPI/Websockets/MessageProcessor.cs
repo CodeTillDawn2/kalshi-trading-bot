@@ -7,6 +7,7 @@ using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.WebSockets;
@@ -31,6 +32,7 @@ namespace KalshiBotAPI.Websockets
         private readonly ISqlDataService _sqlDataService;
         private readonly IKalshiAPIService _kalshiAPIService;
         private readonly MessageProcessorConfig _config;
+        private readonly KalshiAPIServiceConfig _apiConfig;
         private bool _isDataPersistenceEnabled;
         private readonly bool _enablePerformanceMonitoring;
         private readonly IMessageProcessorPerformanceMetrics _performanceMetrics;
@@ -111,6 +113,11 @@ namespace KalshiBotAPI.Websockets
         private CancellationToken _processingCancellationToken;
         private DateTime _lastMessageTimestamp = DateTime.UtcNow;
 
+        // Rate limiter for lifecycle events
+        private readonly object _lifecycleRateLimiterLock = new object();
+        private DateTime _lifecycleRateLimiterLastReset = DateTime.UtcNow;
+        private int _lifecycleRateLimiterCounter = 0;
+
         /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>
@@ -166,6 +173,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="sqlDataService">Handles data persistence to SQL database when enabled.</param>
         /// <param name="kalshiAPIService">Provides access to Kalshi API for market data retrieval and updates.</param>
         /// <param name="config">Configuration settings for WebSocket operations.</param>
+        /// <param name="apiConfig">Configuration settings for Kalshi API operations.</param>
         /// <param name="performanceMetrics">Service for posting performance metrics to central monitoring.</param>
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
@@ -175,6 +183,7 @@ namespace KalshiBotAPI.Websockets
             ISqlDataService sqlDataService,
             IKalshiAPIService kalshiAPIService,
             MessageProcessorConfig config,
+            IOptions<KalshiAPIServiceConfig> apiConfig,
             IMessageProcessorPerformanceMetrics performanceMetrics)
         {
             _logger = logger;
@@ -184,6 +193,7 @@ namespace KalshiBotAPI.Websockets
             _sqlDataService = sqlDataService;
             _kalshiAPIService = kalshiAPIService;
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _apiConfig = apiConfig?.Value ?? throw new ArgumentNullException(nameof(apiConfig));
             _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
             _enablePerformanceMonitoring = _config.EnablePerformanceMetrics;
@@ -905,15 +915,23 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogDebug("Skipping data persistence for market lifecycle: DataPersistence is disabled");
                 }
 
-                // Trigger API refresh for the affected market
+                // Trigger API refresh for the affected market, but throttle to prevent rate limiting
                 if (data.TryGetProperty("msg", out var msg) && msg.TryGetProperty("market_ticker", out var tickerProp))
                 {
                     var marketTicker = tickerProp.GetString();
                     if (!string.IsNullOrEmpty(marketTicker))
                     {
-                        var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
-                        _logger.LogDebug("Fetched API data for market {MarketTicker} due to lifecycle event: {ProcessedCount} processed, {ErrorCount} errors",
-                            marketTicker, processedCount, errorCount);
+                        if (CanProcessLifecycleEvent())
+                        {
+                            var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
+                            _logger.LogDebug("Fetched API data for market {MarketTicker} due to lifecycle event: {ProcessedCount} processed, {ErrorCount} errors",
+                                marketTicker, processedCount, errorCount);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Skipped API refresh for market {MarketTicker} due to rate limiting ({MaxPerSecond} per second)",
+                                marketTicker, _apiConfig.MaxLifecycleEventsPerSecond);
+                        }
                     }
                 }
             }
@@ -949,7 +967,7 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogDebug("Skipping data persistence for event lifecycle: DataPersistence is disabled");
                 }
 
-                // Trigger API refresh if market_ticker or event_ticker is available
+                // Trigger API refresh if market_ticker or event_ticker is available, but throttle to prevent rate limiting
                 if (data.TryGetProperty("msg", out var msg))
                 {
                     // First try market_ticker
@@ -958,9 +976,17 @@ namespace KalshiBotAPI.Websockets
                         var marketTicker = marketTickerProp.GetString();
                         if (!string.IsNullOrEmpty(marketTicker))
                         {
-                            var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
-                            _logger.LogDebug("Fetched API data for market {MarketTicker} due to event lifecycle: {ProcessedCount} processed, {ErrorCount} errors",
-                                marketTicker, processedCount, errorCount);
+                            if (CanProcessLifecycleEvent())
+                            {
+                                var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
+                                _logger.LogDebug("Fetched API data for market {MarketTicker} due to event lifecycle: {ProcessedCount} processed, {ErrorCount} errors",
+                                    marketTicker, processedCount, errorCount);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Skipped API refresh for market {MarketTicker} due to rate limiting ({MaxPerSecond} per second)",
+                                    marketTicker, _apiConfig.MaxLifecycleEventsPerSecond);
+                            }
                         }
                     }
                     // Then try event_ticker
@@ -969,9 +995,17 @@ namespace KalshiBotAPI.Websockets
                         var eventTicker = eventTickerProp.GetString();
                         if (!string.IsNullOrEmpty(eventTicker))
                         {
-                            var eventResponse = await _kalshiAPIService.FetchEventAsync(eventTicker);
-                            _logger.LogDebug("Fetched API data for event {EventTicker} due to event lifecycle: {Success}",
-                                eventTicker, eventResponse != null ? "success" : "failed");
+                            if (CanProcessLifecycleEvent())
+                            {
+                                var eventResponse = await _kalshiAPIService.FetchEventAsync(eventTicker);
+                                _logger.LogDebug("Fetched API data for event {EventTicker} due to event lifecycle: {Success}",
+                                    eventTicker, eventResponse != null ? "success" : "failed");
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Skipped API refresh for event {EventTicker} due to rate limiting ({MaxPerSecond} per second)",
+                                    eventTicker, _apiConfig.MaxLifecycleEventsPerSecond);
+                            }
                         }
                     }
                     else
@@ -1379,6 +1413,32 @@ namespace KalshiBotAPI.Websockets
                     _totalProcessingTimeMs = 0;
                     _lastMetricsLogTime = now;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a lifecycle event can be processed based on the rate limit.
+        /// Resets the counter every second and allows up to MaxLifecycleEventsPerSecond events.
+        /// </summary>
+        /// <returns>True if the event can be processed, false if rate limited.</returns>
+        private bool CanProcessLifecycleEvent()
+        {
+            lock (_lifecycleRateLimiterLock)
+            {
+                var now = DateTime.UtcNow;
+                if ((now - _lifecycleRateLimiterLastReset).TotalSeconds >= 1)
+                {
+                    _lifecycleRateLimiterCounter = 0;
+                    _lifecycleRateLimiterLastReset = now;
+                }
+
+                if (_lifecycleRateLimiterCounter < _apiConfig.MaxLifecycleEventsPerSecond)
+                {
+                    _lifecycleRateLimiterCounter++;
+                    return true;
+                }
+
+                return false;
             }
         }
 

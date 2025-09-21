@@ -19,5 +19,12 @@ public class KalshiAPIServiceConfig
     [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
     public bool EnablePerformanceMetrics { get; set; }
 
+    /// <summary>
+    /// Gets or sets the maximum number of lifecycle events to process per second.
+    /// Used to throttle API calls triggered by market lifecycle events to prevent rate limiting. Defaults to 10.
+    /// </summary>
+    [Required(ErrorMessage = "The 'MaxLifecycleEventsPerSecond' is missing in the configuration.")]
+    public int MaxLifecycleEventsPerSecond { get; set; } = 10;
+
 
 }

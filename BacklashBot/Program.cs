@@ -468,6 +468,7 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<ISqlDataService>(),
     sp.GetRequiredService<IKalshiAPIService>(),
     sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
+    sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
     sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
 ));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(

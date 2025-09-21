@@ -1302,8 +1302,17 @@ namespace BacklashBot.Services
 
                 if (change.Timestamp > DateTime.UtcNow.AddMinutes(1) || change.Timestamp < DateTime.UtcNow.AddMinutes(-10))
                 {
-                    _logger.LogWarning("Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}",
-                        _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts);
+                    string reason;
+                    if (change.Timestamp > DateTime.UtcNow.AddMinutes(1))
+                    {
+                        reason = $"timestamp is more than 1 minute in the future (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
+                    }
+                    else
+                    {
+                        reason = $"timestamp is more than 10 minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
+                    }
+                    _logger.LogWarning("Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
+                        _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts, reason);
                     isValid = false;
                     invalidCount++;
                 }
