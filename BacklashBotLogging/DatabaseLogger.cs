@@ -110,7 +110,7 @@ namespace KalshiBotLogging
 
             // Get dynamic values or use defaults
             string environment = _loggingConfig?.Environment ?? _defaultEnvironment;
-            string brainInstance = _instanceNameConfig?.BrainInstance ?? _defaultInstance;
+            string brainInstance = _instanceNameConfig?.Name ?? _defaultInstance;
             string sessionIdentifier = GetSessionIdentifier();
 
             var logEntry = new LogEntryDTO

@@ -13,7 +13,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
-using BacklashCommon.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.SmokehouseBot.Services;
@@ -414,7 +413,7 @@ builder.Services.AddScoped<ICandlestickService>(sp => new CandlestickService(
     sp.GetRequiredService<IOptions<CandlestickServiceConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IOptions<DataStorageConfig>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IScopeManagerService>()));
 builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
@@ -476,23 +475,21 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<ISubscriptionManager>(),
     sp.GetRequiredService<IMessageProcessor>(),
-    sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
     new OvernightActivitiesHelper(
-        provider.GetRequiredService<ILogger<BacklashCommon.Services.OvernightActivitiesHelper>>(),
-        provider.GetRequiredService<IInterestScoreService>(),
+        provider.GetRequiredService<ILogger<OvernightActivitiesHelper>>(),
         provider.GetRequiredService<ISnapshotGroupHelper>(),
         provider.GetRequiredService<IOptions<DataStorageConfig>>(),
         provider.GetRequiredService<ISqlDataService>(),
         provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
     new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value));
-builder.Services.AddScoped<BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService, HealthCheckService>();
-builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
+builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
+builder.Services.AddScoped<IDataCache, DataCache>();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

@@ -41,7 +41,7 @@ namespace BacklashIntegrationTests
         {
             // Arrange - Load configs from appsettings.json
             var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            var executionConfig = _configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
+            var instanceNameConfig = _configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
 
             // Act & Assert
             Assert.DoesNotThrow(() =>
@@ -49,7 +49,7 @@ namespace BacklashIntegrationTests
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueue,
                     loggingConfig,
-                    executionConfig,
+                    instanceNameConfig,
                     LogLevel.Warning, // minLevel
                     null, // brainStatus
                     "BacklashBot", // defaultEnvironment
@@ -70,12 +70,12 @@ namespace BacklashIntegrationTests
         {
             // Arrange - Load configs from appsettings.json
             var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            var executionConfig = _configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
+            var instanceNameConfig = _configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
 
             var provider = new DatabaseLoggerProvider(
                 _loggingQueue,
                 loggingConfig,
-                executionConfig,
+                instanceNameConfig,
                 LogLevel.Information, // minLevel set to Information to allow the log
                 null, // brainStatus
                 "BacklashBot", // defaultEnvironment

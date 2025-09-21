@@ -2,6 +2,7 @@ using BacklashBot.Configuration;
 using BacklashBot.Helpers;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
@@ -250,7 +251,7 @@ namespace KalshiBotTasks
 
             _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
-            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _executionConfig, _scopeFactory, this.config, centralPerformanceMonitor);
+            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _scopeFactory, this.config, centralPerformanceMonitor);
 
             _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
             _missingOrderbookCount = 0;

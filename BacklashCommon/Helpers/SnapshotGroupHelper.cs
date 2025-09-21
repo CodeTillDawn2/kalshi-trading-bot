@@ -121,7 +121,7 @@ namespace BacklashCommon.Helpers
                     }
                     try
                     {
-                        await Task.Delay(_dataStorageConfig.RetryDelayMs);
+                        await Task.Delay(_snapshotGroupHelperConfig.SnapshotGroupRetryDelayMs);
                         rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }

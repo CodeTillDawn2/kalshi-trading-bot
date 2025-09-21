@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BacklashCommon.Services.Interfaces
+namespace BacklashBot.Management.Interfaces
 {
     /// <summary>IInterestScoreService</summary>
     /// <summary>IInterestScoreService</summary>

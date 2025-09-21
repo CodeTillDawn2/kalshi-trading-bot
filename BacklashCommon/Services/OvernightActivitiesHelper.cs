@@ -3,7 +3,6 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
-using BacklashCommon.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
@@ -89,12 +88,11 @@ namespace BacklashCommon.Services
         /// Initializes a new instance of the <see cref="OvernightActivitiesHelper"/> class.
         /// </summary>
         /// <param name="logger">The logger instance for recording operations and performance data.</param>
-        /// <param name="interestScoreHelper">The interest score service (injected but not used in constructor).</param>
         /// <param name="analysisHelper">The market analysis helper for generating snapshot groups.</param>
         /// <param name="dataStorageConfig">The execution configuration options.</param>
         /// <param name="sqlDataService">The SQL data service for snapshot operations.</param>
         /// <param name="performanceMonitor">Optional performance monitor for tracking metrics (uses interface segregation).</param>
-        public OvernightActivitiesHelper(ILogger<IOvernightActivitiesHelper> logger, IInterestScoreService interestScoreHelper,
+        public OvernightActivitiesHelper(ILogger<IOvernightActivitiesHelper> logger, 
             ISnapshotGroupHelper analysisHelper, IOptions<DataStorageConfig> dataStorageConfig, ISqlDataService sqlDataService,
             INightActivitiesPerformanceMetrics? performanceMonitor = null)
         {

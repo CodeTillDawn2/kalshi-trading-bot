@@ -1,4 +1,3 @@
-using BacklashBot.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
@@ -37,12 +36,6 @@ namespace TradingSimulator.Strategies
         /// Logger for recording simulation progress, errors, and important events.
         /// </summary>
         private readonly ILogger<TradingStrategy<T>> _logger;
-
-        /// <summary>
-        /// Configuration options for snapshot processing and validation.
-        /// </summary>
-        private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceOptions;
-
 
         /// <summary>
         /// Factory for creating service scopes for dependency injection.
@@ -138,7 +131,6 @@ namespace TradingSimulator.Strategies
             ITradingSnapshotService snapshotService,
             ISnapshotPeriodHelper snapshotPeriodHelper,
             ILogger<TradingStrategy<T>> logger,
-            IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceOptions,
             IServiceScopeFactory scopeFactory,
             IBacklashBotContext dbContext,
             List<(string Name, TradingStrategyFunc<T> Func)> strategies)
@@ -146,7 +138,6 @@ namespace TradingSimulator.Strategies
             _snapshotService = snapshotService;
             _logger = logger;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _tradingSnapshotServiceOptions = tradingSnapshotServiceOptions;
             _scopeFactory = scopeFactory;
             _dbContext = dbContext;
             _strategies = strategies;

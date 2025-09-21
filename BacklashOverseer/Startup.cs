@@ -8,7 +8,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
-using BacklashCommon.Services.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
@@ -104,7 +103,7 @@ namespace BacklashOverseer
                     instanceNameConfig,
                     minLevel,
                     null, // brainStatus
-                    "Overseer", // defaultEnvironment
+                    loggingConfig.Environment, // defaultEnvironment
                     instanceNameConfig.Name // defaultInstance
                 );
             });
@@ -155,7 +154,6 @@ namespace BacklashOverseer
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
-            services.AddScoped<IDataCache, DataCache>();
 
             // Register the new WebSocketMonitorServiceLite as singleton
             services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();
@@ -295,9 +293,8 @@ namespace BacklashOverseer
             services.AddScoped<IOvernightActivitiesHelper>(provider =>
                 new OvernightActivitiesHelper(
                     provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
-                    null, // interestScoreHelper parameter not used in constructor
                     provider.GetRequiredService<ISnapshotGroupHelper>(),
-                    provider.GetRequiredService<IOptions<DataStor>>(),
+                    provider.GetRequiredService<IOptions<DataStorageConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 

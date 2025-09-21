@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BacklashBot.Configuration
+namespace BacklashCommon.Configuration
 {
     /// <summary>
     /// Configuration class for TradingSnapshotService settings.
@@ -33,6 +33,25 @@ namespace BacklashBot.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'MaxParallelism' is missing in the configuration.")]
         public int MaxParallelism { get; set; }
+
+        /// <summary>
+        /// Version number of the snapshot JSON schema used for data serialization and deserialization.
+        /// Ensures compatibility between snapshot data structures and processing logic across different versions.
+        /// Incremented when schema changes require migration logic or backward compatibility handling.
+        /// Used by TradingSnapshotService for schema validation and snapshot upgrading during loading.
+        /// </summary>
+        [Required(ErrorMessage = "The 'SnapshotSchemaVersion' is missing in the configuration.")]
+        public int SnapshotSchemaVersion { get; set; }
+
+        /// <summary>
+        /// Frequency in seconds at which trading decisions are evaluated and executed.
+        /// This controls how often the trading strategy analyzes market conditions and makes buy/sell/hold decisions.
+        /// Lower values provide more responsive trading but increase computational load and potential for overtrading.
+        /// Typical values: 30-300 seconds depending on strategy requirements and market volatility.
+        /// Used by TradingStrategy to determine snapshot intervals and decision timing.
+        /// </summary>
+        [Required(ErrorMessage = "The 'DecisionFrequencySeconds' is missing in the configuration.")]
+        public int DecisionFrequencySeconds { get; set; }
 
         /// <summary>
         /// Flag to enable or disable performance metrics collection for snapshot operations.

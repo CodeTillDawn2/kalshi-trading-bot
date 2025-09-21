@@ -1,12 +1,4 @@
-// <summary>
-// TradingSimulatorService is the core orchestrator for running trading strategy simulations and backtesting operations.
-// It manages the complete lifecycle of evaluating trading strategies against historical market snapshots, including
-// data loading, strategy execution, performance analysis, and result reporting. The service integrates with
-// DataLoader for data access, MarketProcessor for simulation execution, StrategyResolver for strategy configuration,
-// and provides comprehensive GUI integration through events and progress reporting.
-// </summary>
-
-using BacklashBot.Configuration;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Configuration;
@@ -14,7 +6,6 @@ using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
-using BacklashCommon.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using KalshiBotData.Data;
@@ -85,7 +76,7 @@ namespace TradingSimulator
         private IServiceScopeFactory _scopeFactory;
         private IBacklashBotContext _dbContext;
         private SnapshotGroupHelper _marketAnalysisHelper;
-        private IOptions<GeneralExecutionConfig> _executionConfig;
+        private IOptions<DataStorageConfig> _dataStorageConfig;
         private IOptions<TradingSimulatorServiceConfig> _simulatorOptions;
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
@@ -149,7 +140,7 @@ namespace TradingSimulator
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
-            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
+            _dataStorageConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<DataStorageConfig>()!);
             _simulatorOptions = Options.Create(simulatorConfig);
 
             // Configure DataLoaderConfig
@@ -188,7 +179,7 @@ namespace TradingSimulator
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object,
                 Options.Create(
                     new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }),
-                _executionConfig, _scopeFactory, config, null);
+                _dataStorageConfig, _scopeFactory, config, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();
@@ -196,7 +187,7 @@ namespace TradingSimulator
             var simulationEngine = serviceProvider.GetRequiredService<SimulationEngine>();
             var equityCalculator = serviceProvider.GetRequiredService<EquityCalculator>();
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, simulationEngine, equityCalculator, config, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _dataStorageConfig, null, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();

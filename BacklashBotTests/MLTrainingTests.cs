@@ -6,6 +6,7 @@ using BacklashBotData.Configuration;
 using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
+using BacklashCommon.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using Microsoft.EntityFrameworkCore;
@@ -104,7 +105,7 @@ namespace KalshiBotTests
 
             // Options from config
             var snapshotServiceConfig = Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
-            _generalExecutionOpts = Options.Create(config.GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>());
+            _generalExecutionOpts = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>());
 
             // Snapshot loader (same implementation you use elsewhere)
             _snapshotService = new TradingSnapshotService(

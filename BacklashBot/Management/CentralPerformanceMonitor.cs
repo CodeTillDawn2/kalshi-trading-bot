@@ -5,6 +5,7 @@ using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;

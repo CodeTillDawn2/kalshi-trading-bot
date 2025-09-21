@@ -28,7 +28,7 @@ namespace BacklashBot.Services
         private readonly ILogger<ICandlestickService> _logger;
         private readonly CandlestickServiceConfig _candlestickConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
-        private readonly GeneralExecutionConfig _generalExecutionConfig;
+        private readonly DataStorageConfig _storageConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -53,7 +53,7 @@ namespace BacklashBot.Services
             IOptions<CandlestickServiceConfig> candlestickConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<LoggingConfig> loggingConfig,
-            IOptions<GeneralExecutionConfig> generalExecutionConfig,
+            IOptions<DataStorageConfig> storageConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService)
         {
@@ -61,7 +61,7 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _statusTracker = statusTracker;
             _scopeFactory = scopeFactory;
-            _generalExecutionConfig = generalExecutionConfig.Value;
+            _storageConfig = storageConfig.Value;
             _candlestickConfig = candlestickConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _loggingConfig = loggingConfig.Value;
@@ -336,7 +336,7 @@ namespace BacklashBot.Services
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                             _logger.LogDebug("Processing {Interval} candlesticks for market {MarketTicker}", interval, marketTicker);
 
-                            string hardDataStorageLocation = _generalExecutionConfig.HardDataStorageLocation;
+                            string hardDataStorageLocation = _storageConfig.HardDataStorageLocation;
                             var existingCandlesticks = marketData.Candlesticks[interval];
                             var latestExistingDate = existingCandlesticks.Any() ? existingCandlesticks.Max(c => c.Date) : (DateTime?)null;
 

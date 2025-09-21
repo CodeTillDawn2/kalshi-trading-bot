@@ -1,3 +1,4 @@
+using BacklashCommon.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace BacklashBotTests
     {
         private Mock<DatabaseLoggingQueue> _loggingQueueMock;
         private LoggingConfig _loggingConfig;
-        private GeneralExecutionConfig _executionConfig;
+        private InstanceNameConfig _instanceNameConfig;
 
         /// <summary>
         /// Sets up the test environment by loading configuration and creating mocked dependencies.
@@ -30,7 +31,7 @@ namespace BacklashBotTests
 
             // Load configs from configuration
             _loggingConfig = configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            _executionConfig = configuration.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
+            _instanceNameConfig = configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
 
             _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);
         }
@@ -48,7 +49,7 @@ namespace BacklashBotTests
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueueMock.Object,
                     _loggingConfig,
-                    _executionConfig,
+                    _instanceNameConfig,
                     LogLevel.Warning, // minLevel
                     null, // brainStatus
                     "BacklashBot", // defaultEnvironment
@@ -71,7 +72,7 @@ namespace BacklashBotTests
             var provider = new DatabaseLoggerProvider(
                 _loggingQueueMock.Object,
                 _loggingConfig,
-                _executionConfig,
+                _instanceNameConfig,
                 LogLevel.Warning,
                 null, // brainStatus
                 "BacklashBot",

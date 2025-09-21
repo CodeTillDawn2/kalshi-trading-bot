@@ -4,6 +4,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
@@ -42,8 +43,8 @@ namespace BacklashBot.Management
         private readonly ICentralPerformanceMonitor _performanceTracker;
         private readonly IBrainStatusService _brainStatus;
         private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
-        private readonly GeneralExecutionConfig _generalConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
+        private readonly InstanceNameConfig _instanceNameConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
@@ -79,7 +80,7 @@ namespace BacklashBot.Management
             IServiceScopeFactory scopeFactory,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
             IOptions<GeneralExecutionConfig> generalExecutionConfig,
-            IOptions<GeneralExecutionConfig> generalConfig,
+            IOptions<InstanceNameConfig> instanceNameConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
             IMarketManagerService marketManager,
@@ -101,12 +102,12 @@ namespace BacklashBot.Management
             _brainStatus = brainStatusService;
             _errorHandler = backlashErrorHandler;
             _performanceTracker = backlashPerformanceTracker;
-            _generalConfig = generalExecutionConfig.Value;
+            _instanceNameConfig = instanceNameConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _brainInstance = _generalConfig.BrainInstance;
-            _decisionInterval = TimeSpan.FromSeconds(_generalConfig.DecisionFrequencySeconds);
+            _brainInstance = _instanceNameConfig.Name;
+            _decisionInterval = TimeSpan.FromSeconds(_tradingSnapshotServiceConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
             Console.WriteLine("CentralBrain constructor completed");
 
