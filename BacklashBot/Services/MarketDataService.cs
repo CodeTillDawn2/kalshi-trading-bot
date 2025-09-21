@@ -1338,7 +1338,6 @@ namespace BacklashBot.Services
             if (dollarOpenInterest < 0) errors.Add($"dollarOpenInterest < 0 ({dollarOpenInterest})");
             if (ts < 0) errors.Add($"ts < 0 ({ts})");
             if (loggedDate == default(DateTime)) errors.Add($"loggedDate is default ({loggedDate})");
-            if (processedDate == default(DateTime?)) errors.Add($"processedDate is default ({processedDate})");
 
             if (errors.Any())
             {

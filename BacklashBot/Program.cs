@@ -128,7 +128,7 @@ builder.Services.AddOptions<GeneralExecutionConfig>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<InstanceNameConfig>()
-    .Bind(builder.Configuration.GetSection("Central:GeneralExecution"))
+    .Bind(builder.Configuration.GetSection(InstanceNameConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<OverseerClientServiceConfig>()
@@ -197,6 +197,14 @@ builder.Services.AddOptions<BacklashBot.State.CalculationsConfig>()
     .ValidateOnStart();
 builder.Services.AddOptions<BacklashBotDataConfig>()
     .Bind(builder.Configuration.GetSection(BacklashBotDataConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<DataStorageConfig>()
+    .Bind(builder.Configuration.GetSection(DataStorageConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<InstanceNameConfig>()
+    .Bind(builder.Configuration.GetSection(InstanceNameConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 

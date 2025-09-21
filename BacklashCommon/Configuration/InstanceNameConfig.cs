@@ -15,7 +15,7 @@ namespace BacklashCommon.Configuration
         /// <summary>
         /// Gets or sets the brain instance identifier.
         /// </summary>
-        [Required(ErrorMessage = "The 'InstanceName' is missing in the configuration.")]
+        [Required(ErrorMessage = "The 'Name' is missing in the configuration.")]
         public string Name { get; set; } = null!;
     }
 }
