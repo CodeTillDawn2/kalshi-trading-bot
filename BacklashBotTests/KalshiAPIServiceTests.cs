@@ -204,25 +204,32 @@ namespace KalshiBotTests
 
             // Get a market with good liquidity for testing
             var marketDto = activeMarket.Where(x => x.yes_bid > 20 && x.no_bid > 20).OrderByDescending(x => x.APILastFetchedDate).FirstOrDefault();
-            if (marketDto != null)
-            {
-                _testMarketTicker = marketDto.market_ticker;
-                _testEventTicker = marketDto.event_ticker;
-            }
-            else
+            if (marketDto == null)
             {
                 // Fallback to first market if no good bids found
                 marketDto = activeMarket.First();
-                _testMarketTicker = marketDto.market_ticker;
-                _testEventTicker = marketDto.event_ticker;
             }
+
+            _testMarketTicker = marketDto.market_ticker;
+            _testEventTicker = marketDto.event_ticker;
 
             // Get event data for the selected market
             var eventDto = await _realContext.GetEventByTicker(_testEventTicker);
             Assert.That(eventDto, Is.Not.Null, $"Event not found for ticker {_testEventTicker}");
             _testSeriesTicker = eventDto.series_ticker;
 
-            _testStartTs = UnixHelper.ConvertToUnixTimestamp(DateTime.UtcNow.AddDays(-1)); // 24 hours ago
+            // Get the latest candlestick for this market to use as a reference point
+            var latestCandlestick = await _realContext.GetLatestCandlestick(_testMarketTicker, 1); // 1 = minute interval
+            if (latestCandlestick != null)
+            {
+                // Set start time to 2 hours before the latest candlestick to ensure overlap
+                _testStartTs = latestCandlestick.end_period_ts - (2 * 60 * 60); // Subtract 2 hours in Unix timestamp
+            }
+            else
+            {
+                // Fallback to 24 hours ago if no candlesticks exist
+                _testStartTs = UnixHelper.ConvertToUnixTimestamp(DateTime.UtcNow.AddDays(-1));
+            }
         }
 
         /// <summary>

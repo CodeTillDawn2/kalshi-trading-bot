@@ -337,7 +337,7 @@ namespace BacklashBot.Services
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                             _logger.LogDebug("Processing {Interval} candlesticks for market {MarketTicker}", interval, marketTicker);
 
-                            string hardDataStorageLocation = Path.Combine(_generalExecutionConfig.HardDataStorageLocation,"Tests");
+                            string hardDataStorageLocation = _generalExecutionConfig.HardDataStorageLocation;
                             var existingCandlesticks = marketData.Candlesticks[interval];
                             var latestExistingDate = existingCandlesticks.Any() ? existingCandlesticks.Max(c => c.Date) : (DateTime?)null;
 
