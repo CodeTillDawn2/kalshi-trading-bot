@@ -11,6 +11,7 @@ namespace BacklashBot.Services.Interfaces
     {
         /// <summary>Gets or sets the OrderbookCancelWindow.</summary>
         /// <summary>Gets or sets the ChangeWindowDuration.</summary>
+        event EventHandler<string> MarketInvalid;
         IMarketData Market { get; }
         /// <summary>Stop</summary>
         /// <summary>Gets or sets the OrderbookCancelWindow.</summary>

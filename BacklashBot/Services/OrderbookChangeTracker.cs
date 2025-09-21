@@ -42,6 +42,8 @@ namespace BacklashBot.Services
 
         private readonly bool _enablePerformanceMetrics;
 
+        public event EventHandler<string> MarketInvalid;
+
         private readonly ConcurrentQueue<OrderbookChange> _orderbookChanges = new ConcurrentQueue<OrderbookChange>();
         private readonly ConcurrentQueue<TradeEvent> _tradeEvents = new ConcurrentQueue<TradeEvent>();
         private readonly System.Timers.Timer _recalculationTimer;
@@ -1001,9 +1003,11 @@ namespace BacklashBot.Services
             _logger.LogDebug("Processing {YesChangeCount} Yes-side and {NoChangeCount} No-side order book changes for {MarketTicker}",
                 validYesChanges.Count, validNoChanges.Count, _marketTicker);
 
-            if (!ValidateEvents(validYesChanges.Concat(validNoChanges).ToList()))
+            var (isValid, invalidCount) = ValidateEvents(validYesChanges.Concat(validNoChanges).ToList());
+            if (!isValid)
             {
-                _logger.LogError("Event validation failed for {MarketTicker}, skipping metric recalculation", _marketTicker);
+                _logger.LogWarning("Event validation failed for {MarketTicker}: {InvalidCount} invalid events found, skipping metric recalculation", _marketTicker, invalidCount);
+                MarketInvalid?.Invoke(this, _marketTicker);
                 return;
             }
 
@@ -1249,12 +1253,12 @@ namespace BacklashBot.Services
             }
         }
 
-        private bool ValidateEvents(List<OrderbookChange> orderbookChanges)
+        private (bool isValid, int invalidCount) ValidateEvents(List<OrderbookChange> orderbookChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
                 _logger.LogDebug("Event validation cancelled for {MarketTicker}", _marketTicker);
-                return false;
+                return (false, 0);
             }
 
             bool isValid = true;
@@ -1266,7 +1270,7 @@ namespace BacklashBot.Services
                 if (_cancellationToken.IsCancellationRequested)
                 {
                     _logger.LogDebug("Event validation loop cancelled for {MarketTicker}", _marketTicker);
-                    return false;
+                    return (false, invalidCount);
                 }
 
                 if (!changeIds.Add(change.Id))
@@ -1314,7 +1318,7 @@ namespace BacklashBot.Services
                 _logger.LogDebug("All order book changes validated successfully for {MarketTicker}", _marketTicker);
             }
 
-            return isValid;
+            return (isValid, invalidCount);
         }
 
         private void CleanupOldTrades()

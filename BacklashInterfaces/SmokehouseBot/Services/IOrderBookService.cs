@@ -11,6 +11,7 @@ namespace BacklashBot.Services.Interfaces
         /// <summary>ClearQueueForMarketAsync</summary>
         /// <summary>GetCurrentOrderBook</summary>
         event EventHandler<string> OrderBookUpdated;
+        event EventHandler<string> MarketInvalid;
         /// <summary>IsEventQueueUnderLimit</summary>
         /// <summary>ClearQueueForMarketAsync</summary>
         void ConfigureWebSocketEventHandlers();

@@ -39,6 +39,7 @@ namespace BacklashBot.Services
         private OrderBookEventArgs? _lastProcessedOrderBookEvent;
         private readonly ConcurrentDictionary<string, List<long>> _marketLockWaitDurations = new();
         private const int MaxWaitTimeSamples = 100;
+        private readonly HashSet<string> _subscribedMarkets = new();
 
         /// <summary>
         /// Configuration options for the order book service timeouts and limits.
@@ -65,6 +66,12 @@ namespace BacklashBot.Services
         /// The string parameter contains the market ticker that was updated.
         /// </summary>
         public event EventHandler<string> OrderBookUpdated;
+
+        /// <summary>
+        /// Event raised when a market is invalid.
+        /// The string parameter contains the market ticker that is invalid.
+        /// </summary>
+        public event EventHandler<string> MarketInvalid;
 
         /// <summary>
         /// Initializes a new instance of the OrderBookService class.
@@ -265,6 +272,8 @@ namespace BacklashBot.Services
                 {
                     _serviceFactory.GetDataCache().Markets.Remove(marketTicker, out _);
                 }
+
+                _subscribedMarkets.Remove(marketTicker);
 
                 _logger.LogDebug("Successfully cleared data for market {MarketTicker}", marketTicker);
             }
@@ -799,6 +808,13 @@ namespace BacklashBot.Services
 
             marketData.LastOrderbookEventTimestamp = DateTime.UtcNow;
 
+            // Subscribe to market invalid event once per market
+            if (!_subscribedMarkets.Contains(marketTicker))
+            {
+                marketData.ChangeTracker.MarketInvalid += OnMarketInvalid;
+                _subscribedMarkets.Add(marketTicker);
+            }
+
             try
             {
                 var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
@@ -1100,6 +1116,11 @@ namespace BacklashBot.Services
         {
             _notificationQueue.Add(marketTicker, _statusTrackerService.GetCancellationToken());
             _logger.LogDebug("Enqueued notification for {MarketTicker}", marketTicker);
+        }
+
+        private void OnMarketInvalid(object sender, string marketTicker)
+        {
+            MarketInvalid?.Invoke(this, marketTicker);
         }
 
 

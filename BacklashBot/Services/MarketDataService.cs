@@ -61,6 +61,10 @@ namespace BacklashBot.Services
         public event EventHandler<string> TickerAdded;
         public event EventHandler<string> AccountBalanceUpdated;
         private readonly ConcurrentBag<TickerDTO> _preppedTickers = new ConcurrentBag<TickerDTO>();
+        private void OnMarketInvalid(object sender, string marketTicker)
+        {
+            _ = UnwatchMarket(marketTicker);
+        }
         private readonly ConcurrentDictionary<(DateTime, string), TickerDTO> _tickerDeduplication = new ConcurrentDictionary<(DateTime, string), TickerDTO>();
         private readonly AsyncRetryPolicy _retryPolicy;
         private readonly System.Timers.Timer _tickerUpdateTimer;
@@ -148,6 +152,8 @@ namespace BacklashBot.Services
                 _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += ProcessEventLifecycleEventAsync;
                 _serviceFactory.GetKalshiWebSocketClient().FillReceived += (sender, args) =>
                     Task.Run(() => ProcessFillEventAsync(args));
+
+                _serviceFactory.GetOrderBookService().MarketInvalid += OnMarketInvalid;
             }
             catch (Exception ex)
             {
