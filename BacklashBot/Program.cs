@@ -513,6 +513,10 @@ builder.Services.AddSignalR(options =>
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
 });
 
+// Disable MVC discovery by clearing application parts
+builder.Services.AddControllers().ConfigureApplicationPartManager(manager => manager.ApplicationParts.Clear());
+
+
 // Configure Kestrel for IIS (no specific URL binding)
 builder.WebHost.ConfigureKestrel(options => { });
 
@@ -554,9 +558,7 @@ app.Lifetime.ApplicationStopping.Register(() =>
 });
 
 // ## HTTP Pipeline Configuration
-app.UseRouting();
-app.UseAuthorization();
-
+// Configure endpoints for SignalR-only application
 app.MapHub<BacklashBotHub>("/chartHub");
 app.MapGet("/shutdown-services", async (ICentralBrain brain, ILogger<Program> logger) =>
 {
