@@ -1328,7 +1328,7 @@ namespace BacklashBot.Services
         {
             var errors = new List<string>();
 
-            if (price <= 0) errors.Add($"price <= 0 ({price})");
+            if (price < 0) errors.Add($"price < 0 ({price})");
             if (yesBid < 0) errors.Add($"yesBid < 0 ({yesBid})");
             if (yesAsk <= yesBid) errors.Add($"yesAsk <= yesBid ({yesAsk} <= {yesBid})");
             if (volume < 0) errors.Add($"volume < 0 ({volume})");
@@ -1401,6 +1401,21 @@ namespace BacklashBot.Services
                 var start = sortedCandles.First().Date;
                 var end = sortedCandles.Last().Date;
 
+                // Create lookup dictionary for O(1) access
+                Dictionary<DateTime, CandlestickData> candleLookup;
+                if (intervalType == 3)
+                {
+                    // For day interval, group by date (ignore time)
+                    candleLookup = sortedCandles
+                        .GroupBy(c => c.Date.Date)
+                        .ToDictionary(g => g.Key, g => g.First());
+                }
+                else
+                {
+                    // For minute/hour, exact datetime match
+                    candleLookup = sortedCandles.ToDictionary(c => c.Date);
+                }
+
                 List<DateTime> allTimes;
                 switch (intervalType)
                 {
@@ -1433,11 +1448,13 @@ namespace BacklashBot.Services
 
                     if (intervalType == 3)
                     {
-                        candle = sortedCandles.FirstOrDefault(c => c.Date.ToShortDateString() == time.ToShortDateString());
+                        // Use date-only lookup for day interval
+                        candleLookup.TryGetValue(time.Date, out candle);
                     }
                     else
                     {
-                        candle = sortedCandles.FirstOrDefault(c => c.Date == time);
+                        // Use exact datetime lookup for minute/hour
+                        candleLookup.TryGetValue(time, out candle);
                     }
 
                     if (candle != null)

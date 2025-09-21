@@ -592,11 +592,13 @@ namespace BacklashBot.Services
                 startDate = latestExistingDate.Value;
             }
 
-            _logger.LogDebug("Processing candlesticks for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCount={ExistingCount}",
+            _logger.LogInformation("Processing candlesticks for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCount={ExistingCount}",
                 marketTicker, interval, startDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), existingCandlesticks.Count);
 
             // Load from Parquet files
+            var parquetStopwatch = Stopwatch.StartNew();
             string basePath = Path.Combine(hardDataStorageLocation, "Candlesticks", marketTicker);
+            var filesToLoad = new List<string>();
             if (Directory.Exists(basePath))
             {
                 foreach (var yearDir in Directory.GetDirectories(basePath))
@@ -622,57 +624,87 @@ namespace BacklashBot.Services
                                 skippedFiles.Add(file);
                                 continue;
                             }
-                            var loadedCandles = await LoadFromParquetAsync(file);
-                            parquetCandlesticksLoaded += loadedCandles.Count;
-                            candlesticks.AddRange(loadedCandles);
-                            parquetFilesLoaded++;
+                            filesToLoad.Add(file);
                         }
                     }
-                    else // minute or hour
+                    else // minute or hour (both use weekly grouping)
                     {
                         foreach (var monthDir in Directory.GetDirectories(yearDir))
                         {
                             var month = int.Parse(Path.GetFileName(monthDir));
                             if (year == startDate.Year && month < startDate.Month)
                             {
-                                var monthFiles = Directory.GetFiles(monthDir, $"*{intervalSuffix}.parquet");
+                                var monthFiles = Directory.GetFiles(monthDir, $"*Week*{intervalSuffix}.parquet");
                                 parquetFilesSkipped += monthFiles.Length;
                                 skippedFiles.AddRange(monthFiles);
                                 continue;
                             }
-                            var intervalFiles = Directory.GetFiles(monthDir, $"*{intervalSuffix}.parquet");
-                            foreach (var file in intervalFiles)
+                            var weekFiles = Directory.GetFiles(monthDir, $"*Week*{intervalSuffix}.parquet");
+                            foreach (var file in weekFiles)
                             {
-                                if (interval == "minute")
+                                // Check if the week is before startDate
+                                var fileName = Path.GetFileNameWithoutExtension(file);
+                                var weekPart = fileName.Split('_')[0]; // WeekN
+                                var weekNumber = int.Parse(weekPart.Replace("Week", ""));
+                                var startOfWeek = new DateTime(year, month, (weekNumber - 1) * 7 + 1);
+                                if (year == startDate.Year && month == startDate.Month && startOfWeek < startDate.Date)
                                 {
-                                    var day = int.Parse(Path.GetFileNameWithoutExtension(file).Split('_')[0]);
-                                    if (year == startDate.Year && month == startDate.Month && day < startDate.Day)
-                                    {
-                                        parquetFilesSkipped++;
-                                        skippedFiles.Add(file);
-                                        continue;
-                                    }
+                                    parquetFilesSkipped++;
+                                    skippedFiles.Add(file);
+                                    continue;
                                 }
-                                var loadedCandles = await LoadFromParquetAsync(file);
-                                parquetCandlesticksLoaded += loadedCandles.Count;
-                                candlesticks.AddRange(loadedCandles);
-                                parquetFilesLoaded++;
+                                filesToLoad.Add(file);
                             }
                         }
                     }
                 }
             }
 
+            // Load files concurrently in batches
+            var loadTasks = new List<Task<List<CandlestickData>>>();
+            using var loadSemaphore = new SemaphoreSlim(_candlestickConfig.MaxParallelParquetTasks);
+            foreach (var file in filesToLoad)
+            {
+                loadTasks.Add(Task.Run(async () =>
+                {
+                    await loadSemaphore.WaitAsync(_statusTracker.GetCancellationToken());
+                    try
+                    {
+                        return await LoadFromParquetAsync(file);
+                    }
+                    finally
+                    {
+                        loadSemaphore.Release();
+                    }
+                }, _statusTracker.GetCancellationToken()));
+            }
+
+            var loadResults = await Task.WhenAll(loadTasks);
+            foreach (var result in loadResults)
+            {
+                candlesticks.AddRange(result);
+                parquetCandlesticksLoaded += result.Count;
+                parquetFilesLoaded++;
+            }
+
             // Filter and deduplicate Parquet candlesticks
             int preFilterCount = candlesticks.Count;
-            candlesticks = candlesticks
-                .Where(c => c.IntervalType == intervalType && c.Date >= startDate)
-                .GroupBy(c => c.Date) // Deduplicate by Date
-                .Select(g => g.First()) // Keep the first occurrence
-                .OrderBy(c => c.Date) // Preserve sort order
-                .ToList();
+            var dedupedParquet = new Dictionary<DateTime, CandlestickData>();
+            foreach (var c in candlesticks)
+            {
+                if (c.IntervalType == intervalType && c.Date >= startDate)
+                {
+                    if (!dedupedParquet.ContainsKey(c.Date))
+                    {
+                        dedupedParquet[c.Date] = c;
+                    }
+                }
+            }
+            candlesticks = dedupedParquet.Values.OrderBy(c => c.Date).ToList();
             _logger.LogDebug("Parquet processing for {MarketTicker} at {Interval}: FilesLoaded={FilesLoaded}, FilesSkipped={FilesSkipped}, CandlesticksLoaded={CandlesticksLoaded}, CandlesticksFiltered={CandlesticksFiltered}, CandlesticksAfterDeduplication={FinalCount}, SkippedFiles=[{SkippedFiles}]",
                 marketTicker, interval, parquetFilesLoaded, parquetFilesSkipped, parquetCandlesticksLoaded, preFilterCount - candlesticks.Count, candlesticks.Count, string.Join(";", skippedFiles));
+            parquetStopwatch.Stop();
+            LogPerformanceMetric("LoadParquetFiles", parquetStopwatch.ElapsedMilliseconds, $"Market: {marketTicker}, Interval: {interval}, Files: {parquetFilesLoaded}, Candlesticks: {candlesticks.Count}");
 
             // Load SQL candlesticks
             DateTime sqlStartTime = candlesticks.Any() ? candlesticks.Max(c => c.Date) : startDate;
@@ -691,15 +723,19 @@ namespace BacklashBot.Services
             var rawCandlesticks = await context.RetrieveCandlesticksAsync(
                 _statusTracker.GetCancellationToken(), intervalType, marketTicker, sqlStartTime);
 
-            _logger.LogDebug("Loaded {SqlCount} candlesticks from SQL for {MarketTicker} at {Interval} starting from {StartTime}",
+            _logger.LogInformation("Loaded {SqlCount} candlesticks from SQL for {MarketTicker} at {Interval} starting from {StartTime}",
                 rawCandlesticks.Count(), marketTicker, interval, sqlStartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
 
             // Deduplicate SQL candlesticks
-            rawCandlesticks = rawCandlesticks
-                .GroupBy(c => c.Date)
-                .Select(g => g.First())
-                .OrderBy(c => c.Date)
-                .ToList();
+            var dedupedSql = new Dictionary<DateTime, CandlestickData>();
+            foreach (var c in rawCandlesticks)
+            {
+                if (!dedupedSql.ContainsKey(c.Date))
+                {
+                    dedupedSql[c.Date] = c;
+                }
+            }
+            rawCandlesticks = dedupedSql.Values.OrderBy(c => c.Date).ToList();
 
             // Insert last candlestick of Parquet data as the starting point for forward fill
             int preForwardFillCount = rawCandlesticks.Count;
@@ -716,6 +752,8 @@ namespace BacklashBot.Services
             }
 
             // Forward fill new candlesticks
+            _logger.LogInformation("Forward filling {SqlCount} candlesticks for {MarketTicker} at {Interval}",
+                rawCandlesticks.Count(), marketTicker, interval);
             rawCandlesticks = _serviceFactory.GetMarketDataService().ForwardFillCandlesticks(rawCandlesticks, marketTicker);
             // Remove the extra candlestick if added
             if (candlestickAdded)
@@ -724,29 +762,38 @@ namespace BacklashBot.Services
             }
 
             // Deduplicate after forward fill
-            rawCandlesticks = rawCandlesticks
-                .GroupBy(c => c.Date)
-                .Select(g => g.First())
-                .OrderBy(c => c.Date)
-                .ToList();
+            var dedupedForwardFill = new Dictionary<DateTime, CandlestickData>();
+            foreach (var c in rawCandlesticks)
+            {
+                if (!dedupedForwardFill.ContainsKey(c.Date))
+                {
+                    dedupedForwardFill[c.Date] = c;
+                }
+            }
+            rawCandlesticks = dedupedForwardFill.Values.OrderBy(c => c.Date).ToList();
 
             int forwardFilledCount = rawCandlesticks.Count - preForwardFillCount;
             // Combine Parquet and forward-filled SQL candlesticks, deduplicating
-            var combinedCandlesticks = candlesticks
-                .Concat(rawCandlesticks)
-                .GroupBy(c => c.Date)
-                .Select(g => g.First())
-                .OrderBy(c => c.Date)
-                .ToList();
+            var combinedDeduped = new Dictionary<DateTime, CandlestickData>();
+            foreach (var c in candlesticks.Concat(rawCandlesticks))
+            {
+                if (!combinedDeduped.ContainsKey(c.Date))
+                {
+                    combinedDeduped[c.Date] = c;
+                }
+            }
+            var combinedCandlesticks = combinedDeduped.Values.OrderBy(c => c.Date).ToList();
 
             // Combine with existing candlesticks, ensuring no duplicates
-            var finalCandlesticks = existingCandlesticks
-                .Where(c => c.Date < startDate)
-                .Concat(combinedCandlesticks)
-                .GroupBy(c => c.Date)
-                .Select(g => g.First())
-                .OrderBy(c => c.Date)
-                .ToList();
+            var finalDeduped = new Dictionary<DateTime, CandlestickData>();
+            foreach (var c in existingCandlesticks.Where(c => c.Date < startDate).Concat(combinedCandlesticks))
+            {
+                if (!finalDeduped.ContainsKey(c.Date))
+                {
+                    finalDeduped[c.Date] = c;
+                }
+            }
+            var finalCandlesticks = finalDeduped.Values.OrderBy(c => c.Date).ToList();
 
             _logger.LogDebug("Processed candlesticks for {MarketTicker} at {Interval}: ForwardFilledAdded={ForwardFilledCount}, TotalAfterFill={TotalCount}",
                 marketTicker, interval, forwardFilledCount, finalCandlesticks.Count);
@@ -795,36 +842,22 @@ namespace BacklashBot.Services
             int intervalType = interval == "minute" ? 1 : interval == "hour" ? 2 : 3;
             string intervalSuffix = interval == "minute" ? "_Minute" : interval == "hour" ? "_Hour" : "_Day";
 
-            IEnumerable<IGrouping<string, CandlestickData>> groups;
-
             // Filter out future data and data that is not of the current interval type
             var relevantCandlesticks = candlesticks
                 .Where(c => c.Date.Date < DateTime.UtcNow.Date && c.IntervalType == intervalType)
                 .ToList();
 
-            if (interval == "day")
+            IEnumerable<IGrouping<string, CandlestickData>> groups = interval switch
             {
-                // Group by year and month for day interval
-                groups = relevantCandlesticks
-                    .GroupBy(c => $"{c.Date.Year}-{c.Date.Month:D2}");
-            }
-            else if (interval == "hour")
-            {
-                // Group by year, month, and 7-day chunks for hour interval
-                groups = relevantCandlesticks
-                    .GroupBy(c =>
-                    {
-                        var dayOfMonth = c.Date.Day;
-                        var weekNumber = (dayOfMonth - 1) / 7 + 1; // 1-based week number (1-5)
-                        return $"{c.Date.Year}-{c.Date.Month:D2}-Week{weekNumber}";
-                    });
-            }
-            else // minute
-            {
-                // Group by date for minute interval
-                groups = relevantCandlesticks
-                    .GroupBy(c => c.Date.Date.ToString("yyyy-MM-dd"));
-            }
+                "day" => relevantCandlesticks.GroupBy(c => $"{c.Date.Year}-{c.Date.Month:D2}"),
+                "hour" or "minute" => relevantCandlesticks.GroupBy(c =>
+                {
+                    var dayOfMonth = c.Date.Day;
+                    var weekNumber = (dayOfMonth - 1) / 7 + 1; // 1-based week number (1-5)
+                    return $"{c.Date.Year}-{c.Date.Month:D2}-Week{weekNumber}";
+                }),
+                _ => throw new ArgumentException($"Unsupported interval: {interval}")
+            };
 
             var saveTasks = groups.Select(async group =>
             {
@@ -846,9 +879,9 @@ namespace BacklashBot.Services
                         $"{parts[1]}{intervalSuffix}.parquet" // Month_Day.parquet
                     );
                 }
-                else if (interval == "hour")
+                else // hour or minute (both use weekly grouping)
                 {
-                    // Save in month folder: HardDataStorageLocation\MarketTicker\Year\Month\WeekN_Hour.parquet
+                    // Save in month folder: HardDataStorageLocation\MarketTicker\Year\Month\WeekN_Hour/Minute.parquet
                     var parts = key.Split('-');
                     filePath = Path.Combine(
                         hardDataStorageLocation,
@@ -856,20 +889,7 @@ namespace BacklashBot.Services
                         marketTicker,
                         parts[0], // Year
                         parts[1], // Month
-                        $"{parts[2]}{intervalSuffix}.parquet" // WeekN_Hour.parquet
-                    );
-                }
-                else // minute
-                {
-                    // Save in month folder: HardDataStorageLocation\MarketTicker\Year\Month\DD_Minute.parquet
-                    var date = DateTime.Parse(key);
-                    filePath = Path.Combine(
-                        hardDataStorageLocation,
-                        "candlesticks",
-                        marketTicker,
-                        date.Year.ToString(),
-                        date.Month.ToString("D2"),
-                        $"{date.Day:D2}{intervalSuffix}.parquet"
+                        $"{parts[2]}{intervalSuffix}.parquet" // WeekN_Hour/Minute.parquet
                     );
                 }
 

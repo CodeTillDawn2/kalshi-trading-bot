@@ -46,5 +46,13 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'CandlestickMandatoryOverlapDaysDay' is missing in the configuration.")]
         public int CandlestickMandatoryOverlapDaysDay { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of parallel tasks for loading Parquet files.
+        /// This controls concurrency when batch loading historical candlestick data to prevent I/O overload.
+        /// </summary>
+        /// <value>Default is 4 parallel tasks.</value>
+        [Required(ErrorMessage = "The 'MaxParallelParquetTasks' is missing in the configuration.")]
+        public int MaxParallelParquetTasks { get; set; }
     }
 }
