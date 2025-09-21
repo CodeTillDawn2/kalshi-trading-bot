@@ -331,6 +331,9 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
                 });
             });
 
+            // Add MVC controllers
+            services.AddControllers();
+
             // Add SignalR
             services.AddSignalR(options =>
             {
@@ -370,6 +373,7 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapHub<OverseerHub>("/chartHub");
 
                 // Add health check endpoint for overseer discovery
