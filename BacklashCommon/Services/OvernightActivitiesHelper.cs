@@ -427,26 +427,34 @@ namespace BacklashCommon.Services
             _logger.LogInformation("Database query returned {Count} markets requiring interest score updates in {Duration}ms",
                 overnightInterestScoresData.Count, dbStopwatch.ElapsedMilliseconds);
 
+            // Bulk fetch markets and snapshot counts
+            var markets = await Task.WhenAll(overnightInterestScoresData.Select(m => context.GetMarketByTicker(m.market_ticker)));
+            var marketsDict = overnightInterestScoresData.Zip(markets, (dto, m) => new { dto.market_ticker, m }).ToDictionary(x => x.market_ticker, x => x.m);
+            var snapshotCounts = await Task.WhenAll(overnightInterestScoresData.Select(m => context.GetSnapshotCount(m.market_ticker)));
+            var snapshotDict = overnightInterestScoresData.Zip(snapshotCounts, (dto, c) => new { dto.market_ticker, c }).ToDictionary(x => x.market_ticker, x => x.c);
+
             int processed = 0;
             int successful = 0;
             int failed = 0;
             var processingStopwatch = Stopwatch.StartNew();
 
-            foreach (MarketDTO market in overnightInterestScoresData)
+            foreach (MarketDTO marketDto in overnightInterestScoresData)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var marketStopwatch = Stopwatch.StartNew();
                 try
                 {
-                    double score = (await interestScoreHelper.CalculateMarketInterestScoreAsync(context, market.market_ticker)).score;
+                    var market = marketsDict[marketDto.market_ticker];
+                    long snapshotCount = snapshotDict[marketDto.market_ticker];
+                    double score = (await interestScoreHelper.CalculateMarketInterestScoreAsync(market, snapshotCount)).score;
                     marketStopwatch.Stop();
 
-                    MarketWatchDTO? marketWatch = await context.GetMarketWatch(market.market_ticker);
+                    MarketWatchDTO? marketWatch = await context.GetMarketWatch(marketDto.market_ticker);
 
                     if (marketWatch == null)
                     {
-                        marketWatch = new MarketWatchDTO() { market_ticker = market.market_ticker, InterestScore = score, InterestScoreDate = DateTime.Now };
+                        marketWatch = new MarketWatchDTO() { market_ticker = marketDto.market_ticker, InterestScore = score, InterestScoreDate = DateTime.Now };
                     }
                     else
                     {
@@ -463,7 +471,7 @@ namespace BacklashCommon.Services
                     if (marketStopwatch.ElapsedMilliseconds > 5000)
                     {
                         _logger.LogWarning("Slow interest score calculation for market {MarketTicker}: {Duration}ms",
-                            market.market_ticker, marketStopwatch.ElapsedMilliseconds);
+                            marketDto.market_ticker, marketStopwatch.ElapsedMilliseconds);
                     }
                 }
                 catch (Exception ex)
@@ -472,7 +480,7 @@ namespace BacklashCommon.Services
                     failed++;
                     _performanceMetrics.ErrorsEncountered++;
                     _logger.LogWarning(ex, "Failed to calculate interest score for market {MarketTicker} after {Duration}ms",
-                        market.market_ticker, marketStopwatch.ElapsedMilliseconds);
+                        marketDto.market_ticker, marketStopwatch.ElapsedMilliseconds);
                 }
 
                 // Progress logging every 50 markets

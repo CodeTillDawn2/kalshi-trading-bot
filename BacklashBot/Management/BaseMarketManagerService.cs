@@ -286,7 +286,9 @@ namespace BacklashBot.Management
                 {
                     if (mw.InterestScore == null)
                     {
-                        var score = await interestScoreHelper.CalculateMarketInterestScoreAsync(context, mw.market_ticker);
+                        var market = await context.GetMarketByTicker(mw.market_ticker);
+                        var snapshotCount = await context.GetSnapshotCount(mw.market_ticker);
+                        var score = await interestScoreHelper.CalculateMarketInterestScoreAsync(market, snapshotCount);
                         mw.InterestScore = score.score;
                         mw.InterestScoreDate = DateTime.Now;
                         await context.AddOrUpdateMarketWatch(mw);

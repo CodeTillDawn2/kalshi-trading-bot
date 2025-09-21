@@ -151,6 +151,71 @@ namespace BacklashBot.Services
                 _lastMetricsLog = DateTime.UtcNow;
             }
         }
+        /// <summary>
+        /// Computes percentile thresholds and max values for market metrics.
+        /// This method fetches all market liquidity states and calculates percentiles for volume, liquidity, and open interest,
+        /// as well as maximum values for bid sums and volume rates. Results are cached for performance.
+        /// </summary>
+        /// <param name="dbContext">Database context for accessing market data.</param>
+        private async Task ComputePercentileThresholdsAndMaxValuesAsync(IBacklashBotContext dbContext)
+        {
+            var markets = await dbContext.GetMarketLiquidityStates();
+            var volumeSorted = markets.Select(m => (double)m.volume_24h).OrderBy(v => v).ToList();
+            var liquiditySorted = markets.Select(m => Math.Abs((double)m.liquidity)).OrderBy(v => v).ToList();
+            var openInterestSorted = markets.Select(m => (double)m.open_interest).OrderBy(v => v).ToList();
+
+            percentileThresholdsCache["volume_24h"] = (
+                volumeSorted[(int)(volumeSorted.Count() * 0.90)],
+                volumeSorted[(int)(volumeSorted.Count() * 0.95)],
+                volumeSorted[(int)(volumeSorted.Count() * 0.99)],
+                volumeSorted[^1],
+                DateTime.UtcNow
+            );
+
+            percentileThresholdsCache["liquidity"] = (
+                liquiditySorted[(int)(liquiditySorted.Count() * 0.90)],
+                liquiditySorted[(int)(liquiditySorted.Count() * 0.95)],
+                liquiditySorted[(int)(liquiditySorted.Count() * 0.99)],
+                liquiditySorted[^1],
+                DateTime.UtcNow
+            );
+
+            percentileThresholdsCache["open_interest"] = (
+                openInterestSorted[(int)(openInterestSorted.Count() * 0.90)],
+                openInterestSorted[(int)(openInterestSorted.Count() * 0.95)],
+                openInterestSorted[(int)(openInterestSorted.Count() * 0.99)],
+                openInterestSorted[^1],
+                DateTime.UtcNow
+            );
+
+            maxMarketValuesCache = (
+                markets.Max(m => (double?)(m.yes_bid + m.no_bid)) ?? 0,
+                markets.Max(m => (double?)(m.volume_24h / 24.0)) ?? 0,
+                DateTime.UtcNow
+            );
+        }
+
+        /// <summary>
+        /// Ensures that percentile thresholds and max values are up to date.
+        /// Checks if recalculation is needed based on cache duration and updates cache if necessary.
+        /// </summary>
+        /// <param name="dbContext">Database context for accessing market data.</param>
+        private async Task EnsurePercentileThresholdsAndMaxValuesAsync(IBacklashBotContext dbContext)
+        {
+            bool needsRecalculation = !percentileThresholdsCache.Any() ||
+                percentileThresholdsCache.Values.Any(t => DateTime.UtcNow - t.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours)) ||
+                DateTime.UtcNow - maxMarketValuesCache.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours);
+            if (needsRecalculation)
+            {
+                RecordCacheMiss();
+                await ComputePercentileThresholdsAndMaxValuesAsync(dbContext);
+            }
+            else
+            {
+                RecordCacheHit();
+            }
+        }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InterestScoreService"/> class.
@@ -218,6 +283,12 @@ namespace BacklashBot.Services
                 var token = cts.Token;
                 _logger.LogDebug("API: Need to calculate market {0} interest scores... refetching from API", uniqueTickers);
                 await apiService.FetchMarketsAsync(tickers: uniqueTickers);
+                await EnsurePercentileThresholdsAndMaxValuesAsync(dbContext);
+                // Bulk fetch markets and snapshot counts
+                var markets = await Task.WhenAll(uniqueTickers.Select(t => dbContext.GetMarketByTicker(t)));
+                var marketsDict = uniqueTickers.Zip(markets, (t, m) => new { t, m }).ToDictionary(x => x.t, x => x.m);
+                var snapshotCounts = await Task.WhenAll(uniqueTickers.Select(t => dbContext.GetSnapshotCount(t)));
+                var snapshotDict = uniqueTickers.Zip(snapshotCounts, (t, c) => new { t, c }).ToDictionary(x => x.t, x => x.c);
 
                 foreach (var ticker in uniqueTickers)
                 {
@@ -225,9 +296,11 @@ namespace BacklashBot.Services
                     double score;
                     try
                     {
+                        var market = marketsDict[ticker];
+                        long snapshotCount = snapshotDict[ticker];
                         var (finalScore, _) = await CalculateMarketInterestScoreAsync(
-                            dbContext,
-                            ticker,
+                            market,
+                            snapshotCount,
                             spreadTightnessWeight,
                             spreadWidthWeight,
                             volumeWeight,
@@ -258,21 +331,21 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
-        /// Calculates a comprehensive interest score for a specific market ticker.
+        /// Calculates a comprehensive interest score for a specific market.
         /// The score is computed using multiple weighted factors including spread characteristics,
         /// trading volume, liquidity, open interest, and market continuity. Thresholds and
         /// maximum values are cached for performance and recalculated periodically based on
         /// configurable cache duration settings.
         ///
         /// Features:
-        /// - Input validation for ticker and weight parameters
+        /// - Input validation for weight parameters
         /// - Configurable cache duration for performance optimization
         /// - Performance metrics collection for operation timing
         /// - Cache hit/miss tracking for monitoring efficiency
         /// - Comprehensive error handling with detailed logging
         /// </summary>
-        /// <param name="dbContext">Database context for accessing market data.</param>
-        /// <param name="marketTicker">The market ticker symbol to score. Must not be null or empty.</param>
+        /// <param name="market">The market data object to score. Must not be null.</param>
+        /// <param name="snapshotCount">The number of snapshots for the market.</param>
         /// <param name="spreadTightnessWeight">Weight for spread tightness factor (0.0-1.0). Must be within valid range.</param>
         /// <param name="spreadWidthWeight">Weight for spread width factor (0.0-1.0). Must be within valid range.</param>
         /// <param name="volumeWeight">Weight for volume factor (0.0-1.0). Must be within valid range.</param>
@@ -281,12 +354,12 @@ namespace BacklashBot.Services
         /// <param name="openInterestPercentileWeight">Weight for open interest percentile factor (0.0-1.0). Must be within valid range.</param>
         /// <param name="continuityWeight">Weight for market continuity factor (0.0-1.0). Must be within valid range.</param>
         /// <returns>A tuple containing the final score and detailed score components.</returns>
-        /// <exception cref="ArgumentException">Thrown when ticker is invalid or weights are outside the 0.0-1.0 range.</exception>
+        /// <exception cref="ArgumentException">Thrown when weights are outside the 0.0-1.0 range.</exception>
         public async Task<(double score,
     (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
 CalculateMarketInterestScoreAsync(
-    IBacklashBotContext dbContext,
-    string marketTicker,
+    dynamic market,
+    long snapshotCount,
     double spreadTightnessWeight = 0.2,
     double spreadWidthWeight = 0.15,
     double volumeWeight = 0.20,
@@ -299,11 +372,6 @@ CalculateMarketInterestScoreAsync(
             try
             {
                 // Input validation
-                if (string.IsNullOrWhiteSpace(marketTicker))
-                {
-                    throw new ArgumentException("Market ticker cannot be null or empty.", nameof(marketTicker));
-                }
-
                 ValidateWeights(new Dictionary<string, double>
                 {
                     ["spreadTightnessWeight"] = spreadTightnessWeight,
@@ -315,77 +383,17 @@ CalculateMarketInterestScoreAsync(
                     ["continuityWeight"] = continuityWeight
                 });
 
-                // Threshold and max values calculation
-                async Task ComputePercentileThresholdsAndMaxValuesAsync()
-                {
-                    var markets = await dbContext.GetMarketLiquidityStates();
-
-                    var volumeSorted = markets.Select(m => (double)m.volume_24h).OrderBy(v => v).ToList();
-                    var liquiditySorted = markets.Select(m => Math.Abs((double)m.liquidity)).OrderBy(v => v).ToList();
-                    var openInterestSorted = markets.Select(m => (double)m.open_interest).OrderBy(v => v).ToList();
-
-                    percentileThresholdsCache["volume_24h"] = (
-                        volumeSorted[(int)(volumeSorted.Count() * 0.90)],
-                        volumeSorted[(int)(volumeSorted.Count() * 0.95)],
-                        volumeSorted[(int)(volumeSorted.Count() * 0.99)],
-                        volumeSorted[^1],
-                        DateTime.UtcNow
-                    );
-
-                    percentileThresholdsCache["liquidity"] = (
-                        liquiditySorted[(int)(liquiditySorted.Count() * 0.90)],
-                        liquiditySorted[(int)(liquiditySorted.Count() * 0.95)],
-                        liquiditySorted[(int)(liquiditySorted.Count() * 0.99)],
-                        liquiditySorted[^1],
-                        DateTime.UtcNow
-                    );
-
-                    percentileThresholdsCache["open_interest"] = (
-                        openInterestSorted[(int)(openInterestSorted.Count() * 0.90)],
-                        openInterestSorted[(int)(openInterestSorted.Count() * 0.95)],
-                        openInterestSorted[(int)(openInterestSorted.Count() * 0.99)],
-                        openInterestSorted[^1],
-                        DateTime.UtcNow
-                    );
-
-                    maxMarketValuesCache = (
-                        markets.Max(m => (double?)(m.yes_bid + m.no_bid)) ?? 0,
-                        markets.Max(m => (double?)(m.volume_24h / 24.0)) ?? 0,
-                        DateTime.UtcNow
-                    );
-                }
-
-                // Check if thresholds and max values need recalculation
-                bool needsRecalculation = !percentileThresholdsCache.Any() ||
-                    percentileThresholdsCache.Values.Any(t => DateTime.UtcNow - t.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours)) ||
-                    DateTime.UtcNow - maxMarketValuesCache.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours);
-
-                if (needsRecalculation)
-                {
-                    RecordCacheMiss();
-                    await ComputePercentileThresholdsAndMaxValuesAsync();
-                }
-                else
-                {
-                    RecordCacheHit();
-                }
-
-                // Get market data
-                var market = await dbContext.GetMarketByTicker(marketTicker);
-
-                // Get snapshot count for continuity score
-                long snapshotCount = await dbContext.GetSnapshotCount(marketTicker);
 
                 if (market == null)
                 {
-                    _logger.LogWarning("No market data found for {MarketTicker}.", marketTicker);
+                    _logger.LogWarning("No market data found.");
                     return (0.0, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                 }
 
                 // Calculate score
                 if (KalshiConstants.IsMarketStatusEnded(market.status) || market.yes_bid == 0 || market.no_bid == 0)
                 {
-                    _logger.LogDebug("MarketInterestScore 0.0 for {MarketTicker} due to market being ended.", marketTicker);
+                    _logger.LogDebug("MarketInterestScore 0.0 for market due to market being ended.");
                     return (0.0, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                 }
 
@@ -436,14 +444,14 @@ CalculateMarketInterestScoreAsync(
                     continuity: continuityScore * 10.0
                 );
 
-                _logger.LogInformation("Calculated interest score {Score} for market {MarketTicker}.", finalScore, marketTicker);
+                _logger.LogInformation("Calculated interest score {Score} for market.", finalScore);
                 RecordScoringOperationTime(DateTime.UtcNow - startTime);
                 return (finalScore, scoreParts);
             }
             catch (Exception ex)
             {
                 RecordScoringOperationTime(DateTime.UtcNow - startTime);
-                _logger.LogError(ex, "Failed to calculate MarketInterestScore for {MarketTicker}.", marketTicker);
+                _logger.LogError(ex, "Failed to calculate MarketInterestScore for market.");
                 throw;
             }
         }

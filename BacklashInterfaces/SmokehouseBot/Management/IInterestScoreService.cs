@@ -23,14 +23,14 @@ namespace BacklashBot.Management.Interfaces
         Task<(double score,
             (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
         CalculateMarketInterestScoreAsync(
-            IBacklashBotContext dbContext,
-            string marketTicker,
+            dynamic market,
+            long snapshotCount,
             double spreadTightnessWeight = 0.2,
             double spreadWidthWeight = 0.15,
-            double volumeWeight = 0.28,
-            double volumePercentileWeight = 0.125,
-            double liquidityPercentileWeight = 0.05,
-            double openInterestPercentileWeight = 0.05,
+            double volumeWeight = 0.20,
+            double volumePercentileWeight = 0.1,
+            double liquidityPercentileWeight = 0.09,
+            double openInterestPercentileWeight = 0.065,
             double continuityWeight = 0.145);
     }
 }
