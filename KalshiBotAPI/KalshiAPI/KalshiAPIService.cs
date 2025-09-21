@@ -696,6 +696,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// Fetches detailed information about a specific event from the Kalshi API.
         /// Optionally includes nested market data if requested. Processes the event data into DTOs
         /// and persists both event and market information to the database.
+        /// Implements retry with exponential backoff for 404 errors.
         /// </summary>
         /// <param name="eventTicker">The ticker symbol of the event to retrieve.</param>
         /// <param name="withNestedMarkets">If true, includes detailed market data nested within the event response.</param>
@@ -725,13 +726,48 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
-                response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
-                var eventResponse = JsonSerializer.Deserialize<EventResponse>(
-                    jsonString,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
+                const int maxRetries = 5;
+                int retryCount = 0;
+                int delayMs = 1000; // Start with 1 second
+                EventResponse? eventResponse = null;
+
+                while (true)
+                {
+                    try
+                    {
+                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            retryCount++;
+                            if (retryCount >= maxRetries)
+                            {
+                                _logger.LogWarning("FetchEventAsync failed after {RetryCount} retries for ticker: {EventTicker} - 404 Not Found", maxRetries, eventTicker);
+                                return null;
+                            }
+
+                            _logger.LogInformation("FetchEventAsync retry {RetryCount}/{MaxRetries} for ticker: {EventTicker} - 404 Not Found, waiting {DelayMs}ms", retryCount, maxRetries, eventTicker, delayMs);
+                            await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
+                            delayMs *= 2; // Exponential backoff
+                            continue;
+                        }
+
+                        response.EnsureSuccessStatusCode();
+                        var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                        eventResponse = JsonSerializer.Deserialize<EventResponse>(
+                            jsonString,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+                        break; // Exit the retry loop on success
+                    }
+                    catch (Exception ex)
+                    {
+                        // For non-404 exceptions, don't retry
+                        _logger.LogWarning("Unexpected error in FetchEventAsync for ticker: {EventTicker}: {ExceptionType} - {Message}, Url: {0} Inner {1}"
+                            , eventTicker, ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
+                        return null;
+                    }
+                }
 
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
