@@ -1,10 +1,9 @@
-using KalshiBotAPI.WebSockets.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs.KalshiAPI;
-using BacklashOverseer;
+using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BacklashOverseer
 {
@@ -177,7 +176,7 @@ namespace BacklashOverseer
                                 _logger.LogInformation("Exchange is active, connecting WebSocket");
                                 var client = _webSocketClient;
                                 await client.ConnectAsync();
-    
+
                                 // Check if connection was actually successful
                                 if (client.IsConnected())
                                 {

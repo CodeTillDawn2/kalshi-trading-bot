@@ -1,5 +1,4 @@
 using BacklashDTOs;
-using System.Diagnostics;
 using static BacklashPatterns.PatternUtils;
 using static BacklashPatterns.TrendCalcs;
 
@@ -99,36 +98,36 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double TrendMomentumWeight { get; set; } = 0.0;
 
-/// <summary>Gets or sets the BaseName.</summary>
-/// <summary>Gets or sets the BaseName.</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>Gets or sets the BaseName.</summary>
+        /// <summary>Gets or sets the BaseName.</summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public const string BaseName = "BeltHold";
 
         /// <summary>

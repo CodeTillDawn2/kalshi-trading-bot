@@ -35,12 +35,12 @@ public class DragonflyDojiPattern : PatternDefinition
     /// <summary>
     /// Minimum ratio of lower wick length to body size to emphasize the Dragonfly shape.
     /// Strictest: 3.0 (very long wick relative to body), Loosest: 1.0 (minimal wick dominance).
-/// <summary>
-/// <summary>
-/// Gets the name of the pattern.
-/// </summary>
-/// Gets the base name of the pattern.
-/// </summary>
+    /// <summary>
+    /// <summary>
+    /// Gets the name of the pattern.
+    /// </summary>
+    /// Gets the base name of the pattern.
+    /// </summary>
     /// </summary>
     public static double WickBodyRatio { get; set; } = 2.0;
 

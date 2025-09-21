@@ -245,7 +245,7 @@ namespace BacklashInterfaces.Enums
             /// Outcome is unclear or highly uncertain
             /// </summary>
             High,
-/// <summary>Gets or sets the Conditions_MarketCategory.</summary>
+            /// <summary>Gets or sets the Conditions_MarketCategory.</summary>
             /// <summary>
             /// Outcome is relatively clear or certain
             /// </summary>

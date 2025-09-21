@@ -41,36 +41,36 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double OptionalTrendDirectionRatioMin { get; set; } = 0.6;
 
-/// <summary>Gets or sets the BaseName.</summary>
-/// <summary>Gets or sets the BaseName.</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>Gets or sets the BaseName.</summary>
+        /// <summary>Gets or sets the BaseName.</summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public const string BaseName = "ClosingMarubozu";
         /// <summary>
         /// Gets the description of the pattern.
@@ -78,11 +78,11 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish pattern with a single candle that opens at its low and closes at its high, showing strong buying momentum. Can indicate continuation or reversal depending on trend context."
             : "A bearish pattern with a single candle that opens at its high and closes at its low, showing strong selling momentum. Can indicate continuation or reversal depending on trend context.";
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         public override string Name => $"{BaseName}_{Direction.ToString()}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         public override PatternDirection Direction { get; }
         private readonly bool? IsContinuation; // Nullable to allow unclassified cases
         public override double Strength { get; protected set; }

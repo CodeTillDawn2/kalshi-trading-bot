@@ -1,3 +1,9 @@
+using BacklashBot.Configuration;
+using BacklashBot.Helpers;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 /// <summary>
 /// Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
 /// from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
@@ -38,16 +44,8 @@
 /// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
 /// </summary>
 using Microsoft.Extensions.Options;
-using BacklashBot.Helpers;
-using BacklashBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.State.Interfaces;
-using BacklashDTOs;
-using BacklashDTOs.Data;
 using System.Collections.Concurrent;
 using TradingStrategies.Helpers.Interfaces;
-using BacklashDTOs.Configuration;
-using BacklashBot.Configuration;
 
 namespace BacklashBot.State
 {
@@ -752,97 +750,97 @@ namespace BacklashBot.State
             await Task.Run(() =>
             {
                 _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _marketDataConfig.Calculations.RSI_Short_Periods);
-            if (_rsi_Short != null) _rsi_Short = Math.Round((double)_rsi_Short, 2);
-            _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _marketDataConfig.Calculations.RSI_Medium_Periods);
-            if (_rsi_Medium != null) _rsi_Medium = Math.Round((double)_rsi_Medium, 2);
-            _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _marketDataConfig.Calculations.RSI_Long_Periods);
-            if (_rsi_Long != null) _rsi_Long = Math.Round((double)_rsi_Long, 2);
+                if (_rsi_Short != null) _rsi_Short = Math.Round((double)_rsi_Short, 2);
+                _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _marketDataConfig.Calculations.RSI_Medium_Periods);
+                if (_rsi_Medium != null) _rsi_Medium = Math.Round((double)_rsi_Medium, 2);
+                _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _marketDataConfig.Calculations.RSI_Long_Periods);
+                if (_rsi_Long != null) _rsi_Long = Math.Round((double)_rsi_Long, 2);
 
-            _macd_Medium = _tradingCalculator.CalculateMACD(hourCopy,
-                _marketDataConfig.Calculations.MACD_Medium_FastPeriod,
-                _marketDataConfig.Calculations.MACD_Medium_SlowPeriod,
-                _marketDataConfig.Calculations.MACD_Medium_SignalPeriod);
+                _macd_Medium = _tradingCalculator.CalculateMACD(hourCopy,
+                    _marketDataConfig.Calculations.MACD_Medium_FastPeriod,
+                    _marketDataConfig.Calculations.MACD_Medium_SlowPeriod,
+                    _marketDataConfig.Calculations.MACD_Medium_SignalPeriod);
 
-            if (_macd_Medium.MACD != null) _macd_Medium.MACD = Math.Round((double)_macd_Medium.MACD, 2);
-            if (_macd_Medium.Signal != null) _macd_Medium.Signal = Math.Round((double)_macd_Medium.Signal, 2);
-            if (_macd_Medium.Histogram != null) _macd_Medium.Histogram = Math.Round((double)_macd_Medium.Histogram, 2);
+                if (_macd_Medium.MACD != null) _macd_Medium.MACD = Math.Round((double)_macd_Medium.MACD, 2);
+                if (_macd_Medium.Signal != null) _macd_Medium.Signal = Math.Round((double)_macd_Medium.Signal, 2);
+                if (_macd_Medium.Histogram != null) _macd_Medium.Histogram = Math.Round((double)_macd_Medium.Histogram, 2);
 
-            _macd_Long = _tradingCalculator.CalculateMACD(dayCopy,
-                _marketDataConfig.Calculations.MACD_Long_FastPeriod,
-                _marketDataConfig.Calculations.MACD_Long_SlowPeriod,
-                _marketDataConfig.Calculations.MACD_Long_SignalPeriod);
+                _macd_Long = _tradingCalculator.CalculateMACD(dayCopy,
+                    _marketDataConfig.Calculations.MACD_Long_FastPeriod,
+                    _marketDataConfig.Calculations.MACD_Long_SlowPeriod,
+                    _marketDataConfig.Calculations.MACD_Long_SignalPeriod);
 
-            if (_macd_Long.MACD != null) _macd_Long.MACD = Math.Round((double)_macd_Long.MACD, 2);
-            if (_macd_Long.Signal != null) _macd_Long.Signal = Math.Round((double)_macd_Long.Signal, 2);
-            if (_macd_Long.Histogram != null) _macd_Long.Histogram = Math.Round((double)_macd_Long.Histogram, 2);
-
-
-            _ema_Medium = TradingCalculations.CalculateEMA(hourCopy.Select(c => c.MidClose).ToList(),
-            _marketDataConfig.Calculations.EMA_Medium_Periods);
-            if (_ema_Medium != null) _ema_Medium = Math.Round((double)_ema_Medium, 2);
+                if (_macd_Long.MACD != null) _macd_Long.MACD = Math.Round((double)_macd_Long.MACD, 2);
+                if (_macd_Long.Signal != null) _macd_Long.Signal = Math.Round((double)_macd_Long.Signal, 2);
+                if (_macd_Long.Histogram != null) _macd_Long.Histogram = Math.Round((double)_macd_Long.Histogram, 2);
 
 
-            _ema_Long = TradingCalculations.CalculateEMA(dayCopy.Select(c => c.MidClose).ToList(),
-                _marketDataConfig.Calculations.EMA_Long_Periods);
-            if (_ema_Long != null) _ema_Long = Math.Round((double)_ema_Long, 2);
+                _ema_Medium = TradingCalculations.CalculateEMA(hourCopy.Select(c => c.MidClose).ToList(),
+                _marketDataConfig.Calculations.EMA_Medium_Periods);
+                if (_ema_Medium != null) _ema_Medium = Math.Round((double)_ema_Medium, 2);
 
-            _bollingerbands_Medium = _tradingCalculator.CalculateBollingerBands(hourCopy,
-                _marketDataConfig.Calculations.BollingerBands_Medium_Periods,
-                _marketDataConfig.Calculations.BollingerBands_Medium_StdDev);
 
-            if (_bollingerbands_Medium.lower != null) _bollingerbands_Medium.lower = Math.Round((double)_bollingerbands_Medium.lower, 2);
-            if (_bollingerbands_Medium.middle != null) _bollingerbands_Medium.middle = Math.Round((double)_bollingerbands_Medium.middle, 2);
-            if (_bollingerbands_Medium.upper != null) _bollingerbands_Medium.upper = Math.Round((double)_bollingerbands_Medium.upper, 2);
+                _ema_Long = TradingCalculations.CalculateEMA(dayCopy.Select(c => c.MidClose).ToList(),
+                    _marketDataConfig.Calculations.EMA_Long_Periods);
+                if (_ema_Long != null) _ema_Long = Math.Round((double)_ema_Long, 2);
 
-            _bollingerbands_Long = _tradingCalculator.CalculateBollingerBands(dayCopy,
-                _marketDataConfig.Calculations.BollingerBands_Long_Periods,
-                _marketDataConfig.Calculations.BollingerBands_Long_StdDev);
-            if (_bollingerbands_Long.lower != null) _bollingerbands_Long.lower = Math.Round((double)_bollingerbands_Long.lower, 2);
-            if (_bollingerbands_Long.middle != null) _bollingerbands_Long.middle = Math.Round((double)_bollingerbands_Long.middle, 2);
-            if (_bollingerbands_Long.upper != null) _bollingerbands_Long.upper = Math.Round((double)_bollingerbands_Long.upper, 2);
+                _bollingerbands_Medium = _tradingCalculator.CalculateBollingerBands(hourCopy,
+                    _marketDataConfig.Calculations.BollingerBands_Medium_Periods,
+                    _marketDataConfig.Calculations.BollingerBands_Medium_StdDev);
 
-            _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _marketDataConfig.Calculations.ATR_Medium_Periods);
-            if (_atr_Medium != null) _atr_Medium = Math.Round((double)_atr_Medium, 2);
-            _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _marketDataConfig.Calculations.ATR_Long_Periods);
-            if (_atr_Long != null) _atr_Long = Math.Round((double)_atr_Long, 2);
-            _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _marketDataConfig.Calculations.VWAP_Short_Periods);
-            if (_vwap_Short != null) _vwap_Short = Math.Round((double)_vwap_Short, 2);
-            _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _marketDataConfig.Calculations.VWAP_Medium_Periods);
-            if (_vwap_Medium != null) _vwap_Medium = Math.Round((double)_vwap_Medium, 2);
-            _stochasticoscilator_Short = _tradingCalculator.CalculateStochastic(minuteCopy,
-                _marketDataConfig.Calculations.Stochastic_Short_Periods,
-                _marketDataConfig.Calculations.Stochastic_Short_DPeriods);
-            if (_stochasticoscilator_Short.K != null) _stochasticoscilator_Short.K = Math.Round((double)_stochasticoscilator_Short.K, 2);
-            if (_stochasticoscilator_Short.D != null) _stochasticoscilator_Short.D = Math.Round((double)_stochasticoscilator_Short.D, 2);
-            _stochasticoscilator_Medium = _tradingCalculator.CalculateStochastic(hourCopy,
-                _marketDataConfig.Calculations.Stochastic_Medium_Periods,
-                _marketDataConfig.Calculations.Stochastic_Medium_DPeriods);
-            if (_stochasticoscilator_Medium.K != null) _stochasticoscilator_Medium.K = Math.Round((double)_stochasticoscilator_Medium.K, 2);
-            if (_stochasticoscilator_Medium.D != null) _stochasticoscilator_Medium.D = Math.Round((double)_stochasticoscilator_Medium.D, 2);
-            _stochasticoscilator_Long = _tradingCalculator.CalculateStochastic(dayCopy,
-                _marketDataConfig.Calculations.Stochastic_Long_Periods,
-                _marketDataConfig.Calculations.Stochastic_Long_DPeriods);
-            if (_stochasticoscilator_Long.K != null) _stochasticoscilator_Long.K = Math.Round((double)_stochasticoscilator_Long.K, 2);
-            if (_stochasticoscilator_Long.D != null) _stochasticoscilator_Long.D = Math.Round((double)_stochasticoscilator_Long.D, 2);
-            _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
+                if (_bollingerbands_Medium.lower != null) _bollingerbands_Medium.lower = Math.Round((double)_bollingerbands_Medium.lower, 2);
+                if (_bollingerbands_Medium.middle != null) _bollingerbands_Medium.middle = Math.Round((double)_bollingerbands_Medium.middle, 2);
+                if (_bollingerbands_Medium.upper != null) _bollingerbands_Medium.upper = Math.Round((double)_bollingerbands_Medium.upper, 2);
 
-            _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
+                _bollingerbands_Long = _tradingCalculator.CalculateBollingerBands(dayCopy,
+                    _marketDataConfig.Calculations.BollingerBands_Long_Periods,
+                    _marketDataConfig.Calculations.BollingerBands_Long_StdDev);
+                if (_bollingerbands_Long.lower != null) _bollingerbands_Long.lower = Math.Round((double)_bollingerbands_Long.lower, 2);
+                if (_bollingerbands_Long.middle != null) _bollingerbands_Long.middle = Math.Round((double)_bollingerbands_Long.middle, 2);
+                if (_bollingerbands_Long.upper != null) _bollingerbands_Long.upper = Math.Round((double)_bollingerbands_Long.upper, 2);
 
-            var adxResult = _tradingCalculator.CalculateADX(minuteCopy);
-            ADX = adxResult.ADX;
-            PlusDI = adxResult.PlusDI;
-            MinusDI = adxResult.MinusDI;
+                _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _marketDataConfig.Calculations.ATR_Medium_Periods);
+                if (_atr_Medium != null) _atr_Medium = Math.Round((double)_atr_Medium, 2);
+                _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _marketDataConfig.Calculations.ATR_Long_Periods);
+                if (_atr_Long != null) _atr_Long = Math.Round((double)_atr_Long, 2);
+                _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _marketDataConfig.Calculations.VWAP_Short_Periods);
+                if (_vwap_Short != null) _vwap_Short = Math.Round((double)_vwap_Short, 2);
+                _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _marketDataConfig.Calculations.VWAP_Medium_Periods);
+                if (_vwap_Medium != null) _vwap_Medium = Math.Round((double)_vwap_Medium, 2);
+                _stochasticoscilator_Short = _tradingCalculator.CalculateStochastic(minuteCopy,
+                    _marketDataConfig.Calculations.Stochastic_Short_Periods,
+                    _marketDataConfig.Calculations.Stochastic_Short_DPeriods);
+                if (_stochasticoscilator_Short.K != null) _stochasticoscilator_Short.K = Math.Round((double)_stochasticoscilator_Short.K, 2);
+                if (_stochasticoscilator_Short.D != null) _stochasticoscilator_Short.D = Math.Round((double)_stochasticoscilator_Short.D, 2);
+                _stochasticoscilator_Medium = _tradingCalculator.CalculateStochastic(hourCopy,
+                    _marketDataConfig.Calculations.Stochastic_Medium_Periods,
+                    _marketDataConfig.Calculations.Stochastic_Medium_DPeriods);
+                if (_stochasticoscilator_Medium.K != null) _stochasticoscilator_Medium.K = Math.Round((double)_stochasticoscilator_Medium.K, 2);
+                if (_stochasticoscilator_Medium.D != null) _stochasticoscilator_Medium.D = Math.Round((double)_stochasticoscilator_Medium.D, 2);
+                _stochasticoscilator_Long = _tradingCalculator.CalculateStochastic(dayCopy,
+                    _marketDataConfig.Calculations.Stochastic_Long_Periods,
+                    _marketDataConfig.Calculations.Stochastic_Long_DPeriods);
+                if (_stochasticoscilator_Long.K != null) _stochasticoscilator_Long.K = Math.Round((double)_stochasticoscilator_Long.K, 2);
+                if (_stochasticoscilator_Long.D != null) _stochasticoscilator_Long.D = Math.Round((double)_stochasticoscilator_Long.D, 2);
+                _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
 
-            if (ADX != null) ADX = Math.Round((double)ADX, 2);
-            if (PlusDI != null) PlusDI = Math.Round((double)PlusDI, 2);
-            if (MinusDI != null) MinusDI = Math.Round((double)MinusDI, 2);
+                _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
 
-            CalculateSlope();
+                var adxResult = _tradingCalculator.CalculateADX(minuteCopy);
+                ADX = adxResult.ADX;
+                PlusDI = adxResult.PlusDI;
+                MinusDI = adxResult.MinusDI;
 
-            RecentCandlesticks = minuteCopy.TakeLast(_marketDataConfig.Calculations.RecentCandlesticksCount).ToList();
-            var psarValue = _tradingCalculator.CalculatePSAR(minuteCopy);
-            PSAR = psarValue.HasValue ? Math.Round((double)psarValue.Value, 2) : null;
-            _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
+                if (ADX != null) ADX = Math.Round((double)ADX, 2);
+                if (PlusDI != null) PlusDI = Math.Round((double)PlusDI, 2);
+                if (MinusDI != null) MinusDI = Math.Round((double)MinusDI, 2);
+
+                CalculateSlope();
+
+                RecentCandlesticks = minuteCopy.TakeLast(_marketDataConfig.Calculations.RecentCandlesticksCount).ToList();
+                var psarValue = _tradingCalculator.CalculatePSAR(minuteCopy);
+                PSAR = psarValue.HasValue ? Math.Round((double)psarValue.Value, 2) : null;
+                _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
             });
         }
 

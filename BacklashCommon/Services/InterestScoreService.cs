@@ -1,11 +1,14 @@
-using BacklashBotData.Data.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Management.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Services.Interfaces;
+using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
-using BacklashDTOs.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace BacklashBot.Services
+namespace BacklashCommon.Services
 {
     /// <summary>
     /// Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.
@@ -284,11 +287,14 @@ namespace BacklashBot.Services
                 _logger.LogDebug("API: Need to calculate market {0} interest scores... refetching from API", uniqueTickers);
                 await apiService.FetchMarketsAsync(tickers: uniqueTickers);
                 await EnsurePercentileThresholdsAndMaxValuesAsync(dbContext);
-                // Bulk fetch markets and snapshot counts
-                var markets = await Task.WhenAll(uniqueTickers.Select(t => dbContext.GetMarketByTicker(t)));
-                var marketsDict = uniqueTickers.Zip(markets, (t, m) => new { t, m }).ToDictionary(x => x.t, x => x.m);
-                var snapshotCounts = await Task.WhenAll(uniqueTickers.Select(t => dbContext.GetSnapshotCount(t)));
-                var snapshotDict = uniqueTickers.Zip(snapshotCounts, (t, c) => new { t, c }).ToDictionary(x => x.t, x => x.c);
+                // Fetch markets and snapshot counts sequentially to avoid DbContext concurrency issues
+                var marketsDict = new Dictionary<string, MarketDTO?>();
+                var snapshotDict = new Dictionary<string, long>();
+                foreach (var ticker in uniqueTickers)
+                {
+                    marketsDict[ticker] = await dbContext.GetMarketByTicker(ticker);
+                    snapshotDict[ticker] = await dbContext.GetSnapshotCount(ticker);
+                }
 
                 foreach (var ticker in uniqueTickers)
                 {

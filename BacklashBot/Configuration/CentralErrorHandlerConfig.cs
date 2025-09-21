@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace BacklashDTOs.Configuration
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration settings for the CentralErrorHandler component that manages error processing,
@@ -13,7 +12,7 @@ namespace BacklashDTOs.Configuration
     /// - Threshold for triggering catastrophic failure detection
     /// - Parameters for internet connectivity check retry logic
     /// </remarks>
-    public class ErrorHandlerConfig
+    public class CentralErrorHandlerConfig
     {
         /// <summary>
         /// The configuration section name for ErrorHandlerConfig.

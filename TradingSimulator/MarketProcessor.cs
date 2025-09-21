@@ -1,20 +1,13 @@
+using BacklashCommon.Helpers;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using TradingStrategies;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using TradingStrategies.Trading.Overseer;
-using TradingStrategies.Trading.Helpers;
-using System.Text.Json;
-using static BacklashInterfaces.Enums.StrategyEnums;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using TradingSimulator.Simulator;
 using Microsoft.Extensions.DependencyInjection;
-using TradingStrategies.Strategies;
-using System.Threading;
-using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
-using BacklashInterfaces.PerformanceMetrics;
-using BacklashCommon.Helpers;
+using System.Text.Json;
+using TradingSimulator.Simulator;
+using TradingStrategies.Strategies;
+using TradingStrategies.Trading.Overseer;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingSimulator
 {

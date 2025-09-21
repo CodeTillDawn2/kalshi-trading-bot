@@ -3,83 +3,83 @@ using System.Collections.Concurrent;
 
 namespace KalshiBotAPI.WebSockets.Interfaces
 {
-/// <summary>ISubscriptionManager</summary>
-/// <summary>ISubscriptionManager</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+    /// <summary>ISubscriptionManager</summary>
+    /// <summary>ISubscriptionManager</summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
     public interface ISubscriptionManager
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
     {
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         Task StartAsync();
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         Task SubscribeToChannelAsync(string action, string[] marketTickers);
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         Task SubscribeToWatchedMarketsAsync();
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction);
         Task UnsubscribeFromChannelAsync(string action);
         Task UnsubscribeFromAllAsync();
@@ -89,8 +89,8 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         bool IsSubscribed(string marketTicker, string action);
         bool CanSubscribeToMarket(string marketTicker, string channel);
         void SetSubscriptionState(string marketTicker, string channel, SubscriptionState state);
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         void ClearOrderBookQueue(string marketTicker);
         Task WaitForEmptyOrderBookQueueAsync(string marketTicker, TimeSpan timeout);
         HashSet<string> WatchedMarkets { get; set; }

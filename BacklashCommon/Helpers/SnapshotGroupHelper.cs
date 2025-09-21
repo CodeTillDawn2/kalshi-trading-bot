@@ -1,14 +1,14 @@
-using BacklashBotData.Data.Interfaces;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
-using TradingStrategies.Classification.Interfaces;
-using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using TradingStrategies.Classification.Interfaces;
 
 namespace BacklashCommon.Helpers
 {
@@ -18,7 +18,7 @@ namespace BacklashCommon.Helpers
     /// </summary>
     public class SnapshotGroupHelper : ISnapshotGroupHelper
     {
-        private readonly GeneralExecutionConfig _generalExecutionConfig;
+        private readonly DataStorageConfig _dataStorageConfig;
         private readonly SnapshotGroupHelperConfig _snapshotGroupHelperConfig;
         private readonly ISnapshotPeriodHelper _snapshotPeriodHelper;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -36,25 +36,25 @@ namespace BacklashCommon.Helpers
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
         /// <param name="snapshotService">Service for managing trading snapshots.</param>
-        /// <param name="generalExecutionConfig">Configuration options for general execution settings.</param>
+        /// <param name="dataStorageConfig">Configuration options for general execution settings.</param>
         /// <param name="marketAnalysisHelperConfig">Configuration options for market analysis helper settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
-        public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, 
-            ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, 
+        public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper,
+            ITradingSnapshotService snapshotService, IOptions<DataStorageConfig> dataStorageConfig,
             IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor centralPerformanceMonitor, ILogger<SnapshotGroupHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
             ArgumentNullException.ThrowIfNull(snapshotService);
-            ArgumentNullException.ThrowIfNull(generalExecutionConfig);
+            ArgumentNullException.ThrowIfNull(dataStorageConfig);
             ArgumentNullException.ThrowIfNull(marketAnalysisHelperConfig);
             ArgumentNullException.ThrowIfNull(logger);
 
             _snapshotService = snapshotService;
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _generalExecutionConfig = generalExecutionConfig.Value ?? throw new ArgumentNullException(nameof(generalExecutionConfig.Value));
+            _dataStorageConfig = dataStorageConfig.Value ?? throw new ArgumentNullException(nameof(dataStorageConfig.Value));
             _snapshotGroupHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
             _centralPerformanceMonitor = centralPerformanceMonitor;
 
@@ -121,7 +121,7 @@ namespace BacklashCommon.Helpers
                     }
                     try
                     {
-                        await Task.Delay(_generalExecutionConfig.RetryDelayMs);
+                        await Task.Delay(_dataStorageConfig.RetryDelayMs);
                         rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }
@@ -167,7 +167,7 @@ namespace BacklashCommon.Helpers
                     continue;
                 }
 
-                string snapshotDirectory = Path.Combine(_generalExecutionConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
+                string snapshotDirectory = Path.Combine(_dataStorageConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
 
                 // Process valid snapshots into snapshot groups
                 var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);

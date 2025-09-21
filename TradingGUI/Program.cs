@@ -1,18 +1,15 @@
-using System.Diagnostics;
-using System.Management;
+using BacklashBotData.Data;
+using BacklashCommon.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TradingStrategies.Trading.Overseer;
-using BacklashInterfaces.PerformanceMetrics;
-using TradingStrategies.Configuration;
-using TradingStrategies.Trading.Helpers;
-using BacklashDTOs.Configuration;
-using BacklashCommon.Configuration;
-using BacklashBotData.Data;
-using TradingSimulator;
-using TradingGUI.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Management;
+using TradingGUI.Configuration;
+using TradingSimulator;
+using TradingStrategies.Configuration;
+using TradingStrategies.Trading.Overseer;
 
 namespace TradingGUI
 {

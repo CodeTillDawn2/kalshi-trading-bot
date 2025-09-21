@@ -1,13 +1,13 @@
-using KalshiBotLogging;
+using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
-using BacklashDTOs.Configuration;
+using KalshiBotLogging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
 {
@@ -43,7 +43,7 @@ namespace BacklashBot.Management
         private readonly IMarketManagerService _marketManagerService;
         private readonly IServiceFactory _serviceFactory;
         private readonly DatabaseLoggingQueue _loggingQueue;
-        private readonly ErrorHandlerConfig _errorHandlerConfig;
+        private readonly CentralErrorHandlerConfig _errorHandlerConfig;
         private readonly ConcurrentQueue<(DateTime Timestamp, ErrorHandlerTaskInfo Error)> _nonCatastrophicErrors = new();
         private readonly TimeSpan _errorWindow; // Configurable window
         private readonly int _errorThreshold; // Configurable threshold
@@ -113,7 +113,7 @@ namespace BacklashBot.Management
             IMarketManagerService marketManagerService,
             IServiceFactory serviceFactory,
             DatabaseLoggingQueue loggingQueue,
-            IOptions<ErrorHandlerConfig> errorHandlerConfig,
+            IOptions<CentralErrorHandlerConfig> errorHandlerConfig,
             ILogger<ICentralErrorHandler> logger)
         {
             _logger = logger;

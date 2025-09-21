@@ -1,6 +1,5 @@
 using BacklashBot.State;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace BacklashBot.Configuration;
 

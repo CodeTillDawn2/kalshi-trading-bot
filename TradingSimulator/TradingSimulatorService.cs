@@ -6,26 +6,28 @@
 // and provides comprehensive GUI integration through events and progress reporting.
 // </summary>
 
+using BacklashBot.Configuration;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Helpers;
+using BacklashCommon.Services.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using KalshiBotData.Data;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BacklashDTOs.Configuration;
-using BacklashBot.Management;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashDTOs;
-using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TradingSimulator.Simulator;
 using TradingSimulator.Strategies;
-using TradingStrategies;
-using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using TradingStrategies.ML;
@@ -34,15 +36,6 @@ using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using TradingSimulator.Simulator;
-using BacklashBotData.Data.Interfaces;
-using BacklashBotData.Data;
-using BacklashCommon.Services;
-using BacklashCommon.Helpers;
-using BacklashDTOs.Configuration;
-using BacklashCommon.Configuration;
-using BacklashBotData.Configuration;
-using BacklashBot.Configuration;
 
 namespace TradingSimulator
 {
@@ -156,7 +149,7 @@ namespace TradingSimulator
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
-            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>()!);
+            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
             _simulatorOptions = Options.Create(simulatorConfig);
 
             // Configure DataLoaderConfig

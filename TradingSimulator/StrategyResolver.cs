@@ -1,9 +1,9 @@
-using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Strategies;
+using TradingStrategies.Strategies.Strategies.Strats;
+using TradingStrategies.Strategies.Strats;
+using TradingStrategies.Trading.Helpers;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingSimulator.TradingSimulatorService;
-using TradingStrategies.Trading.Helpers;
-using TradingStrategies.Strategies.Strategies.Strats;
 
 namespace TradingSimulator
 {

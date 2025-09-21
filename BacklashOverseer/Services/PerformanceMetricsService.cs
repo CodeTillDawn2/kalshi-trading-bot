@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace BacklashOverseer.Services

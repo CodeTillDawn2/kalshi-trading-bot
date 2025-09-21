@@ -1,5 +1,5 @@
-using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashBotData.Data.Interfaces;
+using BacklashInterfaces.SmokehouseBot.Services;
 
 namespace BacklashBot.Services
 {

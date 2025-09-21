@@ -1,9 +1,7 @@
 using BacklashDTOs;
-using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using System.Globalization;
 using System.Text.Json;
-using TradingStrategies.Extensions;
 using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
 

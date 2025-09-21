@@ -1,13 +1,12 @@
 using BacklashBotData.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using BacklashDTOs;
-using TradingSimulator;
+using Microsoft.Extensions.Options;
 using ScottPlot;
+using TradingGUI.Configuration;
+using TradingSimulator;
+using Color = System.Drawing.Color;
 using Image = System.Drawing.Image;
 using Label = System.Windows.Forms.Label;
-using Color = System.Drawing.Color;
-using TradingGUI.Configuration;
 
 namespace TradingGUI
 {

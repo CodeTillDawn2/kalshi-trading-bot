@@ -1,9 +1,7 @@
 using BacklashDTOs;
-using static BacklashPatterns.TrendCalcs;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Binder;
+using System.Diagnostics;
+using static BacklashPatterns.TrendCalcs;
 
 namespace BacklashPatterns
 {

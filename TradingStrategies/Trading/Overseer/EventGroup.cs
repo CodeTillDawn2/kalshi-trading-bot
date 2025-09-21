@@ -1,5 +1,3 @@
-using System;
-
 namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>

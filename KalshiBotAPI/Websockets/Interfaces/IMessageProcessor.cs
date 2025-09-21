@@ -1,83 +1,82 @@
 using BacklashDTOs;
-using System.Collections.Concurrent;
 
 namespace KalshiBotAPI.WebSockets.Interfaces
 {
-/// <summary>IMessageProcessor</summary>
-/// <summary>IMessageProcessor</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+    /// <summary>IMessageProcessor</summary>
+    /// <summary>IMessageProcessor</summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
     public interface IMessageProcessor
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
+    /// <summary>
+    /// </summary>
     {
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<OrderBookEventArgs> OrderBookReceived;
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<TickerEventArgs> TickerReceived;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<TradeEventArgs> TradeReceived;
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<FillEventArgs> FillReceived;
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<MarketLifecycleEventArgs> MarketLifecycleReceived;
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         event EventHandler<EventLifecycleEventArgs> EventLifecycleReceived;
         event EventHandler<DateTime> MessageReceived;
 

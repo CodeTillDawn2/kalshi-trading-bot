@@ -1,3 +1,18 @@
+using BacklashBot.Configuration;
+using BacklashBot.Helpers;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Management;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Helpers;
+using BacklashCommon.Services;
+using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotData.Data;
@@ -6,29 +21,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BacklashDTOs.Configuration;
-using BacklashBot.KalshiAPI.Interfaces;
-using BacklashCommon.Services;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.Helpers;
-using BacklashDTOs;
-using BacklashBot.State.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;
-using TradingStrategies.Classification;
-using TradingStrategies.Configuration;
 using TradingStrategies.ML.SpikePrediction;
-using BacklashBot.Management;
-using BacklashBotData.Data.Interfaces;
-using BacklashBotData.Data;
-using BacklashCommon.Helpers;
-using BacklashCommon.Configuration;
-using BacklashBot.Configuration;
-using BacklashBotData.Configuration;
-using BacklashInterfaces.PerformanceMetrics;
 
 
 namespace KalshiBotTasks
@@ -62,6 +58,7 @@ namespace KalshiBotTasks
         private IServiceScopeFactory _scopeFactory;
         private SqlDataService _sqlDataService;
         private Mock<ILogger<SpikePredictionModel>> _spikeLoggerMock;
+        private BacklashBotDataConfig _dataConfig;
 
 
         /// <summary>
@@ -163,13 +160,6 @@ namespace KalshiBotTasks
 
             this.config = configuration;
 
-            var tradingSnapshotServiceConfig = config.GetSection("WatchedMarkets:TradingSnapshotService").Get<TradingSnapshotServiceConfig>()!;
-            var tradingConfig = config.GetSection("TradingConfig").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>()!;
-            var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
-            _tradingSnapshotServiceOptions = Options.Create(tradingSnapshotServiceConfig);
-            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
-            var kalshiOptions = Options.Create(kalshiConfig); // Create options for KalshiConfig
-
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             var apiLoggerMock = new Mock<ILogger<IKalshiAPIService>>(); // Align to IKalshiAPIService to match constructor
             var overnightLoggerMock = new Mock<ILogger<OvernightActivitiesHelper>>();
@@ -188,14 +178,45 @@ namespace KalshiBotTasks
             services.AddScoped<CentralPerformanceMonitor>();
             services.AddSingleton<IConfiguration>(config);
 
-            // Create InterestScoreConfig options for testing
-            var interestScoreConfig = new InterestScoreConfig
-            {
-                CacheDurationHours = 6,
-                EnablePerformanceMetrics = true,
-                MaxPerformanceMetricsHistory = 1000
-            };
-            var interestScoreOptions = Options.Create(interestScoreConfig);
+            // Register options using the same pattern as Program.cs
+            services.AddOptions<TradingSnapshotServiceConfig>()
+                .Bind(config.GetSection(TradingSnapshotServiceConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<GeneralExecutionConfig>()
+                .Bind(config.GetSection(GeneralExecutionConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<KalshiConfig>()
+                .Bind(config.GetSection(KalshiConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<InterestScoreConfig>()
+                .Bind(config.GetSection(InterestScoreConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<BacklashBotDataConfig>()
+                .Bind(config.GetSection(BacklashBotDataConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<SnapshotPeriodHelperConfig>()
+                .Bind(config.GetSection(SnapshotPeriodHelperConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<SnapshotGroupHelperConfig>()
+                .Bind(config.GetSection(SnapshotGroupHelperConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            var tempProvider = services.BuildServiceProvider();
+
+            _tradingSnapshotServiceOptions = tempProvider.GetRequiredService<IOptions<TradingSnapshotServiceConfig>>();
+            _executionConfig = tempProvider.GetRequiredService<IOptions<GeneralExecutionConfig>>();
+            var kalshiOptions = tempProvider.GetRequiredService<IOptions<KalshiConfig>>();
+            var interestScoreOptions = tempProvider.GetRequiredService<IOptions<InterestScoreConfig>>();
+            var dataConfigOptions = tempProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>();
+            var snapshotPeriodHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>();
+            var snapshotGroupHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>();
 
             _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions);
 
@@ -209,17 +230,8 @@ namespace KalshiBotTasks
             var connectionString = ConfigurationHelper.BuildConnectionString(config);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
 
-            // Create BacklashBotDataConfig for database context and data service
-            var dataConfig = new BacklashBotDataConfig
-            {
-                MaxRetryCount = 3,
-                RetryDelaySeconds = 1.0,
-                BatchSize = 100,
-                MaxQueueSize = 10000,
-                WorkersPerQueue = 2,
-                EnablePerformanceMetrics = true
-            };
-            var dataConfigOptions = Options.Create(dataConfig);
+            var dataConfig = dataConfigOptions.Value;
+            _dataConfig = dataConfig;
 
             // Create database context with proper parameters
             var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
@@ -234,17 +246,11 @@ namespace KalshiBotTasks
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
-            _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
-
-            var snapshotGroupHelperConfig = new SnapshotGroupHelperConfig
-            {
-                EnablePerformanceMetrics = true
-            };
-            var snapshotGroupHelperOptions = Options.Create(snapshotGroupHelperConfig);
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(snapshotPeriodHelperOptions.Value);
 
             _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _snapshotGroupHelper, _executionConfig, _sqlDataService);
-            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
+            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _executionConfig, _scopeFactory, this.config, centralPerformanceMonitor);
 
             _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
             _missingOrderbookCount = 0;
@@ -357,15 +363,7 @@ namespace KalshiBotTasks
                     try
                     {
                         var connectionString = ConfigurationHelper.BuildConnectionString(config);
-                        var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>() ?? new BacklashBotDataConfig
-                        {
-                            MaxRetryCount = 3,
-                            RetryDelaySeconds = 1.0,
-                            BatchSize = 100,
-                            MaxQueueSize = 10000,
-                            WorkersPerQueue = 1,
-                            EnablePerformanceMetrics = false
-                        };
+                        var dataConfig = _dataConfig;
                         var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
                         using var dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
 

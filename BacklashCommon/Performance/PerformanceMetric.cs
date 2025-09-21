@@ -1,5 +1,3 @@
-using System;
-
 namespace BacklashCommon.Performance
 {
     /// <summary>

@@ -1,11 +1,8 @@
 using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.KalshiAPI;
-using BacklashBot.Management.Interfaces;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BacklashBot.Services
 {

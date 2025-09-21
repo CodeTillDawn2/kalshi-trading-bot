@@ -1,15 +1,14 @@
-using Microsoft.AspNetCore.SignalR;
+using BacklashBot.Configuration;
 using BacklashBot.Hubs;
+using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Management;
-using System.Diagnostics;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
-using System.Text.Json;
-using BacklashBot.Hubs;
 using OverseerBotShared;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace BacklashBot.Services
 {

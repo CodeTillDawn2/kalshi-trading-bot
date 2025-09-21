@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BacklashBotData.Data.Interfaces;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace BacklashCommon.Services
 {
@@ -85,7 +80,7 @@ namespace BacklashCommon.Services
     {
         private readonly ILogger<IOvernightActivitiesHelper> _logger;
         private readonly ISnapshotGroupHelper _analysisHelper;
-        private readonly GeneralExecutionConfig _executionConfig;
+        private readonly DataStorageConfig _dataStorageConfig;
         private readonly ISqlDataService _sqlDataService;
         private readonly PerformanceMetrics _performanceMetrics = new();
         private readonly INightActivitiesPerformanceMetrics? _performanceMonitor;
@@ -96,16 +91,16 @@ namespace BacklashCommon.Services
         /// <param name="logger">The logger instance for recording operations and performance data.</param>
         /// <param name="interestScoreHelper">The interest score service (injected but not used in constructor).</param>
         /// <param name="analysisHelper">The market analysis helper for generating snapshot groups.</param>
-        /// <param name="executionConfig">The execution configuration options.</param>
+        /// <param name="dataStorageConfig">The execution configuration options.</param>
         /// <param name="sqlDataService">The SQL data service for snapshot operations.</param>
         /// <param name="performanceMonitor">Optional performance monitor for tracking metrics (uses interface segregation).</param>
         public OvernightActivitiesHelper(ILogger<IOvernightActivitiesHelper> logger, IInterestScoreService interestScoreHelper,
-            ISnapshotGroupHelper analysisHelper, IOptions<GeneralExecutionConfig> executionConfig, ISqlDataService sqlDataService,
+            ISnapshotGroupHelper analysisHelper, IOptions<DataStorageConfig> dataStorageConfig, ISqlDataService sqlDataService,
             INightActivitiesPerformanceMetrics? performanceMonitor = null)
         {
             _logger = logger;
             _analysisHelper = analysisHelper;
-            _executionConfig = executionConfig.Value;
+            _dataStorageConfig = dataStorageConfig.Value;
             _sqlDataService = sqlDataService;
             _performanceMonitor = performanceMonitor;
         }
@@ -231,7 +226,7 @@ namespace BacklashCommon.Services
             var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             HashSet<string> inactiveMarkets = await context.GetProcessedMarkets();
 
-            string hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
+            string hardDataStorageLocation = _dataStorageConfig.HardDataStorageLocation;
 
             foreach (string marketTicker in inactiveMarkets)
             {

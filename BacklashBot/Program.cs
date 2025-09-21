@@ -1,10 +1,8 @@
 using BacklashBot.Configuration;
 using BacklashBot.Hubs;
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
-using BacklashBot.Middleware;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
@@ -12,12 +10,10 @@ using BacklashBot.State.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
-using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
-using BacklashDTOs.Configuration;
-using BacklashDTOs.Configuration;
+using BacklashCommon.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.SmokehouseBot.Services;
@@ -26,14 +22,8 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotLogging;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
 
@@ -190,8 +180,8 @@ builder.Services.AddOptions<InterestScoreConfig>()
     .Bind(builder.Configuration.GetSection(InterestScoreConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<ErrorHandlerConfig>()
-    .Bind(builder.Configuration.GetSection(ErrorHandlerConfig.SectionName))
+builder.Services.AddOptions<CentralErrorHandlerConfig>()
+    .Bind(builder.Configuration.GetSection(CentralErrorHandlerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<OrderBookServiceConfig>()
@@ -496,7 +486,7 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
         provider.GetRequiredService<ILogger<BacklashCommon.Services.OvernightActivitiesHelper>>(),
         provider.GetRequiredService<IInterestScoreService>(),
         provider.GetRequiredService<ISnapshotGroupHelper>(),
-        provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+        provider.GetRequiredService<IOptions<DataStorageConfig>>(),
         provider.GetRequiredService<ISqlDataService>(),
         provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>

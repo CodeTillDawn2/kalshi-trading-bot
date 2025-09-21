@@ -1,11 +1,9 @@
 using BacklashDTOs;
-using BacklashPatterns;
-using TradingStrategies.Extensions;
-using TradingStrategies.Configuration;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashPatterns;
+using System.Diagnostics;
+using TradingStrategies.Configuration;
+using TradingStrategies.Extensions;
 
 /// <summary>
 /// Represents the comprehensive result of pattern detection including patterns and performance metrics.

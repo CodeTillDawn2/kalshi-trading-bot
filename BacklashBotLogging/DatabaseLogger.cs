@@ -1,7 +1,6 @@
-using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using Microsoft.Extensions.Logging;
-using BacklashDTOs.Configuration;
 // Removed reference to BacklashBot to avoid circular dependency
 
 namespace KalshiBotLogging
@@ -24,7 +23,7 @@ namespace KalshiBotLogging
         private readonly LogLevel _minConsoleLogLevel;
         private readonly LogLevel _minSqlLogLevel;
         private readonly LoggingConfig? _loggingConfig;
-        private readonly GeneralExecutionConfig? _executionConfig;
+        private readonly InstanceNameConfig? _instanceNameConfig;
         private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
         private readonly string _defaultInstance;
@@ -36,7 +35,7 @@ namespace KalshiBotLogging
         /// <param name="loggingQueue">The queue responsible for handling database logging operations asynchronously.</param>
         /// <param name="minLevel">The minimum log level that this logger will process; logs below this level are ignored.</param>
         /// <param name="loggingConfig">Optional logging configuration for dynamic environment settings including min log levels.</param>
-        /// <param name="executionConfig">Optional execution configuration for brain instance settings.</param>
+        /// <param name="instanceNameConfig">Optional execution configuration for brain instance settings.</param>
         /// <param name="brainStatus">Optional brain status service for session identifier retrieval (not used in simplified version).</param>
         /// <param name="defaultEnvironment">Default environment name if not specified in config.</param>
         /// <param name="defaultInstance">Default instance name if not specified in config.</param>
@@ -45,7 +44,7 @@ namespace KalshiBotLogging
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel,
             LoggingConfig loggingConfig,
-            GeneralExecutionConfig? executionConfig = null,
+            InstanceNameConfig? instanceNameConfig = null,
             object? brainStatus = null,
             string defaultEnvironment = "KalshiBot",
             string defaultInstance = "DefaultInstance")
@@ -54,7 +53,7 @@ namespace KalshiBotLogging
             _loggingQueue = loggingQueue;
             _minLevel = minLevel;
             _loggingConfig = loggingConfig;
-            _executionConfig = executionConfig;
+            _instanceNameConfig = instanceNameConfig;
             _brainStatus = brainStatus;
             _defaultEnvironment = defaultEnvironment;
             _defaultInstance = defaultInstance;
@@ -111,7 +110,7 @@ namespace KalshiBotLogging
 
             // Get dynamic values or use defaults
             string environment = _loggingConfig?.Environment ?? _defaultEnvironment;
-            string brainInstance = _executionConfig?.BrainInstance ?? _defaultInstance;
+            string brainInstance = _instanceNameConfig?.BrainInstance ?? _defaultInstance;
             string sessionIdentifier = GetSessionIdentifier();
 
             var logEntry = new LogEntryDTO

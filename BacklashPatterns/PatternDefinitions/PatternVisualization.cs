@@ -1,5 +1,3 @@
-using BacklashPatterns.PatternDefinitions;
-
 namespace BacklashPatterns.PatternDefinitions
 {
     /// <summary>

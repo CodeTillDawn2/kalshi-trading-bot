@@ -1,20 +1,14 @@
+using BacklashBot.Hubs;
+using BacklashBot.Management.Interfaces;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State;
+using BacklashDTOs.Data;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using BacklashDTOs.Configuration;
-using BacklashBot.Hubs;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.State;
-using BacklashDTOs.Data;
-using TradingStrategies.Helpers.Interfaces;
 using System.Diagnostics;
-using System.Threading;
-using System.Timers;
-using BacklashBot.Management;
-using BacklashBot.Management.Interfaces;
-using BacklashInterfaces.PerformanceMetrics;
-using Microsoft.Extensions.Configuration;
+using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
 {

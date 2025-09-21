@@ -3,13 +3,12 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
-using BacklashDTOs.Configuration;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
@@ -225,8 +224,8 @@ namespace BacklashBot.Services
                 }
 
                 // Last applicable candlestick, plus some cushion time
-                foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysMinute * 60), 
-                    ("hour", lastHourTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysHour * 3600), 
+                foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysMinute * 60),
+                    ("hour", lastHourTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysHour * 3600),
                     ("day", lastDayTimestamp - _candlestickConfig.CandlestickMandatoryOverlapDaysDay * 86400) })
                 {
 

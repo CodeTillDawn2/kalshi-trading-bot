@@ -1,21 +1,17 @@
-using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotAPI.Configuration;
-using Microsoft.Extensions.Logging;
-using BacklashDTOs;
-using BacklashDTOs.Exceptions;
-using BacklashInterfaces.Constants;
-using BacklashInterfaces.Enums;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashDTOs;
+using BacklashInterfaces.Enums;
+using BacklashInterfaces.PerformanceMetrics;
+using KalshiBotAPI.Configuration;
+using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using BacklashBot.Services.Interfaces;
-using BacklashInterfaces.SmokehouseBot.Services;
-using BacklashBot.KalshiAPI.Interfaces;
-using System.Threading;
-using System.Diagnostics;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace KalshiBotAPI.Websockets
 {
@@ -115,44 +111,44 @@ namespace KalshiBotAPI.Websockets
         private CancellationToken _processingCancellationToken;
         private DateTime _lastMessageTimestamp = DateTime.UtcNow;
 
-/// <summary>Gets or sets the OrderBookReceived.</summary>
-/// <summary>Gets or sets the OrderBookReceived.</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>Gets or sets the OrderBookReceived.</summary>
+        /// <summary>Gets or sets the OrderBookReceived.</summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public event EventHandler<TickerEventArgs>? TickerReceived;
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         public event EventHandler<TradeEventArgs>? TradeReceived;
         public event EventHandler<FillEventArgs>? FillReceived;
         public event EventHandler<MarketLifecycleEventArgs>? MarketLifecycleReceived;

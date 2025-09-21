@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
 using BacklashInterfaces.PerformanceMetrics;
+using System.Collections.Concurrent;
 
 namespace TradingStrategies.Trading.Overseer
 {

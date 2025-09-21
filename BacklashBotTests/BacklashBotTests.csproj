@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
     <ProjectReference Include="..\BacklashBot\BacklashBot.csproj" />
     <ProjectReference Include="..\BacklashCommon\BacklashCommon.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />

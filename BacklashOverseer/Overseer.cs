@@ -1,19 +1,15 @@
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
+using BacklashOverseer.Config;
+using BacklashOverseer.Services;
 using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using BacklashBot.KalshiAPI.Interfaces;
-using BacklashDTOs;
-using KalshiBotData.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using System.Text.Json;
-using System.Linq;
-using BacklashOverseer.Services;
-using BacklashOverseer.Config;
 using Microsoft.Extensions.Options;
-using BacklashBotData.Data.Interfaces;
 using OverseerBotShared;
+using System.Text.Json;
 
 namespace BacklashOverseer
 {

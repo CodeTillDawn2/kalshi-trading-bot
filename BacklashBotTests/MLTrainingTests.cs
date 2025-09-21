@@ -1,13 +1,13 @@
+using BacklashBot.Configuration;
 using BacklashBot.Management;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
+using BacklashBotData.Configuration;
 using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using BacklashDTOs.Configuration;
-using BacklashDTOs.Configuration;
-using KalshiBotData.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,10 +15,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System.Text;
 using TradingSimulator.ML;
-using TradingStrategies.Configuration;
-using BacklashCommon.Configuration;
-using BacklashBotData.Configuration;
-using BacklashBot.Configuration;
 
 namespace KalshiBotTests
 {
@@ -59,7 +55,7 @@ namespace KalshiBotTests
         /// Configuration options for general execution parameters, including decision frequencies
         /// and other settings that affect snapshot timing and processing.
         /// </summary>
-        private IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> _generalExecutionOpts;
+        private IOptions<GeneralExecutionConfig> _generalExecutionOpts;
 
         /// <summary>
         /// Output directory path where training data CSV files and model files are saved.

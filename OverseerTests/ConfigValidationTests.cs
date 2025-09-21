@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
-
 using BacklashCommon.Configuration;
 using BacklashOverseer.Config;
 using KalshiBotAPI.Configuration;
-using BacklashDTOs.Configuration;
+using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace OverseerTests
 {
@@ -37,9 +31,9 @@ namespace OverseerTests
             // Get all config types with SectionName from assemblies referenced by BacklashOverseer.csproj
             var assemblies = new[]
             {
-                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
-                typeof(KalshiBotAPI.Configuration.KalshiConfig).Assembly, // KalshiBotAPI
-                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
+                typeof(SecretsConfig).Assembly, // BacklashCommon
+                typeof(KalshiConfig).Assembly, // KalshiBotAPI
+                typeof(InstanceNameConfig).Assembly, // BacklashDTOs
                 typeof(BacklashOverseer.Config.OverseerConfig).Assembly // BacklashOverseer itself
             };
 
@@ -67,10 +61,9 @@ namespace OverseerTests
             // Automatically collect all SectionName values from assemblies referenced by BacklashOverseer.csproj
             var assemblies = new[]
             {
-                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
-                typeof(KalshiBotAPI.Configuration.KalshiConfig).Assembly, // KalshiBotAPI
-                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
-                typeof(BacklashOverseer.Config.OverseerConfig).Assembly // BacklashOverseer itself
+                typeof(SecretsConfig).Assembly, // BacklashCommon
+                typeof(KalshiConfig).Assembly, // KalshiBotAPI
+                typeof(OverseerConfig).Assembly // BacklashOverseer itself
             };
 
             foreach (var assembly in assemblies)
@@ -203,7 +196,6 @@ namespace OverseerTests
                 WebSocketMonitorConfig.SectionName,
                 KalshiWebSocketClientConfig.SectionName,
                 LoggingConfig.SectionName,
-                GeneralExecutionConfig.SectionName,
                 OverseerConfig.SectionName,
                 OverseerHubConfig.SectionName,
                 MarketWatchControllerConfig.SectionName,

@@ -1,10 +1,8 @@
+using BacklashBot.Configuration;
+using BacklashCommon.Configuration;
+using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NUnit.Framework;
-using KalshiBotLogging;
-using BacklashDTOs.Configuration;
-using System;
-using System.Threading;
 
 namespace BacklashIntegrationTests
 {

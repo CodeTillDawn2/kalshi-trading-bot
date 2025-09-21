@@ -3,10 +3,10 @@ using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
-    /// <summary>
-    /// Represents an Evening Star candlestick pattern.
-    /// </summary>
-    public class EveningStarPattern : PatternDefinition
+/// <summary>
+/// Represents an Evening Star candlestick pattern.
+/// </summary>
+public class EveningStarPattern : PatternDefinition
 {
     /// <summary>
     /// Minimum body size for the first bullish candle.

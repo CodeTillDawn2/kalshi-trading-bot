@@ -1,7 +1,6 @@
 using BacklashDTOs;
-using System.Diagnostics;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace TradingSimulator.Simulator
 {

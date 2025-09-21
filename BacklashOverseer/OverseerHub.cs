@@ -1,21 +1,14 @@
-using Microsoft.AspNetCore.SignalR;
-using BacklashOverseer.Services;
-using BacklashOverseer.Config;
-using KalshiBotAPI.Configuration;
-using KalshiBotAPI.KalshiAPI;
-using KalshiBotAPI.Websockets;
-using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data;
-
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
-using BacklashOverseer.Models;
-using OverseerBotShared;
-using System.Threading;
-using System.Diagnostics;
 using BacklashBotData.Data.Interfaces;
+using BacklashOverseer.Config;
+using BacklashOverseer.Models;
+using BacklashOverseer.Services;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OverseerBotShared;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace BacklashOverseer
 {
@@ -950,18 +943,18 @@ namespace BacklashOverseer
             /// Gets or sets the timestamp of the client's last activity.
             /// </summary>
             public DateTime LastSeen { get; set; }
-            }
-    
-            /// <summary>
-            /// Represents rate limiting information for a client.
-            /// </summary>
-            private class ClientRateLimit
-            {
-                public string Key { get; set; } = "";
-                public int HandshakeCount { get; set; }
-                public int CheckInCount { get; set; }
-                public DateTime WindowStart { get; set; } = DateTime.UtcNow;
-            }
         }
+
+        /// <summary>
+        /// Represents rate limiting information for a client.
+        /// </summary>
+        private class ClientRateLimit
+        {
+            public string Key { get; set; } = "";
+            public int HandshakeCount { get; set; }
+            public int CheckInCount { get; set; }
+            public DateTime WindowStart { get; set; } = DateTime.UtcNow;
+        }
+    }
 
 }

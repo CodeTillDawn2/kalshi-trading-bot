@@ -1,9 +1,7 @@
 using BacklashDTOs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
-using System.IO;
 
 namespace TradingStrategies.Extensions
 {

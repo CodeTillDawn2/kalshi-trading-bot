@@ -1,13 +1,8 @@
 // ChartHub.cs
-using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Data.Interfaces;
-using BacklashDTOs;
+using Microsoft.AspNetCore.SignalR;
 using OverseerBotShared;
-using System.Security.Cryptography;
-using System.Text;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 namespace BacklashBot.Hubs
 {

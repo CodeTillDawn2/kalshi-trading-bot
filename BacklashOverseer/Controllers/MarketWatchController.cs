@@ -1,18 +1,14 @@
 
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashDTOs.Data;
+using BacklashInterfaces.Constants;
+using BacklashOverseer.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using BacklashDTOs.Data;
-using BacklashInterfaces.Constants;
-using BacklashBot.KalshiAPI.Interfaces;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BacklashOverseer.Services;
-using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer.Controllers
 {
@@ -77,7 +73,7 @@ namespace BacklashOverseer.Controllers
 
             MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:MarketsCacheDurationMinutes", 15));
             LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:LogDataCacheDurationMinutes", 5));
-            
+
             _enableMarketWatchControllerPerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnableMarketWatchControllerPerformanceMetrics", true);
         }
 

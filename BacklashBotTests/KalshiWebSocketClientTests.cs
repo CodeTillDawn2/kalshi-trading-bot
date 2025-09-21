@@ -1,22 +1,19 @@
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashCommon.Configuration;
+using BacklashDTOs;
+using BacklashInterfaces.Enums;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BacklashDTOs.Configuration;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.State.Interfaces;
-using BacklashDTOs;
-using BacklashInterfaces.Enums;
-using BacklashCommon.Configuration;
 using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
-using BacklashBotData.Configuration;
 
 namespace KalshiBotTests
 {

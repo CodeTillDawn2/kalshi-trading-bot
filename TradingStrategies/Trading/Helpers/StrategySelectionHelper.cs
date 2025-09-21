@@ -1,13 +1,12 @@
+using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using TradingStrategies.Configuration;
 using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
-using System.Diagnostics;
-using System.Collections.Concurrent;
-using TradingStrategies.Configuration;
-using TradingStrategies.Trading.Overseer;
-using Microsoft.Extensions.Options;
 
 namespace TradingStrategies.Trading.Helpers
 {

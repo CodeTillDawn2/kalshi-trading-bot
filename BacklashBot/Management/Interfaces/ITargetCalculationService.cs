@@ -1,5 +1,5 @@
-using BacklashDTOs.Data;
 using BacklashDTOs;
+using BacklashDTOs.Data;
 
 namespace BacklashBot.Management.Interfaces
 {

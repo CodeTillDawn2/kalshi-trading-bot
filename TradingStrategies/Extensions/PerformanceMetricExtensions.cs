@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using BacklashCommon.Performance;
 
 namespace TradingStrategies.Extensions

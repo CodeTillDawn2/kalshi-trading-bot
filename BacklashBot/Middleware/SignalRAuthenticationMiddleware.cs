@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography;
 using System.Text;
 

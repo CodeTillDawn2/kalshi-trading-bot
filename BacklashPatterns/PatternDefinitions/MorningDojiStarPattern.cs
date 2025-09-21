@@ -23,78 +23,78 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Loosest: 0.5 (smaller but noticeable bearish candle, per BabyPips  loose reversal patterns).
         /// </summary>
         public static double MinBodySize { get; } = 1.0;
-/// <summary>Gets or sets the Strength.</summary>
-/// <summary>Gets or sets the Name.</summary>
-/// <summary>
-/// </summary>
+        /// <summary>Gets or sets the Strength.</summary>
+        /// <summary>Gets or sets the Name.</summary>
+        /// <summary>
+        /// </summary>
 
-/// <summary>MorningDojiStarPattern</summary>
-/// <summary>
-/// </summary>
+        /// <summary>MorningDojiStarPattern</summary>
+        /// <summary>
+        /// </summary>
         /// <summary>
         /// Threshold for confirming a downtrend prior to the pattern. Negative values indicate a bearish trend.
         /// - Strictest: -0.5 (strong downtrend).
         /// - Loosest: -0.1 (minimal downtrend, per Investopedia s relaxed Morning Doji Star).
         /// </summary>
         public static double TrendThreshold { get; } = -0.3;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
 
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         /// <summary>
         /// Maximum allowable gap between the first candle s close and the second candle s open.
         /// - Strictest: 0.2 (tight gap for clear Doji indecision).
         /// - Loosest: 1.0 (larger gap allowed, per loose Doji Star definitions).
         /// </summary>
         public static double MaxOpenGap { get; } = 0.5;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
 
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         /// <summary>
         /// Factor determining the minimum size of the third candle s body relative to the first candle s body.
         /// - Strictest: 0.5 (third candle closes at least at the midpoint).
         /// - Loosest: 0.1 (minimal penetration, per relaxed reversal standards).
         /// </summary>
         public static double ThirdBodyFactor { get; } = 0.3;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
 
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         /// <summary>
         /// Minimum absolute body size for the third candle, ensuring a significant bullish move.
         /// - Strictest: 1.0 (significant bullish candle).
         /// - Loosest: 0.5 (smaller but noticeable bullish move, per BabyPips  flexibility).
         /// </summary>
         public static double MinThirdBody { get; } = 1.0;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public const string BaseName = "MorningDojiStar";
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public override string Name => BaseName;
         /// <summary>
         /// Gets the description of the pattern.
@@ -105,8 +105,8 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override PatternDirection Direction => PatternDirection.Bullish;
         public override double Strength { get; protected set; }
-/// <summary>
-/// </summary>
+        /// <summary>
+        /// </summary>
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
         public MorningDojiStarPattern(List<int> candles) : base(candles)

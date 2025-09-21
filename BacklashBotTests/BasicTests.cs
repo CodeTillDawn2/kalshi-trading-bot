@@ -1,18 +1,15 @@
+using BacklashBot.Configuration;
+using BacklashBot.Helpers;
+using BacklashBot.Services;
+using BacklashBot.State;
+using BacklashDTOs.Data;
+using KalshiBotData.Extensions;
+using KalshiBotData.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BacklashBot.Helpers;
-using BacklashBot.Services;
-using BacklashBot.State;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
-using BacklashDTOs.Data;
-using BacklashDTOs.Configuration;
-using TradingStrategies.Configuration;
-using System.Collections.Generic;
-using BacklashBot.Configuration;
 
 namespace KalshiBotTests
 {
@@ -64,7 +61,7 @@ namespace KalshiBotTests
         /// <summary>
         /// Configuration options for general execution parameters.
         /// </summary>
-        private IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> _generalExecutionOptions;
+        private IOptions<GeneralExecutionConfig> _generalExecutionOptions;
 
         /// <summary>
         /// Margin factor used for floating-point comparison tolerance in assertions.

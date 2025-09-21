@@ -1,45 +1,32 @@
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Services;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashCommon.Helpers;
+using BacklashCommon.Services;
+using BacklashCommon.Services.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
+using BacklashOverseer.Config;
+using BacklashOverseer.Services;
+using BacklashOverseer.State;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
-using KalshiBotAPI.WebSockets;
+using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
-
-using BacklashOverseer;
-using BacklashOverseer.Config;
-using BacklashCommon.Configuration;
-using BacklashBotData.Configuration;
 using KalshiBotLogging;
-using Microsoft.Extensions.Options;
-using BacklashOverseer.Services;
-using BacklashDTOs.Configuration;
-using BacklashCommon.Services;
-using BacklashInterfaces.SmokehouseBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Management;
-using BacklashOverseer.State;
-using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using System.IO;
-using BacklashInterfaces.PerformanceMetrics;
-using KalshiBotAPI.Websockets;
-using BacklashBotData.Data.Interfaces;
-using BacklashBotData.Data;
-using BacklashCommon.Helpers;
 
 namespace BacklashOverseer
 {
@@ -71,47 +58,56 @@ namespace BacklashOverseer
             // Add configuration as singleton
             services.AddSingleton<IConfiguration>(Configuration);
 
+            // Bind configurations from appsettings
+            services.AddOptions<LoggingConfig>()
+                .Bind(Configuration.GetSection(LoggingConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<InstanceNameConfig>()
+                .Bind(Configuration.GetSection(InstanceNameConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             // Add logging services
             services.AddLogging(builder =>
             {
+                builder.ClearProviders();
+                builder.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
+                builder.AddFilter("Microsoft.AspNetCore.StaticFiles", LogLevel.Warning);
+                builder.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.Warning);
+                builder.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
                 builder.AddConsole();
-                builder.SetMinimumLevel(LogLevel.Debug);
+                var loggingConfig = Configuration.GetSection(LoggingConfig.SectionName).Get<LoggingConfig>();
+                if (loggingConfig != null)
+                {
+                    var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.ConsoleLogLevel, true);
+                    builder.SetMinimumLevel(consoleLogLevel);
+                }
+                else
+                {
+                    builder.SetMinimumLevel(LogLevel.Debug);
+                }
             });
 
             // Add database logging services
             services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), true)); // isOverseer = true
             services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
-            // Create default configs for Overseer
-            var overseerLoggingConfig = new LoggingConfig
-            {
-                Environment = "Overseer",
-                StoreWebSocketEvents = false,
-                SqlDatabaseLogLevel = "Information",
-                ConsoleLogLevel = "Information"
-            };
-            var overseerExecutionConfig = new GeneralExecutionConfig
-            {
-                BrainInstance = "OverseerInstance",
-                QueuesTargetCount = 100,
-                RetryDelayMs = 1000,
-                AuthTokenValidityHours = 24,
-                HardDataStorageLocation = "Data",
-                DecisionFrequencySeconds = 60,
-                RefreshIntervalMinutes = 5,
-                SnapshotSchemaVersion = 1
-            };
-
             services.AddSingleton<ILoggerProvider>(provider =>
-                new DatabaseLoggerProvider(
+            {
+                var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+                var instanceNameConfig = provider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
+                var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
+                return new DatabaseLoggerProvider(
                     provider.GetRequiredService<DatabaseLoggingQueue>(),
-                    overseerLoggingConfig,
-                    overseerExecutionConfig,
-                    LogLevel.Information, // Allow Information level and above
+                    loggingConfig,
+                    instanceNameConfig,
+                    minLevel,
                     null, // brainStatus
                     "Overseer", // defaultEnvironment
-                    "OverseerInstance" // defaultInstance
-                ));
+                    instanceNameConfig.Name // defaultInstance
+                );
+            });
 
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();
@@ -143,7 +139,6 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<ISubscriptionManager>(),
                 sp.GetRequiredService<IMessageProcessor>(),
-                sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
                 sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
                 sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
@@ -160,7 +155,7 @@ namespace BacklashOverseer
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
-            services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
+            services.AddScoped<IDataCache, DataCache>();
 
             // Register the new WebSocketMonitorServiceLite as singleton
             services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();
@@ -194,32 +189,32 @@ namespace BacklashOverseer
                 .Bind(Configuration.GetSection(OverseerReadyConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
-// Configure SubscriptionManager settings
-services.AddOptions<SubscriptionManagerConfig>()
-    .Bind(Configuration.GetSection(SubscriptionManagerConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-services.AddOptions<MessageProcessorConfig>()
-    .Bind(Configuration.GetSection(MessageProcessorConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+            // Configure SubscriptionManager settings
+            services.AddOptions<SubscriptionManagerConfig>()
+                .Bind(Configuration.GetSection(SubscriptionManagerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<MessageProcessorConfig>()
+                .Bind(Configuration.GetSection(MessageProcessorConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-services.AddOptions<WebSocketConnectionManagerConfig>()
-    .Bind(Configuration.GetSection(WebSocketConnectionManagerConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+            services.AddOptions<WebSocketConnectionManagerConfig>()
+                .Bind(Configuration.GetSection(WebSocketConnectionManagerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-services.AddOptions<KalshiWebSocketClientConfig>()
-    .Bind(Configuration.GetSection(KalshiWebSocketClientConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+            services.AddOptions<KalshiWebSocketClientConfig>()
+                .Bind(Configuration.GetSection(KalshiWebSocketClientConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
 
-// Configure Secrets settings
-services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
-    .Bind(Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+            // Configure Secrets settings
+            services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
+                .Bind(Configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
             // Interpolate placeholders in KalshiConfig
             services.PostConfigure<KalshiConfig>(config =>
             {
@@ -291,11 +286,6 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
             services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
                 (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
-            // Register GeneralExecutionConfig
-            services.AddOptions<GeneralExecutionConfig>()
-                .Bind(Configuration.GetSection(GeneralExecutionConfig.SectionName))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
 
             // Register services needed for OvernightActivitiesHelper
             services.AddScoped<IInterestScoreService, InterestScoreService>();
@@ -303,11 +293,11 @@ services.AddOptions<BacklashCommon.Configuration.SecretsConfig>()
 
             // Register OvernightActivitiesHelper
             services.AddScoped<IOvernightActivitiesHelper>(provider =>
-                new BacklashCommon.Services.OvernightActivitiesHelper(
+                new OvernightActivitiesHelper(
                     provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
                     null, // interestScoreHelper parameter not used in constructor
                     provider.GetRequiredService<ISnapshotGroupHelper>(),
-                    provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+                    provider.GetRequiredService<IOptions<DataStor>>(),
                     provider.GetRequiredService<ISqlDataService>(),
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 

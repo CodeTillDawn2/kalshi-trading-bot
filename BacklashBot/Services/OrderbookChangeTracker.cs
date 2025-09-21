@@ -1,13 +1,13 @@
-using Microsoft.Extensions.Options;
+using BacklashBot.Configuration;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
-using BacklashBot.Management.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;
-using BacklashBot.Configuration;
 
 namespace BacklashBot.Services
 {

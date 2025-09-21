@@ -3,8 +3,8 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
-/// <summary>ThrustingPattern</summary>
-/// </summary>
+    /// <summary>ThrustingPattern</summary>
+    /// </summary>
     public class ThrustingPattern : PatternDefinition
     {
         /// <summary>

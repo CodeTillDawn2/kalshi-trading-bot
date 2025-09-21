@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
-
 using BacklashBot.Configuration;
-using BacklashBot.State;
 using BacklashBot.Services;
+using BacklashBot.State;
 using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
-using BacklashDTOs.Configuration;
 using KalshiBotAPI.Configuration;
+using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using TradingStrategies.Configuration;
-using BacklashCommon.Configuration;
 
 namespace BacklashBotTests
 {
@@ -207,7 +200,7 @@ namespace BacklashBotTests
             ValidateConfig(interestScoreConfig, interestScoreSection);
 
             // ErrorHandlerConfig - "Central:ErrorHandler"
-            var errorHandlerConfig = new ErrorHandlerConfig();
+            var errorHandlerConfig = new CentralErrorHandlerConfig();
             var errorHandlerSection = _configuration.GetSection("Central:ErrorHandler");
             errorHandlerSection.Bind(errorHandlerConfig);
             ValidateConfig(errorHandlerConfig, errorHandlerSection);
@@ -233,10 +226,10 @@ namespace BacklashBotTests
             // Get all config types with SectionName from assemblies referenced by BacklashBot.csproj
             var assemblies = new[]
             {
-                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
-                typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
-                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
-                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
+                typeof(GeneralExecutionConfig).Assembly, // BacklashDTOs
+                typeof(SecretsConfig).Assembly, // BacklashCommon
                 typeof(MarketServiceDataConfig).Assembly // BacklashBot itself
             };
 
@@ -272,10 +265,9 @@ namespace BacklashBotTests
             // Automatically collect all SectionName values from assemblies referenced by BacklashBot.csproj
             var assemblies = new[]
             {
-                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
-                typeof(KalshiBotAPI.Configuration.KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
-                typeof(BacklashDTOs.Configuration.GeneralExecutionConfig).Assembly, // BacklashDTOs
-                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
+                typeof(SecretsConfig).Assembly, // BacklashCommon
                 typeof(MarketServiceDataConfig).Assembly // BacklashBot itself
             };
 
@@ -428,7 +420,7 @@ namespace BacklashBotTests
                 BrainStatusServiceConfig.SectionName,
                 SnapshotGroupHelperConfig.SectionName,
                 InterestScoreConfig.SectionName,
-                ErrorHandlerConfig.SectionName,
+                CentralErrorHandlerConfig.SectionName,
                 OrderBookServiceConfig.SectionName,
                 BacklashBotDataConfig.SectionName,
                 QueueMonitoringConfig.SectionName,

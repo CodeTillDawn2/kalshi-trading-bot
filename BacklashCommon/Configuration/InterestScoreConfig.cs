@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace BacklashDTOs.Configuration
+namespace BacklashCommon.Configuration
 {
     /// <summary>
     /// Configuration class for InterestScoreService settings.

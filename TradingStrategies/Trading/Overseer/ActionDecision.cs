@@ -1,5 +1,4 @@
 using static BacklashInterfaces.Enums.StrategyEnums;
-using System;
 
 namespace TradingStrategies.Trading.Overseer
 {

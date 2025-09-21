@@ -1,17 +1,14 @@
+using BacklashBot.Management.Interfaces;
+using BacklashDTOs.Exceptions;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BacklashDTOs.Exceptions;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Management;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Linq;
 
 namespace KalshiBotAPI.Websockets
 {

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>

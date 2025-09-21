@@ -1,17 +1,16 @@
-using KalshiBotAPI.Configuration;
-using KalshiBotAPI.WebSockets.Interfaces;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.Enums;
 using BacklashInterfaces.PerformanceMetrics;
+using KalshiBotAPI.Configuration;
+using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json;
 
 namespace KalshiBotAPI.Websockets
 {
@@ -196,7 +195,6 @@ namespace KalshiBotAPI.Websockets
         /// <param name="connectionManager">Manager for WebSocket connection lifecycle.</param>
         /// <param name="subscriptionManager">Manager for channel subscriptions and states.</param>
         /// <param name="messageProcessor">Processor for incoming WebSocket messages.</param>
-        /// <param name="dataCache">Cache for storing watched markets and other data.</param>
         /// <param name="performanceMetrics">Optional performance metrics service for recording WebSocket metrics.</param>
         /// <param name="writeToSql">Whether to write market data to SQL database.</param>
         /// <param name="webSocketBufferSize">Size of the WebSocket buffer in bytes. Default is 16KB.</param>
@@ -211,7 +209,6 @@ namespace KalshiBotAPI.Websockets
             IWebSocketConnectionManager connectionManager,
             ISubscriptionManager subscriptionManager,
             IMessageProcessor messageProcessor,
-            IDataCache dataCache,
             IWebSocketPerformanceMetrics? performanceMetrics = null,
             bool writeToSql = false,
             int webSocketBufferSize = 16384,
@@ -226,7 +223,6 @@ namespace KalshiBotAPI.Websockets
             _connectionManager = connectionManager;
             _subscriptionManager = subscriptionManager;
             _messageProcessor = messageProcessor;
-            _dataCache = dataCache;
             _performanceMetrics = performanceMetrics;
             WriteToSQL = writeToSql;
             _webSocketBufferSize = webSocketBufferSize;
@@ -775,7 +771,7 @@ namespace KalshiBotAPI.Websockets
 
         #endregion
 
-}
+    }
 
 
 }

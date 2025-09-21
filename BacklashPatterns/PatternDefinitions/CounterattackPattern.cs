@@ -1,5 +1,4 @@
 using BacklashDTOs;
-using System.Diagnostics;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions

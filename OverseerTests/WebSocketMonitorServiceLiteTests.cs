@@ -1,14 +1,10 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using NUnit.Framework;
-using BacklashOverseer;
-using KalshiBotAPI.WebSockets.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashDTOs.KalshiAPI;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using BacklashOverseer;
+using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace OverseerTests
 {
@@ -93,7 +89,8 @@ namespace OverseerTests
             // Act & Assert
             // The constructor may not validate all null parameters immediately
             // but some will cause issues during usage
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var service = new WebSocketMonitorServiceLite(
                     null,
                     _webSocketClientMock.Object,
@@ -101,7 +98,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var service = new WebSocketMonitorServiceLite(
                     _loggerMock.Object,
                     null,
@@ -109,7 +107,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var service = new WebSocketMonitorServiceLite(
                     _loggerMock.Object,
                     _webSocketClientMock.Object,

@@ -1,10 +1,8 @@
-using BacklashDTOs.Configuration;
-using BacklashDTOs.Data;
-using BacklashDTOs;
-using BacklashBot.Management.Interfaces;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using BacklashBot.Configuration;
+using BacklashBot.Management.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
 {

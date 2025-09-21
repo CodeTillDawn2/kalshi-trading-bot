@@ -1,17 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TradingStrategies.Strategies;
-using TradingStrategies.Trading.Overseer;
-using TradingStrategies.Extensions;
-using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace TradingStrategies.Trading.Overseer
 {

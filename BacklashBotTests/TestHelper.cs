@@ -1,13 +1,7 @@
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using BacklashBot.Configuration;
 using BacklashBot.State;
-using BacklashDTOs.Configuration;
-using TradingStrategies.Configuration;
-using BacklashBotTests.Configuration;
-using System;
-using System.Text.Json;
-using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace KalshiBotTests
 {
@@ -37,9 +31,9 @@ namespace KalshiBotTests
         /// The returned options object can be injected into services that depend on TradingConfig for isolated testing.
         /// </summary>
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured with standard test values.</returns>
-        public static IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> GetGeneralExecutionConfig()
+        public static IOptions<GeneralExecutionConfig> GetGeneralExecutionConfig()
         {
-            var config = GetConfiguration().GetSection("Central:GeneralExecution").Get<BacklashDTOs.Configuration.GeneralExecutionConfig>();
+            var config = GetConfiguration().GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
             return Options.Create(config);
         }
 

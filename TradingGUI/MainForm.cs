@@ -1,15 +1,14 @@
 // MainForm.cs
-using BacklashDTOs;
 using BacklashBotData.Data;
-using Microsoft.Extensions.Configuration;
+using BacklashDTOs;
+using Microsoft.Extensions.DependencyInjection;
+using ScottPlot.Plottable;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator;
 using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
-using ScottPlot.Plottable;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace TradingGUI
 {
@@ -289,7 +288,7 @@ namespace TradingGUI
 
                 // Query markets from database
                 var markets = await _context.GetMarketsFiltered(includedMarkets: bases.ToHashSet());
-                
+
                 foreach (var market in markets.OrderBy(m => m.market_ticker))
                 {
                     var pnlStr = pnlByBase.TryGetValue(market.market_ticker, out var pnl) ? pnl.ToString("F2") : "";

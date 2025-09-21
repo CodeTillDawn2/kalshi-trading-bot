@@ -1,7 +1,5 @@
-using NUnit.Framework;
-using BacklashDTOs;
 using BacklashBot.Helpers;
-using System.Collections.Generic;
+using BacklashDTOs;
 
 namespace KalshiBotTests
 {

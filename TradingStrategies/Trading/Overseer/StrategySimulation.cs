@@ -1,14 +1,11 @@
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using TradingStrategies.Configuration;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
-using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using BacklashInterfaces.PerformanceMetrics;
-using System.Diagnostics;
-using System.Linq;
-using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
-using System.Collections.Concurrent;
 
 namespace TradingStrategies.Trading.Overseer
 {

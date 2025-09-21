@@ -1,9 +1,8 @@
-using BacklashBotData.Data.Interfaces;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 
 namespace BacklashBot.Management

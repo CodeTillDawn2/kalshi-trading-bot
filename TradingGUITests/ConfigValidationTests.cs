@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
-
 using BacklashCommon.Configuration;
+using KalshiBotAPI.Configuration;
+using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using TradingGUI.Configuration;
 using TradingStrategies.Configuration;
-using KalshiBotAPI.Configuration;
-using BacklashDTOs.Configuration;
 
 namespace TradingGUITests
 {
@@ -197,7 +191,6 @@ namespace TradingGUITests
                 KalshiConfig.SectionName,
                 KalshiAPIServiceConfig.SectionName,
                 LoggingConfig.SectionName,
-                CandlestickServiceConfig.SectionName,
                 MarketTypeServiceConfig.SectionName,
                 EquityCalculatorConfig.SectionName,
                 StrategySelectionHelperConfig.SectionName,

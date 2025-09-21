@@ -1,5 +1,4 @@
 using BacklashBot.State.Interfaces;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics.Metrics;
 
 namespace BacklashBot.State

@@ -1,17 +1,15 @@
-using KalshiBotData.Data;
+using BacklashBot.Configuration;
+using BacklashBotData.Data;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
-using BacklashDTOs;
-using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using TradingStrategies.Configuration;
-using BacklashBotData.Data;
-using BacklashDTOs.Configuration;
 
 namespace KalshiBotTasks
 {

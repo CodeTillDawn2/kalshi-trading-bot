@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using BacklashOverseer.Services;
 using BacklashCommon.Performance;
+using BacklashOverseer.Services;
 
 namespace BacklashOverseer.Performance
 {

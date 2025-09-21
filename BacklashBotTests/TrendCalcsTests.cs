@@ -1,9 +1,7 @@
-using NUnit.Framework;
 using BacklashDTOs;
 using BacklashPatterns;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
 
 namespace KalshiBotTests
 {

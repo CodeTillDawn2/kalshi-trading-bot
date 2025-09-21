@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Provides a centralized mechanism for logging and exporting research data on trading entries during simulation and backtesting operations.

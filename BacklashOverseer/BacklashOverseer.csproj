@@ -62,9 +62,6 @@
     <ProjectReference Include="..\KalshiBotAPI\KalshiBotAPI.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
-    <ProjectReference Include="..\BacklashBot\BacklashBot.csproj">
-      <ExcludeAssets>Content</ExcludeAssets>
-    </ProjectReference>
     <ProjectReference Include="..\OverseerBotShared\OverseerBotShared.csproj" />
   </ItemGroup>
 

@@ -1,21 +1,14 @@
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using BacklashBot.Services.Interfaces;
-using BacklashDTOs.Exceptions;
+using BacklashBotData.Configuration;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using Polly;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Threading;
-using System.Runtime.InteropServices;
-
-using Polly;
-using Polly.Retry;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using BacklashInterfaces.PerformanceMetrics;
-using BacklashBotData.Configuration;
 namespace KalshiBotData.Data
 {
     /// <summary>
@@ -302,8 +295,8 @@ namespace KalshiBotData.Data
                     }
                 }
             });
-        
-    }
+
+        }
 
         /// <summary>
         /// Asynchronously stores order book data from WebSocket messages into the database queue for processing.
@@ -916,7 +909,7 @@ namespace KalshiBotData.Data
         }
 
 
-   
+
         /// <summary>
         /// Background worker method that continuously processes database operations from a specific queue.
         /// Executes stored procedures with retry logic for transient SQL errors and handles specific error conditions.
@@ -1066,5 +1059,5 @@ namespace KalshiBotData.Data
             public DateTime EnqueueTime { get; init; }
         }
     }
-    
+
 }

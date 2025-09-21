@@ -1,11 +1,9 @@
-using BacklashDTOs.Data;
-using TradingStrategies;
-using System.Text.RegularExpressions;
 using BacklashBot.Services.Interfaces;
-using BacklashDTOs;
-using BacklashDTOs.Configuration;
-using Microsoft.Extensions.Options;
 using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
+using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 using TradingStrategies.Configuration;
 
 namespace TradingSimulator

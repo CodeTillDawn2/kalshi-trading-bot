@@ -1,27 +1,20 @@
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
+using BacklashDTOs.Data;
+using BacklashDTOs.Helpers;
+using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
-using BacklashBotData.Data;
-
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework.Interfaces;
-using System.Diagnostics;
 using System.Text.Json;
-using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.State.Interfaces;
-using BacklashDTOs.Data;
-using BacklashDTOs.Helpers;
-using BacklashDTOs.KalshiAPI;
-using BacklashInterfaces.Constants;
-using BacklashInterfaces.PerformanceMetrics;
-using BacklashBotData.Data.Interfaces;
-using BacklashCommon.Configuration;
-using BacklashBotData.Configuration;
-using static BacklashCommon.Configuration.ConfigurationHelper;
 
 namespace KalshiBotTests
 {
@@ -293,7 +286,8 @@ namespace KalshiBotTests
                 .Verifiable();
 
             _contextMock.Setup(c => c.GetMarketByTicker(It.IsAny<string>()))
-                .ReturnsAsync((string ticker) => new MarketDTO {
+                .ReturnsAsync((string ticker) => new MarketDTO
+                {
                     market_ticker = ticker,
                     status = KalshiConstants.Status_Active
                 })
@@ -337,14 +331,16 @@ namespace KalshiBotTests
 
             // Additional methods that might be called
             _contextMock.Setup(c => c.GetEventByTicker(It.IsAny<string>()))
-                .ReturnsAsync((string ticker) => new EventDTO {
+                .ReturnsAsync((string ticker) => new EventDTO
+                {
                     event_ticker = ticker,
                     series_ticker = "TEST_SERIES"
                 })
                 .Verifiable();
 
             _contextMock.Setup(c => c.GetSeriesByTicker(It.IsAny<string>()))
-                .ReturnsAsync((string ticker) => new SeriesDTO {
+                .ReturnsAsync((string ticker) => new SeriesDTO
+                {
                     series_ticker = ticker,
                     title = "Test Series"
                 })

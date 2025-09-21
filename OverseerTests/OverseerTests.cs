@@ -1,21 +1,14 @@
+using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
+using BacklashOverseer;
+using BacklashOverseer.Config;
+using BacklashOverseer.Services;
+using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
-using BacklashOverseer;
-using KalshiBotAPI.WebSockets.Interfaces;
-using BacklashBot.KalshiAPI.Interfaces;
-using BacklashDTOs;
-using KalshiBotData.Data;
-using Microsoft.AspNetCore.SignalR;
-using BacklashOverseer.Services;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
-using BacklashBotData.Data.Interfaces;
-using BacklashOverseer.Models;
-using BacklashOverseer.Config;
 
 namespace OverseerTests
 {
@@ -119,7 +112,8 @@ namespace OverseerTests
             // Act & Assert
             // The constructor may not validate all null parameters immediately
             // but some will cause issues during usage
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     null,
                     _scopeFactoryMock.Object,
@@ -130,7 +124,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     _webSocketClientMock.Object,
                     null,
@@ -141,7 +136,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     _webSocketClientMock.Object,
                     _scopeFactoryMock.Object,
@@ -152,7 +148,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     _webSocketClientMock.Object,
                     _scopeFactoryMock.Object,
@@ -163,7 +160,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     _webSocketClientMock.Object,
                     _scopeFactoryMock.Object,
@@ -174,7 +172,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var overseer = new Overseer(
                     _webSocketClientMock.Object,
                     _scopeFactoryMock.Object,

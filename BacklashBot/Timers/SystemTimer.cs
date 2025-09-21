@@ -1,5 +1,4 @@
 using System.Timers;
-using BacklashInterfaces.SmokehouseBot.Timers;
 
 namespace BacklashBot.Timers
 {

@@ -1,10 +1,10 @@
 using BacklashDTOs;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text.Json;
-using TradingStrategies.Trading.Overseer;
 using TradingStrategies.ML.SpikePrediction;
+using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using Microsoft.Extensions.Logging;
 
 namespace TradingStrategies.Strategies.Strats
 {

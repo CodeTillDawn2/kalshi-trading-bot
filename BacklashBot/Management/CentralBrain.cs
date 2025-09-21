@@ -1,19 +1,17 @@
 // CentralBrain.cs
-using BacklashBotData.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using BacklashDTOs.Configuration;
-using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
-using BacklashInterfaces.SmokehouseBot.Services;
-using BTimer = BacklashInterfaces.SmokehouseBot.Timers.ITimer;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.SmokehouseBot.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using BacklashBot.Configuration;
+using BTimer = BacklashInterfaces.SmokehouseBot.Timers.ITimer;
 
 namespace BacklashBot.Management
 {
@@ -464,7 +462,7 @@ namespace BacklashBot.Management
                 // Start WebSocket services BEFORE snapshot timer to ensure markets receive data
                 _logger.LogDebug("BRAIN: Starting WebSocketHostedService...");
                 webSocketService.StartServices(_statusTrackerService.GetCancellationToken());
-               _logger.LogInformation("BRAIN: WebSocketHostedService started successfully");
+                _logger.LogInformation("BRAIN: WebSocketHostedService started successfully");
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 

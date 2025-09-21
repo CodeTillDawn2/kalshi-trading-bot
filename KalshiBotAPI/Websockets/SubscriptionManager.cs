@@ -1,14 +1,14 @@
-using KalshiBotAPI.WebSockets.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashDTOs;
+using BacklashInterfaces.Constants;
+using BacklashInterfaces.Enums;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
+using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BacklashInterfaces.Enums;
-using BacklashInterfaces.Constants;
-using BacklashInterfaces.PerformanceMetrics;
-using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
 using System.Text.Json;
-using BacklashDTOs;
 
 namespace KalshiBotAPI.Websockets
 {
@@ -218,44 +218,44 @@ namespace KalshiBotAPI.Websockets
             bool lockExitedEarly = false;
             _logger.LogInformation("Subscribing to channel: action={Action}, markets={Markets}, current subscriptions count: {Count}", action, string.Join(", ", marketTickers), _channelSubscriptions.Count);
 
-                // Check for subscription deduplication
-                var deduplicationKey = $"{action}:{string.Join(",", marketTickers.OrderBy(m => m))}";
-                if (_recentSubscriptions.TryGetValue(deduplicationKey, out var lastSubscriptionTime) &&
-                    DateTime.UtcNow - lastSubscriptionTime < TimeSpan.FromSeconds(5))
+            // Check for subscription deduplication
+            var deduplicationKey = $"{action}:{string.Join(",", marketTickers.OrderBy(m => m))}";
+            if (_recentSubscriptions.TryGetValue(deduplicationKey, out var lastSubscriptionTime) &&
+                DateTime.UtcNow - lastSubscriptionTime < TimeSpan.FromSeconds(5))
+            {
+                _logger.LogWarning("Duplicate subscription attempt for {Action} with markets {Markets}, skipping", action, string.Join(", ", marketTickers));
+                return;
+            }
+            _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
+
+            if (!_connectionManager.IsConnected())
+            {
+                if (_queuedSubscriptionUpdateRequests.Count >= _maxQueueSize)
                 {
-                    _logger.LogWarning("Duplicate subscription attempt for {Action} with markets {Markets}, skipping", action, string.Join(", ", marketTickers));
+                    _logger.LogWarning("Subscription queue full ({MaxSize}), dropping subscription: action={Action}, markets={Markets}", _maxQueueSize, action, string.Join(", ", marketTickers));
                     return;
                 }
-                _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
+                _logger.LogWarning("WebSocket not connected, queuing subscription: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
+                _queuedSubscriptionUpdateRequests.Enqueue(("add_markets", marketTickers, action));
+                return;
+            }
 
-                if (!_connectionManager.IsConnected())
-                {
-                    if (_queuedSubscriptionUpdateRequests.Count >= _maxQueueSize)
-                    {
-                        _logger.LogWarning("Subscription queue full ({MaxSize}), dropping subscription: action={Action}, markets={Markets}", _maxQueueSize, action, string.Join(", ", marketTickers));
-                        return;
-                    }
-                    _logger.LogWarning("WebSocket not connected, queuing subscription: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
-                    _queuedSubscriptionUpdateRequests.Enqueue(("add_markets", marketTickers, action));
-                    return;
-                }
+            // Track semaphore contention
+            var semaphoreWaitStart = DateTime.UtcNow;
+            await _channelSubscriptionSynchronizationSemaphore.WaitAsync(_processingCancellationToken);
+            var semaphoreWaitTime = DateTime.UtcNow - semaphoreWaitStart;
+            RecordLockMetrics("ChannelSubscriptionSemaphore", semaphoreWaitTime, semaphoreWaitTime > TimeSpan.Zero);
 
-                // Track semaphore contention
-                var semaphoreWaitStart = DateTime.UtcNow;
-                await _channelSubscriptionSynchronizationSemaphore.WaitAsync(_processingCancellationToken);
-                var semaphoreWaitTime = DateTime.UtcNow - semaphoreWaitStart;
-                RecordLockMetrics("ChannelSubscriptionSemaphore", semaphoreWaitTime, semaphoreWaitTime > TimeSpan.Zero);
+            // Track lock contention
+            var lockWaitStart = DateTime.UtcNow;
+            _subscriptionLock.EnterWriteLock();
+            var lockWaitTime = DateTime.UtcNow - lockWaitStart;
+            RecordLockMetrics("SubscriptionLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+            try
+            {
+                _processingCancellationToken.ThrowIfCancellationRequested();
 
-                // Track lock contention
-                var lockWaitStart = DateTime.UtcNow;
-                _subscriptionLock.EnterWriteLock();
-                var lockWaitTime = DateTime.UtcNow - lockWaitStart;
-                RecordLockMetrics("SubscriptionLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
-                try
-                {
-                    _processingCancellationToken.ThrowIfCancellationRequested();
-
-                    var channel = GetChannelName(action);
+                var channel = GetChannelName(action);
                 if (!_channelSubscriptions.TryGetValue(channel, out var subscription))
                 {
                     subscription = (0, new HashSet<string>());

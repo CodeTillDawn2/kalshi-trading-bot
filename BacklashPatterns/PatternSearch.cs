@@ -1,11 +1,10 @@
 using BacklashDTOs;
-using BacklashPatterns.PatternDefinitions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using static BacklashPatterns.PatternUtils;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashPatterns.PatternDefinitions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns
 {
@@ -299,423 +298,423 @@ namespace BacklashPatterns
                 var detailedPatterns = new Dictionary<int, List<PatternDefinition>>();
                 int initialCapacity = config.InitialPatternCapacity; // Configurable initial size for patterns per candle
 
-            for (int i = 0; i < prices.Length; i++)
-            {
-                CandidatePatternIndices.Clear();
-                var patternsFound = new PatternDefinition[initialCapacity]; // Now stores PatternDefinition objects
-                int patternCount = 0;
-
-                var current = prices[i];
-                var previous = i > 0 ? prices[i - 1] : null;
-
-                // Significance check to skip insignificant candles
-                bool isSignificant = IsPatternSignificant(current, previous) ?? false;
-                if (!isSignificant) continue;
-
-                // 1-Candle Patterns
-                if (i >= 1)
+                for (int i = 0; i < prices.Length; i++)
                 {
-                    bool hasContext = previous != null && (Math.Abs(current.Close - previous.Close) >= config.SignificancePriceThreshold ||
-                                      current.Volume > previous.Volume * config.VolumeIncreaseMultiplier);
+                    CandidatePatternIndices.Clear();
+                    var patternsFound = new PatternDefinition[initialCapacity]; // Now stores PatternDefinition objects
+                    int patternCount = 0;
 
-                    if (hasContext)
+                    var current = prices[i];
+                    var previous = i > 0 ? prices[i - 1] : null;
+
+                    // Significance check to skip insignificant candles
+                    bool isSignificant = IsPatternSignificant(current, previous) ?? false;
+                    if (!isSignificant) continue;
+
+                    // 1-Candle Patterns
+                    if (i >= 1)
                     {
-                        // RickshawMan check
-                        var rickshawMan = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await RickshawManPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "RickshawMan", metrics);
-                        if (rickshawMan != null)
-                            AddPattern(rickshawMan, patternsFound, ref patternCount, initialCapacity);
+                        bool hasContext = previous != null && (Math.Abs(current.Close - previous.Close) >= config.SignificancePriceThreshold ||
+                                          current.Volume > previous.Volume * config.VolumeIncreaseMultiplier);
 
-                        // LongLeggedDoji check
-                        var longLeggedDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await LongLeggedDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "LongLeggedDoji", metrics);
-                        if (longLeggedDoji != null)
-                            AddPattern(longLeggedDoji, patternsFound, ref patternCount, initialCapacity);
-
-                        // DragonflyDoji check
-                        var dragonflyDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await DragonflyDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "DragonflyDoji", metrics);
-                        if (dragonflyDoji != null)
-                            AddPattern(dragonflyDoji, patternsFound, ref patternCount, initialCapacity);
-
-                        // GravestoneDoji check
-                        var gravestoneDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await GravestoneDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "gravestoneDoji", metrics);
-                        if (gravestoneDoji != null)
-                            AddPattern(gravestoneDoji, patternsFound, ref patternCount, initialCapacity);
-                    }
-                }
-
-                var doji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await DojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "doji", metrics);
-                if (doji != null)
-                    AddPattern(doji, patternsFound, ref patternCount, initialCapacity);
-
-                var hammer = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HammerPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "hammer", metrics);
-                if (hammer != null)
-                    AddPattern(hammer, patternsFound, ref patternCount, initialCapacity);
-
-                var hangingMan = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HangingManPattern.IsPatternAsync(metricsCache, i, prices, trendLookback), "hangingMan", metrics);
-                if (hangingMan != null)
-                    AddPattern(hangingMan, patternsFound, ref patternCount, initialCapacity);
-
-                var invertedHammer = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await InvertedHammerPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "invertedHammer", metrics);
-                if (invertedHammer != null)
-                    AddPattern(invertedHammer, patternsFound, ref patternCount, initialCapacity);
-
-                var shootingStar = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await ShootingStarPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "shootingStar", metrics);
-                if (shootingStar != null)
-                    AddPattern(shootingStar, patternsFound, ref patternCount, initialCapacity);
-
-                var takuri = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await TakuriPattern.IsPatternAsync(i, trendLookback, metricsCache, prices), "takuri", metrics);
-                if (takuri != null)
-                    AddPattern(takuri, patternsFound, ref patternCount, initialCapacity);
-
-                var spinningTop = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await SpinningTopPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "spinningTop", metrics);
-                if (spinningTop != null)
-                    AddPattern(spinningTop, patternsFound, ref patternCount, initialCapacity);
-
-                var highWaveCandle = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HighWaveCandlePattern.IsPatternAsync(i, trendLookback, prices, metricsCache), "highWaveCandle", metrics);
-                if (highWaveCandle != null)
-                    AddPattern(highWaveCandle, patternsFound, ref patternCount, initialCapacity);
-
-                // 2-Candle Patterns
-                if (i >= 1)
-                {
-                    var beltHoldBullish = await BeltHoldPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, PatternDirection.Bullish);
-                    if (beltHoldBullish != null)
-                        AddPattern(beltHoldBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var beltHoldBearish = await BeltHoldPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, PatternDirection.Bearish);
-                    if (beltHoldBearish != null)
-                        AddPattern(beltHoldBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var engulfingBullish = await EngulfingPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, true);
-                    if (engulfingBullish != null)
-                        AddPattern(engulfingBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var engulfingBearish = await EngulfingPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, false);
-                    if (engulfingBearish != null)
-                        AddPattern(engulfingBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var closingMarubozuBullish = await ClosingMarubozuPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, PatternDirection.Bullish);
-                    if (closingMarubozuBullish != null)
-                        AddPattern(closingMarubozuBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var closingMarubozuBearish = await ClosingMarubozuPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, PatternDirection.Bearish);
-                    if (closingMarubozuBearish != null)
-                        AddPattern(closingMarubozuBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var counterattackBullish = await CounterattackPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, true);
-                    if (counterattackBullish != null)
-                        AddPattern(counterattackBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var counterattackBearish = await CounterattackPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, false);
-                    if (counterattackBearish != null)
-                        AddPattern(counterattackBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var darkCloudCover = await DarkCloudCoverPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
-                    if (darkCloudCover != null)
-                        AddPattern(darkCloudCover, patternsFound, ref patternCount, initialCapacity);
-
-                    var dojiStar = await DojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                    if (dojiStar != null)
-                        AddPattern(dojiStar, patternsFound, ref patternCount, initialCapacity);
-
-                    var haramiBullish = await HaramiPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, true);
-                    if (haramiBullish != null)
-                        AddPattern(haramiBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var haramiBearish = await HaramiPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, false);
-                    if (haramiBearish != null)
-                        AddPattern(haramiBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var homingPigeon = await HomingPigeonPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
-                    if (homingPigeon != null)
-                        AddPattern(homingPigeon, patternsFound, ref patternCount, initialCapacity);
-
-                    var inNeck = await InNeckPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
-                    if (inNeck != null)
-                        AddPattern(inNeck, patternsFound, ref patternCount, initialCapacity);
-
-                    var kickingBullish = await KickingPattern.IsPatternAsync(i, true, trendLookback, metricsCache, prices);
-                    if (kickingBullish != null)
-                        AddPattern(kickingBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var kickingBearish = await KickingPattern.IsPatternAsync(i, false, trendLookback, metricsCache, prices);
-                    if (kickingBearish != null)
-                        AddPattern(kickingBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var kickingByLengthBullish = await KickingByLengthPattern.IsPatternAsync(i, trendLookback, true, metricsCache, prices);
-                    if (kickingByLengthBullish != null)
-                        AddPattern(kickingByLengthBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var kickingByLengthBearish = await KickingByLengthPattern.IsPatternAsync(i, trendLookback, false, metricsCache, prices);
-                    if (kickingByLengthBearish != null)
-                        AddPattern(kickingByLengthBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var longLineCandleBullish = await LongLineCandlePattern.IsPatternAsync(metricsCache, true, i, trendLookback, prices);
-                    if (longLineCandleBullish != null)
-                        AddPattern(longLineCandleBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var longLineCandleBearish = await LongLineCandlePattern.IsPatternAsync(metricsCache, false, i, trendLookback, prices);
-                    if (longLineCandleBearish != null)
-                        AddPattern(longLineCandleBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var marubozuBullish = await MarubozuPattern.IsPatternAsync(metricsCache, i, trendLookback, true, prices);
-                    if (marubozuBullish != null)
-                        AddPattern(marubozuBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var marubozuBearish = await MarubozuPattern.IsPatternAsync(metricsCache, i, trendLookback, false, prices);
-                    if (marubozuBearish != null)
-                        AddPattern(marubozuBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var onNeck = await OnNeckPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
-                    if (onNeck != null)
-                        AddPattern(onNeck, patternsFound, ref patternCount, initialCapacity);
-
-                    var piercing = await PiercingPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
-                    if (piercing != null)
-                        AddPattern(piercing, patternsFound, ref patternCount, initialCapacity);
-
-                    var separatingLinesBullish = await SeparatingLinesPattern.IsPatternAsync(metricsCache, i, trendLookback, PatternDirection.Bullish, prices);
-                    if (separatingLinesBullish != null)
-                        AddPattern(separatingLinesBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var separatingLinesBearish = await SeparatingLinesPattern.IsPatternAsync(metricsCache, i, trendLookback, PatternDirection.Bearish, prices);
-                    if (separatingLinesBearish != null)
-                        AddPattern(separatingLinesBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    var thrustingBullish = await ThrustingPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                    if (thrustingBullish != null)
-                        AddPattern(thrustingBullish, patternsFound, ref patternCount, initialCapacity);
-
-                    var thrustingBearish = await ThrustingPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                    if (thrustingBearish != null)
-                        AddPattern(thrustingBearish, patternsFound, ref patternCount, initialCapacity);
-
-                    // 3-Candle Patterns
-                    if (i >= 2)
-                    {
-                        var abandonedBabyBullish = await AbandonedBabyPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, PatternDirection.Bullish);
-                        if (abandonedBabyBullish != null)
-                            AddPattern(abandonedBabyBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var abandonedBabyBearish = await AbandonedBabyPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, PatternDirection.Bearish);
-                        if (abandonedBabyBearish != null)
-                            AddPattern(abandonedBabyBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var morningDojiStar = await MorningDojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (morningDojiStar != null)
-                            AddPattern(morningDojiStar, patternsFound, ref patternCount, initialCapacity);
-
-                        var twoCrows = await TwoCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (twoCrows != null)
-                            AddPattern(twoCrows, patternsFound, ref patternCount, initialCapacity);
-
-                        var morningStar = await MorningStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (morningStar != null)
-                            AddPattern(morningStar, patternsFound, ref patternCount, initialCapacity);
-
-                        var unique3River = await Unique3RiverPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (unique3River != null)
-                            AddPattern(unique3River, patternsFound, ref patternCount, initialCapacity);
-
-                        var downsideGapThreeMethods = await DownsideGapThreeMethodsPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
-                        if (downsideGapThreeMethods != null)
-                            AddPattern(downsideGapThreeMethods, patternsFound, ref patternCount, initialCapacity);
-
-                        var eveningDojiStar = await EveningDojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (eveningDojiStar != null)
-                            AddPattern(eveningDojiStar, patternsFound, ref patternCount, initialCapacity);
-
-                        var eveningStar = await EveningStarPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
-                        if (eveningStar != null)
-                            AddPattern(eveningStar, patternsFound, ref patternCount, initialCapacity);
-
-                        var modifiedHikkakeBullish = await ModifiedHikkakePattern.IsPatternAsync(i, true, prices, metricsCache, trendLookback);
-                        if (modifiedHikkakeBullish != null)
-                            AddPattern(modifiedHikkakeBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var modifiedHikkakeBearish = await ModifiedHikkakePattern.IsPatternAsync(i, false, prices, metricsCache, trendLookback);
-                        if (modifiedHikkakeBearish != null)
-                            AddPattern(modifiedHikkakeBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var hikkakeBullish = await HikkakePattern.IsPatternAsync(i, trendLookback, true, prices, metricsCache);
-                        if (hikkakeBullish != null)
-                            AddPattern(hikkakeBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var hikkakeBearish = await HikkakePattern.IsPatternAsync(i, trendLookback, false, prices, metricsCache);
-                        if (hikkakeBearish != null)
-                            AddPattern(hikkakeBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var identicalThreeCrows = await IdenticalThreeCrowsPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
-                        if (identicalThreeCrows != null)
-                            AddPattern(identicalThreeCrows, patternsFound, ref patternCount, initialCapacity);
-
-                        var stickSandwichBullish = await StickSandwichPattern.IsPatternAsync(i, PatternDirection.Bullish, prices, metricsCache, trendLookback);
-                        if (stickSandwichBullish != null)
-                            AddPattern(stickSandwichBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var stickSandwichBearish = await StickSandwichPattern.IsPatternAsync(i, PatternDirection.Bearish, prices, metricsCache, trendLookback);
-                        if (stickSandwichBearish != null)
-                            AddPattern(stickSandwichBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var tasukiGapBullish = await TasukiGapPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (tasukiGapBullish != null)
-                            AddPattern(tasukiGapBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var tasukiGapBearish = await TasukiGapPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (tasukiGapBearish != null)
-                            AddPattern(tasukiGapBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var tristarBullish = await TristarPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (tristarBullish != null)
-                            AddPattern(tristarBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var tristarBearish = await TristarPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (tristarBearish != null)
-                            AddPattern(tristarBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeInsideUp = await ThreeInsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (threeInsideUp != null)
-                            AddPattern(threeInsideUp, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeInsideDown = await ThreeInsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (threeInsideDown != null)
-                            AddPattern(threeInsideDown, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeOutsideUp = await ThreeOutsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (threeOutsideUp != null)
-                            AddPattern(threeOutsideUp, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeOutsideDown = await ThreeOutsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (threeOutsideDown != null)
-                            AddPattern(threeOutsideDown, patternsFound, ref patternCount, initialCapacity);
-
-                        var shortLineCandleBullish = await ShortLineCandlePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, metricsCache, prices);
-                        if (shortLineCandleBullish != null)
-                            AddPattern(shortLineCandleBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var shortLineCandleBearish = await ShortLineCandlePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, metricsCache, prices);
-                        if (shortLineCandleBearish != null)
-                            AddPattern(shortLineCandleBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var stalledPattern = await StalledPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (stalledPattern != null)
-                            AddPattern(stalledPattern, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeAdvancingWhiteSoldiers = await ThreeAdvancingWhiteSoldiersPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (threeAdvancingWhiteSoldiers != null)
-                            AddPattern(threeAdvancingWhiteSoldiers, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeBlackCrows = await ThreeBlackCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (threeBlackCrows != null)
-                            AddPattern(threeBlackCrows, patternsFound, ref patternCount, initialCapacity);
-
-                        var threeStarsInTheSouth = await ThreeStarsInTheSouthPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (threeStarsInTheSouth != null)
-                            AddPattern(threeStarsInTheSouth, patternsFound, ref patternCount, initialCapacity);
-
-                        var upsideGapTwoCrows = await UpsideGapTwoCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                        if (upsideGapTwoCrows != null)
-                            AddPattern(upsideGapTwoCrows, patternsFound, ref patternCount, initialCapacity);
-
-                        var upsideDownsideGapThreeMethodsBullish = await UpsideDownsideGapThreeMethodsPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (upsideDownsideGapThreeMethodsBullish != null)
-                            AddPattern(upsideDownsideGapThreeMethodsBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var upsideDownsideGapThreeMethodsBearish = await UpsideDownsideGapThreeMethodsPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (upsideDownsideGapThreeMethodsBearish != null)
-                            AddPattern(upsideDownsideGapThreeMethodsBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        var upDownGapSideBySideWhiteLinesBullish = await UpDownGapSideBySideWhiteLinesPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                        if (upDownGapSideBySideWhiteLinesBullish != null)
-                            AddPattern(upDownGapSideBySideWhiteLinesBullish, patternsFound, ref patternCount, initialCapacity);
-
-                        var upDownGapSideBySideWhiteLinesBearish = await UpDownGapSideBySideWhiteLinesPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                        if (upDownGapSideBySideWhiteLinesBearish != null)
-                            AddPattern(upDownGapSideBySideWhiteLinesBearish, patternsFound, ref patternCount, initialCapacity);
-
-                        // 4-Candle Patterns
-                        if (i >= 3)
+                        if (hasContext)
                         {
-                            var concealingBabySwallow = await ConcealingBabySwallowPattern.IsPatternAsync(i, prices, metricsCache, trendLookback);
-                            if (concealingBabySwallow != null)
-                                AddPattern(concealingBabySwallow, patternsFound, ref patternCount, initialCapacity);
+                            // RickshawMan check
+                            var rickshawMan = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await RickshawManPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "RickshawMan", metrics);
+                            if (rickshawMan != null)
+                                AddPattern(rickshawMan, patternsFound, ref patternCount, initialCapacity);
 
-                            var threeLineStrikeBullish = await ThreeLineStrikePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
-                            if (threeLineStrikeBullish != null)
-                                AddPattern(threeLineStrikeBullish, patternsFound, ref patternCount, initialCapacity);
+                            // LongLeggedDoji check
+                            var longLeggedDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await LongLeggedDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "LongLeggedDoji", metrics);
+                            if (longLeggedDoji != null)
+                                AddPattern(longLeggedDoji, patternsFound, ref patternCount, initialCapacity);
 
-                            var threeLineStrikeBearish = await ThreeLineStrikePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
-                            if (threeLineStrikeBearish != null)
-                                AddPattern(threeLineStrikeBearish, patternsFound, ref patternCount, initialCapacity);
+                            // DragonflyDoji check
+                            var dragonflyDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await DragonflyDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "DragonflyDoji", metrics);
+                            if (dragonflyDoji != null)
+                                AddPattern(dragonflyDoji, patternsFound, ref patternCount, initialCapacity);
 
-                            // 5-Candle Patterns
-                            if (i >= 4)
+                            // GravestoneDoji check
+                            var gravestoneDoji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await GravestoneDojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "gravestoneDoji", metrics);
+                            if (gravestoneDoji != null)
+                                AddPattern(gravestoneDoji, patternsFound, ref patternCount, initialCapacity);
+                        }
+                    }
+
+                    var doji = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await DojiPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "doji", metrics);
+                    if (doji != null)
+                        AddPattern(doji, patternsFound, ref patternCount, initialCapacity);
+
+                    var hammer = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HammerPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "hammer", metrics);
+                    if (hammer != null)
+                        AddPattern(hammer, patternsFound, ref patternCount, initialCapacity);
+
+                    var hangingMan = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HangingManPattern.IsPatternAsync(metricsCache, i, prices, trendLookback), "hangingMan", metrics);
+                    if (hangingMan != null)
+                        AddPattern(hangingMan, patternsFound, ref patternCount, initialCapacity);
+
+                    var invertedHammer = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await InvertedHammerPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "invertedHammer", metrics);
+                    if (invertedHammer != null)
+                        AddPattern(invertedHammer, patternsFound, ref patternCount, initialCapacity);
+
+                    var shootingStar = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await ShootingStarPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "shootingStar", metrics);
+                    if (shootingStar != null)
+                        AddPattern(shootingStar, patternsFound, ref patternCount, initialCapacity);
+
+                    var takuri = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await TakuriPattern.IsPatternAsync(i, trendLookback, metricsCache, prices), "takuri", metrics);
+                    if (takuri != null)
+                        AddPattern(takuri, patternsFound, ref patternCount, initialCapacity);
+
+                    var spinningTop = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await SpinningTopPattern.IsPatternAsync(metricsCache, i, trendLookback, prices), "spinningTop", metrics);
+                    if (spinningTop != null)
+                        AddPattern(spinningTop, patternsFound, ref patternCount, initialCapacity);
+
+                    var highWaveCandle = await CheckPatternWithMetricsAsync(async () => (PatternDefinition?)await HighWaveCandlePattern.IsPatternAsync(i, trendLookback, prices, metricsCache), "highWaveCandle", metrics);
+                    if (highWaveCandle != null)
+                        AddPattern(highWaveCandle, patternsFound, ref patternCount, initialCapacity);
+
+                    // 2-Candle Patterns
+                    if (i >= 1)
+                    {
+                        var beltHoldBullish = await BeltHoldPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, PatternDirection.Bullish);
+                        if (beltHoldBullish != null)
+                            AddPattern(beltHoldBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var beltHoldBearish = await BeltHoldPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, PatternDirection.Bearish);
+                        if (beltHoldBearish != null)
+                            AddPattern(beltHoldBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var engulfingBullish = await EngulfingPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, true);
+                        if (engulfingBullish != null)
+                            AddPattern(engulfingBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var engulfingBearish = await EngulfingPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, false);
+                        if (engulfingBearish != null)
+                            AddPattern(engulfingBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var closingMarubozuBullish = await ClosingMarubozuPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, PatternDirection.Bullish);
+                        if (closingMarubozuBullish != null)
+                            AddPattern(closingMarubozuBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var closingMarubozuBearish = await ClosingMarubozuPattern.IsPatternAsync(i, metricsCache, prices, trendLookback, PatternDirection.Bearish);
+                        if (closingMarubozuBearish != null)
+                            AddPattern(closingMarubozuBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var counterattackBullish = await CounterattackPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, true);
+                        if (counterattackBullish != null)
+                            AddPattern(counterattackBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var counterattackBearish = await CounterattackPattern.IsPatternAsync(i, trendLookback, prices, metricsCache, false);
+                        if (counterattackBearish != null)
+                            AddPattern(counterattackBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var darkCloudCover = await DarkCloudCoverPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
+                        if (darkCloudCover != null)
+                            AddPattern(darkCloudCover, patternsFound, ref patternCount, initialCapacity);
+
+                        var dojiStar = await DojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                        if (dojiStar != null)
+                            AddPattern(dojiStar, patternsFound, ref patternCount, initialCapacity);
+
+                        var haramiBullish = await HaramiPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, true);
+                        if (haramiBullish != null)
+                            AddPattern(haramiBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var haramiBearish = await HaramiPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, false);
+                        if (haramiBearish != null)
+                            AddPattern(haramiBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var homingPigeon = await HomingPigeonPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
+                        if (homingPigeon != null)
+                            AddPattern(homingPigeon, patternsFound, ref patternCount, initialCapacity);
+
+                        var inNeck = await InNeckPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
+                        if (inNeck != null)
+                            AddPattern(inNeck, patternsFound, ref patternCount, initialCapacity);
+
+                        var kickingBullish = await KickingPattern.IsPatternAsync(i, true, trendLookback, metricsCache, prices);
+                        if (kickingBullish != null)
+                            AddPattern(kickingBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var kickingBearish = await KickingPattern.IsPatternAsync(i, false, trendLookback, metricsCache, prices);
+                        if (kickingBearish != null)
+                            AddPattern(kickingBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var kickingByLengthBullish = await KickingByLengthPattern.IsPatternAsync(i, trendLookback, true, metricsCache, prices);
+                        if (kickingByLengthBullish != null)
+                            AddPattern(kickingByLengthBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var kickingByLengthBearish = await KickingByLengthPattern.IsPatternAsync(i, trendLookback, false, metricsCache, prices);
+                        if (kickingByLengthBearish != null)
+                            AddPattern(kickingByLengthBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var longLineCandleBullish = await LongLineCandlePattern.IsPatternAsync(metricsCache, true, i, trendLookback, prices);
+                        if (longLineCandleBullish != null)
+                            AddPattern(longLineCandleBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var longLineCandleBearish = await LongLineCandlePattern.IsPatternAsync(metricsCache, false, i, trendLookback, prices);
+                        if (longLineCandleBearish != null)
+                            AddPattern(longLineCandleBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var marubozuBullish = await MarubozuPattern.IsPatternAsync(metricsCache, i, trendLookback, true, prices);
+                        if (marubozuBullish != null)
+                            AddPattern(marubozuBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var marubozuBearish = await MarubozuPattern.IsPatternAsync(metricsCache, i, trendLookback, false, prices);
+                        if (marubozuBearish != null)
+                            AddPattern(marubozuBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var onNeck = await OnNeckPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
+                        if (onNeck != null)
+                            AddPattern(onNeck, patternsFound, ref patternCount, initialCapacity);
+
+                        var piercing = await PiercingPattern.IsPatternAsync(i, trendLookback, metricsCache, prices);
+                        if (piercing != null)
+                            AddPattern(piercing, patternsFound, ref patternCount, initialCapacity);
+
+                        var separatingLinesBullish = await SeparatingLinesPattern.IsPatternAsync(metricsCache, i, trendLookback, PatternDirection.Bullish, prices);
+                        if (separatingLinesBullish != null)
+                            AddPattern(separatingLinesBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var separatingLinesBearish = await SeparatingLinesPattern.IsPatternAsync(metricsCache, i, trendLookback, PatternDirection.Bearish, prices);
+                        if (separatingLinesBearish != null)
+                            AddPattern(separatingLinesBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        var thrustingBullish = await ThrustingPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                        if (thrustingBullish != null)
+                            AddPattern(thrustingBullish, patternsFound, ref patternCount, initialCapacity);
+
+                        var thrustingBearish = await ThrustingPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                        if (thrustingBearish != null)
+                            AddPattern(thrustingBearish, patternsFound, ref patternCount, initialCapacity);
+
+                        // 3-Candle Patterns
+                        if (i >= 2)
+                        {
+                            var abandonedBabyBullish = await AbandonedBabyPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, PatternDirection.Bullish);
+                            if (abandonedBabyBullish != null)
+                                AddPattern(abandonedBabyBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var abandonedBabyBearish = await AbandonedBabyPattern.IsPatternAsync(i, trendLookback, metricsCache, prices, PatternDirection.Bearish);
+                            if (abandonedBabyBearish != null)
+                                AddPattern(abandonedBabyBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var morningDojiStar = await MorningDojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (morningDojiStar != null)
+                                AddPattern(morningDojiStar, patternsFound, ref patternCount, initialCapacity);
+
+                            var twoCrows = await TwoCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (twoCrows != null)
+                                AddPattern(twoCrows, patternsFound, ref patternCount, initialCapacity);
+
+                            var morningStar = await MorningStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (morningStar != null)
+                                AddPattern(morningStar, patternsFound, ref patternCount, initialCapacity);
+
+                            var unique3River = await Unique3RiverPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (unique3River != null)
+                                AddPattern(unique3River, patternsFound, ref patternCount, initialCapacity);
+
+                            var downsideGapThreeMethods = await DownsideGapThreeMethodsPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
+                            if (downsideGapThreeMethods != null)
+                                AddPattern(downsideGapThreeMethods, patternsFound, ref patternCount, initialCapacity);
+
+                            var eveningDojiStar = await EveningDojiStarPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (eveningDojiStar != null)
+                                AddPattern(eveningDojiStar, patternsFound, ref patternCount, initialCapacity);
+
+                            var eveningStar = await EveningStarPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
+                            if (eveningStar != null)
+                                AddPattern(eveningStar, patternsFound, ref patternCount, initialCapacity);
+
+                            var modifiedHikkakeBullish = await ModifiedHikkakePattern.IsPatternAsync(i, true, prices, metricsCache, trendLookback);
+                            if (modifiedHikkakeBullish != null)
+                                AddPattern(modifiedHikkakeBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var modifiedHikkakeBearish = await ModifiedHikkakePattern.IsPatternAsync(i, false, prices, metricsCache, trendLookback);
+                            if (modifiedHikkakeBearish != null)
+                                AddPattern(modifiedHikkakeBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var hikkakeBullish = await HikkakePattern.IsPatternAsync(i, trendLookback, true, prices, metricsCache);
+                            if (hikkakeBullish != null)
+                                AddPattern(hikkakeBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var hikkakeBearish = await HikkakePattern.IsPatternAsync(i, trendLookback, false, prices, metricsCache);
+                            if (hikkakeBearish != null)
+                                AddPattern(hikkakeBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var identicalThreeCrows = await IdenticalThreeCrowsPattern.IsPatternAsync(i, prices, trendLookback, metricsCache);
+                            if (identicalThreeCrows != null)
+                                AddPattern(identicalThreeCrows, patternsFound, ref patternCount, initialCapacity);
+
+                            var stickSandwichBullish = await StickSandwichPattern.IsPatternAsync(i, PatternDirection.Bullish, prices, metricsCache, trendLookback);
+                            if (stickSandwichBullish != null)
+                                AddPattern(stickSandwichBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var stickSandwichBearish = await StickSandwichPattern.IsPatternAsync(i, PatternDirection.Bearish, prices, metricsCache, trendLookback);
+                            if (stickSandwichBearish != null)
+                                AddPattern(stickSandwichBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var tasukiGapBullish = await TasukiGapPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (tasukiGapBullish != null)
+                                AddPattern(tasukiGapBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var tasukiGapBearish = await TasukiGapPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (tasukiGapBearish != null)
+                                AddPattern(tasukiGapBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var tristarBullish = await TristarPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (tristarBullish != null)
+                                AddPattern(tristarBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var tristarBearish = await TristarPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (tristarBearish != null)
+                                AddPattern(tristarBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeInsideUp = await ThreeInsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (threeInsideUp != null)
+                                AddPattern(threeInsideUp, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeInsideDown = await ThreeInsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (threeInsideDown != null)
+                                AddPattern(threeInsideDown, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeOutsideUp = await ThreeOutsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (threeOutsideUp != null)
+                                AddPattern(threeOutsideUp, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeOutsideDown = await ThreeOutsidePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (threeOutsideDown != null)
+                                AddPattern(threeOutsideDown, patternsFound, ref patternCount, initialCapacity);
+
+                            var shortLineCandleBullish = await ShortLineCandlePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, metricsCache, prices);
+                            if (shortLineCandleBullish != null)
+                                AddPattern(shortLineCandleBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var shortLineCandleBearish = await ShortLineCandlePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, metricsCache, prices);
+                            if (shortLineCandleBearish != null)
+                                AddPattern(shortLineCandleBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var stalledPattern = await StalledPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (stalledPattern != null)
+                                AddPattern(stalledPattern, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeAdvancingWhiteSoldiers = await ThreeAdvancingWhiteSoldiersPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (threeAdvancingWhiteSoldiers != null)
+                                AddPattern(threeAdvancingWhiteSoldiers, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeBlackCrows = await ThreeBlackCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (threeBlackCrows != null)
+                                AddPattern(threeBlackCrows, patternsFound, ref patternCount, initialCapacity);
+
+                            var threeStarsInTheSouth = await ThreeStarsInTheSouthPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (threeStarsInTheSouth != null)
+                                AddPattern(threeStarsInTheSouth, patternsFound, ref patternCount, initialCapacity);
+
+                            var upsideGapTwoCrows = await UpsideGapTwoCrowsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                            if (upsideGapTwoCrows != null)
+                                AddPattern(upsideGapTwoCrows, patternsFound, ref patternCount, initialCapacity);
+
+                            var upsideDownsideGapThreeMethodsBullish = await UpsideDownsideGapThreeMethodsPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (upsideDownsideGapThreeMethodsBullish != null)
+                                AddPattern(upsideDownsideGapThreeMethodsBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var upsideDownsideGapThreeMethodsBearish = await UpsideDownsideGapThreeMethodsPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (upsideDownsideGapThreeMethodsBearish != null)
+                                AddPattern(upsideDownsideGapThreeMethodsBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            var upDownGapSideBySideWhiteLinesBullish = await UpDownGapSideBySideWhiteLinesPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                            if (upDownGapSideBySideWhiteLinesBullish != null)
+                                AddPattern(upDownGapSideBySideWhiteLinesBullish, patternsFound, ref patternCount, initialCapacity);
+
+                            var upDownGapSideBySideWhiteLinesBearish = await UpDownGapSideBySideWhiteLinesPattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                            if (upDownGapSideBySideWhiteLinesBearish != null)
+                                AddPattern(upDownGapSideBySideWhiteLinesBearish, patternsFound, ref patternCount, initialCapacity);
+
+                            // 4-Candle Patterns
+                            if (i >= 3)
                             {
-                                var breakawayBullish = await BreakawayPattern.IsPatternAsync(i, prices, metricsCache, PatternDirection.Bullish, trendLookback);
-                                if (breakawayBullish != null)
-                                    AddPattern(breakawayBullish, patternsFound, ref patternCount, initialCapacity);
+                                var concealingBabySwallow = await ConcealingBabySwallowPattern.IsPatternAsync(i, prices, metricsCache, trendLookback);
+                                if (concealingBabySwallow != null)
+                                    AddPattern(concealingBabySwallow, patternsFound, ref patternCount, initialCapacity);
 
-                                var breakawayBearish = await BreakawayPattern.IsPatternAsync(i, prices, metricsCache, PatternDirection.Bearish, trendLookback);
-                                if (breakawayBearish != null)
-                                    AddPattern(breakawayBearish, patternsFound, ref patternCount, initialCapacity);
+                                var threeLineStrikeBullish = await ThreeLineStrikePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bullish, prices, metricsCache);
+                                if (threeLineStrikeBullish != null)
+                                    AddPattern(threeLineStrikeBullish, patternsFound, ref patternCount, initialCapacity);
 
-                                var ladderBottom = await LadderBottomPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                                if (ladderBottom != null)
-                                    AddPattern(ladderBottom, patternsFound, ref patternCount, initialCapacity);
+                                var threeLineStrikeBearish = await ThreeLineStrikePattern.IsPatternAsync(i, trendLookback, PatternDirection.Bearish, prices, metricsCache);
+                                if (threeLineStrikeBearish != null)
+                                    AddPattern(threeLineStrikeBearish, patternsFound, ref patternCount, initialCapacity);
 
-                                var matHoldBullish = await MatHoldPattern.IsPatternAsync(i, trendLookback, true, prices, metricsCache);
-                                if (matHoldBullish != null)
-                                    AddPattern(matHoldBullish, patternsFound, ref patternCount, initialCapacity);
+                                // 5-Candle Patterns
+                                if (i >= 4)
+                                {
+                                    var breakawayBullish = await BreakawayPattern.IsPatternAsync(i, prices, metricsCache, PatternDirection.Bullish, trendLookback);
+                                    if (breakawayBullish != null)
+                                        AddPattern(breakawayBullish, patternsFound, ref patternCount, initialCapacity);
 
-                                var matHoldBearish = await MatHoldPattern.IsPatternAsync(i, trendLookback, false, prices, metricsCache);
-                                if (matHoldBearish != null)
-                                    AddPattern(matHoldBearish, patternsFound, ref patternCount, initialCapacity);
+                                    var breakawayBearish = await BreakawayPattern.IsPatternAsync(i, prices, metricsCache, PatternDirection.Bearish, trendLookback);
+                                    if (breakawayBearish != null)
+                                        AddPattern(breakawayBearish, patternsFound, ref patternCount, initialCapacity);
 
-                                var risingFallingThreeMethods = await RisingFallingThreeMethodsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
-                                if (risingFallingThreeMethods != null)
-                                    AddPattern(risingFallingThreeMethods, patternsFound, ref patternCount, initialCapacity);
+                                    var ladderBottom = await LadderBottomPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                                    if (ladderBottom != null)
+                                        AddPattern(ladderBottom, patternsFound, ref patternCount, initialCapacity);
+
+                                    var matHoldBullish = await MatHoldPattern.IsPatternAsync(i, trendLookback, true, prices, metricsCache);
+                                    if (matHoldBullish != null)
+                                        AddPattern(matHoldBullish, patternsFound, ref patternCount, initialCapacity);
+
+                                    var matHoldBearish = await MatHoldPattern.IsPatternAsync(i, trendLookback, false, prices, metricsCache);
+                                    if (matHoldBearish != null)
+                                        AddPattern(matHoldBearish, patternsFound, ref patternCount, initialCapacity);
+
+                                    var risingFallingThreeMethods = await RisingFallingThreeMethodsPattern.IsPatternAsync(i, trendLookback, prices, metricsCache);
+                                    if (risingFallingThreeMethods != null)
+                                        AddPattern(risingFallingThreeMethods, patternsFound, ref patternCount, initialCapacity);
+                                }
                             }
                         }
                     }
-                }
 
-                if (patternCount > 0)
-                {
-                    var filteredPatterns = FilterPatterns(patternsFound, patternCount, prices);
-                    if (filteredPatterns.Count > 0)
-                        detailedPatterns[i] = filteredPatterns;
+                    if (patternCount > 0)
+                    {
+                        var filteredPatterns = FilterPatterns(patternsFound, patternCount, prices);
+                        if (filteredPatterns.Count > 0)
+                            detailedPatterns[i] = filteredPatterns;
+                    }
+
+                    if (_enablePerformanceMetrics)
+                    {
+                        metrics.IncrementCandlesProcessed();
+                    }
                 }
 
                 if (_enablePerformanceMetrics)
                 {
-                    metrics.IncrementCandlesProcessed();
-                }
-            }
+                    metrics.StopDetection();
 
-            if (_enablePerformanceMetrics)
-            {
-                metrics.StopDetection();
-
-                // Record performance metrics to central monitor if provided
-                if (performanceMonitor != null)
-                {
-                    var summary = metrics.GetSummary();
-                    var metricsDict = new Dictionary<string, object>
+                    // Record performance metrics to central monitor if provided
+                    if (performanceMonitor != null)
                     {
-                        ["MethodName"] = "PatternSearch.DetectPatternsAsync",
-                        ["TotalDetectionTimeMs"] = summary.TotalDetectionTimeMs,
-                        ["TotalCandlesProcessed"] = summary.TotalCandlesProcessed,
-                        ["TotalPatternsFound"] = summary.TotalPatternsFound,
-                        ["PatternCheckTimes"] = summary.PatternCheckTimes,
-                        ["Timestamp"] = DateTime.UtcNow
-                    };
+                        var summary = metrics.GetSummary();
+                        var metricsDict = new Dictionary<string, object>
+                        {
+                            ["MethodName"] = "PatternSearch.DetectPatternsAsync",
+                            ["TotalDetectionTimeMs"] = summary.TotalDetectionTimeMs,
+                            ["TotalCandlesProcessed"] = summary.TotalCandlesProcessed,
+                            ["TotalPatternsFound"] = summary.TotalPatternsFound,
+                            ["PatternCheckTimes"] = summary.PatternCheckTimes,
+                            ["Timestamp"] = DateTime.UtcNow
+                        };
 
-                    // Call the overloaded method with enablement status
-                    performanceMonitor.RecordSimulationMetrics("PatternSearch", metricsDict, _enablePerformanceMetrics);
+                        // Call the overloaded method with enablement status
+                        performanceMonitor.RecordSimulationMetrics("PatternSearch", metricsDict, _enablePerformanceMetrics);
+                    }
                 }
-            }
 
-            return detailedPatterns;
-        });
+                return detailedPatterns;
+            });
         }
 
         private static void AddPattern(PatternDefinition pattern, PatternDefinition[] patternsFound, ref int count, int capacity)

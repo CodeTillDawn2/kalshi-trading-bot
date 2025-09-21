@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using BacklashInterfaces.SmokehouseBot.Services;
-using BacklashBot.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using BacklashPatterns.PatternDefinitions;
+using Microsoft.Extensions.Logging;
 
 namespace BacklashPatterns
 {

@@ -1,7 +1,4 @@
 using OverseerBotShared;
-using System;
-using System.Collections.Generic;
-using Xunit;
 
 namespace BacklashBot.Shared.Tests
 {

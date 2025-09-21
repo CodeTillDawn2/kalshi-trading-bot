@@ -1,22 +1,11 @@
-using Microsoft.AspNetCore.Http;
+using BacklashOverseer;
+using BacklashOverseer.Config;
+using BacklashOverseer.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
-using BacklashOverseer;
-using BacklashOverseer.Services;
-using KalshiBotData.Data;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using BacklashDTOs;
-using BacklashBotData.Data.Interfaces;
-using BacklashOverseer.Models;
-using BacklashOverseer.Config;
-using OverseerBotShared;
 
 namespace OverseerTests
 {
@@ -117,7 +106,8 @@ namespace OverseerTests
             // Act & Assert
             // The constructor may not validate all null parameters immediately
             // but some will cause issues during usage
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var hub = new OverseerHub(
                     null,
                     _scopeFactoryMock.Object,
@@ -127,7 +117,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
                     null,
@@ -148,7 +139,8 @@ namespace OverseerTests
             //     );
             // });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
                     _scopeFactoryMock.Object,
@@ -158,7 +150,8 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() => {
+            Assert.DoesNotThrow(() =>
+            {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
                     _scopeFactoryMock.Object,

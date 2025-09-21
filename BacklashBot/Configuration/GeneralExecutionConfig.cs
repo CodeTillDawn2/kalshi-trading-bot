@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace BacklashDTOs.Configuration
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for general execution settings.
@@ -36,12 +35,6 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'AuthTokenValidityHours' is missing in the configuration.")]
         public int AuthTokenValidityHours { get; set; }
-
-        /// <summary>
-        /// Gets or sets the hard data storage location.
-        /// </summary>
-        [Required(ErrorMessage = "The 'HardDataStorageLocation' is missing in the configuration.")]
-        public string HardDataStorageLocation { get; set; } = null!;
 
         /// <summary>
         /// Frequency in seconds at which trading decisions are evaluated and executed.

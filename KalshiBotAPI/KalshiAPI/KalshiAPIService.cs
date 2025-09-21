@@ -1,8 +1,6 @@
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
-using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
@@ -11,11 +9,9 @@ using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
@@ -243,86 +239,86 @@ namespace KalshiBotAPI.KalshiAPI
                             _logger.LogWarning(new Exception($"No response data found. String: {jsonString}"), "No response data found. String: {jsonString}", jsonString);
 
                         try
+                        {
+                            var marketsToUpdate = new List<MarketDTO>();
+
+                            // Process markets sequentially to avoid concurrency issues
+                            foreach (var apiMarket in responseData?.Markets ?? new List<KalshiMarket>())
                             {
-                                var marketsToUpdate = new List<MarketDTO>();
+                                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                                // Process markets sequentially to avoid concurrency issues
-                                foreach (var apiMarket in responseData?.Markets ?? new List<KalshiMarket>())
+                                var calcStopwatch = Stopwatch.StartNew();
+                                try
                                 {
-                                    _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+                                    foundTickers.Add(apiMarket.Ticker);
 
-                                    var calcStopwatch = Stopwatch.StartNew();
-                                    try
+                                    // Truncate subtitle fields to fit database column limits
+                                    string truncatedYesSubTitle = apiMarket.YesSubTitle?.Length > 255
+                                        ? apiMarket.YesSubTitle.Substring(0, 252) + "..."
+                                        : apiMarket.YesSubTitle ?? "";
+                                    string truncatedNoSubTitle = apiMarket.NoSubTitle?.Length > 255
+                                        ? apiMarket.NoSubTitle.Substring(0, 252) + "..."
+                                        : apiMarket.NoSubTitle ?? "";
+
+                                    var market = new MarketDTO
                                     {
-                                        foundTickers.Add(apiMarket.Ticker);
+                                        market_ticker = apiMarket.Ticker,
+                                        event_ticker = apiMarket.EventTicker,
+                                        market_type = apiMarket.MarketType,
+                                        title = apiMarket.Title,
+                                        subtitle = apiMarket.Subtitle,
+                                        yes_sub_title = truncatedYesSubTitle,
+                                        no_sub_title = truncatedNoSubTitle,
+                                        open_time = apiMarket.OpenTime,
+                                        close_time = apiMarket.CloseTime,
+                                        expected_expiration_time = apiMarket.ExpectedExpirationTime,
+                                        expiration_time = apiMarket.ExpirationTime,
+                                        latest_expiration_time = apiMarket.LatestExpirationTime,
+                                        settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
+                                        status = apiMarket.Status,
+                                        response_price_units = apiMarket.ResponsePriceUnits,
+                                        notional_value = apiMarket.NotionalValue,
+                                        tick_size = apiMarket.TickSize,
+                                        yes_bid = apiMarket.YesBid,
+                                        yes_ask = apiMarket.YesAsk,
+                                        no_bid = apiMarket.NoBid,
+                                        no_ask = apiMarket.NoAsk,
+                                        last_price = apiMarket.LastPrice,
+                                        previous_yes_bid = apiMarket.PreviousYesBid,
+                                        previous_yes_ask = apiMarket.PreviousYesAsk,
+                                        previous_price = apiMarket.PreviousPrice,
+                                        volume = apiMarket.Volume,
+                                        volume_24h = apiMarket.Volume24h,
+                                        liquidity = apiMarket.Liquidity,
+                                        open_interest = apiMarket.OpenInterest,
+                                        result = apiMarket.Result,
+                                        can_close_early = apiMarket.CanCloseEarly,
+                                        expiration_value = apiMarket.ExpirationValue,
+                                        risk_limit_cents = apiMarket.RiskLimitCents,
+                                        strike_type = apiMarket.StrikeType,
+                                        floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
+                                        rules_primary = apiMarket.RulesPrimary,
+                                        rules_secondary = apiMarket.RulesSecondary,
+                                        APILastFetchedDate = DateTime.Now,
+                                        LastModifiedDate = DateTime.Now,
+                                        category = ""
+                                    };
 
-                                        // Truncate subtitle fields to fit database column limits
-                                        string truncatedYesSubTitle = apiMarket.YesSubTitle?.Length > 255
-                                            ? apiMarket.YesSubTitle.Substring(0, 252) + "..."
-                                            : apiMarket.YesSubTitle ?? "";
-                                        string truncatedNoSubTitle = apiMarket.NoSubTitle?.Length > 255
-                                            ? apiMarket.NoSubTitle.Substring(0, 252) + "..."
-                                            : apiMarket.NoSubTitle ?? "";
-
-                                        var market = new MarketDTO
-                                        {
-                                            market_ticker = apiMarket.Ticker,
-                                            event_ticker = apiMarket.EventTicker,
-                                            market_type = apiMarket.MarketType,
-                                            title = apiMarket.Title,
-                                            subtitle = apiMarket.Subtitle,
-                                            yes_sub_title = truncatedYesSubTitle,
-                                            no_sub_title = truncatedNoSubTitle,
-                                            open_time = apiMarket.OpenTime,
-                                            close_time = apiMarket.CloseTime,
-                                            expected_expiration_time = apiMarket.ExpectedExpirationTime,
-                                            expiration_time = apiMarket.ExpirationTime,
-                                            latest_expiration_time = apiMarket.LatestExpirationTime,
-                                            settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
-                                            status = apiMarket.Status,
-                                            response_price_units = apiMarket.ResponsePriceUnits,
-                                            notional_value = apiMarket.NotionalValue,
-                                            tick_size = apiMarket.TickSize,
-                                            yes_bid = apiMarket.YesBid,
-                                            yes_ask = apiMarket.YesAsk,
-                                            no_bid = apiMarket.NoBid,
-                                            no_ask = apiMarket.NoAsk,
-                                            last_price = apiMarket.LastPrice,
-                                            previous_yes_bid = apiMarket.PreviousYesBid,
-                                            previous_yes_ask = apiMarket.PreviousYesAsk,
-                                            previous_price = apiMarket.PreviousPrice,
-                                            volume = apiMarket.Volume,
-                                            volume_24h = apiMarket.Volume24h,
-                                            liquidity = apiMarket.Liquidity,
-                                            open_interest = apiMarket.OpenInterest,
-                                            result = apiMarket.Result,
-                                            can_close_early = apiMarket.CanCloseEarly,
-                                            expiration_value = apiMarket.ExpirationValue,
-                                            risk_limit_cents = apiMarket.RiskLimitCents,
-                                            strike_type = apiMarket.StrikeType,
-                                            floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
-                                            rules_primary = apiMarket.RulesPrimary,
-                                            rules_secondary = apiMarket.RulesSecondary,
-                                            APILastFetchedDate = DateTime.Now,
-                                            LastModifiedDate = DateTime.Now,
-                                            category = ""
-                                        };
-
-                                        marketsToUpdate.Add(market);
-                                        processedCount++;
-                                    }
-                                    finally
-                                    {
-                                        calcStopwatch.Stop();
-                                        RecordCalculationExecutionDuration("ProcessMarketDTO", calcStopwatch.ElapsedMilliseconds);
-                                    }
+                                    marketsToUpdate.Add(market);
+                                    processedCount++;
                                 }
-
-                                using var scope = _scopeFactory.CreateScope();
-                                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-                                await context.AddOrUpdateMarkets(marketsToUpdate);
-                                await Task.CompletedTask;
+                                finally
+                                {
+                                    calcStopwatch.Stop();
+                                    RecordCalculationExecutionDuration("ProcessMarketDTO", calcStopwatch.ElapsedMilliseconds);
+                                }
                             }
+
+                            using var scope = _scopeFactory.CreateScope();
+                            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                            await context.AddOrUpdateMarkets(marketsToUpdate);
+                            await Task.CompletedTask;
+                        }
                         catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
                         {
                             if (stopwatch != null)

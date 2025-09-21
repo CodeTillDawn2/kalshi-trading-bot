@@ -7,10 +7,8 @@
 /// and simulation in the GUI application.
 /// </summary>
 using ScottPlot;
-using ScottPlot.WinForms;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TradingSimulator;
 
 

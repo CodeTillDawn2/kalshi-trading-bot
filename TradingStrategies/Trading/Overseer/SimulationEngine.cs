@@ -1,20 +1,11 @@
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
-using BacklashDTOs.Data;
-using BacklashPatterns;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using TradingStrategies.Configuration;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
-using TradingStrategies.Trading.Overseer;
-using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using System.Diagnostics;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -63,37 +54,37 @@ namespace TradingStrategies.Trading.Overseer
             _enablePerformanceMetrics = simulatorEngineConfig.Value.EnablePerformanceMetrics;
         }
 
-       /// <summary>
-       /// Gets the execution time of the last simulation run.
-       /// </summary>
-       public TimeSpan LastExecutionTime { get; private set; }
+        /// <summary>
+        /// Gets the execution time of the last simulation run.
+        /// </summary>
+        public TimeSpan LastExecutionTime { get; private set; }
 
-       /// <summary>
-       /// Gets the approximate memory usage difference of the last simulation run.
-       /// </summary>
-       public long LastMemoryUsed { get; private set; }
+        /// <summary>
+        /// Gets the approximate memory usage difference of the last simulation run.
+        /// </summary>
+        public long LastMemoryUsed { get; private set; }
 
-       /// <summary>
-       /// Gets the throughput of snapshots processed per second in the last simulation run.
-       /// </summary>
-       public double LastThroughputSnapshotsPerSecond { get; private set; }
+        /// <summary>
+        /// Gets the throughput of snapshots processed per second in the last simulation run.
+        /// </summary>
+        public double LastThroughputSnapshotsPerSecond { get; private set; }
 
-       /// <summary>
-       /// Gets the I/O read time in the last simulation run (placeholder for future I/O tracking).
-       /// </summary>
-       public TimeSpan LastIOReadTime { get; private set; }
+        /// <summary>
+        /// Gets the I/O read time in the last simulation run (placeholder for future I/O tracking).
+        /// </summary>
+        public TimeSpan LastIOReadTime { get; private set; }
 
-       /// <summary>
-       /// Gets the I/O write time in the last simulation run (placeholder for future I/O tracking).
-       /// </summary>
-       public TimeSpan LastIOWriteTime { get; private set; }
+        /// <summary>
+        /// Gets the I/O write time in the last simulation run (placeholder for future I/O tracking).
+        /// </summary>
+        public TimeSpan LastIOWriteTime { get; private set; }
 
-       /// <summary>
-       /// Gets the pattern performance monitor for accessing performance metrics.
-       /// </summary>
-       public PerformanceMonitor? PerformanceMonitor => _performanceMonitor;
+        /// <summary>
+        /// Gets the pattern performance monitor for accessing performance metrics.
+        /// </summary>
+        public PerformanceMonitor? PerformanceMonitor => _performanceMonitor;
 
-       /// <summary>
+        /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
         /// </summary>
         /// <param name="scenario">The trading scenario containing strategies organized by market conditions.</param>

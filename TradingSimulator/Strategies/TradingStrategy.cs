@@ -1,14 +1,11 @@
+using BacklashBot.Configuration;
+using BacklashBot.Services.Interfaces;
+using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BacklashBot.Services.Interfaces;
-using BacklashDTOs;
-using TradingSimulator.Simulator;
 using TradingStrategies.Classification.Interfaces;
-using TradingStrategies.Configuration;
-using BacklashBotData.Data.Interfaces;
-using BacklashDTOs.Configuration;
-using BacklashBot.Configuration;
 
 namespace TradingSimulator.Strategies
 {

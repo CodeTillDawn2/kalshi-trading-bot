@@ -1,6 +1,5 @@
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using BacklashBotData.Data;
 
 namespace BacklashBotData.Data.Interfaces
 {

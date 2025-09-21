@@ -1,12 +1,10 @@
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading;
+using System.Collections.Concurrent;
 
 namespace KalshiBotLogging
 {

@@ -93,36 +93,36 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Same direction, opens near second candle s open, similar size.
          * - Indication: Bullish version confirms uptrend continuation; bearish version confirms downtrend continuation.
          */
-/// <summary>IsPatternAsync</summary>
-/// <summary>IsPatternAsync</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+        /// <summary>IsPatternAsync</summary>
+        /// <summary>IsPatternAsync</summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
+        /// <summary>
+        /// </summary>
         public static async Task<UpDownGapSideBySideWhiteLinesPattern?> IsPatternAsync(
                     int index,
                     int trendLookback,

@@ -1,9 +1,9 @@
 using BacklashBot.Helpers;
-using BacklashDTOs;
-using System.Text;
 using BacklashBot.State;
-using TradingStrategies.Helpers.Interfaces;
+using BacklashDTOs;
 using Microsoft.Extensions.Options;
+using System.Text;
+using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
 {
@@ -53,30 +53,30 @@ namespace BacklashBot.Services
         /// <see cref="CalculateRSIAsync(List{PseudoCandlestick}, int)"/>
         /// </remarks>
         public double? CalculateRSI(List<PseudoCandlestick> pseudoCandles, int periods)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for RSI calculation.");
+                return null;
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for RSI calculation.");
-                        return null;
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    if (periods < 1)
-                    {
-                        _logger.LogError("Invalid periods parameter: {Periods}. Must be at least 1.", periods);
-                        throw new ArgumentException("Periods must be at least 1.", nameof(periods));
-                    }
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            if (periods < 1)
+            {
+                _logger.LogError("Invalid periods parameter: {Periods}. Must be at least 1.", periods);
+                throw new ArgumentException("Periods must be at least 1.", nameof(periods));
+            }
 
             if (pseudoCandles == null || pseudoCandles.Count < periods + 1)
             {
@@ -167,32 +167,32 @@ namespace BacklashBot.Services
         /// <see cref="CalculateMACDAsync(List{PseudoCandlestick}, int, int, int)"/>
         /// </remarks>
         public (double? MACD, double? Signal, double? Histogram) CalculateMACD(List<PseudoCandlestick> pseudoCandlesticks, int shortPeriod, int longPeriod, int signalPeriod)
+        {
+            if (pseudoCandlesticks == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandlesticks), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandlesticks.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for MACD calculation.");
+                return (null, null, null);
+            }
+            for (int i = 0; i < pseudoCandlesticks.Count; i++)
+            {
+                var pc = pseudoCandlesticks[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandlesticks[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandlesticks == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandlesticks), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandlesticks.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for MACD calculation.");
-                        return (null, null, null);
-                    }
-                    for (int i = 0; i < pseudoCandlesticks.Count; i++)
-                    {
-                        var pc = pseudoCandlesticks[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandlesticks[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    int totalPeriods = longPeriod + signalPeriod - 1;
-                    if (pseudoCandlesticks?.Count < totalPeriods)
-                    {
-                        _logger.LogDebug("Insufficient data for MACD calculation. Candles: {Count}, Required: {Required}.",
-                            pseudoCandlesticks?.Count ?? 0, totalPeriods);
-                        return (null, null, null);
-                    }
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            int totalPeriods = longPeriod + signalPeriod - 1;
+            if (pseudoCandlesticks?.Count < totalPeriods)
+            {
+                _logger.LogDebug("Insufficient data for MACD calculation. Candles: {Count}, Required: {Required}.",
+                    pseudoCandlesticks?.Count ?? 0, totalPeriods);
+                return (null, null, null);
+            }
 
             var prices = pseudoCandlesticks.Select(pc => pc.MidClose).ToList();
 
@@ -271,27 +271,27 @@ namespace BacklashBot.Services
         /// </remarks>
         public (double? Lower, double? Middle, double? Upper) CalculateBollingerBands(
                     List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for Bollinger Bands calculation.");
+                return (null, null, null);
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for Bollinger Bands calculation.");
-                        return (null, null, null);
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    log.AppendLine($"Calculating Bollinger Bands for {period} periods with multiplier {stdDevMultiplier}");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating Bollinger Bands for {period} periods with multiplier {stdDevMultiplier}");
 
             if (period < 1)
             {
@@ -379,27 +379,27 @@ namespace BacklashBot.Services
         /// <see cref="CalculateStochasticAsync(List{PseudoCandlestick}, int, int)"/>
         /// </remarks>
         public (double? K, double? D) CalculateStochastic(List<PseudoCandlestick> pseudoCandles, int kPeriod, int dPeriod)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for Stochastic calculation.");
+                return (null, null);
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for Stochastic calculation.");
-                        return (null, null);
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    log.AppendLine($"Calculating Stochastic for KPeriod={kPeriod}, DPeriod={dPeriod}");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating Stochastic for KPeriod={kPeriod}, DPeriod={dPeriod}");
 
             if (kPeriod < 1 || dPeriod < 1)
             {
@@ -487,27 +487,27 @@ namespace BacklashBot.Services
         /// <see cref="CalculateATRAsync(List{PseudoCandlestick}, int)"/>
         /// </remarks>
         public double? CalculateATR(List<PseudoCandlestick> pseudoCandles, int period)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for ATR calculation.");
+                return null;
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for ATR calculation.");
-                        return null;
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    log.AppendLine($"Calculating ATR for {period} periods.");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating ATR for {period} periods.");
 
             if (period < 1)
             {
@@ -585,27 +585,27 @@ namespace BacklashBot.Services
         /// <see cref="CalculateVWAPAsync(List{PseudoCandlestick}, int)"/>
         /// </remarks>
         public decimal? CalculateVWAP(List<PseudoCandlestick> pseudoCandles, int periods)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for VWAP calculation.");
+                return null;
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for VWAP calculation.");
-                        return null;
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    log.AppendLine($"Calculating VWAP for {periods} periods.");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating VWAP for {periods} periods.");
 
             if (periods < 1)
             {
@@ -671,27 +671,27 @@ namespace BacklashBot.Services
         /// <see cref="CalculateOBVAsync(List{PseudoCandlestick})"/>
         /// </remarks>
         public decimal CalculateOBV(List<PseudoCandlestick> pseudoCandles)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for OBV calculation.");
+                return 0;
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for OBV calculation.");
-                        return 0;
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    log.AppendLine($"Calculating OBV for {pseudoCandles?.Count ?? 0} candlesticks.");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating OBV for {pseudoCandles?.Count ?? 0} candlesticks.");
 
             if (pseudoCandles == null || pseudoCandles.Count < 2)
             {
@@ -1083,28 +1083,28 @@ namespace BacklashBot.Services
         /// <see cref="CalculateADXAsync(List{PseudoCandlestick})"/>
         /// </remarks>
         public (double? ADX, double? PlusDI, double? MinusDI) CalculateADX(List<PseudoCandlestick> pseudoCandles)
+        {
+            if (pseudoCandles == null)
+            {
+                throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+            }
+            if (pseudoCandles.Count == 0)
+            {
+                _logger.LogWarning("Empty list of pseudo-candlesticks provided for ADX calculation.");
+                return (null, null, null);
+            }
+            for (int i = 0; i < pseudoCandles.Count; i++)
+            {
+                var pc = pseudoCandles[i];
+                double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                 {
-                    if (pseudoCandles == null)
-                    {
-                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
-                    }
-                    if (pseudoCandles.Count == 0)
-                    {
-                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for ADX calculation.");
-                        return (null, null, null);
-                    }
-                    for (int i = 0; i < pseudoCandles.Count; i++)
-                    {
-                        var pc = pseudoCandles[i];
-                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
-                        {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
-                        }
-                    }
-                    var log = new StringBuilder();
-                    int period = _config.ADX_Periods;
-                    log.AppendLine($"Calculating ADX for {period} periods.");
+                    _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                }
+            }
+            var log = new StringBuilder();
+            int period = _config.ADX_Periods;
+            log.AppendLine($"Calculating ADX for {period} periods.");
 
             if (period < 1)
             {
@@ -1117,7 +1117,7 @@ namespace BacklashBot.Services
             {
                 log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {period * 2}.");
                 _logger.LogDebug("{Log}", log.ToString());
-                return (null,null,null);
+                return (null, null, null);
             }
 
             var highs = pseudoCandles.Select(pc => pc.MidHigh).ToList();

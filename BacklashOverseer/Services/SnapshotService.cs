@@ -1,10 +1,9 @@
 
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
-using System;
-using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using BacklashBotData.Data.Interfaces;
+using System.Diagnostics;
 
 namespace BacklashOverseer.Services
 {

@@ -1,5 +1,3 @@
-using System;
-
 namespace BacklashDTOs.Data
 {
     /// <summary>
