@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BacklashCommon.Configuration
 {
-
+    /// <summary>
+    /// Configuration class for instance name settings.
+    /// </summary>
     public class InstanceNameConfig
     {
         /// <summary>

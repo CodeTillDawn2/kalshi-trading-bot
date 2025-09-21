@@ -8,6 +8,9 @@ namespace BacklashCommon.Configuration
     /// </summary>
     public class TradingSnapshotServiceConfig
     {
+        /// <summary>
+        /// The configuration section name for TradingSnapshotService settings.
+        /// </summary>
         public const string SectionName = "WatchedMarkets:TradingSnapshotService";
 
         /// <summary>

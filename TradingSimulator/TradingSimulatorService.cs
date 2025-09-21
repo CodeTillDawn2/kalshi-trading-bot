@@ -6,6 +6,7 @@ using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
+using BacklashCommon.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using KalshiBotData.Data;
@@ -179,7 +180,7 @@ namespace TradingSimulator
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object,
                 Options.Create(
                     new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }),
-                _dataStorageConfig, _scopeFactory, config, null);
+                _scopeFactory, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();

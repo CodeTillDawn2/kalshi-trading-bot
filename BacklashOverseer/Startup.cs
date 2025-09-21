@@ -100,11 +100,10 @@ namespace BacklashOverseer
                 return new DatabaseLoggerProvider(
                     provider.GetRequiredService<DatabaseLoggingQueue>(),
                     loggingConfig,
-                    instanceNameConfig,
+                    instanceNameConfig.Name,
                     minLevel,
                     null, // brainStatus
-                    loggingConfig.Environment, // defaultEnvironment
-                    instanceNameConfig.Name // defaultInstance
+                    loggingConfig.Environment // defaultEnvironment
                 );
             });
 

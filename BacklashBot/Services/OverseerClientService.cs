@@ -1,6 +1,7 @@
 using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
@@ -88,13 +89,13 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
         /// <param name="overseerConfig">Configuration options for the overseer.</param>
-        /// <param name="generalConfig">Configuration options for general execution settings.</param>
+        /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
             IOptions<OverseerClientServiceConfig> overseerConfig,
-            IOptions<GeneralExecutionConfig> generalConfig,
+            IOptions<InstanceNameConfig> instanceNameConfig,
             ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
@@ -103,7 +104,7 @@ namespace BacklashBot.Services
             _clientId = Guid.NewGuid().ToString();
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
-            _clientName = generalConfig.Value.BrainInstance ?? "BacklashBot";
+            _clientName = instanceNameConfig.Value.Name;
             _logger.LogInformation("OVERSEER- Using brain instance name: {BrainInstanceName}", _clientName);
 
             // Initialize configurable timeouts and intervals

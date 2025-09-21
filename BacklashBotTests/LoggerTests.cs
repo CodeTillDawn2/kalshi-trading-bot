@@ -1,7 +1,9 @@
 using BacklashCommon.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace BacklashBotTests
@@ -13,9 +15,8 @@ namespace BacklashBotTests
     [TestFixture]
     public class LoggerTests
     {
+        private IServiceProvider _serviceProvider;
         private Mock<DatabaseLoggingQueue> _loggingQueueMock;
-        private LoggingConfig _loggingConfig;
-        private InstanceNameConfig _instanceNameConfig;
 
         /// <summary>
         /// Sets up the test environment by loading configuration and creating mocked dependencies.
@@ -29,9 +30,12 @@ namespace BacklashBotTests
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
 
-            // Load configs from configuration
-            _loggingConfig = configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            _instanceNameConfig = configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
+            // Set up DI container
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.Configure<LoggingConfig>(configuration.GetSection("Communications:Logging"));
+            services.Configure<InstanceNameConfig>(configuration.GetSection("Central:GeneralExecution"));
+            _serviceProvider = services.BuildServiceProvider();
 
             _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);
         }
@@ -43,17 +47,20 @@ namespace BacklashBotTests
         [Test]
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
+            // Arrange - Load configs from DI
+            var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+            var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
+
             // Act & Assert
             Assert.DoesNotThrow(() =>
             {
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueueMock.Object,
-                    _loggingConfig,
-                    _instanceNameConfig,
+                    loggingConfig,
+                    instanceNameConfig.Name,
                     LogLevel.Warning, // minLevel
                     null, // brainStatus
-                    "BacklashBot", // defaultEnvironment
-                    "BacklashInstance" // defaultInstance
+                    "BacklashBot" // defaultEnvironment
                 );
 
                 // Verify the provider is not null
@@ -68,15 +75,17 @@ namespace BacklashBotTests
         [Test]
         public void DatabaseLoggerProvider_CanCreateLogger()
         {
-            // Arrange
+            // Arrange - Load configs from DI
+            var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+            var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
+
             var provider = new DatabaseLoggerProvider(
                 _loggingQueueMock.Object,
-                _loggingConfig,
-                _instanceNameConfig,
+                loggingConfig,
+                instanceNameConfig.Name,
                 LogLevel.Warning,
                 null, // brainStatus
-                "BacklashBot",
-                "BacklashInstance"
+                "BacklashBot"
             );
 
             // Act
@@ -85,6 +94,15 @@ namespace BacklashBotTests
             // Assert
             Assert.That(logger, Is.Not.Null);
             Assert.That(logger, Is.InstanceOf<ILogger>());
+        }
+
+        /// <summary>
+        /// Cleans up resources after each test.
+        /// </summary>
+        [TearDown]
+        public void TearDown()
+        {
+            (_serviceProvider as IDisposable)?.Dispose();
         }
     }
 }

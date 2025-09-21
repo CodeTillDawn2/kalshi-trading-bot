@@ -13,12 +13,6 @@ namespace BacklashBot.Configuration
         public const string SectionName = "Central:GeneralExecution";
 
         /// <summary>
-        /// Gets or sets the brain instance identifier.
-        /// </summary>
-        [Required(ErrorMessage = "The 'BrainInstance' is missing in the configuration.")]
-        public string BrainInstance { get; set; } = null!;
-
-        /// <summary>
         /// Gets or sets the target count for queues.
         /// </summary>
         [Required(ErrorMessage = "The 'QueuesTargetCount' is missing in the configuration.")]

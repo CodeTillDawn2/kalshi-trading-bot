@@ -2,7 +2,9 @@ using BacklashBot.Configuration;
 using BacklashCommon.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BacklashIntegrationTests
 {
@@ -13,7 +15,7 @@ namespace BacklashIntegrationTests
     [TestFixture]
     public class LoggerIntegrationTests
     {
-        private IConfiguration _configuration;
+        private IServiceProvider _serviceProvider;
         private DatabaseLoggingQueue _loggingQueue;
 
         /// <summary>
@@ -23,10 +25,16 @@ namespace BacklashIntegrationTests
         public void Setup()
         {
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            _configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
+
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.Configure<LoggingConfig>(configuration.GetSection("Communications:Logging"));
+            services.Configure<InstanceNameConfig>(configuration.GetSection("Central:GeneralExecution"));
+            _serviceProvider = services.BuildServiceProvider();
 
             // Initialize the logging queue as a singleton (not hosted service for test)
             _loggingQueue = new DatabaseLoggingQueue(null, false); // isOverseer = false
@@ -39,9 +47,9 @@ namespace BacklashIntegrationTests
         [Test]
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
-            // Arrange - Load configs from appsettings.json
-            var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            var instanceNameConfig = _configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
+            // Arrange - Load configs from DI
+            var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+            var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
 
             // Act & Assert
             Assert.DoesNotThrow(() =>
@@ -49,11 +57,10 @@ namespace BacklashIntegrationTests
                 var provider = new DatabaseLoggerProvider(
                     _loggingQueue,
                     loggingConfig,
-                    instanceNameConfig,
+                    instanceNameConfig.Name,
                     LogLevel.Warning, // minLevel
                     null, // brainStatus
-                    "BacklashBot", // defaultEnvironment
-                    "BacklashInstance" // defaultInstance
+                    "BacklashBot" // defaultEnvironment
                 );
 
                 // Verify the provider is not null
@@ -68,18 +75,17 @@ namespace BacklashIntegrationTests
         [Test]
         public void DatabaseLoggerProvider_CanLogEntry()
         {
-            // Arrange - Load configs from appsettings.json
-            var loggingConfig = _configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
-            var instanceNameConfig = _configuration.GetSection("Central:GeneralExecution").Get<InstanceNameConfig>();
+            // Arrange - Load configs from DI
+            var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+            var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
 
             var provider = new DatabaseLoggerProvider(
                 _loggingQueue,
                 loggingConfig,
-                instanceNameConfig,
+                instanceNameConfig.Name,
                 LogLevel.Information, // minLevel set to Information to allow the log
                 null, // brainStatus
-                "BacklashBot", // defaultEnvironment
-                "BacklashInstance" // defaultInstance
+                "BacklashBot" // defaultEnvironment
             );
 
             var logger = provider.CreateLogger("TestCategory");
@@ -101,6 +107,7 @@ namespace BacklashIntegrationTests
         public void TearDown()
         {
             _loggingQueue?.Dispose();
+            (_serviceProvider as IDisposable)?.Dispose();
         }
     }
 }

@@ -203,6 +203,7 @@ namespace BacklashBot.Management
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
             IOptions<GeneralExecutionConfig> generalExecutionConfig,
+            string instanceName,
             IOptions<QueueMonitoringConfig> queueMonitoringConfig,
             IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
             IServiceScopeFactory scopeFactory,
@@ -216,7 +217,7 @@ namespace BacklashBot.Management
             _queueMonitoringConfig = queueMonitoringConfig.Value;
             _centralPerformanceMonitorConfig = centralPerformanceMonitorConfig.Value;
             RefreshInterval = TimeSpan.FromMinutes(_generalExecutionConfig.RefreshIntervalMinutes);
-            BrainInstance = _generalExecutionConfig.BrainInstance;
+            BrainInstance = instanceName;
             _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
             _orderBookServiceMetrics = new ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>>();

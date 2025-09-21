@@ -67,13 +67,11 @@ namespace BacklashCommon.Services
         /// <param name="logger">Logger for recording snapshot operations, warnings, and errors.</param>
         /// <param name="tradingSnapshotServiceConfig">Configuration options for trading snapshot service behavior including tolerance settings.</param>
         /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
-        /// <param name="configuration">Configuration for accessing app settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording execution times.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
             IServiceScopeFactory scopeFactory,
-            IConfiguration configuration,
             ICentralPerformanceMonitor? centralPerformanceMonitor = null)
         {
             _logger = logger;
@@ -92,7 +90,7 @@ namespace BacklashCommon.Services
                 Directory.CreateDirectory(_snapshotStorageDirectory);
             }
 
-            _enablePerformanceMetrics = configuration.GetValue<bool>("TradingSnapshotService:EnablePerformanceMetrics", false);
+            _enablePerformanceMetrics = tradingSnapshotServiceConfig.Value.EnablePerformanceMetrics;
         }
 
         /// <summary>

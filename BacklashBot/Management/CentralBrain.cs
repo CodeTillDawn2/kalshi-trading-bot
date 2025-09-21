@@ -45,6 +45,7 @@ namespace BacklashBot.Management
         private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly InstanceNameConfig _instanceNameConfig;
+        private readonly GeneralExecutionConfig _generalConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
@@ -989,7 +990,7 @@ namespace BacklashBot.Management
                 _logger.LogDebug("BRAIN: Completed parallel snapshot creation, processed {Count} markets successfully", marketSnapshots.Count);
 
                 cancellationToken.ThrowIfCancellationRequested();
-                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _generalConfig.SnapshotSchemaVersion,
+                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _tradingSnapshotServiceConfig.SnapshotSchemaVersion,
                     _serviceFactory.GetDataCache().AccountBalance, _serviceFactory.GetDataCache().PortfolioValue, _serviceFactory.GetDataCache().LastWebSocketTimestamp, marketSnapshots);
 
 
@@ -1200,7 +1201,7 @@ namespace BacklashBot.Management
                kvp.Value.YesBidCenterOfMass,
                kvp.Value.NoBidCenterOfMass,
                kvp.Value.TolerancePercentage,
-                _generalConfig.SnapshotSchemaVersion,
+                _tradingSnapshotServiceConfig.SnapshotSchemaVersion,
                 totalYesDepth,
                totalNoDepth,
                kvp.Value.TotalBidVolume_Yes,

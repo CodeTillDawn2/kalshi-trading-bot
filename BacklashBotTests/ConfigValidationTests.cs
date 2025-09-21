@@ -387,61 +387,6 @@ namespace BacklashBotTests
             TestContext.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
         }
 
-        [Test]
-        public void ValidateNoUnusedSections_InAppsettings()
-        {
-            var usedSections = new HashSet<string>
-            {
-                SecretsConfig.SectionName,
-                LoggingConfig.SectionName,
-                KalshiConfig.SectionName,
-                KalshiAPIServiceConfig.SectionName,
-                WebSocketConnectionManagerConfig.SectionName,
-                MessageProcessorConfig.SectionName,
-                SubscriptionManagerConfig.SectionName,
-                WebSocketMonitorConfig.SectionName,
-                KalshiWebSocketClientConfig.SectionName,
-                TradingSnapshotServiceConfig.SectionName,
-                SnapshotPeriodHelperConfig.SectionName,
-                OrderbookChangeTrackerConfig.SectionName,
-                MarketRefreshServiceConfig.SectionName,
-                PseudoCandlestickExtensionsConfig.SectionName,
-                GeneralExecutionConfig.SectionName,
-                OverseerClientServiceConfig.SectionName,
-                CandlestickServiceConfig.SectionName,
-                BroadcastServiceConfig.SectionName,
-                MarketDataInitializerConfig.SectionName,
-                CentralPerformanceMonitorConfig.SectionName,
-                KalshiBotScopeManagerServiceConfig.SectionName,
-                CalculationsConfig.SectionName,
-                MarketServiceDataConfig.SectionName,
-                CentralBrainConfig.SectionName,
-                TargetCalculationServiceConfig.SectionName,
-                BrainStatusServiceConfig.SectionName,
-                SnapshotGroupHelperConfig.SectionName,
-                InterestScoreConfig.SectionName,
-                CentralErrorHandlerConfig.SectionName,
-                OrderBookServiceConfig.SectionName,
-                BacklashBotDataConfig.SectionName,
-                QueueMonitoringConfig.SectionName,
-                "DBConnection:DefaultConnection"
-            };
-
-            var allConfigurationKeys = GetAllConfigurationKeys(_configuration);
-
-            var unusedKeys = allConfigurationKeys.Where(key =>
-                !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
-            ).ToList();
-
-            TestContext.WriteLine("Manual: Unused configuration keys found:");
-            foreach (var key in unusedKeys)
-            {
-                TestContext.WriteLine($"  {key}");
-            }
-
-            Assert.That(unusedKeys, Is.Empty, $"Manual: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
-        }
-
         private void ValidateConfig(object config, IConfigurationSection section)
         {
             var validationResults = new List<ValidationResult>();

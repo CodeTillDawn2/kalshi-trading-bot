@@ -264,7 +264,6 @@ namespace KalshiBotTests
                 _connectionManagerMock.Object,
                 _subscriptionManagerMock.Object,
                 _messageProcessorMock.Object,
-                _dataCacheMock.Object,
                 null, // performanceMetrics
                 false); // writeToSql
         }

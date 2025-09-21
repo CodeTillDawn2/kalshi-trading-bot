@@ -97,7 +97,7 @@ namespace KalshiBotTests
 
             var config = new ConfigurationBuilder().Build();
             var snapshotServiceConfig = Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
-            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, snapshotServiceConfig, _generalExecutionOptions, _scopeFactory, config);
+            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, snapshotServiceConfig, _scopeFactory, null);
         }
 
         /// <summary>

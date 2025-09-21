@@ -109,7 +109,7 @@ namespace KalshiBotTests
 
             // Snapshot loader (same implementation you use elsewhere)
             _snapshotService = new TradingSnapshotService(
-                NullLogger<ITradingSnapshotService>.Instance, snapshotServiceConfig, _generalExecutionOpts, _scopeFactory, config, centralPerformanceMonitor);
+                NullLogger<ITradingSnapshotService>.Instance, snapshotServiceConfig, _scopeFactory, centralPerformanceMonitor);
 
             _outDir = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
             Directory.CreateDirectory(_outDir);

@@ -14,7 +14,7 @@ namespace BacklashCommon.Configuration
         /// <summary>
         /// Gets or sets the retry delay in milliseconds for operations that require retries.
         /// </summary>
-        [Required(ErrorMessage = "The 'RetryDelayMs' is missing in the configuration.")]
+        [Required(ErrorMessage = "The 'SnapshotGroupRetryDelayMs' is missing in the configuration.")]
         public int SnapshotGroupRetryDelayMs { get; set; }
         /// <summary>
         /// Gets or sets whether to enable performance metrics collection for MarketAnalysisHelper operations.

@@ -23,10 +23,9 @@ namespace KalshiBotLogging
         private readonly LogLevel _minConsoleLogLevel;
         private readonly LogLevel _minSqlLogLevel;
         private readonly LoggingConfig? _loggingConfig;
-        private readonly InstanceNameConfig? _instanceNameConfig;
+        private readonly string _instanceName;
         private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
-        private readonly string _defaultInstance;
 
         /// <summary>
         /// Initializes a new instance of the DatabaseLogger class with the specified parameters.
@@ -35,28 +34,25 @@ namespace KalshiBotLogging
         /// <param name="loggingQueue">The queue responsible for handling database logging operations asynchronously.</param>
         /// <param name="minLevel">The minimum log level that this logger will process; logs below this level are ignored.</param>
         /// <param name="loggingConfig">Optional logging configuration for dynamic environment settings including min log levels.</param>
-        /// <param name="instanceNameConfig">Optional execution configuration for brain instance settings.</param>
+        /// <param name="instanceName">The instance name for logging.</param>
         /// <param name="brainStatus">Optional brain status service for session identifier retrieval (not used in simplified version).</param>
         /// <param name="defaultEnvironment">Default environment name if not specified in config.</param>
-        /// <param name="defaultInstance">Default instance name if not specified in config.</param>
         public DatabaseLogger(
             string categoryName,
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel,
             LoggingConfig loggingConfig,
-            InstanceNameConfig? instanceNameConfig = null,
+            string instanceName,
             object? brainStatus = null,
-            string defaultEnvironment = "KalshiBot",
-            string defaultInstance = "DefaultInstance")
+            string defaultEnvironment = "KalshiBot")
         {
             _categoryName = categoryName;
             _loggingQueue = loggingQueue;
             _minLevel = minLevel;
             _loggingConfig = loggingConfig;
-            _instanceNameConfig = instanceNameConfig;
+            _instanceName = instanceName;
             _brainStatus = brainStatus;
             _defaultEnvironment = defaultEnvironment;
-            _defaultInstance = defaultInstance;
 
             // Parse configurable log levels with defaults
             if (_loggingConfig.ConsoleLogLevel != null)
@@ -110,7 +106,6 @@ namespace KalshiBotLogging
 
             // Get dynamic values or use defaults
             string environment = _loggingConfig?.Environment ?? _defaultEnvironment;
-            string brainInstance = _instanceNameConfig?.Name ?? _defaultInstance;
             string sessionIdentifier = GetSessionIdentifier();
 
             var logEntry = new LogEntryDTO
@@ -120,7 +115,7 @@ namespace KalshiBotLogging
                 Message = $"{message} ({_categoryName})",
                 Exception = exception?.ToString() ?? "",
                 Environment = environment,
-                BrainInstance = brainInstance,
+                BrainInstance = _instanceName,
                 SessionIdentifier = sessionIdentifier,
                 Source = _categoryName
             };

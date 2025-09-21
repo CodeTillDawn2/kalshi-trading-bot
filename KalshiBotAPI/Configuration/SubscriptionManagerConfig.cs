@@ -34,7 +34,7 @@ public class SubscriptionManagerConfig
     /// Gets or sets the retry delay in milliseconds.
     /// </summary>
     [Required(ErrorMessage = "The 'RetryDelayMs' is missing in the configuration.")]
-    public int RetryDelayMs { get; set; }
+    public int SubscriptionManagerRetryDelayMs { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum queue size.

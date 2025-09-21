@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BacklashCommon.Configuration
 {
-
+    /// <summary>
+    /// Configuration class for data storage settings.
+    /// </summary>
     public class DataStorageConfig
     {
         /// <summary>

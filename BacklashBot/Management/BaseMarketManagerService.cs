@@ -4,6 +4,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
@@ -31,7 +32,7 @@ namespace BacklashBot.Management
         protected List<string> MarketsToAddAfterReset = new List<string>();
         protected bool _recentMarketAdjustment = false;
         protected bool _firstWatchUpdate = true;
-        protected readonly GeneralExecutionConfig _executionConfig;
+        protected readonly InstanceNameConfig _instanceNameConfig;
         protected readonly CentralBrainConfig _centralBrainConfig;
         protected IStatusTrackerService _statusTrackerService;
         protected bool MonitoringWatchList = false;
@@ -46,7 +47,7 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording market management operations</param>
         /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
-        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="instanceNameConfig">Configuration options for instance name parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
@@ -56,7 +57,7 @@ namespace BacklashBot.Management
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
             ICentralPerformanceMonitor performanceMonitor,
-            IOptions<GeneralExecutionConfig> executionConfig,
+            IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
@@ -68,7 +69,7 @@ namespace BacklashBot.Management
             _statusTrackerService = statusTrackerService;
             _logger = logger;
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
+            _instanceNameConfig = instanceNameConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _performanceMonitor = performanceMonitor;
             _brainStatus = brainStatus;

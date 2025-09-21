@@ -11,10 +11,9 @@ namespace KalshiBotLogging
         private readonly DatabaseLoggingQueue _loggingQueue;
         private readonly LogLevel _minLevel;
         private readonly LoggingConfig _loggingConfig;
-        private readonly InstanceNameConfig _instanceNameConfig;
+        private readonly string _instanceName;
         private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
-        private readonly string _defaultInstance;
 
         /// <summary>
         /// Initializes a new instance of the DatabaseLoggerProvider class.
@@ -22,27 +21,24 @@ namespace KalshiBotLogging
         /// <param name="loggingQueue">The queue for logging messages.</param>
         /// <param name="minLevel">The minimum log level.</param>
         /// <param name="loggingConfig">The logging configuration.</param>
-        /// <param name="instanceNameConfig">The execution configuration.</param>
+        /// <param name="instanceName">The instance name for logging.</param>
         /// <param name="brainStatus">The brain status service (not used in simplified version).</param>
         /// <param name="defaultEnvironment">The default environment name.</param>
-        /// <param name="defaultInstance">The default instance name.</param>
         public DatabaseLoggerProvider(
             DatabaseLoggingQueue loggingQueue,
             LoggingConfig loggingConfig,
-            InstanceNameConfig instanceNameConfig,
+            string instanceName,
             LogLevel minLevel = LogLevel.Warning,
             object? brainStatus = null,
-            string defaultEnvironment = "KalshiBot",
-            string defaultInstance = "DefaultInstance"
+            string defaultEnvironment = "KalshiBot"
             )
         {
             _loggingQueue = loggingQueue;
             _minLevel = minLevel;
             _loggingConfig = loggingConfig;
-            _instanceNameConfig = instanceNameConfig;
+            _instanceName = instanceName;
             _brainStatus = brainStatus;
             _defaultEnvironment = defaultEnvironment;
-            _defaultInstance = defaultInstance;
         }
 
         /// <summary>
@@ -52,7 +48,7 @@ namespace KalshiBotLogging
         /// <returns>A new DatabaseLogger instance.</returns>
         public ILogger CreateLogger(string categoryName)
         {
-            return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _instanceNameConfig, _brainStatus, _defaultEnvironment, _defaultInstance);
+            return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _instanceName, _brainStatus, _defaultEnvironment);
         }
 
         /// <summary>

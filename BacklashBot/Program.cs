@@ -127,6 +127,10 @@ builder.Services.AddOptions<GeneralExecutionConfig>()
     .Bind(builder.Configuration.GetSection(GeneralExecutionConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<InstanceNameConfig>()
+    .Bind(builder.Configuration.GetSection("Central:GeneralExecution"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<OverseerClientServiceConfig>()
     .Bind(builder.Configuration.GetSection(OverseerClientServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -210,6 +214,7 @@ builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
     sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IOptions<InstanceNameConfig>>().Value.Name,
     sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
     sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
@@ -241,7 +246,7 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
     Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 1");
     var generalExecutionConfig1 = sp.GetRequiredService<IOptions<GeneralExecutionConfig>>();
     Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 2");
-    var generalExecutionConfig2 = sp.GetRequiredService<IOptions<GeneralExecutionConfig>>();
+    var generalExecutionConfig2 = sp.GetRequiredService<IOptions<InstanceNameConfig>>();
     Console.WriteLine("Resolving ICentralErrorHandler");
     var centralErrorHandler = sp.GetRequiredService<ICentralErrorHandler>();
     Console.WriteLine("Resolving ICentralPerformanceMonitor");
@@ -290,7 +295,7 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<ILogger<IMarketManagerService>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>(),
@@ -308,17 +313,16 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentr
 builder.Services.AddSingleton<ILoggerProvider>(provider =>
 {
     var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
-    var executionConfig = provider.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value;
+    var instanceNameConfig = provider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
     var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
 
     return new DatabaseLoggerProvider(
         provider.GetRequiredService<DatabaseLoggingQueue>(),
         loggingConfig,
-        executionConfig,
+        instanceNameConfig.Name,
         minLevel,
         null, // brainStatus - avoid circular dependency
-        "prd", // defaultEnvironment
-        executionConfig.BrainInstance); // defaultInstance
+        loggingConfig.Environment);
 });
 
 // Register OrderbookChangeTracker with transient lifetime
@@ -440,7 +444,7 @@ builder.Services.AddSingleton<IOverseerClientService>(sp => new OverseerClientSe
     sp.GetRequiredService<ILogger<OverseerClientService>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IOptions<OverseerClientServiceConfig>>(),
-    sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+    sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConnectionManager(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),

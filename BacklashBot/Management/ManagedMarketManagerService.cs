@@ -4,6 +4,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,7 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording market management operations</param>
         /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
-        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="instanceName">Configuration options for execution parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
@@ -38,13 +39,13 @@ namespace BacklashBot.Management
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
             ICentralPerformanceMonitor performanceMonitor,
-            IOptions<GeneralExecutionConfig> executionConfig,
+            IOptions<InstanceNameConfig> instanceName,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceName, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
         }
 
@@ -156,7 +157,7 @@ namespace BacklashBot.Management
                 }
                 else if (actualTarget > actualMarketCount && metrics.CurrentUsage < brain.UsageMin)
                 {
-                    BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance ?? "");
+                    BrainInstanceDTO? dto = await context.GetBrainInstance(_instanceNameConfig.Name ?? "");
                     _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                     List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, actualTarget - actualMarketCount, dto?.MinimumInterest ?? 0);
                     var dataCache = _serviceFactory.GetDataCache();
@@ -170,7 +171,7 @@ namespace BacklashBot.Management
                 }
                 else
                 {
-                    BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance ?? "");
+                    BrainInstanceDTO? dto = await context.GetBrainInstance(_instanceNameConfig.Name ?? "");
                     _logger.LogInformation("BRAIN: Usage within acceptable range: {Percentage:F2}%. Checking for uninteresting markets.", metrics.CurrentUsage);
                     int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto?.MinimumInterest ?? 0);
                     _logger.LogInformation("BRAIN: Removed {Removed} uninteresting markets.", removed);

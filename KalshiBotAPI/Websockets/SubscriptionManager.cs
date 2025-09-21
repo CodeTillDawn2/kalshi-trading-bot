@@ -99,7 +99,7 @@ namespace KalshiBotAPI.Websockets
             var subscriptionConfig = config.Value;
             _subscriptionTimeoutMs = subscriptionConfig.SubscriptionTimeoutMs;
             _confirmationTimeoutSeconds = subscriptionConfig.ConfirmationTimeoutSeconds;
-            _retryDelayMs = subscriptionConfig.RetryDelayMs;
+            _retryDelayMs = subscriptionConfig.SubscriptionManagerRetryDelayMs;
             _maxQueueSize = subscriptionConfig.MaxQueueSize;
             _batchSize = subscriptionConfig.BatchSize;
             _healthCheckIntervalMs = subscriptionConfig.HealthCheckIntervalMs;
