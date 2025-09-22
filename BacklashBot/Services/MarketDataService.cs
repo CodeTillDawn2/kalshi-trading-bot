@@ -52,6 +52,7 @@ namespace BacklashBot.Services
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketServiceDataConfig _marketDataConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketSyncLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
         private HashSet<string> _lastWatchedMarkets = new HashSet<string>();
         private readonly IScopeManagerService _scopeManagerService;
@@ -887,71 +888,91 @@ namespace BacklashBot.Services
         /// </summary>
         public async Task SyncMarketDataAsync(string marketTicker)
         {
-            _logger.LogInformation("Sync-Sync needed for: {MarketTicker}", marketTicker);
-            var stopwatch = Stopwatch.StartNew();
-            var process = Process.GetCurrentProcess();
-            var startCpuTime = process.TotalProcessorTime;
+            var syncSemaphore = _marketSyncLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
+            bool lockAcquired = false;
             try
             {
-                _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                _logger.LogInformation("Sync-Syncing market data for: {MarketTicker}", marketTicker);
-                _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+                lockAcquired = await syncSemaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
+                if (!lockAcquired)
                 {
-                    _logger.LogInformation("Sync-Market {MarketTicker} not found in cache for data sync", marketTicker);
+                    _logger.LogWarning("Failed to acquire sync lock for {MarketTicker} within {Timeout} ms", marketTicker, _marketDataConfig.SemaphoreTimeoutMs);
                     return;
                 }
-                _logger.LogInformation("Sync-Began market data sync for {MarketTicker}", marketTicker);
-                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().UpdateCandlesticksAsync(marketTicker));
-                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().PopulateMarketDataAsync(marketTicker));
-                _logger.LogInformation("Sync-Populated market data for {MarketTicker}", marketTicker);
 
-                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetOrderBookService().SyncOrderBookAsync(marketTicker));
-                List<OrderbookData> orderbook = new List<OrderbookData>();
-                if (_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker))
+                _logger.LogInformation("Sync-Sync needed for: {MarketTicker}", marketTicker);
+                var stopwatch = Stopwatch.StartNew();
+                var process = Process.GetCurrentProcess();
+                var startCpuTime = process.TotalProcessorTime;
+                try
                 {
-                    orderbook = _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData;
-                }
-                marketData.OrderbookData = orderbook;
+                    _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+                    _logger.LogInformation("Sync-Syncing market data for: {MarketTicker}", marketTicker);
+                    _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+                    if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+                    {
+                        _logger.LogInformation("Sync-Market {MarketTicker} not found in cache for data sync", marketTicker);
+                        return;
+                    }
+                    _logger.LogInformation("Sync-Began market data sync for {MarketTicker}", marketTicker);
+                    await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().UpdateCandlesticksAsync(marketTicker));
+                    await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().PopulateMarketDataAsync(marketTicker));
+                    _logger.LogInformation("Sync-Populated market data for {MarketTicker}", marketTicker);
 
-                if (marketData != null)
+                    await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetOrderBookService().SyncOrderBookAsync(marketTicker));
+                    List<OrderbookData> orderbook = new List<OrderbookData>();
+                    if (_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker))
+                    {
+                        orderbook = _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData;
+                    }
+                    marketData.OrderbookData = orderbook;
+
+                    if (marketData != null)
+                    {
+                        marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
+                            marketTicker,
+                            marketData.Candlesticks["minute"],
+                            minCandlestickPercentage: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_MinCandlestickPercentage", 0.1),
+                            maxLevels: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MaxLevels", 6),
+                            sigma: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_Sigma", 2.0),
+                            minDistance: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MinDistance", 3));
+                    }
+
+                    NotifyMarketDataUpdated(marketTicker);
+                    marketData.LastSuccessfulSync = DateTime.UtcNow;
+
+                    _logger.LogDebug("Sync-Completed market data sync for {MarketTicker}", marketTicker);
+                }
+                catch (OperationCanceledException)
                 {
-                    marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
-                        marketTicker,
-                        marketData.Candlesticks["minute"],
-                        minCandlestickPercentage: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_MinCandlestickPercentage", 0.1),
-                        maxLevels: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MaxLevels", 6),
-                        sigma: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_Sigma", 2.0),
-                        minDistance: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MinDistance", 3));
+                    _logger.LogDebug("SyncMarketDataAsync was cancelled for {MarketTicker}", marketTicker);
                 }
-
-                NotifyMarketDataUpdated(marketTicker);
-                marketData.LastSuccessfulSync = DateTime.UtcNow;
-
-                _logger.LogDebug("Sync-Completed market data sync for {MarketTicker}", marketTicker);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogDebug("SyncMarketDataAsync was cancelled for {MarketTicker}", marketTicker);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to sync market data for {MarketTicker}", marketTicker);
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to sync market data for {MarketTicker}", marketTicker);
+                }
+                finally
+                {
+                    // Log performance metrics if enabled
+                    if (_marketDataConfig.EnablePerformanceMetrics)
+                    {
+                        var endCpuTime = process.TotalProcessorTime;
+                        var cpuTimeUsed = endCpuTime - startCpuTime;
+                        var elapsed = stopwatch.Elapsed;
+                        var cpuUsagePercent = (cpuTimeUsed.TotalMilliseconds / elapsed.TotalMilliseconds) * 100 / Environment.ProcessorCount;
+                        var memoryUsageMB = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
+                        var cacheSize = _serviceFactory.GetDataCache().Markets.Count;
+                        var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.Count;
+                        _logger.LogInformation("Performance-Sync for {MarketTicker}: Elapsed={Elapsed}ms, CPU Usage={CpuUsage:F2}%, Memory={Memory:F2}MB, Markets Cache={CacheSize}, Watched Markets={WatchedMarkets}",
+                            marketTicker, elapsed.TotalMilliseconds, cpuUsagePercent, memoryUsageMB, cacheSize, watchedMarkets);
+                    }
+                }
             }
             finally
             {
-                // Log performance metrics if enabled
-                if (_marketDataConfig.EnablePerformanceMetrics)
+                if (lockAcquired)
                 {
-                    var endCpuTime = process.TotalProcessorTime;
-                    var cpuTimeUsed = endCpuTime - startCpuTime;
-                    var elapsed = stopwatch.Elapsed;
-                    var cpuUsagePercent = (cpuTimeUsed.TotalMilliseconds / elapsed.TotalMilliseconds) * 100 / Environment.ProcessorCount;
-                    var memoryUsageMB = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
-                    var cacheSize = _serviceFactory.GetDataCache().Markets.Count;
-                    var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.Count;
-                    _logger.LogInformation("Performance-Sync for {MarketTicker}: Elapsed={Elapsed}ms, CPU Usage={CpuUsage:F2}%, Memory={Memory:F2}MB, Markets Cache={CacheSize}, Watched Markets={WatchedMarkets}",
-                        marketTicker, elapsed.TotalMilliseconds, cpuUsagePercent, memoryUsageMB, cacheSize, watchedMarkets);
+                    syncSemaphore.Release();
+                    _marketSyncLocks.TryRemove(marketTicker, out _);
                 }
             }
         }

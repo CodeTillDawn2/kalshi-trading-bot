@@ -1168,7 +1168,9 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
 
-                _logger.LogInformation("Fetched {Count} candlesticks for {MarketTicker} from API", candlesticks.Count, marketTicker);
+                _logger.LogInformation("Fetched {Count} candlesticks for {MarketTicker} from API (interval: {Interval}, timeframe: {StartTs} to {EndTs})",
+                    candlesticks.Count, marketTicker, interval, UnixHelper.ConvertFromUnixTimestamp(startTs).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    endTs.HasValue ? UnixHelper.ConvertFromUnixTimestamp(endTs.Value).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "now");
 
                 // Process candlesticks sequentially to avoid database concurrency issues
                 foreach (var apiCandlestick in candlesticks)

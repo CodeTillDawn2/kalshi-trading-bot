@@ -24,7 +24,7 @@ namespace KalshiBotLogging
         private readonly LogLevel _minSqlLogLevel;
         private readonly LoggingConfig? _loggingConfig;
         private readonly string _instanceName;
-        private readonly object? _brainStatus; // Simplified to avoid circular dependency
+        private readonly string? _sessionIdentifier;
         private readonly string _defaultEnvironment;
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace KalshiBotLogging
         /// <param name="minLevel">The minimum log level that this logger will process; logs below this level are ignored.</param>
         /// <param name="loggingConfig">Optional logging configuration for dynamic environment settings including min log levels.</param>
         /// <param name="instanceName">The instance name for logging.</param>
-        /// <param name="brainStatus">Optional brain status service for session identifier retrieval (not used in simplified version).</param>
+        /// <param name="sessionIdentifier">The session identifier for logging.</param>
         /// <param name="defaultEnvironment">Default environment name if not specified in config.</param>
         public DatabaseLogger(
             string categoryName,
@@ -43,7 +43,7 @@ namespace KalshiBotLogging
             LogLevel minLevel,
             LoggingConfig loggingConfig,
             string instanceName,
-            object? brainStatus = null,
+            string? sessionIdentifier = null,
             string defaultEnvironment = "KalshiBot")
         {
             _categoryName = categoryName;
@@ -51,7 +51,7 @@ namespace KalshiBotLogging
             _minLevel = minLevel;
             _loggingConfig = loggingConfig;
             _instanceName = instanceName;
-            _brainStatus = brainStatus;
+            _sessionIdentifier = sessionIdentifier;
             _defaultEnvironment = defaultEnvironment;
 
             // Parse configurable log levels with defaults
@@ -146,25 +146,12 @@ namespace KalshiBotLogging
 
         /// <summary>
         /// Retrieves the current session identifier.
-        /// Uses the brain status service if available, otherwise returns "DEF" as fallback.
+        /// Returns the session identifier if available, otherwise returns "DEF" as fallback.
         /// </summary>
         /// <returns>The session identifier string.</returns>
         private string GetSessionIdentifier()
         {
-            if (_brainStatus is global::BacklashBot.Management.Interfaces.IBrainStatusService brainStatusService)
-            {
-                try
-                {
-                    return brainStatusService.SessionIdentifier;
-                }
-                catch
-                {
-                    // Fallback if service not initialized
-                    return "DEF";
-                }
-            }
-            // Fallback if service not available
-            return "DEF";
+            return _sessionIdentifier ?? "DEF";
         }
     }
 }

@@ -32,17 +32,20 @@ namespace BacklashBot.Management
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
         /// <param name="brainStatusConfig">Configuration options for brain status settings.</param>
+        /// <param name="sessionIdentifier">The pre-generated session identifier.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<InstanceNameConfig> instanceNameConfig, IOptions<BrainStatusServiceConfig> brainStatusConfig, ILogger<BrainStatusService> logger)
+        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<InstanceNameConfig> instanceNameConfig, IOptions<BrainStatusServiceConfig> brainStatusConfig, string sessionIdentifier, ILogger<BrainStatusService> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(instanceNameConfig);
             ArgumentNullException.ThrowIfNull(brainStatusConfig);
+            ArgumentNullException.ThrowIfNull(sessionIdentifier);
             ArgumentNullException.ThrowIfNull(logger);
 
             _scopeFactory = scopeFactory;
             this.instanceNameConfig = instanceNameConfig.Value ?? throw new ArgumentNullException(nameof(instanceNameConfig.Value));
             _brainStatusConfig = brainStatusConfig.Value ?? throw new ArgumentNullException(nameof(brainStatusConfig.Value));
+            _sessionIdentifier = sessionIdentifier;
 
             if (string.IsNullOrWhiteSpace(this.instanceNameConfig.Name))
             {
@@ -124,7 +127,7 @@ namespace BacklashBot.Management
                     throw new Exception($"Brain instance with ID {instanceNameConfig.Name} not found.");
                 }
                 _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
-                _sessionIdentifier = GenerateRandomString(_brainStatusConfig.SessionIdLength);
+                // _sessionIdentifier is already set in constructor
                 _initialized = true;
                 _initializationTime = DateTime.UtcNow - startTime;
                 _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", instanceNameConfig.Name);
@@ -137,33 +140,6 @@ namespace BacklashBot.Management
             }
         }
 
-        /// <summary>
-        /// Generates a random alphanumeric string of the specified length with additional entropy.
-        /// </summary>
-        /// <param name="length">The length of the string to generate.</param>
-        /// <returns>A random alphanumeric string.</returns>
-        private string GenerateRandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            // Use more bytes for better entropy
-            var data = new byte[length + 8]; // Extra 8 bytes for timestamp
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(data);
-            }
-            // Incorporate timestamp for additional entropy
-            var timestamp = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-            for (int i = 0; i < Math.Min(8, data.Length); i++)
-            {
-                data[i] ^= timestamp[i];
-            }
-            var result = new char[length];
-            for (int i = 0; i < length; i++)
-            {
-                result[i] = chars[data[i] % chars.Length];
-            }
-            return new string(result);
-        }
 
         /// <summary>
         /// Gets current performance metrics for the brain status service.
