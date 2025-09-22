@@ -329,7 +329,7 @@ builder.Services.AddSingleton<ILoggerProvider>(provider =>
         loggingConfig,
         instanceNameConfig.Name,
         minLevel,
-        null, // brainStatus - avoid circular dependency
+        provider.GetRequiredService<IBrainStatusService>(), // brainStatus
         loggingConfig.Environment);
 });
 

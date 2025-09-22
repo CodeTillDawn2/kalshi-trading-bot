@@ -146,12 +146,24 @@ namespace KalshiBotLogging
 
         /// <summary>
         /// Retrieves the current session identifier.
-        /// Returns "DEF" as a fallback since brain status service is not available in logging project.
+        /// Uses the brain status service if available, otherwise returns "DEF" as fallback.
         /// </summary>
-        /// <returns>The session identifier string, always "DEF" in this simplified version.</returns>
+        /// <returns>The session identifier string.</returns>
         private string GetSessionIdentifier()
         {
-            // Simplified to avoid circular dependency - brain status service not available in logging project
+            if (_brainStatus is global::BacklashBot.Management.Interfaces.IBrainStatusService brainStatusService)
+            {
+                try
+                {
+                    return brainStatusService.SessionIdentifier;
+                }
+                catch
+                {
+                    // Fallback if service not initialized
+                    return "DEF";
+                }
+            }
+            // Fallback if service not available
             return "DEF";
         }
     }
