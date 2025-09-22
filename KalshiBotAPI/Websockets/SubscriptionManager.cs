@@ -379,7 +379,9 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage)
+                // Only add pending confirmations for update_subscription, not for initial subscribe
+                // Subscribe confirmations may not include ID, so we don't track them as pending
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage && message.Contains("\"cmd\": \"update_subscription\""))
                 {
                     _pendingSubscriptionConfirmations.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
                 }
@@ -575,11 +577,12 @@ namespace KalshiBotAPI.Websockets
                 };
 
                 var message = JsonSerializer.Serialize(updateCommand);
-                _logger.LogInformation("Sending update_subscription command: channel={Channel}, SID={Sid}, ID={Id}, action={Action}, markets={Markets}",
-                    channel, subscription.Sid, subscriptionId, action, string.Join(", ", marketsToUpdate));
+                var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                _logger.LogInformation("[{Timestamp}] SENDING update_subscription command: channel={Channel}, SID={Sid}, ID={Id}, action={Action}, markets={Markets}",
+                    timestamp, channel, subscription.Sid, subscriptionId, action, string.Join(", ", marketsToUpdate));
 
                 // Log the full message for debugging
-                _logger.LogDebug("Full update_subscription message: {Message}", message);
+                _logger.LogDebug("[{Timestamp}] Full update_subscription message ID={Id}: {Message}", timestamp, subscriptionId, message);
 
                 if (KalshiConstants.MarketChannelsDelta.Contains(channel))
                 {
@@ -628,7 +631,7 @@ namespace KalshiBotAPI.Websockets
                 }
                 _channelSubscriptions[channel] = (subscription.Sid, updatedMarkets);
 
-                _logger.LogInformation("Updated subscription locally: channel={Channel}, SID={Sid}, action={Action}, new markets={Markets}",
+                _logger.LogDebug("Updated subscription locally: channel={Channel}, SID={Sid}, action={Action}, new markets={Markets}",
                     channel, subscription.Sid, action, string.Join(", ", updatedMarkets));
                 success = true;
             }
@@ -1163,6 +1166,16 @@ namespace KalshiBotAPI.Websockets
                         var currentRetryCount = retryInfo.RetryCount;
                         var firstRetryTime = retryInfo.FirstRetryTime;
 
+                        // Check if the channel already has a SID set, indicating the subscription was successful despite no confirmation
+                        if (_channelSubscriptions.TryGetValue(confirm.Value.Channel, out var existingSubscription) && existingSubscription.Sid != 0)
+                        {
+                            _logger.LogInformation("Channel {Channel} has SID {Sid}, assuming subscription was successful despite no confirmation received. Removing pending confirmation for ID {Id}",
+                                confirm.Value.Channel, existingSubscription.Sid, confirm.Key);
+                            _pendingSubscriptionConfirmations.TryRemove(confirm.Key, out var _);
+                            _subscriptionRetryInfo.TryRemove(subscriptionKey, out var _);
+                            continue;
+                        }
+
                         // Check if we've been retrying for more than 15 minutes
                         var totalRetryTime = DateTime.UtcNow - firstRetryTime;
                         if (totalRetryTime > TimeSpan.FromMinutes(15))
@@ -1489,6 +1502,9 @@ namespace KalshiBotAPI.Websockets
                 {
                     SetSubscriptionState(market, channel, SubscriptionState.Subscribed);
                 }
+
+                // Raise healthy event only for markets that were previously unhealthy
+                RaiseMarketWebSocketHealthy(subscription.Markets.ToArray());
             }
             else
             {

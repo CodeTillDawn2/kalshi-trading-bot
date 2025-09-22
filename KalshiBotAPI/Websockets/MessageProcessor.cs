@@ -2,6 +2,7 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
+using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Enums;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
@@ -495,9 +496,15 @@ namespace KalshiBotAPI.Websockets
 
                 // Check for message deduplication based on sequence number per channel
                 long sequenceNumber = 0;
-                string channelKey = msgType; // Use message type as channel identifier
+                string channelKey = msgType; // Default to message type as channel identifier
                 if (data.TryGetProperty("seq", out var seqProp) && seqProp.TryGetInt64(out sequenceNumber))
                 {
+                    // For messages with sid, use sid as the channel identifier since seq is per sid
+                    if (data.TryGetProperty("sid", out var sidProp) && sidProp.TryGetInt32(out int sid))
+                    {
+                        channelKey = sid.ToString();
+                    }
+
                     lock (_sequenceNumberSynchronizationLock)
                     {
                         // Get or create sequence number set for this channel
@@ -793,7 +800,15 @@ namespace KalshiBotAPI.Websockets
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing order book update message");
+                if (!data.TryGetProperty("msg", out var msg))
+                {
+                    _logger.LogError(ex, "Error processing order book update message. Could not parse message.");
+                }
+                if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+                {
+                    _logger.LogError(ex, "Error processing order book update message. Could not parse market ticker.");
+                }
+                _logger.LogWarning(new OrderbookTransientFailureException(marketTickerProp.GetString(), "", ex), "Problem processing order book update message");
             }
         }
 
@@ -1075,23 +1090,8 @@ namespace KalshiBotAPI.Websockets
                     {
                         await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
 
-                        // Raise healthy event for the markets that were confirmed
-                        if (msg.TryGetProperty("market_ticker", out var marketTickerProp))
-                        {
-                            var marketTicker = marketTickerProp.GetString();
-                            if (!string.IsNullOrEmpty(marketTicker))
-                            {
-                                _subscriptionManager.RaiseMarketWebSocketHealthy(new[] { marketTicker });
-                            }
-                        }
-                        else if (msg.TryGetProperty("market_tickers", out var marketTickersProp) && marketTickersProp.ValueKind == JsonValueKind.Array)
-                        {
-                            var marketTickers = marketTickersProp.EnumerateArray().Select(t => t.GetString()).Where(t => !string.IsNullOrEmpty(t)).ToArray();
-                            if (marketTickers.Any())
-                            {
-                                _subscriptionManager.RaiseMarketWebSocketHealthy(marketTickers);
-                            }
-                        }
+                        // Note: Healthy events are only raised by SubscriptionManager when recovering from unhealthy state
+                        // Initial subscription confirmations do not trigger healthy events
                     }
                     else
                     {
@@ -1186,7 +1186,8 @@ namespace KalshiBotAPI.Websockets
                 if (data.TryGetProperty("id", out var idProp))
                 {
                     var id = idProp.GetInt32();
-                    _logger.LogInformation("Confirmation received for ID: {Id}", id);
+                    var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                    _logger.LogInformation("[{Timestamp}] RECEIVED confirmation for ID: {Id}", timestamp, id);
 
                     // Check if this is a subscribe confirmation with sid
                     if (data.TryGetProperty("sid", out var sidProp))
@@ -1215,7 +1216,10 @@ namespace KalshiBotAPI.Websockets
                             _logger.LogWarning("No pending confirmation found for subscribe confirmation ID: {Id}", id);
                         }
 
-                        _logger.LogInformation("Subscribe confirmed with SID: {Sid} for ID: {Id} on channel '{Channel}'{MarketInfo} | Source: {Source}", sid, id, channel, marketInfo, "MessageProcessor");
+                        _logger.LogInformation("[{Timestamp}] RECEIVED subscribe confirmed with SID: {Sid} for ID: {Id} on channel '{Channel}'{MarketInfo} | Source: {Source}", timestamp, sid, id, channel, marketInfo, "MessageProcessor");
+
+                        // Note: Healthy events are only raised by SubscriptionManager when recovering from unhealthy state
+                        // Initial subscription confirmations do not trigger healthy events
                     }
                     else
                     {

@@ -139,18 +139,6 @@ namespace BacklashCommon.Services
                 }
                 if (cacheSnapshot.Markets == null || !cacheSnapshot.Markets.Any())
                 {
-                    // Only warn if there are watched markets - empty snapshots are expected during startup
-                    using var scope = _serviceScopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-                    var watchedMarketsCount = (await context.GetMarketWatches()).Count;
-                    if (watchedMarketsCount > 0)
-                    {
-                        _logger.LogWarning("CacheSnapshot contains no markets, cannot save snapshot (but {WatchedMarketsCount} markets are being watched)", watchedMarketsCount);
-                    }
-                    else
-                    {
-                        _logger.LogDebug("CacheSnapshot contains no markets, cannot save snapshot (no markets are being watched yet)");
-                    }
                     return new List<string>();
                 }
                 if (cacheSnapshot.Timestamp == default)
@@ -276,7 +264,7 @@ namespace BacklashCommon.Services
                         if (_enablePerformanceMetrics) ioStopwatch = Stopwatch.StartNew();
                         await File.WriteAllTextAsync(fullPath, fileJson, Encoding.Unicode);
                         if (_enablePerformanceMetrics) ioStopwatch.Stop();
-                        _logger.LogInformation("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);
+                        _logger.LogDebug("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);
                     }
 
                     _lastSavedSnapshotTimestamp = timestamp;

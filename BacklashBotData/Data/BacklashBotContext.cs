@@ -1835,11 +1835,15 @@ namespace BacklashBotData.Data
         /// <param name="optionsBuilder">The options builder for configuring the context.</param>
         /// <remarks>
         /// This method is called by Entity Framework during context initialization.
-        /// It sets up the SQL Server provider with the connection string from configuration.
+        /// It sets up the SQL Server provider with the connection string from configuration
+        /// and enables retry on failure for transient SQL Server errors.
         /// </remarks>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString, sqlServerOptionsAction: sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure();
+            });
         }
 
         /// <summary>

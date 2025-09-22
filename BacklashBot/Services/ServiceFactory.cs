@@ -108,7 +108,25 @@ namespace BacklashBot.Services
                 _logger.LogInformation("SF: Wiring up MarketWebSocketHealthy event from SubscriptionManager to MarketDataService");
                 subscriptionManager.MarketWebSocketHealthy += async (sender, markets) =>
                 {
-                    _logger.LogInformation("SF: MarketWebSocketHealthy event received for markets: {Markets}", string.Join(", ", markets));
+                    // Check if any markets need to be marked healthy (were previously unhealthy)
+                    var marketsNeedingUpdate = new List<string>();
+                    foreach (var market in markets)
+                    {
+                        if (_scopeManager.Scope?.ServiceProvider.GetService<IDataCache>()?.Markets.TryGetValue(market, out var marketData) == true && marketData != null)
+                        {
+                            if (!marketData.WebSocketHealthy)
+                            {
+                                marketsNeedingUpdate.Add(market);
+                            }
+                        }
+                    }
+
+                    // Only log if there are markets that actually need updating
+                    if (marketsNeedingUpdate.Any())
+                    {
+                        _logger.LogInformation("SF: MarketWebSocketHealthy event received for markets: {Markets}", string.Join(", ", marketsNeedingUpdate));
+                    }
+
                     foreach (var market in markets)
                     {
                         await marketDataService.MarkMarketAsHealthyAsync(market);

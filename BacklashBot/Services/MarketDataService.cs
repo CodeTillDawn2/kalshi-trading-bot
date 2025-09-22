@@ -729,7 +729,6 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task MarkMarketAsHealthyAsync(string marketTicker)
         {
-            _logger.LogInformation("Marking market {MarketTicker} as healthy - WebSocket connectivity restored", marketTicker);
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -737,15 +736,24 @@ namespace BacklashBot.Services
                 // Set WebSocket health to true in the MarketData instance
                 if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 {
+                    bool wasAlreadyHealthy = marketData.WebSocketHealthy;
                     marketData.WebSocketHealthy = true;
-                    _logger.LogDebug("Set WebSocketHealthy=true for market {MarketTicker}", marketTicker);
+
+                    // Only log if the market was previously unhealthy
+                    if (!wasAlreadyHealthy)
+                    {
+                        _logger.LogInformation("Marking market {MarketTicker} as healthy - WebSocket connectivity restored", marketTicker);
+                        _logger.LogInformation("Market {MarketTicker} WebSocket connectivity has been restored", marketTicker);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Market {MarketTicker} WebSocket connectivity confirmed (already healthy)", marketTicker);
+                    }
                 }
                 else
                 {
                     _logger.LogWarning("MarketData instance for {MarketTicker} not found in cache, cannot set WebSocket health", marketTicker);
                 }
-
-                _logger.LogInformation("Market {MarketTicker} WebSocket connectivity has been restored", marketTicker);
             }
             catch (OperationCanceledException)
             {
