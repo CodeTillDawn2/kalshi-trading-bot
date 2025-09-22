@@ -1277,12 +1277,31 @@ namespace KalshiBotAPI.Websockets
                     {
                         _logger.LogDebug("Processing order book message with seq {Seq}", seq);
 
-                        // Update last sequence number
+                        // Check for sequence gap (global across all markets)
                         var lockWaitStart = DateTime.UtcNow;
                         lock (_sequenceNumberSynchronizationLock)
                         {
                             var lockWaitTime = DateTime.UtcNow - lockWaitStart;
                             RecordLockMetrics("SequenceNumberLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+
+                            if (_latestProcessedSequenceNumber > 0 && seq != _latestProcessedSequenceNumber + 1)
+                            {
+                                _logger.LogWarning("Sequence gap detected: expected {Expected}, got {Seq}. Triggering full orderbook channel resubscribe for new snapshot.",
+                                    _latestProcessedSequenceNumber + 1, seq);
+                                // Trigger resubscribe of entire orderbook channel to get new snapshot
+                                _ = Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await UnsubscribeFromChannelAsync("orderbook");
+                                        await SubscribeToChannelAsync("orderbook", WatchedMarkets.ToArray());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Failed to resubscribe orderbook channel after sequence gap");
+                                    }
+                                }, _processingCancellationToken);
+                            }
 
                             if (seq > _latestProcessedSequenceNumber)
                             {

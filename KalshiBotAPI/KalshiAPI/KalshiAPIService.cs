@@ -760,9 +760,24 @@ namespace KalshiBotAPI.KalshiAPI
                         );
                         break; // Exit the retry loop on success
                     }
+                    catch (TaskCanceledException ex)
+                    {
+                        // Retry on timeout (TaskCanceledException from HttpClient timeout)
+                        retryCount++;
+                        if (retryCount >= maxRetries)
+                        {
+                            _logger.LogWarning("FetchEventAsync failed after {RetryCount} retries for ticker: {EventTicker} - Timeout", maxRetries, eventTicker);
+                            return null;
+                        }
+
+                        _logger.LogInformation("FetchEventAsync retry {RetryCount}/{MaxRetries} for ticker: {EventTicker} - Timeout, waiting {DelayMs}ms", retryCount, maxRetries, eventTicker, delayMs);
+                        await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
+                        delayMs *= 2; // Exponential backoff
+                        continue;
+                    }
                     catch (Exception ex)
                     {
-                        // For non-404 exceptions, don't retry
+                        // For other exceptions, don't retry
                         _logger.LogWarning("Unexpected error in FetchEventAsync for ticker: {EventTicker}: {ExceptionType} - {Message}, Url: {0} Inner {1}"
                             , eventTicker, ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
                         return null;

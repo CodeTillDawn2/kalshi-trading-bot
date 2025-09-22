@@ -137,18 +137,7 @@ namespace BacklashOverseer
         /// <returns>True if connected, false otherwise.</returns>
         public bool IsConnected()
         {
-            bool monitorConnected = _isConnected;
-            bool clientConnected = _webSocketClient.IsConnected();
-            _logger.LogDebug("Connection state check: Monitor={MonitorConnected}, Client={ClientConnected}", monitorConnected, clientConnected);
-
-            // Sync the states if they don't match
-            if (monitorConnected != clientConnected)
-            {
-                _logger.LogWarning("Connection state mismatch detected: Monitor={MonitorConnected}, Client={ClientConnected}. Syncing states.", monitorConnected, clientConnected);
-                _isConnected = clientConnected;
-            }
-
-            return _isConnected;
+            return _webSocketClient.IsConnected();
         }
 
         private async Task MonitorExchangeStatusAsync(bool immediate = false)

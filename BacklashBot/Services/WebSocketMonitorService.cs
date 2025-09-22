@@ -26,7 +26,6 @@ namespace BacklashBot.Services
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IWebSocketMonitorService> _logger;
         private readonly IConfiguration _configuration;
-        private bool _isWebSocketConnected = false;
         private Task _exchangeStatusMonitorTask;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
@@ -162,12 +161,11 @@ namespace BacklashBot.Services
             _logger.LogInformation("WebSocketMonitorService.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
             try
             {
-                if (_isWebSocketConnected)
+                if (IsConnected())
                 {
                     try
                     {
                         await _serviceFactory.GetKalshiWebSocketClient().ShutdownAsync();
-                        _isWebSocketConnected = false;
                         _logger.LogInformation("WebSocket connection closed.");
                     }
                     catch (Exception ex)
@@ -423,8 +421,7 @@ namespace BacklashBot.Services
         /// </summary>
         /// <returns>True if the WebSocket is currently connected, false otherwise.</returns>
         /// <remarks>
-        /// This method checks the actual WebSocket connection state rather than relying on internal flags.
-        /// If there's a discrepancy between the monitor's flag and actual connection, it logs a warning.
+        /// This method checks the actual WebSocket connection state directly from the WebSocket client.
         /// </remarks>
         public bool IsConnected()
         {
@@ -434,30 +431,18 @@ namespace BacklashBot.Services
                 var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
                 if (kalshiWebSocketClient != null)
                 {
-                    bool actualConnectionState = kalshiWebSocketClient.IsConnected();
-
-                    // Log discrepancy if monitor flag doesn't match actual state
-                    if (_isWebSocketConnected != actualConnectionState)
-                    {
-                        _logger.LogWarning("WebSocket connection state discrepancy detected: MonitorFlag={MonitorFlag}, ActualState={ActualState}",
-                            _isWebSocketConnected, actualConnectionState);
-
-                        // Update monitor flag to match actual state
-                        _isWebSocketConnected = actualConnectionState;
-                    }
-
-                    return actualConnectionState;
+                    return kalshiWebSocketClient.IsConnected();
                 }
                 else
                 {
-                    _logger.LogWarning("KalshiWebSocketClient is null, falling back to monitor flag");
-                    return _isWebSocketConnected;
+                    _logger.LogWarning("KalshiWebSocketClient is null, returning false");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking WebSocket connection state, falling back to monitor flag");
-                return _isWebSocketConnected;
+                _logger.LogError(ex, "Error checking WebSocket connection state");
+                return false;
             }
         }
 
@@ -488,7 +473,8 @@ namespace BacklashBot.Services
                     {
                         try
                         {
-                            _logger.LogDebug("Checking exchange status, Current _isWebSocketConnected: {IsConnected}", _isWebSocketConnected);
+                            bool currentConnectionState = IsConnected();
+                            _logger.LogDebug("Checking exchange status, Current WebSocket connected: {IsConnected}", currentConnectionState);
 
                             // Start timing for exchange status check and cycle
                             _monitoringStopwatch.Restart();
@@ -510,7 +496,7 @@ namespace BacklashBot.Services
                             _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
                             _logger.LogDebug("Exchange status check completed in {Duration}ms, Cycle time: {CycleTime}ms", checkDuration, _cycleStopwatch.ElapsedMilliseconds);
 
-                            if (status.exchange_active && !_isWebSocketConnected)
+                            if (status.exchange_active && !currentConnectionState)
                             {
                                 // Only connect if market data initialization is complete
                                 if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
@@ -520,7 +506,6 @@ namespace BacklashBot.Services
                                     _connectionStopwatch.Restart();
                                     await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
                                     long connectionDuration = _connectionStopwatch.ElapsedMilliseconds;
-                                    _isWebSocketConnected = true;
                                     if (_enableMetrics)
                                     {
                                         _connectionSuccessCount++;
@@ -535,12 +520,11 @@ namespace BacklashBot.Services
                                     _logger.LogDebug("Exchange is active but initialization not complete yet, waiting for MarketDataInitializer to finish");
                                 }
                             }
-                            else if (!status.exchange_active && _isWebSocketConnected)
+                            else if (!status.exchange_active && currentConnectionState)
                             {
                                 _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
                                 _serviceFactory.GetDataCache().LastWebSocketTimestamp = DateTime.UtcNow;
                                 await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
-                                _isWebSocketConnected = false;
                                 if (_enableMetrics)
                                 {
                                     RecordConnectionFailure();
@@ -559,7 +543,6 @@ namespace BacklashBot.Services
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Error in exchange status monitoring");
-                            _isWebSocketConnected = false;
                             _serviceFactory.GetDataCache().ExchangeStatus = false;
                             _serviceFactory.GetDataCache().TradingStatus = false;
                             if (_enableMetrics)
@@ -597,6 +580,7 @@ namespace BacklashBot.Services
                 {
                     try
                     {
+                        bool currentConnectionState = IsConnected();
                         _logger.LogDebug("Performing immediate exchange status check");
 
                         // Start timing for exchange status check and cycle
@@ -619,7 +603,7 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
                         _logger.LogDebug("Exchange status check completed in {Duration}ms, Cycle time: {CycleTime}ms", checkDuration, _cycleStopwatch.ElapsedMilliseconds);
 
-                        if (status.exchange_active && !_isWebSocketConnected)
+                        if (status.exchange_active && !currentConnectionState)
                         {
                             // Only connect if market data initialization is complete
                             if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
@@ -629,7 +613,6 @@ namespace BacklashBot.Services
                                 _connectionStopwatch.Restart();
                                 await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);
                                 long connectionDuration = _connectionStopwatch.ElapsedMilliseconds;
-                                _isWebSocketConnected = true;
                                 if (_enableMetrics)
                                 {
                                     _connectionSuccessCount++;
@@ -644,11 +627,10 @@ namespace BacklashBot.Services
                                 _logger.LogDebug("Exchange is active but initialization not complete yet, waiting for MarketDataInitializer to finish");
                             }
                         }
-                        else if (!status.exchange_active && _isWebSocketConnected)
+                        else if (!status.exchange_active && currentConnectionState)
                         {
                             _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
                             await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
-                            _isWebSocketConnected = false;
                             if (_enableMetrics)
                             {
                                 RecordConnectionFailure();
@@ -658,7 +640,7 @@ namespace BacklashBot.Services
                         }
                         else
                         {
-                            _logger.LogDebug("Exchange status unchanged: Active={ExchangeActive}, Connected={IsConnected}", status.exchange_active, _isWebSocketConnected);
+                            _logger.LogDebug("Exchange status unchanged: Active={ExchangeActive}, Connected={IsConnected}", status.exchange_active, currentConnectionState);
                         }
                     }
                     catch (OperationCanceledException)
@@ -669,7 +651,6 @@ namespace BacklashBot.Services
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error in immediate exchange status check");
-                        _isWebSocketConnected = false;
                         _serviceFactory.GetDataCache().ExchangeStatus = false;
                         _serviceFactory.GetDataCache().TradingStatus = false;
                         if (_enableMetrics)

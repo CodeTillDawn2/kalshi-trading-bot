@@ -437,7 +437,7 @@ namespace KalshiBotAPI.Websockets
                         {
                             var fullMessage = messageBuilder.ToString();
                             _lastMessageTimestamp = DateTime.UtcNow;
-                            _logger.LogInformation("STALE-Received complete WebSocket message: Length={Length}, Timestamp={Timestamp}", fullMessage.Length, _lastMessageTimestamp);
+                            _logger.LogInformation("Received complete WebSocket message: Length={Length}, Timestamp={Timestamp}", fullMessage.Length, _lastMessageTimestamp);
 
                             // Use batching or direct processing based on configuration
                             if (_config.EnableMessageBatching)
@@ -487,7 +487,7 @@ namespace KalshiBotAPI.Websockets
         {
             var processingStartTime = _processingStopwatch.ElapsedMilliseconds;
 
-            _logger.LogInformation("STALE-Processing WebSocket message: {Message}, ProcessingStartTime={ProcessingStartTime}", message, DateTime.UtcNow);
+            _logger.LogInformation("Processing WebSocket message: {Message}, ProcessingStartTime={ProcessingStartTime}", message, DateTime.UtcNow);
             try
             {
                 _processingCancellationToken.ThrowIfCancellationRequested();

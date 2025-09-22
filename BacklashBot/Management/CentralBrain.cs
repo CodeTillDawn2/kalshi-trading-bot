@@ -881,7 +881,7 @@ namespace BacklashBot.Management
                 // Check if WebSocket is connected before proceeding with snapshots
                 if (!IsWebSocketServiceRunning())
                 {
-                    _logger.LogDebug("BRAIN: Skipping snapshot creation - WebSocket not connected yet.");
+                    _logger.LogWarning("BRAIN: Skipping snapshot creation - WebSocket not connected yet.");
                     ResetPerformanceMetrics();
                     return;
                 }

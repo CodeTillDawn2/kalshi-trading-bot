@@ -535,7 +535,7 @@ namespace BacklashBot.Services
             var marketTicker = args.Data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
             var seq = args.Data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : -1;
             var eventId = Guid.NewGuid();
-            _logger.LogInformation("STALE-HandleOrderBookReceived called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, ReceivedTime={ReceivedTime}",
+            _logger.LogInformation("HandleOrderBookReceived called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, ReceivedTime={ReceivedTime}",
                 args.OfferType, marketTicker, seq, eventId, DateTime.UtcNow);
             _lastProcessedOrderBookEvent = args;
             QueueOrderBookUpdateAsync(args, eventId);
@@ -547,11 +547,11 @@ namespace BacklashBot.Services
             var marketTicker = args.Data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
             var seq = args.Data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : -1;
             var actualEventId = eventId ?? Guid.NewGuid();
-            _logger.LogInformation("STALE-QueueOrderBookUpdateAsync called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, QueuedTime={QueuedTime}",
+            _logger.LogInformation("QueueOrderBookUpdateAsync called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, QueuedTime={QueuedTime}",
                 args.OfferType, marketTicker, seq, actualEventId, DateTime.UtcNow);
             var msg = args.Data.GetProperty("msg");
             _eventQueue.Add((args.Data, args.OfferType, seq, actualEventId), _statusTrackerService.GetCancellationToken());
-            _logger.LogInformation("STALE-Queued orderbook update for {MarketTicker}, Seq: {Seq}, EventId: {EventId}", marketTicker, seq, actualEventId);
+            _logger.LogInformation("Queued orderbook update for {MarketTicker}, Seq: {Seq}, EventId: {EventId}", marketTicker, seq, actualEventId);
         }
 
         private void StartProcessors()
@@ -780,7 +780,7 @@ namespace BacklashBot.Services
         private async Task ApplyOrderBookUpdateAsync(JsonElement data, string offerType, long seq, Guid eventId, string marketTicker)
         {
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-            _logger.LogInformation("STALE-ApplyOrderBookUpdateAsync started for {MarketTicker}, OfferType: {OfferType}, Seq: {Seq}, EventId: {EventId}, ApplyTime={ApplyTime}",
+            _logger.LogInformation("ApplyOrderBookUpdateAsync started for {MarketTicker}, OfferType: {OfferType}, Seq: {Seq}, EventId: {EventId}, ApplyTime={ApplyTime}",
                 marketTicker, offerType, seq, eventId, DateTime.UtcNow);
             var message = new OrderbookMessage(data, offerType);
             List<OrderbookData>? updatedOrderbook = null;
@@ -1003,6 +1003,11 @@ namespace BacklashBot.Services
                         _logger.LogWarning(new OrderbookTransientFailureException(marketTicker, "DELTA-Received non-positive delta for non-existent level"),
                             "DELTA-Received non-positive delta for non-existent level: {MarketTicker}, Price: {message.Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}",
                             marketTicker, message.Price, message.Side, message.Delta.Value, orderbook.Count);
+                        // Trigger snapshot refresh due to invalid orderbook change
+                        if (!_serviceFactory.GetMarketDataService().MarketsToRefresh.Contains(marketTicker))
+                        {
+                            _serviceFactory.GetMarketDataService().MarketsToRefresh.Add(marketTicker);
+                        }
                         return orderbook;
                     }
 

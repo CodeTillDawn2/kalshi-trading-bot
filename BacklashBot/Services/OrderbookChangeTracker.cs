@@ -522,7 +522,7 @@ namespace BacklashBot.Services
             if (deltaContracts != 0)
             {
                 var recordTime = DateTime.UtcNow;
-                _logger.LogInformation("STALE-Recording orderbook change for {MarketTicker}: Side={Side}, Price={Price}, Delta={DeltaContracts}, RecordTime={RecordTime}",
+                _logger.LogInformation("Recording orderbook change for {MarketTicker}: Side={Side}, Price={Price}, Delta={DeltaContracts}, RecordTime={RecordTime}",
                     _marketTicker, side, price, deltaContracts, recordTime);
                 var change = new OrderbookChange
                 {
@@ -1314,7 +1314,7 @@ namespace BacklashBot.Services
                     {
                         reason = $"timestamp is more than {_trackerConfig.Value.EventCalculationPeriod} minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
                     }
-                    _logger.LogWarning("STALE-Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
+                    _logger.LogWarning("Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
                         _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts, reason);
                     isValid = false;
                     invalidCount++;
