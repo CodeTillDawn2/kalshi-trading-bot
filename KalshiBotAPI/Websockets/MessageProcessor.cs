@@ -36,6 +36,7 @@ namespace KalshiBotAPI.Websockets
         private bool _isDataPersistenceEnabled;
         private readonly bool _enablePerformanceMonitoring;
         private readonly IMessageProcessorPerformanceMetrics _performanceMetrics;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts;
         private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue;
         private readonly ReaderWriterLockSlim? _orderBookQueueLock;
@@ -118,6 +119,19 @@ namespace KalshiBotAPI.Websockets
         private DateTime _lifecycleRateLimiterLastReset = DateTime.UtcNow;
         private int _lifecycleRateLimiterCounter = 0;
 
+        // Queue for delayed API calls
+        private readonly ConcurrentQueue<(string MarketTicker, TaskCompletionSource<bool> Tcs, DateTime QueuedTime)> _delayedApiCallQueue = new();
+        private readonly SemaphoreSlim _delayedProcessingSemaphore = new(1, 1);
+        private Task _delayedApiProcessingTask = null!;
+        private readonly CancellationTokenSource _delayedProcessingCancellation = new();
+
+        // Delayed API call metrics
+        private long _totalDelayedApiCalls = 0;
+        private long _totalWaitTimeMs = 0;
+        private long _maxWaitTimeMs = 0;
+        private DateTime _lastDelayedMetricsTime = DateTime.UtcNow;
+        private readonly object _delayedMetricsLock = new object();
+
         /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>
@@ -184,7 +198,8 @@ namespace KalshiBotAPI.Websockets
             IKalshiAPIService kalshiAPIService,
             MessageProcessorConfig config,
             IOptions<KalshiAPIServiceConfig> apiConfig,
-            IMessageProcessorPerformanceMetrics performanceMetrics)
+            IMessageProcessorPerformanceMetrics performanceMetrics,
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -195,6 +210,7 @@ namespace KalshiBotAPI.Websockets
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _apiConfig = apiConfig?.Value ?? throw new ArgumentNullException(nameof(apiConfig));
             _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
             _enablePerformanceMonitoring = _config.EnablePerformanceMetrics;
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
@@ -228,6 +244,9 @@ namespace KalshiBotAPI.Websockets
             {
                 _batchProcessingTask = Task.Run(() => ProcessMessageBatchAsync(), _batchCancellationSource.Token);
             }
+
+            // Start delayed API processing task
+            _delayedApiProcessingTask = Task.Run(() => ProcessDelayedApiCallsAsync(), _delayedProcessingCancellation.Token);
 
             _logger.LogInformation("MessageProcessor initialized with configuration: Batching={BatchingEnabled}, AdvancedLocking={AdvancedLockingEnabled}, Metrics={MetricsEnabled}",
                 _config.EnableMessageBatching, _config.UseAdvancedLocking, _enablePerformanceMonitoring);
@@ -264,6 +283,20 @@ namespace KalshiBotAPI.Websockets
                 }
             }
 
+            // Cancel delayed API processing
+            _delayedProcessingCancellation.Cancel();
+
+            if (_delayedApiProcessingTask != null && !_delayedApiProcessingTask.IsCompleted)
+            {
+                try
+                {
+                    await _delayedApiProcessingTask.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Expected when cancelling
+                }
+            }
 
             if (_messageReceivingTask != null && !_messageReceivingTask.IsCompleted)
             {
@@ -403,7 +436,7 @@ namespace KalshiBotAPI.Websockets
                         {
                             var fullMessage = messageBuilder.ToString();
                             _lastMessageTimestamp = DateTime.UtcNow;
-                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
+                            _logger.LogInformation("STALE-Received complete WebSocket message: Length={Length}, Timestamp={Timestamp}", fullMessage.Length, _lastMessageTimestamp);
 
                             // Use batching or direct processing based on configuration
                             if (_config.EnableMessageBatching)
@@ -453,7 +486,7 @@ namespace KalshiBotAPI.Websockets
         {
             var processingStartTime = _processingStopwatch.ElapsedMilliseconds;
 
-            _logger.LogDebug("Processing WebSocket message: {Message}", message);
+            _logger.LogInformation("STALE-Processing WebSocket message: {Message}, ProcessingStartTime={ProcessingStartTime}", message, DateTime.UtcNow);
             try
             {
                 _processingCancellationToken.ThrowIfCancellationRequested();
@@ -478,7 +511,7 @@ namespace KalshiBotAPI.Websockets
                                 _duplicateMessagesInWindow++;
                                 CheckDuplicateMessageWarnings();
                             }
-                            _logger.LogWarning("Duplicate message detected with sequence number {SequenceNumber} for channel {Channel}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, channelKey, _duplicateMessageCount);
+                            _logger.LogWarning("DUP-Duplicate message detected with sequence number {SequenceNumber} for channel {Channel}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, channelKey, _duplicateMessageCount);
                             return; // Skip processing duplicate messages
                         }
                         channelSequences.Add(sequenceNumber);
@@ -921,17 +954,9 @@ namespace KalshiBotAPI.Websockets
                     var marketTicker = tickerProp.GetString();
                     if (!string.IsNullOrEmpty(marketTicker))
                     {
-                        if (CanProcessLifecycleEvent())
-                        {
-                            var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
-                            _logger.LogDebug("Fetched API data for market {MarketTicker} due to lifecycle event: {ProcessedCount} processed, {ErrorCount} errors",
-                                marketTicker, processedCount, errorCount);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Skipped API refresh for market {MarketTicker} due to rate limiting ({MaxPerSecond} per second)",
-                                marketTicker, _apiConfig.MaxLifecycleEventsPerSecond);
-                        }
+                        _logger.LogDebug("Triggering API refresh for market {MarketTicker} due to lifecycle event, ApiCallTime={ApiCallTime}",
+                            marketTicker, DateTime.UtcNow);
+                        await ProcessLifecycleApiCallAsync(marketTicker);
                     }
                 }
             }
@@ -976,17 +1001,9 @@ namespace KalshiBotAPI.Websockets
                         var marketTicker = marketTickerProp.GetString();
                         if (!string.IsNullOrEmpty(marketTicker))
                         {
-                            if (CanProcessLifecycleEvent())
-                            {
-                                var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
-                                _logger.LogDebug("Fetched API data for market {MarketTicker} due to event lifecycle: {ProcessedCount} processed, {ErrorCount} errors",
-                                    marketTicker, processedCount, errorCount);
-                            }
-                            else
-                            {
-                                _logger.LogWarning("Skipped API refresh for market {MarketTicker} due to rate limiting ({MaxPerSecond} per second)",
-                                    marketTicker, _apiConfig.MaxLifecycleEventsPerSecond);
-                            }
+                            _logger.LogDebug("Triggering API refresh for market {MarketTicker} due to event lifecycle, ApiCallTime={ApiCallTime}",
+                                marketTicker, DateTime.UtcNow);
+                            await ProcessLifecycleApiCallAsync(marketTicker);
                         }
                     }
                     // Then try event_ticker
@@ -995,17 +1012,12 @@ namespace KalshiBotAPI.Websockets
                         var eventTicker = eventTickerProp.GetString();
                         if (!string.IsNullOrEmpty(eventTicker))
                         {
-                            if (CanProcessLifecycleEvent())
-                            {
-                                var eventResponse = await _kalshiAPIService.FetchEventAsync(eventTicker);
-                                _logger.LogDebug("Fetched API data for event {EventTicker} due to event lifecycle: {Success}",
-                                    eventTicker, eventResponse != null ? "success" : "failed");
-                            }
-                            else
-                            {
-                                _logger.LogWarning("Skipped API refresh for event {EventTicker} due to rate limiting ({MaxPerSecond} per second)",
-                                    eventTicker, _apiConfig.MaxLifecycleEventsPerSecond);
-                            }
+                            _logger.LogDebug("Triggering API refresh for event {EventTicker} due to event lifecycle, ApiCallTime={ApiCallTime}",
+                                eventTicker, DateTime.UtcNow);
+                            // For events, we fetch the event data directly (not through the throttled market API)
+                            var eventResponse = await _kalshiAPIService.FetchEventAsync(eventTicker);
+                            _logger.LogDebug("Fetched API data for event {EventTicker} due to event lifecycle: {Success}",
+                                eventTicker, eventResponse != null ? "success" : "failed");
                         }
                     }
                     else
@@ -1417,12 +1429,16 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
-        /// Checks if a lifecycle event can be processed based on the rate limit.
+        /// Attempts to process a lifecycle API call immediately or queues it for later processing.
         /// Resets the counter every second and allows up to MaxLifecycleEventsPerSecond events.
         /// </summary>
-        /// <returns>True if the event can be processed, false if rate limited.</returns>
-        private bool CanProcessLifecycleEvent()
+        /// <param name="marketTicker">The market ticker for the API call.</param>
+        /// <returns>A task that completes when the API call is processed (either immediately or after queuing).</returns>
+        private Task ProcessLifecycleApiCallAsync(string marketTicker)
         {
+            var tcs = new TaskCompletionSource<bool>();
+            var queuedItem = (MarketTicker: marketTicker, Tcs: tcs, QueuedTime: DateTime.UtcNow);
+
             lock (_lifecycleRateLimiterLock)
             {
                 var now = DateTime.UtcNow;
@@ -1435,10 +1451,134 @@ namespace KalshiBotAPI.Websockets
                 if (_lifecycleRateLimiterCounter < _apiConfig.MaxLifecycleEventsPerSecond)
                 {
                     _lifecycleRateLimiterCounter++;
-                    return true;
+                    // Process immediately
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { marketTicker });
+                            _logger.LogDebug("Processed immediate API call for market {MarketTicker}: {ProcessedCount} processed, {ErrorCount} errors",
+                                marketTicker, processedCount, errorCount);
+                            tcs.SetResult(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing immediate API call for market {MarketTicker}", marketTicker);
+                            tcs.SetException(ex);
+                        }
+                    });
                 }
+                else
+                {
+                    // Queue for later processing
+                    _delayedApiCallQueue.Enqueue(queuedItem);
+                    _logger.LogDebug("Queued API call for market {MarketTicker} due to rate limiting, QueueDepth={QueueDepth}",
+                        marketTicker, _delayedApiCallQueue.Count);
+                }
+            }
 
-                return false;
+            return tcs.Task;
+        }
+
+        /// <summary>
+        /// Processes queued API calls when rate limiting allows.
+        /// Runs continuously in the background.
+        /// </summary>
+        private async Task ProcessDelayedApiCallsAsync()
+        {
+            _logger.LogInformation("Delayed API call processing task started");
+
+            try
+            {
+                while (!_delayedProcessingCancellation.Token.IsCancellationRequested)
+                {
+                    await Task.Delay(100, _delayedProcessingCancellation.Token); // Check every 100ms
+
+                    if (_delayedApiCallQueue.IsEmpty)
+                        continue;
+
+                    lock (_lifecycleRateLimiterLock)
+                    {
+                        var now = DateTime.UtcNow;
+                        if ((now - _lifecycleRateLimiterLastReset).TotalSeconds >= 1)
+                        {
+                            _lifecycleRateLimiterCounter = 0;
+                            _lifecycleRateLimiterLastReset = now;
+                        }
+
+                        if (_lifecycleRateLimiterCounter < _apiConfig.MaxLifecycleEventsPerSecond && _delayedApiCallQueue.TryDequeue(out var item))
+                        {
+                            _lifecycleRateLimiterCounter++;
+                            var queueTime = now - item.QueuedTime;
+                            var queueTimeMs = (long)queueTime.TotalMilliseconds;
+
+                            // Track metrics
+                            lock (_delayedMetricsLock)
+                            {
+                                _totalDelayedApiCalls++;
+                                _totalWaitTimeMs += queueTimeMs;
+                                if (queueTimeMs > _maxWaitTimeMs)
+                                {
+                                    _maxWaitTimeMs = queueTimeMs;
+                                }
+                            }
+
+                            _ = Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    var (processedCount, errorCount) = await _kalshiAPIService.FetchMarketsAsync(tickers: new[] { item.MarketTicker });
+                                    _logger.LogDebug("Processed delayed API call for market {MarketTicker} (queued {QueueTimeMs}ms): {ProcessedCount} processed, {ErrorCount} errors",
+                                        item.MarketTicker, queueTimeMs, processedCount, errorCount);
+                                    item.Tcs.SetResult(true);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error processing delayed API call for market {MarketTicker}", item.MarketTicker);
+                                    item.Tcs.SetException(ex);
+                                }
+                            });
+
+                            // Send metrics periodically (every 30 seconds)
+                            if ((now - _lastDelayedMetricsTime).TotalSeconds >= 30)
+                            {
+                                lock (_delayedMetricsLock)
+                                {
+                                    var totalCalls = _totalDelayedApiCalls;
+                                    var totalWait = _totalWaitTimeMs;
+                                    var maxWait = _maxWaitTimeMs;
+                                    var avgWait = totalCalls > 0 ? (double)totalWait / totalCalls : 0;
+
+                                    _performanceMonitor.RecordDelayedApiCallMetrics(
+                                        "MessageProcessor",
+                                        totalCalls,
+                                        avgWait,
+                                        maxWait,
+                                        _delayedApiCallQueue.Count,
+                                        _enablePerformanceMonitoring);
+
+                                    // Reset metrics for next period
+                                    _totalDelayedApiCalls = 0;
+                                    _totalWaitTimeMs = 0;
+                                    _maxWaitTimeMs = 0;
+                                    _lastDelayedMetricsTime = now;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Delayed API call processing task cancelled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in delayed API call processing task");
+            }
+            finally
+            {
+                _logger.LogInformation("Delayed API call processing task completed");
             }
         }
 
@@ -1458,7 +1598,7 @@ namespace KalshiBotAPI.Websockets
             {
                 if (_duplicateMessagesInWindow >= _config.DuplicateMessageWarningThreshold)
                 {
-                    _logger.LogWarning("High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
+                    _logger.LogWarning("DUP-High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
                         _duplicateMessagesInWindow, _config.DuplicateMessageTimeWindowMs);
 
                     // Post duplicate metrics to central monitoring

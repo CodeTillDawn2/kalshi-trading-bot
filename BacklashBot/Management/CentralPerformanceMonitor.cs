@@ -1497,6 +1497,32 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records delayed API call metrics for rate limiting analysis.
+        /// </summary>
+        /// <param name="componentName">The name of the component recording the metrics.</param>
+        /// <param name="totalDelayedCalls">Total number of delayed API calls in the period.</param>
+        /// <param name="averageWaitTimeMs">Average wait time in milliseconds.</param>
+        /// <param name="maxWaitTimeMs">Maximum wait time in milliseconds.</param>
+        /// <param name="currentQueueDepth">Current number of items in the delay queue.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled.</param>
+        public void RecordDelayedApiCallMetrics(string componentName, long totalDelayedCalls, double averageWaitTimeMs, long maxWaitTimeMs, int currentQueueDepth, bool metricsEnabled)
+        {
+            if (!(_centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true) || !metricsEnabled)
+            {
+                return;
+            }
+
+            _logger.LogInformation("Delayed API call metrics recorded for {ComponentName}: TotalCalls={TotalCalls}, AvgWait={AvgWait:F2}ms, MaxWait={MaxWait}ms, QueueDepth={QueueDepth}, MetricsEnabled={MetricsEnabled}",
+                componentName, totalDelayedCalls, averageWaitTimeMs, maxWaitTimeMs, currentQueueDepth, metricsEnabled);
+
+            // Store in configurable metrics for monitoring
+            _configurableMetrics[$"{componentName}_TotalDelayedCalls"] = totalDelayedCalls;
+            _configurableMetrics[$"{componentName}_AverageWaitTimeMs"] = averageWaitTimeMs;
+            _configurableMetrics[$"{componentName}_MaxWaitTimeMs"] = maxWaitTimeMs;
+            _configurableMetrics[$"{componentName}_CurrentQueueDepth"] = currentQueueDepth;
+        }
+
+        /// <summary>
         /// Sends the current enablement status to indicate whether this class is enabled for performance monitoring.
         /// </summary>
         private void SendEnablementStatus()

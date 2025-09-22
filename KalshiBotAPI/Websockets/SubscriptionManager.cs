@@ -1345,6 +1345,10 @@ namespace KalshiBotAPI.Websockets
                         await ResubscribeAsync(true); // Force resubscribe to all
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogDebug("Subscription health monitor cancelled during shutdown");
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error during subscription health monitoring");

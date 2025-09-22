@@ -53,5 +53,22 @@ namespace BacklashInterfaces.PerformanceMetrics
             int totalItemsFound,
             Dictionary<string, long>? itemCheckTimes = null);
 
+        /// <summary>
+        /// Records metrics for delayed API calls due to rate limiting.
+        /// </summary>
+        /// <param name="componentName">The name of the component (e.g., "MessageProcessor").</param>
+        /// <param name="totalDelayedCalls">Total number of API calls that were delayed.</param>
+        /// <param name="averageWaitTimeMs">Average wait time in milliseconds for delayed calls.</param>
+        /// <param name="maxWaitTimeMs">Maximum wait time in milliseconds for any delayed call.</param>
+        /// <param name="currentQueueDepth">Current number of items in the delay queue.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
+        void RecordDelayedApiCallMetrics(
+            string componentName,
+            long totalDelayedCalls,
+            double averageWaitTimeMs,
+            long maxWaitTimeMs,
+            int currentQueueDepth,
+            bool metricsEnabled);
+
     }
 }

@@ -533,22 +533,25 @@ namespace BacklashBot.Services
         {
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
             var marketTicker = args.Data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
-            _logger.LogDebug("HandleOrderBookReceived called for offer type: {OfferType}, market: {MarketTicker}",
-                args.OfferType, marketTicker);
+            var seq = args.Data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : -1;
+            var eventId = Guid.NewGuid();
+            _logger.LogInformation("STALE-HandleOrderBookReceived called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, ReceivedTime={ReceivedTime}",
+                args.OfferType, marketTicker, seq, eventId, DateTime.UtcNow);
             _lastProcessedOrderBookEvent = args;
-            QueueOrderBookUpdateAsync(args);
+            QueueOrderBookUpdateAsync(args, eventId);
         }
 
-        private void QueueOrderBookUpdateAsync(OrderBookEventArgs args)
+        private void QueueOrderBookUpdateAsync(OrderBookEventArgs args, Guid? eventId = null)
         {
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
             var marketTicker = args.Data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
-            _logger.LogDebug("QueueOrderBookUpdateAsync called for offer type: {OfferType}, market: {MarketTicker}", args.OfferType, marketTicker);
             var seq = args.Data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : -1;
-            var eventId = Guid.NewGuid();
+            var actualEventId = eventId ?? Guid.NewGuid();
+            _logger.LogInformation("STALE-QueueOrderBookUpdateAsync called for offer type: {OfferType}, market: {MarketTicker}, Seq={Seq}, EventId={EventId}, QueuedTime={QueuedTime}",
+                args.OfferType, marketTicker, seq, actualEventId, DateTime.UtcNow);
             var msg = args.Data.GetProperty("msg");
-            _eventQueue.Add((args.Data, args.OfferType, seq, eventId), _statusTrackerService.GetCancellationToken());
-            _logger.LogDebug("Queued orderbook update for {MarketTicker}, Message: {0}, Seq: {Seq}, EventId: {EventId}", marketTicker, msg, seq, eventId);
+            _eventQueue.Add((args.Data, args.OfferType, seq, actualEventId), _statusTrackerService.GetCancellationToken());
+            _logger.LogInformation("STALE-Queued orderbook update for {MarketTicker}, Seq: {Seq}, EventId: {EventId}", marketTicker, seq, actualEventId);
         }
 
         private void StartProcessors()
@@ -777,8 +780,8 @@ namespace BacklashBot.Services
         private async Task ApplyOrderBookUpdateAsync(JsonElement data, string offerType, long seq, Guid eventId, string marketTicker)
         {
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-            _logger.LogDebug("ApplyOrderBookUpdateAsync started for {MarketTicker}, OfferType: {OfferType}, Seq: {Seq}, EventId: {EventId}, Data: {data}",
-                marketTicker, offerType, seq, eventId, data.ToString());
+            _logger.LogInformation("STALE-ApplyOrderBookUpdateAsync started for {MarketTicker}, OfferType: {OfferType}, Seq: {Seq}, EventId: {EventId}, ApplyTime={ApplyTime}",
+                marketTicker, offerType, seq, eventId, DateTime.UtcNow);
             var message = new OrderbookMessage(data, offerType);
             List<OrderbookData>? updatedOrderbook = null;
 

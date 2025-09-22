@@ -553,6 +553,35 @@ namespace TradingStrategies.Trading.Overseer
 
         #endregion
 
+        /// <summary>
+        /// Records delayed API call metrics for rate limiting analysis.
+        /// </summary>
+        /// <param name="componentName">The name of the component recording the metrics.</param>
+        /// <param name="totalDelayedCalls">Total number of delayed API calls in the period.</param>
+        /// <param name="averageWaitTimeMs">Average wait time in milliseconds.</param>
+        /// <param name="maxWaitTimeMs">Maximum wait time in milliseconds.</param>
+        /// <param name="currentQueueDepth">Current number of items in the delay queue.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled.</param>
+        public void RecordDelayedApiCallMetrics(string componentName, long totalDelayedCalls, double averageWaitTimeMs, long maxWaitTimeMs, int currentQueueDepth, bool metricsEnabled)
+        {
+            if (!EnablePerformanceMetrics)
+            {
+                return;
+            }
+
+            var metrics = new Dictionary<string, object>
+            {
+                ["TotalDelayedCalls"] = totalDelayedCalls,
+                ["AverageWaitTimeMs"] = averageWaitTimeMs,
+                ["MaxWaitTimeMs"] = maxWaitTimeMs,
+                ["CurrentQueueDepth"] = currentQueueDepth,
+                ["MetricsEnabled"] = metricsEnabled,
+                ["Timestamp"] = DateTime.UtcNow
+            };
+
+            _simulationMetrics[$"{componentName}.DelayedApiCalls"] = metrics;
+        }
+
     }
 
     namespace TradingStrategies.Performance

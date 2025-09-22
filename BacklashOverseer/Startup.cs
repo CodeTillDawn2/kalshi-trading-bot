@@ -118,7 +118,9 @@ namespace BacklashOverseer
                 sp.GetRequiredService<ISqlDataService>(),
                 sp.GetRequiredService<IKalshiAPIService>(),
                 sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
-                sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
+                sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
+                sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
+                sp.GetRequiredService<IPerformanceMonitor>()
             ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
                 sp.GetRequiredService<ILogger<SubscriptionManager>>(),
