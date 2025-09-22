@@ -436,6 +436,7 @@ namespace BacklashBot.Services
 
                 _serviceFactory.GetDataCache().Markets[marketTicker] = _marketDataFactory(market);
                 _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = new List<OrderbookData>();
+                _serviceFactory.GetDataCache().Markets[marketTicker].LastSuccessfulSync = DateTime.UtcNow;
                 _logger.LogInformation("Initialized market cache for {MarketTicker}", marketTicker);
 
                 await _serviceFactory.GetWebSocketHostedService().TriggerConnectionCheckAsync();
@@ -507,6 +508,7 @@ namespace BacklashBot.Services
                 _logger.LogDebug("Initializing market cache for {MarketTicker}", marketTicker);
                 _serviceFactory.GetDataCache().Markets[marketTicker] = _marketDataFactory(market);
                 _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = new List<OrderbookData>();
+                _serviceFactory.GetDataCache().Markets[marketTicker].LastSuccessfulSync = DateTime.UtcNow;
                 _logger.LogDebug("Initialized market cache for {MarketTicker}", marketTicker);
 
                 _logger.LogDebug("Syncing market data for {MarketTicker}", marketTicker);
