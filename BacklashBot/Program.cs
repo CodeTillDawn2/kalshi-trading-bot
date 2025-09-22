@@ -27,7 +27,7 @@ using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
 
 // Local function to generate session identifier
-string GenerateSessionIdentifier(int length = 10)
+string GenerateSessionIdentifier(int length = 5)
 {
     const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     // Use more bytes for better entropy
