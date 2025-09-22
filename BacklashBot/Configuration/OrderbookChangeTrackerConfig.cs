@@ -17,11 +17,11 @@ public class OrderbookChangeTrackerConfig
     /// Age threshold in minutes for cleaning up old orderbook and trade changes.
     /// Events older than this threshold are automatically removed during cleanup operations.
     /// This helps maintain queue sizes and prevents processing of stale data.
-    /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
+    /// Typical values: 5-20 minutes depending on analysis requirements and memory constraints.
     /// Used by OrderbookChangeTracker for periodic cleanup of old events.
     /// </summary>
-    [Required(ErrorMessage = "The 'CleanupThresholdMinutes' is missing in the configuration.")]
-    public int CleanupThresholdMinutes { get; set; }
+    [Required(ErrorMessage = "The 'EventCalculationPeriod' is missing in the configuration.")]
+    public int EventCalculationPeriod { get; set; }
 
     /// <summary>
     /// Enables or disables performance metrics collection in OrderbookChangeTracker.

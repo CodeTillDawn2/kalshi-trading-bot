@@ -1226,7 +1226,7 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.EventCalculationPeriod);
             int removedCount = 0;
             int queueSizeBefore = _orderbookChanges.Count;
 
@@ -1303,7 +1303,7 @@ namespace BacklashBot.Services
                     continue;
                 }
 
-                if (change.Timestamp > DateTime.UtcNow.AddMinutes(1) || change.Timestamp < DateTime.UtcNow.AddMinutes(-10))
+                if (change.Timestamp > DateTime.UtcNow.AddMinutes(1) || change.Timestamp < DateTime.UtcNow.AddMinutes(-_trackerConfig.Value.EventCalculationPeriod))
                 {
                     string reason;
                     if (change.Timestamp > DateTime.UtcNow.AddMinutes(1))
@@ -1312,7 +1312,7 @@ namespace BacklashBot.Services
                     }
                     else
                     {
-                        reason = $"timestamp is more than 10 minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
+                        reason = $"timestamp is more than {_trackerConfig.Value.EventCalculationPeriod} minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
                     }
                     _logger.LogWarning("STALE-Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
                         _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts, reason);
@@ -1340,7 +1340,7 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.EventCalculationPeriod);
             var gracePeriodEnd = LastMarketOpenTime.Add(TimeSpan.FromMinutes(5));
             int removedCount = 0;
             int warningCount = 0;
