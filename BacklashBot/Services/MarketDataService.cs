@@ -19,6 +19,7 @@ using Polly.Retry;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
+
 namespace BacklashBot.Services
 {
     /// <summary>
@@ -50,7 +51,6 @@ namespace BacklashBot.Services
         private readonly CalculationsConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketServiceDataConfig _marketDataConfig;
-        private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketLocks = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
         private HashSet<string> _lastWatchedMarkets = new HashSet<string>();
@@ -859,12 +859,6 @@ namespace BacklashBot.Services
                 _serviceFactory.GetKalshiWebSocketClient().WatchedMarkets = new HashSet<string>();
                 _logger.LogDebug("Cleared subscription states and WebSocket WatchedMarkets");
 
-                foreach (var semaphore in _marketLocks.Values)
-                {
-                    semaphore.Dispose();
-                }
-                _marketLocks.Clear();
-                _logger.LogDebug("Cleared and disposed all market locks");
 
                 foreach (var semaphore in _marketInitializationLocks.Values)
                 {
@@ -894,21 +888,12 @@ namespace BacklashBot.Services
         public async Task SyncMarketDataAsync(string marketTicker)
         {
             _logger.LogInformation("Sync-Sync needed for: {MarketTicker}", marketTicker);
-            var semaphore = _marketLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
             var stopwatch = Stopwatch.StartNew();
             var process = Process.GetCurrentProcess();
             var startCpuTime = process.TotalProcessorTime;
-            bool lockAcquired = false;
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                lockAcquired = await semaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
-                stopwatch.Stop();
-                if (!lockAcquired)
-                {
-                    _logger.LogError("Sync-Failed to acquire sync lock for {MarketTicker} within {Timeout} ms.", marketTicker, _marketDataConfig.SemaphoreTimeoutMs);
-                    return;
-                }
                 _logger.LogInformation("Sync-Syncing market data for: {MarketTicker}", marketTicker);
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                 if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
@@ -920,6 +905,7 @@ namespace BacklashBot.Services
                 await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().UpdateCandlesticksAsync(marketTicker));
                 await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().PopulateMarketDataAsync(marketTicker));
                 _logger.LogInformation("Sync-Populated market data for {MarketTicker}", marketTicker);
+
                 await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetOrderBookService().SyncOrderBookAsync(marketTicker));
                 List<OrderbookData> orderbook = new List<OrderbookData>();
                 if (_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker))
@@ -954,11 +940,6 @@ namespace BacklashBot.Services
             }
             finally
             {
-                if (lockAcquired)
-                {
-                    semaphore.Release();
-                    _logger.LogInformation("Released sync lock for {MarketTicker}", marketTicker);
-                }
                 // Log performance metrics if enabled
                 if (_marketDataConfig.EnablePerformanceMetrics)
                 {
