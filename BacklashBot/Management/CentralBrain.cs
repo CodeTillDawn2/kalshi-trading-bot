@@ -488,7 +488,6 @@ namespace BacklashBot.Management
                     _snapshotTimer.Elapsed += async (sender, e) => await ExecuteSnapshotCycle(null);
                     _ = Task.Run(async () =>
                     {
-                        await Task.Delay(_centralBrainConfig.SnapshotInitialDelay);
                         _snapshotTimer.Start();
                     });
                     _logger.LogInformation("BRAIN: Snapshot timer initialized early with 1-minute delay.");

@@ -3,11 +3,13 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashOverseer.Config;
 using BacklashOverseer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
 namespace BacklashOverseer.Controllers
@@ -31,6 +33,7 @@ namespace BacklashOverseer.Controllers
         private readonly ILogger<MarketWatchController> _logger;
         private readonly IConfiguration _configuration;
         private readonly PerformanceMetricsService _performanceMetricsService;
+        private readonly MarketWatchControllerConfig _config;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string AllBrainInstancesCacheKey = "AllBrainInstances";
@@ -61,7 +64,8 @@ namespace BacklashOverseer.Controllers
         /// <param name="logger">Logger for recording operational information and errors.</param>
         /// <param name="configuration">Configuration for cache durations and performance metrics settings.</param>
         /// <param name="performanceMetricsService">Service for tracking performance metrics and cache statistics.</param>
-        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService)
+        /// <param name="config">Configuration options for MarketWatchController behavior, including cache durations and performance metrics settings.</param>
+        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService, IOptions<MarketWatchControllerConfig> config)
         {
             _context = context;
             _cache = cache;
@@ -70,11 +74,12 @@ namespace BacklashOverseer.Controllers
             _logger = logger;
             _configuration = configuration;
             _performanceMetricsService = performanceMetricsService;
+            _config = config.Value;
 
-            MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:MarketsCacheDurationMinutes", 15));
-            LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:LogDataCacheDurationMinutes", 5));
+            MarketsCacheDuration = TimeSpan.FromMinutes(_config.MarketsCacheDurationMinutes);
+            LogDataCacheDuration = TimeSpan.FromMinutes(_config.LogDataCacheDurationMinutes);
 
-            _enableMarketWatchControllerPerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnableMarketWatchControllerPerformanceMetrics", true);
+            _enableMarketWatchControllerPerformanceMetrics = _config.EnablePerformanceMetrics;
         }
 
         /// <summary>

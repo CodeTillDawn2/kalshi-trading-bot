@@ -25,12 +25,6 @@ namespace BacklashBot.Configuration
         public TimeSpan StartupRetryInterval { get; set; }
 
         /// <summary>
-        /// Gets or sets the snapshot initial delay as a TimeSpan.
-        /// </summary>
-        [Required(ErrorMessage = "The 'SnapshotInitialDelay' is missing in the configuration.")]
-        public TimeSpan SnapshotInitialDelay { get; set; }
-
-        /// <summary>
         /// Gets or sets the overnight start time as a TimeSpan.
         /// </summary>
         [Required(ErrorMessage = "The 'OvernightStart' is missing in the configuration.")]

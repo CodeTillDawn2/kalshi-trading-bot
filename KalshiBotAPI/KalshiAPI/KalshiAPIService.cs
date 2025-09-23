@@ -100,7 +100,7 @@ namespace KalshiBotAPI.KalshiAPI
             {
                 ["minute"] = (1, 1, 3),
                 ["hour"] = (60, 2, 7),
-                ["day"] = (1440, 3, 25)
+                ["day"] = (1440, 3, 15)
             };
         }
 

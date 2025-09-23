@@ -21,6 +21,7 @@ namespace BacklashBot.Services
         private readonly ILogger<IMarketRefreshService> _logger;
         private readonly TimeSpan _updateInterval;
         private readonly MarketRefreshServiceConfig _marketRefreshServiceConfig;
+        private readonly GeneralExecutionConfig _generalConfig;
         private DateTime? _lastRefreshTime;
         private Task _executeTask;
         /// <summary>
@@ -145,6 +146,7 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             ILogger<IMarketRefreshService> logger,
             IOptions<MarketRefreshServiceConfig> marketRefreshServiceConfig,
+            IOptions<GeneralExecutionConfig> generalConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService
@@ -153,10 +155,11 @@ namespace BacklashBot.Services
             _logger = logger;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
+            _generalConfig = generalConfig.Value;
             _statusTracker = statusTrackerService;
             _scopeFactory = scopeFactory;
             _marketRefreshServiceConfig = marketRefreshServiceConfig.Value;
-            _updateInterval = TimeSpan.FromMinutes(_marketRefreshServiceConfig.RefreshIntervalMinutes);
+            _updateInterval = TimeSpan.FromMinutes(_generalConfig.RefreshIntervalMinutes);
         }
 
         /// <summary>

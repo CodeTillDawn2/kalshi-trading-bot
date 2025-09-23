@@ -1,6 +1,8 @@
 using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.State.Interfaces;
+using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
-using BacklashOverseer;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,29 +11,29 @@ using Moq;
 namespace OverseerTests
 {
     /// <summary>
-    /// Comprehensive unit test suite for the WebSocketMonitorServiceLite class.
+    /// Comprehensive unit test suite for the OverseerWebSocketMonitorService class.
     /// Tests WebSocket connection monitoring, exchange status checking,
-    /// and service lifecycle management.
+    /// performance metrics recording, and service lifecycle management.
     /// </summary>
     [TestFixture]
-    public class WebSocketMonitorServiceLiteTests
+    public class OverseerWebSocketMonitorServiceTests
     {
-        private Mock<ILogger<WebSocketMonitorServiceLite>> _loggerMock;
+        private Mock<ILogger<OverseerWebSocketMonitorService>> _loggerMock;
         private Mock<IKalshiWebSocketClient> _webSocketClientMock;
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
         private Mock<IServiceScope> _scopeMock;
         private Mock<IServiceProvider> _serviceProviderMock;
         private Mock<IKalshiAPIService> _apiServiceMock;
-        private WebSocketMonitorServiceLite _service;
+        private OverseerWebSocketMonitorService _service;
 
         /// <summary>
         /// Sets up test fixtures before each test execution.
-        /// Creates mock dependencies and initializes the WebSocketMonitorServiceLite instance.
+        /// Creates mock dependencies and initializes the OverseerWebSocketMonitorService instance.
         /// </summary>
         [SetUp]
         public void Setup()
         {
-            _loggerMock = new Mock<ILogger<WebSocketMonitorServiceLite>>();
+            _loggerMock = new Mock<ILogger<OverseerWebSocketMonitorService>>();
             _webSocketClientMock = new Mock<IKalshiWebSocketClient>();
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
             _scopeMock = new Mock<IServiceScope>();
@@ -42,7 +44,7 @@ namespace OverseerTests
             _scopeMock.Setup(x => x.ServiceProvider).Returns(_serviceProviderMock.Object);
             _serviceProviderMock.Setup(x => x.GetService(typeof(IKalshiAPIService))).Returns(_apiServiceMock.Object);
 
-            _service = new WebSocketMonitorServiceLite(
+            _service = new OverseerWebSocketMonitorService(
                 _loggerMock.Object,
                 _webSocketClientMock.Object,
                 _scopeFactoryMock.Object
@@ -60,14 +62,14 @@ namespace OverseerTests
         }
 
         /// <summary>
-        /// Tests that the WebSocketMonitorServiceLite constructor properly initializes with valid dependencies.
+        /// Tests that the OverseerWebSocketMonitorService constructor properly initializes with valid dependencies.
         /// Verifies that all required services are properly injected.
         /// </summary>
         [Test]
         public void Constructor_ValidDependencies_CreatesInstance()
         {
             // Arrange & Act
-            var service = new WebSocketMonitorServiceLite(
+            var service = new OverseerWebSocketMonitorService(
                 _loggerMock.Object,
                 _webSocketClientMock.Object,
                 _scopeFactoryMock.Object
@@ -75,23 +77,23 @@ namespace OverseerTests
 
             // Assert
             Assert.That(service, Is.Not.Null);
-            Assert.That(service, Is.InstanceOf<WebSocketMonitorServiceLite>());
+            Assert.That(service, Is.InstanceOf<OverseerWebSocketMonitorService>());
         }
 
         /// <summary>
-        /// Tests that the WebSocketMonitorServiceLite constructor handles null dependencies appropriately.
+        /// Tests that the OverseerWebSocketMonitorService constructor handles null dependencies appropriately.
         /// Some parameters may not throw immediately but will cause issues during usage.
         /// </summary>
         [Test]
-        [Description("Validates WebSocketMonitorServiceLite constructor behavior with null dependencies - tests error handling for logger, WebSocket client, and scope factory parameters")]
-        public void WebSocketMonitorServiceLite_Constructor_WithNullDependencies_ThrowsAppropriateExceptions()
+        [Description("Validates OverseerWebSocketMonitorService constructor behavior with null dependencies - tests error handling for logger, WebSocket client, scope factory, performance monitor, and ready status parameters")]
+        public void OverseerWebSocketMonitorService_Constructor_WithNullDependencies_ThrowsAppropriateExceptions()
         {
             // Act & Assert
             // The constructor may not validate all null parameters immediately
             // but some will cause issues during usage
             Assert.DoesNotThrow(() =>
             {
-                var service = new WebSocketMonitorServiceLite(
+                var service = new OverseerWebSocketMonitorService(
                     null,
                     _webSocketClientMock.Object,
                     _scopeFactoryMock.Object
@@ -100,7 +102,7 @@ namespace OverseerTests
 
             Assert.DoesNotThrow(() =>
             {
-                var service = new WebSocketMonitorServiceLite(
+                var service = new OverseerWebSocketMonitorService(
                     _loggerMock.Object,
                     null,
                     _scopeFactoryMock.Object
@@ -109,7 +111,7 @@ namespace OverseerTests
 
             Assert.DoesNotThrow(() =>
             {
-                var service = new WebSocketMonitorServiceLite(
+                var service = new OverseerWebSocketMonitorService(
                     _loggerMock.Object,
                     _webSocketClientMock.Object,
                     null
@@ -123,7 +125,7 @@ namespace OverseerTests
         /// </summary>
         [Test]
         [Description("Validates StartServices starts WebSocket monitoring and logs startup messages for service initialization and exchange status monitoring")]
-        public void WebSocketMonitorServiceLite_StartServices_StartsMonitoringAndLogsStartupMessages()
+        public void OverseerWebSocketMonitorService_StartServices_StartsMonitoringAndLogsStartupMessages()
         {
             // Arrange
             var cts = new CancellationTokenSource();
@@ -139,7 +141,7 @@ namespace OverseerTests
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("WebSocketMonitorServiceLite starting")),
+                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("OverseerWebSocketMonitorService starting")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.Once);
@@ -171,7 +173,7 @@ namespace OverseerTests
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("WebSocketMonitorServiceLite.StopAsync called")),
+                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("OverseerWebSocketMonitorService.StopAsync called")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.Once);
@@ -179,7 +181,7 @@ namespace OverseerTests
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("WebSocketMonitorServiceLite.StopAsync completed")),
+                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("OverseerWebSocketMonitorService.StopAsync completed")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.Once);
@@ -187,7 +189,7 @@ namespace OverseerTests
 
         /// <summary>
         /// Tests the TriggerConnectionCheckAsync method.
-        /// Verifies that an immediate connection check is performed.
+        /// Verifies that an immediate connection check is performed and metrics are recorded.
         /// </summary>
         [Test]
         public async Task TriggerConnectionCheckAsync_PerformsImmediateCheck()
@@ -256,11 +258,11 @@ namespace OverseerTests
 
         /// <summary>
         /// Tests exchange status monitoring when exchange is active and WebSocket is not connected.
-        /// Verifies that WebSocket connection is initiated.
+        /// Verifies that WebSocket connection is initiated and metrics are recorded.
         /// </summary>
         [Test]
-        [Description("Validates exchange status monitoring connects WebSocket when exchange is active but WebSocket is disconnected, logging connection attempt")]
-        public async Task WebSocketMonitorServiceLite_MonitorExchangeStatus_ExchangeActiveWebSocketDisconnected_InitiatesConnection()
+        [Description("Validates exchange status monitoring connects WebSocket when exchange is active but WebSocket is disconnected, logging connection attempt and recording metrics")]
+        public async Task OverseerWebSocketMonitorService_MonitorExchangeStatus_ExchangeActiveWebSocketDisconnected_InitiatesConnection()
         {
             // Arrange
             var exchangeStatus = new ExchangeStatus
@@ -280,7 +282,7 @@ namespace OverseerTests
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("Exchange is active, connecting WebSocket")),
+                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("Exchange is active and initialization complete, connecting WebSocket")),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.Once);
@@ -501,5 +503,7 @@ namespace OverseerTests
             // The test passes if no unhandled exception is thrown
             Assert.Pass("Shutdown handled exception gracefully");
         }
+
+
     }
 }

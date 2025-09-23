@@ -5,14 +5,16 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BacklashOverseer
+namespace BacklashCommon.Services
 {
     /// <summary>
     /// Lightweight service for monitoring WebSocket connections and exchange status.
+    /// This service monitors the exchange status and manages WebSocket connections without
+    /// modifying BacklashBot-specific objects.
     /// </summary>
-    public class WebSocketMonitorServiceLite : IWebSocketMonitorService
+    public class OverseerWebSocketMonitorService : IWebSocketMonitorService
     {
-        private readonly ILogger<WebSocketMonitorServiceLite> _logger;
+        private readonly ILogger<OverseerWebSocketMonitorService> _logger;
         private bool _isConnected = false;
         private Task? _monitorTask;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -29,13 +31,13 @@ namespace BacklashOverseer
         public CancellationToken CancellationToken { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the WebSocketMonitorServiceLite class.
+        /// Initializes a new instance of the OverseerWebSocketMonitorService class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="webSocketClient">The WebSocket client.</param>
         /// <param name="scopeFactory">The service scope factory.</param>
-        public WebSocketMonitorServiceLite(
-            ILogger<WebSocketMonitorServiceLite> logger,
+        public OverseerWebSocketMonitorService(
+            ILogger<OverseerWebSocketMonitorService> logger,
             IKalshiWebSocketClient webSocketClient,
             IServiceScopeFactory scopeFactory)
         {
@@ -43,7 +45,7 @@ namespace BacklashOverseer
             _scopeFactory = scopeFactory;
             _webSocketClient = webSocketClient;
             _logger = logger;
-            _logger.LogDebug("WebSocketMonitorServiceLite instance created");
+            _logger.LogDebug("OverseerWebSocketMonitorService instance created");
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace BacklashOverseer
         /// <param name="cancellationToken">The cancellation token.</param>
         public void StartServices(CancellationToken cancellationToken)
         {
-            _logger.LogDebug("WebSocketMonitorServiceLite starting...");
+            _logger.LogDebug("OverseerWebSocketMonitorService starting...");
             try
             {
                 _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -66,10 +68,10 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error starting WebSocketMonitorServiceLite");
+                _logger.LogError(ex, "Error starting OverseerWebSocketMonitorService");
                 throw;
             }
-            _logger.LogDebug("WebSocketMonitorServiceLite started.");
+            _logger.LogDebug("OverseerWebSocketMonitorService started.");
         }
 
         /// <summary>
@@ -79,7 +81,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ShutdownAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
+            _logger.LogInformation("OverseerWebSocketMonitorService.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
                 CancellationToken.IsCancellationRequested);
             _cancellationTokenSource.Cancel();
             try
@@ -117,7 +119,7 @@ namespace BacklashOverseer
             }
             finally
             {
-                _logger.LogDebug("WebSocketMonitorServiceLite.StopAsync completed at {0}", DateTime.UtcNow);
+                _logger.LogDebug("OverseerWebSocketMonitorService.StopAsync completed at {0}", DateTime.UtcNow);
             }
         }
 
@@ -158,7 +160,7 @@ namespace BacklashOverseer
                             ExchangeStatus status = await apiService.GetExchangeStatusAsync();
                             _exchangeStatus = status.exchange_active;
                             _tradingStatus = status.trading_active;
-                            _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _exchangeStatus, _tradingStatus);
+                            _logger.LogDebug("Updated exchange status to {Status} and trading status to {tradingStatus}", _exchangeStatus, _tradingStatus);
 
                             if (status.exchange_active && !_isConnected)
                             {
@@ -212,7 +214,7 @@ namespace BacklashOverseer
                         ExchangeStatus status = await apiService.GetExchangeStatusAsync();
                         _exchangeStatus = status.exchange_active;
                         _tradingStatus = status.trading_active;
-                        _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _exchangeStatus, _tradingStatus);
+                        _logger.LogDebug("Updated exchange status to {Status} and trading status to {tradingStatus}", _exchangeStatus, _tradingStatus);
 
                         if (status.exchange_active && !_isConnected)
                         {

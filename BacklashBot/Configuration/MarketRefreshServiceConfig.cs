@@ -14,16 +14,6 @@ public class MarketRefreshServiceConfig
     public const string SectionName = "WatchedMarkets:MarketRefreshService";
 
     /// <summary>
-    /// Interval in minutes for refreshing market data and recalculating trading metrics.
-    /// This controls how often the system updates cached market information and technical indicators.
-    /// Longer intervals reduce API load but may delay response to market changes.
-    /// Typical values: 1-15 minutes depending on data freshness requirements and API rate limits.
-    /// Used by MarketRefreshService and MarketData for periodic data synchronization.
-    /// </summary>
-    [Required(ErrorMessage = "The 'RefreshIntervalMinutes' is missing in the configuration.")]
-    public int RefreshIntervalMinutes { get; set; }
-
-    /// <summary>
     /// Threshold ratio for triggering additional refresh pass when refresh ratio falls below this value.
     /// This determines when to perform a forced refresh on markets that haven't been updated recently.
     /// Typical values: 0.1-0.5 (10%-50%) depending on desired refresh coverage.

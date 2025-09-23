@@ -135,6 +135,10 @@ builder.Services.AddOptions<KalshiWebSocketClientConfig>()
     .Bind(builder.Configuration.GetSection(KalshiWebSocketClientConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<WebSocketMonitorServiceConfig>()
+    .Bind(builder.Configuration.GetSection(WebSocketMonitorServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<TradingSnapshotServiceConfig>()
     .Bind(builder.Configuration.GetSection(TradingSnapshotServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -476,7 +480,7 @@ builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorS
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<ILogger<IWebSocketMonitorService>>(),
-    sp.GetRequiredService<IConfiguration>(),
+    sp.GetRequiredService<IOptions<WebSocketMonitorServiceConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<IStatusTrackerService>(),
@@ -505,8 +509,8 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
     sp.GetRequiredService<IPerformanceMonitor>()
 ));
-builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
-    sp.GetRequiredService<ILogger<SubscriptionManager>>(),
+builder.Services.AddScoped<ISubscriptionManager>(sp => new KalshiBotAPI.Websockets.SubscriptionManager(
+    sp.GetRequiredService<ILogger<KalshiBotAPI.Websockets.SubscriptionManager>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IStatusTrackerService>(),

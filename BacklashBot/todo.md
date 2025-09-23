@@ -1,36 +1,46 @@
-# Performance Metrics Documentation
+BacklashBot:
 
-This document outlines the performance metrics tracked across various classes in the Kalshi Trading Bot project.
+SlopeShortMinutes: New=5 (old 1).
+SlopeMediumMinutes: New=15 (old 5).
+RSI periods all New=14 (old varied 9-21).
+MACD periods: New=12/26/9 (old standard, but confirmed same).
+EMA periods: New=14 (old 21).
+BollingerBands periods: New=20, StdDev=2.0 (old 20/2, same).
+ATR periods: New=14 (old 14, same).
+VWAP periods: New=15 (old 20).
+Stochastic periods: New=14/3 (old 14/3, same).
+TradingFeeRate: New=0.07 (old 0.05?).
+PseudoCandlestickLookbackPeriods: New=34 (old 20).
+RecentCandlesticksCount: New=15 (old 10).
+PSAR params: New=0.02/0.2/0.02 (old same).
+ADX_Periods: New=14 (old 14).
+ResistanceLevels params: New=2.0/0.1/6/2.0/3 (old varied, e.g., MaxLevels=5).
+CandlestickService.MaxParallelCandlestickTasks: New=4 (old 2).
+CandlestickMandatoryOverlapDays: New=15d7h3m (old 7d).
+MaxParallelParquetTasks: New=4 (old 1).
+OrderbookChangeTracker.EventCalculationPeriod: New=5 (old 1).
+MarketRefreshService.RefreshIntervalMinutes: New=5 (old 1).
+RefreshThresholdRatio: New=0.25 (old 0.5).
+TimeBudgetRatio: New=0.60 (old 0.8).
+TradingGUI:
 
-
-## Distinct Return Types (Broken Down by Constituents)
-
-### Primitive Types
-- `bool` (multiple classes)
-- `double` (multiple classes)
-- `int` (multiple classes)
-- `long` (multiple classes)
-
-### Non-Primitive Types
-- `ClientRateLimit` (KalshiBotOverseer.OverseerHub.ClientRateLimit) - Internal class for tracking rate limiting information per client, containing HandshakeCount (int), CheckInCount (int), and WindowStart (DateTime)
-- `PatternDetectionMetrics` (BacklashPatterns.PatternSearch.PatternDetectionMetrics)
-- `ClientMetrics` (KalshiBotOverseer.OverseerHub.ClientSpecificMetrics)
-- `MetricHistory` (KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory)
-- `OverseerHubConfig` (KalshiBotOverseer.OverseerHubConfig) - Configuration class containing settings for connection health monitoring, authentication token validity, and rate limiting parameters
-- `PerformanceMetrics` (TradingSimulator.MarketProcessor.GetPerformanceMetrics, TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics)
-- `PatternDetectionMetricsSummary` (BacklashPatterns.PatternSearch.GetSummary)
-- `ResourceMetrics` (KalshiBotOverseer.OvernightActivitiesHelper.ResourceConsumptionTrend)
-- `TimeSpan` (multiple properties: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns, TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime, etc.)
-- `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
-
-
-
-## TradingStrategies.Trading.Overseer.EquityCalculator
-
-## TradingStrategies.Trading.Helpers.StrategySelectionHelper
-
-
-## TradingGUI.MainForm
+TradingSimulatorService.ProcessingTimeoutSeconds: New=300 (old 60s).
+MaxConcurrentMarkets: New=5 (old 1).
+BatchSize: New=10 (old 50).
+DiscrepancyThresholdPercentage: New=10 (old 5).
+DiscrepancyDetection.VelocityThreshold: New=0.1 (old 0.05).
+MinSnapshotsForDetection: New=10 (old 5).
+PatternDetectionService.LookbackWindow: New=50 (old 20).
+SignificancePriceThreshold: New=0.01 (old 0.005).
+VolumeIncreaseMultiplier: New=1.5 (old 2.0).
+InitialPatternCapacity: New=10 (old 5).
+MaxDegreeOfParallelism: New=4 (old 2).
+SnapshotViewer.ZoomInFactor: New=0.9 (old 0.8).
+ZoomOutFactor: New=1.1 (old 1.2).
+PanThreshold: New=0.001 (old 0.01).
+NavigationTimerInterval: New=300 (old 100).
+Rapid/Fast/Medium thresholds: New=60/15/5 (old 30/10/3).
+Step sizes: New=60/5/2/1 (old 30/3/1/1).
 
 
 # Important warnings to fix

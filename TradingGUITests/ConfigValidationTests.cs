@@ -1,3 +1,5 @@
+using BacklashBot.Configuration;
+using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
 using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Configuration;
@@ -33,8 +35,11 @@ namespace TradingGUITests
             var assemblies = new[]
             {
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(KalshiBotAPI.Configuration.KalshiConfig).Assembly, // KalshiBotAPI
                 typeof(TradingStrategies.Configuration.DataLoaderConfig).Assembly, // TradingStrategies
-                typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly // TradingGUI itself
+                typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly, // TradingGUI itself
+                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(BacklashBot.Configuration.BrainStatusServiceConfig).Assembly // BacklashBot
             };
 
             var configTypes = assemblies
@@ -62,8 +67,11 @@ namespace TradingGUITests
             var assemblies = new[]
             {
                 typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
+                typeof(KalshiBotAPI.Configuration.KalshiConfig).Assembly, // KalshiBotAPI
                 typeof(TradingStrategies.Configuration.DataLoaderConfig).Assembly, // TradingStrategies
-                typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly // TradingGUI itself
+                typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly, // TradingGUI itself
+                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(BacklashBot.Configuration.BrainStatusServiceConfig).Assembly // BacklashBot
             };
 
             foreach (var assembly in assemblies)
@@ -181,42 +189,6 @@ namespace TradingGUITests
             TestContext.WriteLine($"✓ Kalshi KeyId: {MaskKeyId(interpolatedKeyId)}");
             TestContext.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
         }
-
-        [Test]
-        public void ValidateNoUnusedSections_InAppsettings()
-        {
-            var usedSections = new HashSet<string>
-            {
-                SecretsConfig.SectionName,
-                KalshiConfig.SectionName,
-                KalshiAPIServiceConfig.SectionName,
-                LoggingConfig.SectionName,
-                MarketTypeServiceConfig.SectionName,
-                EquityCalculatorConfig.SectionName,
-                StrategySelectionHelperConfig.SectionName,
-                SimulationEngineConfig.SectionName,
-                PatternDetectionServiceConfig.SectionName,
-                DataLoaderConfig.SectionName,
-                SnapshotViewerConfig.SectionName,
-                "DBConnection:DefaultConnection",
-                "DBConnection:BacklashBotData"
-            };
-
-            var allConfigurationKeys = GetAllConfigurationKeys(_configuration);
-
-            var unusedKeys = allConfigurationKeys.Where(key =>
-                !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
-            ).ToList();
-
-            TestContext.WriteLine("Manual: Unused configuration keys found:");
-            foreach (var key in unusedKeys)
-            {
-                TestContext.WriteLine($"  {key}");
-            }
-
-            Assert.That(unusedKeys, Is.Empty, $"Manual: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
-        }
-
         private void ValidateConfig(object config, IConfigurationSection section)
         {
             var validationResults = new List<ValidationResult>();

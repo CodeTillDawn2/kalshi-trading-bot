@@ -2,7 +2,12 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Services
 {
@@ -20,12 +25,12 @@ namespace BacklashBot.Services
     /// - Handles connection errors with appropriate retry logic and backoff
     /// - Provides manual trigger capability for immediate connection checks
     /// </remarks>
-    public class WebSocketMonitorService : IWebSocketMonitorService
+    public class WebSocketMonitorService : BaseWebSocketMonitorService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IWebSocketMonitorService> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly WebSocketMonitorServiceConfig _config;
         private Task _exchangeStatusMonitorTask;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
@@ -79,7 +84,7 @@ namespace BacklashBot.Services
         /// <param name="scopeFactory">Factory for creating service scopes for dependency resolution.</param>
         /// <param name="serviceFactory">Factory providing access to various bot services including WebSocket client.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        /// <param name="configuration">Configuration provider for customizable settings.</param>
+        /// <param name="config">Configuration options for WebSocketMonitorService behavior, including monitoring intervals and performance metrics settings.</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="readyStatus">Status tracker for bot initialization completion.</param>
         /// <param name="statusTrackerService">Service for managing cancellation tokens and operation status.</param>
@@ -88,25 +93,22 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
             ILogger<IWebSocketMonitorService> logger,
-            IConfiguration configuration,
+            IOptions<WebSocketMonitorServiceConfig> config,
             IScopeManagerService scopeManagerService,
             IBotReadyStatus readyStatus,
             IStatusTrackerService statusTrackerService,
             ICentralPerformanceMonitor centralPerformanceMonitor)
+            : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, centralPerformanceMonitor, readyStatus)
         {
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
-            _scopeFactory = scopeFactory;
-            _readyStatus = readyStatus;
-            _logger = logger;
-            _configuration = configuration;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _config = config.Value;
 
             // Load configuration values from injected options
-            _monitoringIntervalMinutes = _configuration.GetValue<int>("Websocket:WebSocketMonitor.MonitoringIntervalMinutes", 1);
-            _retryDelayMinutes = _configuration.GetValue<int>("Websocket:WebSocketMonitor.RetryDelayMinutes", 5);
-            _enableMetrics = _configuration.GetValue<bool>("Websocket:WebSocketMonitor.EnableWebSocketMonitorMetrics", true);
+            _monitoringIntervalMinutes = _config.MonitoringIntervalMinutes;
+            _retryDelayMinutes = _config.RetryDelayMinutes;
+            _enableMetrics = _config.EnableWebSocketMonitorMetrics;
 
             _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableWebSocketMonitorMetrics={EnableWebSocketMonitorMetrics}",
                 _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
@@ -462,7 +464,7 @@ namespace BacklashBot.Services
         /// - Handles errors with appropriate retry delays
         /// - Respects cancellation tokens for graceful shutdown
         /// </remarks>
-        private async Task MonitorAndManageWebSocketConnectionAsync(bool immediate = false)
+        protected override async Task MonitorAndManageWebSocketConnectionAsync(bool immediate = false)
         {
             _logger.LogDebug("MonitorAndManageWebSocketConnectionAsync started at {0}, Immediate={Immediate}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, immediate, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
             try
