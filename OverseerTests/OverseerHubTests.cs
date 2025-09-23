@@ -2,10 +2,13 @@ using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.IO;
 
 namespace OverseerTests
 {
@@ -33,31 +36,31 @@ namespace OverseerTests
         [SetUp]
         public void Setup()
         {
+            // Load configuration from appsettings.json using DI
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../../BacklashOverseer"))
+                .AddJsonFile("appsettings.json");
+            var configuration = configBuilder.Build();
+
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.Configure<OverseerHubConfig>(configuration.GetSection(OverseerHubConfig.SectionName));
+            services.Configure<BrainPersistenceServiceConfig>(configuration.GetSection(BrainPersistenceServiceConfig.SectionName));
+            var serviceProvider = services.BuildServiceProvider();
+
+            var overseerHubOptions = serviceProvider.GetRequiredService<IOptions<OverseerHubConfig>>();
+            _config = overseerHubOptions.Value;
+
+            var brainConfigOptions = serviceProvider.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>();
+            var brainConfig = brainConfigOptions.Value;
+
             _loggerMock = new Mock<ILogger<OverseerHub>>();
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
             _brainServiceLoggerMock = new Mock<ILogger<BrainPersistenceService>>();
-            var brainConfig = new BrainPersistenceServiceConfig
-            {
-                MaxHistoryEntries = 50,
-                EnablePerformanceMetrics = true,
-                EnablePersistence = false,
-                PersistenceSaveIntervalMinutes = 5
-            };
-            var brainConfigOptions = Options.Create(brainConfig);
             _brainService = new BrainPersistenceService(brainConfigOptions, null, _brainServiceLoggerMock.Object, null);
 
             _performanceMetricsLoggerMock = new Mock<ILogger<PerformanceMetricsService>>();
             _performanceMetrics = new PerformanceMetricsService(_performanceMetricsLoggerMock.Object);
-
-            _config = new OverseerHubConfig
-            {
-                ConnectionHealthTimeoutSeconds = 300,
-                HealthCheckIntervalSeconds = 60,
-                AuthTokenValidityHours = 24,
-                MaxHandshakeRequestsPerMinute = 10,
-                MaxCheckInRequestsPerMinute = 60,
-                EnablePerformanceMetrics = true
-            };
 
             var configOptions = Options.Create(_config);
 
