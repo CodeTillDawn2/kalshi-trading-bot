@@ -33,8 +33,8 @@ namespace BacklashBotTests
             // Set up DI container
             var services = new ServiceCollection();
             services.AddOptions();
-            services.Configure<LoggingConfig>(configuration.GetSection("Communications:Logging"));
-            services.Configure<InstanceNameConfig>(configuration.GetSection("Central:GeneralExecution"));
+            services.Configure<LoggingConfig>(configuration.GetSection(LoggingConfig.SectionName));
+            services.Configure<InstanceNameConfig>(configuration.GetSection(InstanceNameConfig.SectionName));
             _serviceProvider = services.BuildServiceProvider();
 
             _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);

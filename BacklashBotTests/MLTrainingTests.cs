@@ -92,7 +92,7 @@ namespace KalshiBotTests
 
             // DI: EF context for real snapshot fetching
             var connectionString = ConfigurationHelper.BuildConnectionString(config);
-            var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
+            var dataConfig = config.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
             services.AddSingleton(connectionString);
@@ -105,7 +105,7 @@ namespace KalshiBotTests
 
             // Options from config
             var snapshotServiceConfig = Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
-            _generalExecutionOpts = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>());
+            _generalExecutionOpts = Options.Create(config.GetSection(GeneralExecutionConfig.SectionName).Get<GeneralExecutionConfig>());
 
             // Snapshot loader (same implementation you use elsewhere)
             _snapshotService = new TradingSnapshotService(

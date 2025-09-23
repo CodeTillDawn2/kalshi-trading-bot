@@ -32,8 +32,8 @@ namespace BacklashIntegrationTests
 
             var services = new ServiceCollection();
             services.AddOptions();
-            services.Configure<LoggingConfig>(configuration.GetSection("Communications:Logging"));
-            services.Configure<InstanceNameConfig>(configuration.GetSection("Central:GeneralExecution"));
+            services.Configure<LoggingConfig>(configuration.GetSection(LoggingConfig.SectionName));
+            services.Configure<InstanceNameConfig>(configuration.GetSection(InstanceNameConfig.SectionName));
             _serviceProvider = services.BuildServiceProvider();
 
             // Initialize the logging queue as a singleton (not hosted service for test)

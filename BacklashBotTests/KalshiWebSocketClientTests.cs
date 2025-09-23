@@ -95,7 +95,7 @@ namespace KalshiBotTests
                 .AddSecretsConfiguration(basePath, baseConfig)
                 .Build();
 
-            var kalshiConfig = _configuration.GetSection("Kalshi").Get<KalshiConfig>();
+            var kalshiConfig = _configuration.GetSection(KalshiConfig.SectionName).Get<KalshiConfig>();
 
 
             // Validate configuration
@@ -106,12 +106,12 @@ namespace KalshiBotTests
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
-            var websocketConfig = _configuration.GetSection("KalshiWebSocketClient");
+            var websocketConfig = _configuration.GetSection(KalshiWebSocketClientConfig.SectionName);
 
             // Initialize real SqlDataService
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
-            var dataConfig = _configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
+            var dataConfig = _configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
             _sqlService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
 
             // Create mock objects for the new refactored dependencies

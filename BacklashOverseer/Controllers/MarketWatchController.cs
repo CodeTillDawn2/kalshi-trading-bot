@@ -23,7 +23,7 @@ namespace BacklashOverseer.Controllers
     /// for cache operations and system monitoring.
     /// </summary>
     [ApiController]
-    [Route("v1/[controller]")]
+    [Route("[controller]")]
     public class MarketWatchController : ControllerBase
     {
         private readonly IBacklashBotContext _context;

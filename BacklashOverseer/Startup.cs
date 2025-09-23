@@ -126,10 +126,9 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
-            services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
-                sp.GetRequiredService<ILogger<SubscriptionManager>>(),
+            services.AddScoped<ISubscriptionManager>(sp => new BaseSubscriptionManager(
+                sp.GetRequiredService<ILogger<BaseSubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
-                sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
             ));
@@ -167,7 +166,7 @@ namespace BacklashOverseer
             {
                 var connectionString = provider.GetRequiredService<string>();
                 var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
-                var dataConfig = Configuration.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
+                var dataConfig = Configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
                 return new BacklashBotContext(connectionString, logger, dataConfig);
             });
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
@@ -211,6 +210,12 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            // Configure BrainPersistenceService settings
+            services.AddOptions<BrainPersistenceServiceConfig>()
+                .Bind(Configuration.GetSection(BrainPersistenceServiceConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             // Configure SubscriptionManager settings
             services.AddOptions<SubscriptionManagerConfig>()
                 .Bind(Configuration.GetSection(SubscriptionManagerConfig.SectionName))
@@ -236,6 +241,16 @@ namespace BacklashOverseer
                 .ValidateOnStart();
             services.AddOptions<BacklashBotDataConfig>()
                 .Bind(Configuration.GetSection(BacklashBotDataConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            // Configure additional configs used by services
+            services.AddOptions<KalshiAPIServiceConfig>()
+                .Bind(Configuration.GetSection(KalshiAPIServiceConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<DataStorageConfig>()
+                .Bind(Configuration.GetSection(DataStorageConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 

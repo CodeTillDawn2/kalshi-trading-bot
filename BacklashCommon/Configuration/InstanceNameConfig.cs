@@ -8,7 +8,7 @@ namespace BacklashCommon.Configuration
     public class InstanceNameConfig
     {
         /// <summary>
-        /// The configuration section name for GeneralExecutionConfig.
+        /// The configuration section name for InstanceNameConfig.
         /// </summary>
         public const string SectionName = "InstanceName";
 

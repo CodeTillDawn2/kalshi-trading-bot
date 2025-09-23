@@ -13,14 +13,16 @@ using System.Text.Json;
 namespace KalshiBotAPI.Websockets
 {
     /// <summary>
-    /// Manages WebSocket channel subscriptions for real-time market data from Kalshi's trading platform.
+    /// Base class for managing WebSocket channel subscriptions for real-time market data from Kalshi's trading platform.
     /// Handles subscription lifecycle, state tracking, confirmation processing, and queue management
     /// for reliable market data streaming with proper error handling and recovery mechanisms.
     /// </summary>
-    public class SubscriptionManager : BaseSubscriptionManager
+    public class BaseSubscriptionManager : ISubscriptionManager
     {
-        private readonly ILogger<SubscriptionManager> _logger;
-        private readonly IDataCache _dataCache;
+        protected readonly ILogger<BaseSubscriptionManager> _logger;
+        protected readonly IWebSocketConnectionManager _connectionManager;
+        protected readonly IStatusTrackerService _statusTrackerService;
+        protected readonly ISubscriptionManagerPerformanceMetrics? _performanceMetrics;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
@@ -42,13 +44,13 @@ namespace KalshiBotAPI.Websockets
         private CancellationToken _processingCancellationToken;
 
         // Configuration options
-        private readonly int _subscriptionTimeoutMs = 60000;
-        private readonly int _confirmationTimeoutSeconds = 60;
-        private readonly int _retryDelayMs = 1000;
-        private readonly int _maxQueueSize = 1000;
-        private readonly int _batchSize = 10;
-        private readonly int _healthCheckIntervalMs = 30000;
-        private readonly bool _enableMetrics = true;
+        private readonly int _subscriptionTimeoutMs;
+        private readonly int _confirmationTimeoutSeconds;
+        private readonly int _retryDelayMs;
+        private readonly int _maxQueueSize;
+        private readonly int _batchSize;
+        private readonly int _healthCheckIntervalMs;
+        private readonly bool _enableMetrics;
 
         // Exponential backoff configuration for subscription retries
         private readonly int _maxSubscriptionRetries = 5;
@@ -84,26 +86,60 @@ namespace KalshiBotAPI.Websockets
         private readonly ReaderWriterLockSlim _queueLock = new();
 
         /// <summary>
-        /// Initializes a new instance of the SubscriptionManager with required dependencies.
+        /// Initializes a new instance of the BaseSubscriptionManager with required dependencies.
         /// Sets up internal data structures for subscription management, state tracking, and queue processing.
         /// </summary>
         /// <param name="logger">Logger for recording subscription activities and errors.</param>
         /// <param name="connectionManager">Manages WebSocket connection lifecycle and communication.</param>
-        /// <param name="dataCache">Provides access to cached market data and watched markets list.</param>
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
         /// <param name="config">Configuration options for subscription manager settings.</param>
         /// <param name="performanceMetrics">Optional service for posting performance metrics.</param>
-        public SubscriptionManager(
-            ILogger<SubscriptionManager> logger,
+        public BaseSubscriptionManager(
+            ILogger<BaseSubscriptionManager> logger,
             IWebSocketConnectionManager connectionManager,
-            IDataCache dataCache,
             IStatusTrackerService statusTrackerService,
             IOptions<SubscriptionManagerConfig> config,
             ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
-            : base(logger, connectionManager, statusTrackerService, config, performanceMetrics)
         {
             _logger = logger;
-            _dataCache = dataCache;
+            _connectionManager = connectionManager;
+            _statusTrackerService = statusTrackerService;
+            _performanceMetrics = performanceMetrics;
+            _processingCancellationToken = statusTrackerService.GetCancellationToken();
+
+            // Load configuration values from injected options
+            var subscriptionConfig = config.Value;
+            _subscriptionTimeoutMs = subscriptionConfig.SubscriptionTimeoutMs;
+            _confirmationTimeoutSeconds = subscriptionConfig.ConfirmationTimeoutSeconds;
+            _retryDelayMs = subscriptionConfig.SubscriptionManagerRetryDelayMs;
+            _maxQueueSize = subscriptionConfig.MaxQueueSize;
+            _batchSize = subscriptionConfig.BatchSize;
+            _healthCheckIntervalMs = subscriptionConfig.HealthCheckIntervalMs;
+            _enableMetrics = subscriptionConfig.EnableSubscriptionManagerMetrics;
+
+            // Initialize message type counts
+            _messageTypeCounts.TryAdd("OrderBook", 0);
+            _messageTypeCounts.TryAdd("Ticker", 0);
+            _messageTypeCounts.TryAdd("Trade", 0);
+            _messageTypeCounts.TryAdd("Fill", 0);
+            _messageTypeCounts.TryAdd("MarketLifecycle", 0);
+            _messageTypeCounts.TryAdd("EventLifecycle", 0);
+            _messageTypeCounts.TryAdd("Subscribe", 0);
+            _messageTypeCounts.TryAdd("Unsubscribe", 0);
+            _messageTypeCounts.TryAdd("Ok", 0);
+            _messageTypeCounts.TryAdd("Error", 0);
+            _messageTypeCounts.TryAdd("Unknown", 0);
+
+            // Initialize performance metrics
+            _operationTimings.TryAdd("Subscribe", 0);
+            _operationTimings.TryAdd("Update", 0);
+            _operationTimings.TryAdd("Unsubscribe", 0);
+            _operationCounts.TryAdd("Subscribe", 0);
+            _operationCounts.TryAdd("Update", 0);
+            _operationCounts.TryAdd("Unsubscribe", 0);
+            _successCounts.TryAdd("Subscribe", 0);
+            _successCounts.TryAdd("Update", 0);
+            _successCounts.TryAdd("Unsubscribe", 0);
         }
 
         /// <summary>
@@ -149,11 +185,7 @@ namespace KalshiBotAPI.Websockets
         /// Gets or sets the collection of market tickers that are being watched for real-time data.
         /// This property is synchronized with the data cache for persistence across application restarts.
         /// </summary>
-        public override HashSet<string> WatchedMarkets
-        {
-            get => _dataCache.WatchedMarkets ?? new HashSet<string>();
-            set => _dataCache.WatchedMarkets = value;
-        }
+        public virtual HashSet<string> WatchedMarkets { get; set; } = new HashSet<string>();
 
         /// <summary>
         /// Gets the dictionary containing counts of different message types processed by the subscription manager.
@@ -359,11 +391,11 @@ namespace KalshiBotAPI.Websockets
                         currentMarkets.Add(ticker);
                         _pendingMarketSubscriptions.TryAdd($"{action}:{ticker}", true);
 
-                        // Update WatchedMarkets in DataCache
+                        // Update WatchedMarkets
                         if (!WatchedMarkets.Contains(ticker))
                         {
                             WatchedMarkets.Add(ticker);
-                            _logger.LogDebug("Added {MarketTicker} to WatchedMarkets in DataCache", ticker);
+                            _logger.LogDebug("Added {MarketTicker} to WatchedMarkets", ticker);
                         }
                     }
                     _channelSubscriptions[channel] = (subscription.Sid, currentMarkets);
@@ -569,11 +601,11 @@ namespace KalshiBotAPI.Websockets
                     if (action == "add_markets")
                     {
                         updatedMarkets.Add(ticker);
-                        // Update WatchedMarkets in DataCache
+                        // Update WatchedMarkets
                         if (!WatchedMarkets.Contains(ticker))
                         {
                             WatchedMarkets.Add(ticker);
-                            _logger.LogDebug("Added {MarketTicker} to WatchedMarkets in DataCache during update", ticker);
+                            _logger.LogDebug("Added {MarketTicker} to WatchedMarkets during update", ticker);
                         }
                     }
                     else
@@ -584,7 +616,7 @@ namespace KalshiBotAPI.Websockets
                         if (!stillSubscribed && WatchedMarkets.Contains(ticker))
                         {
                             WatchedMarkets.Remove(ticker);
-                            _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets in DataCache as no longer subscribed to any channels", ticker);
+                            _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets as no longer subscribed to any channels", ticker);
                         }
                     }
                     _pendingMarketSubscriptions.TryRemove($"{channelAction}:{ticker}", out bool _);
@@ -672,7 +704,7 @@ namespace KalshiBotAPI.Websockets
                     if (!stillSubscribed && WatchedMarkets.Contains(marketTicker))
                     {
                         WatchedMarkets.Remove(marketTicker);
-                        _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets in DataCache as no longer subscribed to any channels", marketTicker);
+                        _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets as no longer subscribed to any channels", marketTicker);
                     }
                 }
                 ((IDictionary<string, (int Sid, HashSet<string> Markets)>)_channelSubscriptions).Remove(channel);
@@ -735,7 +767,7 @@ namespace KalshiBotAPI.Websockets
                             if (WatchedMarkets.Contains(marketTicker))
                             {
                                 WatchedMarkets.Remove(marketTicker);
-                                _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets in DataCache during full unsubscription", marketTicker);
+                                _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets during full unsubscription", marketTicker);
                             }
                         }
                         _logger.LogDebug("Marked local subscription as unsubscribed for channel {Channel}", channel);

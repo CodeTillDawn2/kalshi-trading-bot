@@ -90,7 +90,7 @@ namespace KalshiBotTasks
                 options.UseSqlServer(_configuration["DBConnection:DefaultConnection"]));
             serviceCollection.AddLogging(logging => logging.AddConsole());
             serviceCollection.AddScoped<SchemaDeploymentObj>();
-            serviceCollection.Configure<GeneralExecutionConfig>(_configuration.GetSection("Central:GeneralExecution"));
+            serviceCollection.Configure<GeneralExecutionConfig>(_configuration.GetSection(GeneralExecutionConfig.SectionName));
             serviceCollection.Configure<SchemaDeploymentConfig>(_configuration.GetSection(SchemaDeploymentConfig.SectionName));
             serviceCollection.AddSingleton(resolver => resolver.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value);
 

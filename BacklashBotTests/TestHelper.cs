@@ -33,7 +33,7 @@ namespace KalshiBotTests
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured with standard test values.</returns>
         public static IOptions<GeneralExecutionConfig> GetGeneralExecutionConfig()
         {
-            var config = GetConfiguration().GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>();
+            var config = GetConfiguration().GetSection(GeneralExecutionConfig.SectionName).Get<GeneralExecutionConfig>();
             return Options.Create(config);
         }
 
@@ -47,7 +47,7 @@ namespace KalshiBotTests
         /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured with comprehensive test values for technical indicators.</returns>
         public static IOptions<CalculationsConfig> GetCalculationConfig()
         {
-            var config = GetConfiguration().GetSection("WatchedMarkets:CalculationConfig").Get<CalculationsConfig>();
+            var config = GetConfiguration().GetSection(CalculationsConfig.SectionName).Get<CalculationsConfig>();
             ValidateCalculationConfig(config);
             return Options.Create(config);
         }

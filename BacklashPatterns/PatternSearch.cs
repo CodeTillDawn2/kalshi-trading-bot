@@ -13,30 +13,32 @@ namespace BacklashPatterns
     /// </summary>
     public class PatternDetectionConfig
     {
+        public const string SectionName = "Simulator:PatternDetectionService";
+
         /// <summary>
         /// Minimum price change threshold for significance check.
         /// </summary>
-        public double SignificancePriceThreshold { get; set; } = 1.0;
+        public double SignificancePriceThreshold { get; set; }
 
         /// <summary>
         /// Minimum volume increase multiplier for context check.
         /// </summary>
-        public double VolumeIncreaseMultiplier { get; set; } = 1.1;
+        public double VolumeIncreaseMultiplier { get; set; }
 
         /// <summary>
         /// Initial capacity for patterns array per candle.
         /// </summary>
-        public int InitialPatternCapacity { get; set; } = 10;
+        public int InitialPatternCapacity { get; set; }
 
         /// <summary>
         /// Whether to enable parallel processing for pattern detection.
         /// </summary>
-        public bool EnableParallelProcessing { get; set; } = false;
+        public bool EnableParallelProcessing { get; set; }
 
         /// <summary>
         /// Maximum degree of parallelism for pattern checks.
         /// </summary>
-        public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+        public int MaxDegreeOfParallelism { get; set; }
     }
 
     /// <summary>
@@ -208,7 +210,7 @@ namespace BacklashPatterns
                 return;
             }
 
-            var section = configuration.GetSection("PatternSearch");
+            var section = configuration.GetSection(PatternDetectionConfig.SectionName);
             bool originalValue = _enablePerformanceMetrics;
             _enablePerformanceMetrics = section.GetValue("EnablePerformanceMetrics", true);
 
@@ -229,7 +231,7 @@ namespace BacklashPatterns
         /// <returns>A tuple containing the enabled status and configuration key used.</returns>
         public static (bool IsEnabled, string ConfigurationKey) GetPerformanceMetricsStatus()
         {
-            return (_enablePerformanceMetrics, "PatternSearch:EnablePerformanceMetrics");
+            return (_enablePerformanceMetrics, $"{PatternDetectionConfig.SectionName}:EnablePerformanceMetrics");
         }
 
         /// <summary>

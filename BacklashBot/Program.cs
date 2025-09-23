@@ -497,6 +497,7 @@ builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConne
     sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>()
 ));
+builder.Services.AddScoped<IDataCache, DataCache>();
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<ILogger<MessageProcessor>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
@@ -540,7 +541,6 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
     new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value));
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
-builder.Services.AddScoped<IDataCache, DataCache>();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
@@ -558,7 +558,7 @@ builder.Services.AddControllers().ConfigureApplicationPartManager(manager => man
 // Configure Kestrel for IIS (no specific URL binding)
 builder.WebHost.ConfigureKestrel(options => { });
 
-var loggingConfig = builder.Configuration.GetSection("Communications:Logging").Get<LoggingConfig>();
+var loggingConfig = builder.Configuration.GetSection(LoggingConfig.SectionName).Get<LoggingConfig>();
 var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.ConsoleLogLevel, true);
 builder.Logging.SetMinimumLevel(consoleLogLevel);
 
