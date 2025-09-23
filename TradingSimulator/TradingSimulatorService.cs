@@ -140,20 +140,16 @@ namespace TradingSimulator
             var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
-            _dataStorageConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<DataStorageConfig>()!);
+            var simulatorConfig = config.GetSection(TradingSimulatorServiceConfig.SectionName).Get<TradingSimulatorServiceConfig>();
+            _dataStorageConfig = Options.Create(config.GetSection(DataStorageConfig.SectionName).Get<DataStorageConfig>()!);
             _simulatorOptions = Options.Create(simulatorConfig);
 
             // Configure DataLoaderConfig
-            var dataLoaderConfig = new DataLoaderConfig
-            {
-                EnableSnapshotValidation = bool.Parse(config["SnapshotHandling:DataLoader:EnableSnapshotValidation"] ?? "true"),
-                MinSnapshotCountForValidation = int.Parse(config["SnapshotHandling:DataLoader:MinSnapshotCountForValidation"] ?? "10")
-            };
+            var dataLoaderConfig = config.GetSection(DataLoaderConfig.SectionName).Get<DataLoaderConfig>();
             var dataLoaderOptions = Options.Create(dataLoaderConfig);
 
             var connectionString = ConfigurationHelper.BuildConnectionString(config);
-            var dataConfig = config.GetSection("DBConnection:BacklashBotData").Get<BacklashBotDataConfig>();
+            var dataConfig = config.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
             services.AddSingleton(connectionString);
@@ -162,8 +158,11 @@ namespace TradingSimulator
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
 
             // Add configuration bindings
-            services.Configure<SimulationEngineConfig>(config.GetSection("TradingSimulatorService:SimulationEngine"));
-            services.Configure<EquityCalculatorConfig>(config.GetSection("TradingSimulatorService:EquityCalculator"));
+            services.Configure<SimulationEngineConfig>(config.GetSection(SimulationEngineConfig.SectionName));
+            services.Configure<EquityCalculatorConfig>(config.GetSection(EquityCalculatorConfig.SectionName));
+            services.Configure<SnapshotPeriodHelperConfig>(config.GetSection(SnapshotPeriodHelperConfig.SectionName));
+            services.Configure<TradingSnapshotServiceConfig>(config.GetSection(TradingSnapshotServiceConfig.SectionName));
+            services.Configure<DataLoaderConfig>(config.GetSection(DataLoaderConfig.SectionName));
 
             // Add services required by TradingOverseer
             services.AddScoped<MarketTypeService>();
@@ -176,10 +175,9 @@ namespace TradingSimulator
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(serviceProvider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value);
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object,
-                Options.Create(
-                    new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }),
+                serviceProvider.GetRequiredService<IOptions<TradingSnapshotServiceConfig>>(),
                 _scopeFactory, null);
 
             // Initialize performance monitor first
@@ -200,7 +198,7 @@ namespace TradingSimulator
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
-            _dataLoader = new DataLoader(_snapshotService, dataLoaderOptions);
+            _dataLoader = new DataLoader(_snapshotService, serviceProvider.GetRequiredService<IOptions<DataLoaderConfig>>());
             var marketProcessorConfig = new MarketProcessorConfig
             {
                 CacheDirectory = _cacheDirectory,
@@ -881,7 +879,7 @@ ResolveFamily(StrategyFamily family)
             ResearchBus.DumpCsv(csvPath);
             OnTestProgress?.Invoke($"Dumped ResearchBus to {csvPath}");
 
-            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >10% of snapshots).");
+            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >{_simulatorOptions.Value.DiscrepancyThresholdPercentage}% of snapshots).");
             OnTestProgress?.Invoke($"{label}: all strategy sets completed");
         }
 
