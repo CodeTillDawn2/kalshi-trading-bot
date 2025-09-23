@@ -29,7 +29,6 @@ namespace BacklashBot.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IServiceFactory _serviceFactory;
-        private readonly ILogger<IWebSocketMonitorService> _logger;
         private readonly WebSocketMonitorServiceConfig _config;
         private Task _exchangeStatusMonitorTask;
         private readonly IScopeManagerService _scopeManagerService;
@@ -100,9 +99,12 @@ namespace BacklashBot.Services
             ICentralPerformanceMonitor centralPerformanceMonitor)
             : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, centralPerformanceMonitor, readyStatus)
         {
+            _scopeFactory = scopeFactory;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
+            _readyStatus = readyStatus;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
             _config = config.Value;
 
             // Load configuration values from injected options

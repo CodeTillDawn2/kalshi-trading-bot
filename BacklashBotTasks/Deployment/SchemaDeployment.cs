@@ -91,6 +91,7 @@ namespace KalshiBotTasks
             serviceCollection.AddLogging(logging => logging.AddConsole());
             serviceCollection.AddScoped<SchemaDeploymentObj>();
             serviceCollection.Configure<GeneralExecutionConfig>(_configuration.GetSection("Central:GeneralExecution"));
+            serviceCollection.Configure<SchemaDeploymentConfig>(_configuration.GetSection(SchemaDeploymentConfig.SectionName));
             serviceCollection.AddSingleton(resolver => resolver.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value);
 
             IServiceProvider _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -99,7 +100,8 @@ namespace KalshiBotTasks
             _context = _serviceProvider.GetRequiredService<BacklashBotContext>();
             var logger = _serviceProvider.GetRequiredService<ILogger<SchemaDeployment>>();
             var generalExecutionConfig = _serviceProvider.GetRequiredService<GeneralExecutionConfig>();
-            _schemaDeployment = new SchemaDeploymentObj(_context, logger, generalExecutionConfig, _configuration);
+            var schemaDeploymentConfig = _serviceProvider.GetRequiredService<IOptions<SchemaDeploymentConfig>>();
+            _schemaDeployment = new SchemaDeploymentObj(_context, logger, generalExecutionConfig, schemaDeploymentConfig);
 
             // Ensure database is accessible
             _context.Database.EnsureCreated();
@@ -180,7 +182,7 @@ namespace KalshiBotTasks
             private readonly BacklashBotContext _context;
             private readonly ILogger<SchemaDeployment> _logger;
             private readonly GeneralExecutionConfig _generalExecutionConfig;
-            private readonly IConfigurationRoot _configuration;
+            private readonly SchemaDeploymentConfig _config;
 
             /// <summary>
             /// Initializes a new instance of the SchemaDeploymentObj with required dependencies.
@@ -188,18 +190,18 @@ namespace KalshiBotTasks
             /// <param name="context">Database context for schema persistence operations.</param>
             /// <param name="logger">Logger for recording deployment operations and errors.</param>
             /// <param name="generalExecutionConfig">Configuration settings for general execution operations.</param>
-            /// <param name="configuration">Application configuration root for accessing settings.</param>
+            /// <param name="config">Configuration options for SchemaDeployment behavior.</param>
             /// <exception cref="ArgumentNullException">Thrown when any required parameter is null.</exception>
             /// <remarks>
             /// The constructor validates all dependencies to ensure the service is properly initialized.
             /// This prevents runtime errors during schema deployment operations.
             /// </remarks>
-            public SchemaDeploymentObj(BacklashBotContext context, ILogger<SchemaDeployment> logger, GeneralExecutionConfig generalExecutionConfig, IConfigurationRoot configuration)
+            public SchemaDeploymentObj(BacklashBotContext context, ILogger<SchemaDeployment> logger, GeneralExecutionConfig generalExecutionConfig, IOptions<SchemaDeploymentConfig> config)
             {
                 _context = context ?? throw new ArgumentNullException(nameof(context));
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _generalExecutionConfig = generalExecutionConfig ?? throw new ArgumentNullException(nameof(generalExecutionConfig));
-                _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+                _config = config.Value;
             }
 
             /// <summary>
@@ -291,7 +293,7 @@ namespace KalshiBotTasks
                 try
                 {
                     // Read configured basePath from configuration
-                    string basePath = _configuration["Deployment:BasePath"] ?? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+                    string basePath = _config.BasePath ?? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
                     string fullAppSettingsPath = Path.Combine(basePath, "appsettings.json");
 
                     var filePath = fullAppSettingsPath;
@@ -332,8 +334,7 @@ namespace KalshiBotTasks
                     generalExecutionNode["SnapshotSchemaVersion"] = newVersion;
 
                     // Read configured JSON serialization options
-                    var writeIndented = _configuration.GetValue<bool>("Deployment:JsonWriteIndented", true);
-                    var options = new JsonSerializerOptions { WriteIndented = writeIndented };
+                    var options = new JsonSerializerOptions { WriteIndented = _config.JsonWriteIndented };
                     var updatedJson = jsonNode.ToJsonString(options);
                     await File.WriteAllTextAsync(filePath, updatedJson);
 

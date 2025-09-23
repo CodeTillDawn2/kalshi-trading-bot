@@ -1,8 +1,10 @@
 
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
+using BacklashOverseer.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
 namespace BacklashOverseer.Services
@@ -17,30 +19,31 @@ namespace BacklashOverseer.Services
         private readonly IBacklashBotContext _context;
         private readonly PerformanceMetricsService _performanceMetrics;
         private readonly ILogger<SnapshotAggregationService> _logger;
+        private readonly SnapshotAggregationServiceConfig _config;
 
         /// <summary>
         /// Gets or sets whether performance metrics collection is enabled for SnapshotAggregationService operations.
         /// When disabled, timing operations are skipped to improve performance.
         /// </summary>
-        public bool EnableSnapshotAggregationMetrics { get; set; } = true;
+        public bool EnableSnapshotAggregationMetrics => _config.EnablePerformanceMetrics;
 
         /// <summary>
         /// Initializes a new instance of the SnapshotAggregationService class.
         /// </summary>
         /// <param name="context">The database context interface for accessing snapshot and market data.</param>
-        /// <param name="configuration">The configuration interface for reading application settings.</param>
+        /// <param name="config">The configuration options for SnapshotAggregationService behavior.</param>
         /// <param name="performanceMetrics">The performance metrics service for recording metrics.</param>
         /// <param name="logger">The logger instance for recording operations.</param>
         public SnapshotAggregationService(
             IBacklashBotContext context,
-            IConfiguration configuration,
+            IOptions<SnapshotAggregationServiceConfig> config,
             PerformanceMetricsService performanceMetrics,
             ILogger<SnapshotAggregationService> logger)
         {
             _context = context;
+            _config = config.Value;
             _performanceMetrics = performanceMetrics;
             _logger = logger;
-            EnableSnapshotAggregationMetrics = configuration.GetValue<bool>("PerformanceMetricsService:EnablePerformanceMetricsServiceMetrics", true);
         }
 
         /// <summary>

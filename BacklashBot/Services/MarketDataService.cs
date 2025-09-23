@@ -13,6 +13,7 @@ using BacklashDTOs.Helpers;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
@@ -47,8 +48,6 @@ namespace BacklashBot.Services
         private readonly IBrainStatusService _brainStatus;
         private readonly ILogger<IMarketDataService> _logger;
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
-        private readonly IConfiguration _configuration;
-        private readonly CalculationsConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketServiceDataConfig _marketDataConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
@@ -74,7 +73,6 @@ namespace BacklashBot.Services
         public MarketDataService(
             IServiceFactory serviceFactory,
             ILogger<IMarketDataService> logger,
-            IConfiguration config,
             IServiceScopeFactory scopeFactory,
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
@@ -88,7 +86,6 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
-            _configuration = config;
             _loggingConfig = loggingConfig.Value;
             _marketDataConfig = marketDataConfigOptions?.Value;
             _marketDataFactory = marketDataFactory;
@@ -931,10 +928,10 @@ namespace BacklashBot.Services
                         marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
                             marketTicker,
                             marketData.Candlesticks["minute"],
-                            minCandlestickPercentage: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_MinCandlestickPercentage", 0.1),
-                            maxLevels: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MaxLevels", 6),
-                            sigma: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_Sigma", 2.0),
-                            minDistance: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MinDistance", 3));
+                            minCandlestickPercentage: _marketDataConfig.Calculations.ResistanceLevels_MinCandlestickPercentage,
+                            maxLevels: _marketDataConfig.Calculations.ResistanceLevels_MaxLevels,
+                            sigma: _marketDataConfig.Calculations.ResistanceLevels_Sigma,
+                            minDistance: _marketDataConfig.Calculations.ResistanceLevels_MinDistance);
                     }
 
                     NotifyMarketDataUpdated(marketTicker);

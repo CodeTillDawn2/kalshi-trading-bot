@@ -13,7 +13,7 @@ namespace BacklashBot.Services
         /// The configuration section name for WebSocketMonitorServiceConfig.
         /// This constant defines the path in the configuration file where these settings are located.
         /// </summary>
-        public const string SectionName = "Websocket:WebSocketMonitor";
+        public const string SectionName = "Websockets:WebSocketMonitor";
 
         /// <summary>
         /// Gets or sets the interval in minutes between exchange status checks.

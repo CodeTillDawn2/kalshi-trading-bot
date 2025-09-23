@@ -198,9 +198,16 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+
             // Configure MarketWatchController settings
             services.AddOptions<MarketWatchControllerConfig>()
                 .Bind(Configuration.GetSection(MarketWatchControllerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            // Configure SnapshotAggregationService settings
+            services.AddOptions<Config.SnapshotAggregationServiceConfig>()
+                .Bind(Configuration.GetSection(Config.SnapshotAggregationServiceConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -304,7 +311,7 @@ namespace BacklashOverseer
             services.AddScoped<SnapshotAggregationService>(sp =>
                 new SnapshotAggregationService(
                     sp.GetRequiredService<IBacklashBotContext>(),
-                    sp.GetRequiredService<IConfiguration>(),
+                    sp.GetRequiredService<IOptions<Config.SnapshotAggregationServiceConfig>>(),
                     sp.GetRequiredService<PerformanceMetricsService>(),
                     sp.GetRequiredService<ILogger<SnapshotAggregationService>>()
                 ));

@@ -4,6 +4,8 @@ using BacklashDTOs.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TradingStrategies.Configuration;
 using TradingStrategies.Strategies;
 using static BacklashInterfaces.Enums.StrategyEnums;
 
@@ -26,7 +28,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly EquityCalculator _equityCalculator;
         private readonly ILogger<TradingOverseer> _logger;
         private readonly PerformanceMonitor _performanceMonitor;
-        private readonly bool _enablePerformanceMetrics;
+        private readonly TradingOverseerConfig _config;
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
         /// <summary>
@@ -37,19 +39,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
         /// <param name="simulationEngine">The simulation engine for running trading scenarios.</param>
         /// <param name="equityCalculator">The equity calculator for computing portfolio values.</param>
-        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
+        /// <param name="config">The configuration options for TradingOverseer behavior.</param>
         /// <param name="logger">Logger for recording warnings and errors.</param>
         /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, SimulationEngine simulationEngine, EquityCalculator equityCalculator, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor)
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, SimulationEngine simulationEngine, EquityCalculator equityCalculator, IOptions<TradingOverseerConfig> config, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
             _simulationEngine = simulationEngine;
             _equityCalculator = equityCalculator;
+            _config = config.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
-            _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
-            _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
+            _performanceMonitor.EnablePerformanceMetrics = _config.EnablePerformanceMetrics;
         }
 
         private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);
@@ -105,7 +107,7 @@ namespace TradingStrategies.Trading.Overseer
                 }
             }
 
-            var stopwatch = _enablePerformanceMetrics ? System.Diagnostics.Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnablePerformanceMetrics ? System.Diagnostics.Stopwatch.StartNew() : null;
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
@@ -113,7 +115,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 
-            if (_enablePerformanceMetrics && stopwatch != null)
+            if (_config.EnablePerformanceMetrics && stopwatch != null)
             {
                 stopwatch.Stop();
                 var memoryUsage = GC.GetTotalMemory(true);
@@ -130,7 +132,7 @@ namespace TradingStrategies.Trading.Overseer
                     ["Timestamp"] = DateTime.UtcNow
                 };
 
-                _performanceMonitor.RecordSimulationMetrics("TradingOverseer", metricsDict, _enablePerformanceMetrics);
+                _performanceMonitor.RecordSimulationMetrics("TradingOverseer", metricsDict, _config.EnablePerformanceMetrics);
             }
 
             // Post EquityCalculator metrics automatically
