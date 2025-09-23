@@ -1397,8 +1397,16 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: Delaying 5 seconds before attempting restart.");
                 await Task.Delay(5000);
                 _logger.LogInformation("BRAIN: Attempting restart.");
-                await StartDashboard();
-                _logger.LogInformation("BRAIN: Restarted.");
+                try
+                {
+                    await StartDashboard();
+                    _logger.LogInformation("BRAIN: Restarted.");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex, "BRAIN: Failed to restart after catastrophic error. Application will exit.");
+                    Environment.Exit(1);
+                }
             }
         }
 

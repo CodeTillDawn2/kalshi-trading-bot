@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BacklashCommon.Configuration
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for queue monitoring and alert settings.

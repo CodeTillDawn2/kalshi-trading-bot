@@ -27,11 +27,6 @@ namespace BacklashOverseer.Config
         [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
         public bool EnablePerformanceMetrics { get; set; }
 
-        /// <summary>
-        /// Gets or sets whether to enable data persistence to database.
-        /// </summary>
-        [Required(ErrorMessage = "The 'EnablePersistence' is missing in the configuration.")]
-        public bool EnablePersistence { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in minutes for saving data to persistence store.

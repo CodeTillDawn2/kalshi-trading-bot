@@ -12,10 +12,10 @@ namespace BacklashOverseer.Services
 {
 
     /// <summary>
-    /// Service responsible for managing brain instance states with configurable persistence options.
+    /// Service responsible for managing brain instance states with database persistence.
     /// This service provides thread-safe operations for storing, retrieving, and updating brain
-    /// configuration, market watch lists, and performance metrics history. It supports both
-    /// in-memory storage and optional database persistence for recovery after application restarts.
+    /// configuration, market watch lists, and performance metrics history. It supports
+    /// in-memory storage and database persistence for recovery after application restarts.
     /// The service includes configurable history retention, performance metrics collection,
     /// batch operations, and comprehensive health monitoring.
     /// </summary>
@@ -37,11 +37,11 @@ namespace BacklashOverseer.Services
         private bool _isInitialized;
 
         /// <summary>
-        /// Initializes a new instance of the BrainPersistenceService with configurable options.
-        /// When persistence is enabled, automatically starts a background timer for periodic saves.
+        /// Initializes a new instance of the BrainPersistenceService.
+        /// Automatically starts a background timer for periodic saves if context is provided.
         /// </summary>
-        /// <param name="config">Configuration options including history limits, metric names, and persistence settings.</param>
-        /// <param name="context">Optional database context for persistence operations. Required when EnablePersistence is true.</param>
+        /// <param name="config">Configuration options including history limits and metric settings.</param>
+        /// <param name="context">Database context for persistence operations.</param>
         /// <param name="logger">Optional logger for service operations and performance metrics.</param>
         /// <param name="performanceMetricsService">Optional performance metrics service for transmitting metrics.</param>
         public BrainPersistenceService(
@@ -56,7 +56,7 @@ namespace BacklashOverseer.Services
             _performanceMetricsService = performanceMetricsService;
             _serviceStopwatch.Start();
 
-            if (_config.EnablePersistence && _context != null)
+            if (_context != null)
             {
                 _persistenceTimer = new System.Timers.Timer(_config.PersistenceSaveIntervalMinutes * 60 * 1000);
                 _persistenceTimer.Elapsed += OnPersistenceTimerElapsed;
@@ -108,8 +108,8 @@ namespace BacklashOverseer.Services
             {
                 _brains[brain.BrainInstanceName] = brain;
 
-                // Persist to database if enabled
-                if (_config.EnablePersistence && _context != null)
+                // Persist to database
+                if (_context != null)
                 {
                     await PersistBrainAsync(brain.BrainInstanceName);
                 }
@@ -410,7 +410,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public async Task InitializeAsync()
         {
-            if (_isInitialized || !_config.EnablePersistence || _context == null)
+            if (_isInitialized || _context == null)
                 return;
 
             try
@@ -450,7 +450,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public async Task PersistAllBrainsAsync()
         {
-            if (!_config.EnablePersistence || _context == null)
+            if (_context == null)
                 return;
 
             var stopwatch = Stopwatch.StartNew();
@@ -485,7 +485,7 @@ namespace BacklashOverseer.Services
         /// <param name="brainInstanceName">The name of the brain instance to persist.</param>
         private async Task PersistBrainAsync(string brainInstanceName)
         {
-            if (!_config.EnablePersistence || _context == null || !_brains.TryGetValue(brainInstanceName, out var brain))
+            if (_context == null || !_brains.TryGetValue(brainInstanceName, out var brain))
                 return;
 
             try
@@ -653,7 +653,7 @@ namespace BacklashOverseer.Services
             _persistenceTimer?.Dispose();
 
             // Final persistence save
-            if (_config.EnablePersistence && _context != null)
+            if (_context != null)
             {
                 Task.Run(() => PersistAllBrainsAsync()).Wait();
             }

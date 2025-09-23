@@ -183,11 +183,6 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Configure OverseerReadyConfig settings
-            services.AddOptions<OverseerReadyConfig>()
-                .Bind(Configuration.GetSection(OverseerReadyConfig.SectionName))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
             // Configure SubscriptionManager settings
             services.AddOptions<SubscriptionManagerConfig>()
                 .Bind(Configuration.GetSection(SubscriptionManagerConfig.SectionName))
@@ -300,9 +295,9 @@ namespace BacklashOverseer
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 
             // Register BrainPersistenceService
-            services.AddSingleton<BrainPersistenceService>(sp => new BrainPersistenceService(
+            services.AddScoped<BrainPersistenceService>(sp => new BrainPersistenceService(
                 sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
-                null, // context optional for singleton
+                sp.GetRequiredService<IBacklashBotContext>(),
                 sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
                 sp.GetRequiredService<PerformanceMetricsService>()
             ));

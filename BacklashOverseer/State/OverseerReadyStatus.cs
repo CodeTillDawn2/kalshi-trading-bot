@@ -1,6 +1,5 @@
 using BacklashBot.State.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Diagnostics.Metrics;
 
 namespace BacklashOverseer.State
@@ -21,13 +20,12 @@ namespace BacklashOverseer.State
     /// Features include:
     /// - Comprehensive logging for all state changes and operations
     /// - Input validation to prevent null reference exceptions
-    /// - Configurable default states through OverseerReadyConfig
+    /// - Default states are hardcoded to false for initialization and browser readiness
     /// - Metrics collection for readiness timing and operation performance
     /// </remarks>
     public class OverseerReadyStatus : IBotReadyStatus
     {
         private readonly ILogger<OverseerReadyStatus> _logger;
-        private readonly OverseerReadyConfig _config;
         private readonly Meter _meter;
         private readonly Histogram<double> _readinessTimingHistogram;
 
@@ -50,15 +48,9 @@ namespace BacklashOverseer.State
         /// Creates the initial TaskCompletionSource objects and sets up the default state.
         /// </summary>
         /// <param name="logger">The logger for tracking readiness state changes.</param>
-        /// <param name="config">The configuration for default readiness states.</param>
-        public OverseerReadyStatus(ILogger<OverseerReadyStatus> logger, IOptions<OverseerReadyConfig> config)
+        public OverseerReadyStatus(ILogger<OverseerReadyStatus> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config?.Value ?? new OverseerReadyConfig
-            {
-                DefaultInitializationState = false,
-                DefaultBrowserReadyState = false
-            };
             _meter = new Meter("BacklashOverseer.ReadyStatus");
             _readinessTimingHistogram = _meter.CreateHistogram<double>("readiness_timing", unit: "ms", description: "Timing for readiness state changes");
             ResetAll();
@@ -80,15 +72,15 @@ namespace BacklashOverseer.State
             InitializationCompleted = new TaskCompletionSource<bool>();
             if (InitializationCompleted != null)
             {
-                InitializationCompleted.SetResult(_config.DefaultInitializationState);
-                _logger.LogDebug("InitializationCompleted set to {State}.", _config.DefaultInitializationState);
+                InitializationCompleted.SetResult(false);
+                _logger.LogDebug("InitializationCompleted set to {State}.", false);
             }
 
             BrowserReady = new TaskCompletionSource<bool>();
             if (BrowserReady != null)
             {
-                BrowserReady.SetResult(_config.DefaultBrowserReadyState);
-                _logger.LogDebug("BrowserReady set to {State}.", _config.DefaultBrowserReadyState);
+                BrowserReady.SetResult(false);
+                _logger.LogDebug("BrowserReady set to {State}.", false);
             }
 
             var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
