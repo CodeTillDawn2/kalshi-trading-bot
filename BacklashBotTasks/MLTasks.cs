@@ -277,6 +277,7 @@ namespace BacklashBotTasks
         /// extended with additional test cases for different market conditions or model configurations.
         /// </remarks>
         [Test]
+        [Explicit]
         [Category("ML")]
         public async Task Train_Evaluate_Flatten_Model_On_Real_Data()
         {

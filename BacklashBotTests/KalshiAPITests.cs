@@ -10,6 +10,7 @@ using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -53,6 +54,11 @@ namespace BacklashBotTests
         /// Secrets configuration loaded from appsettings.json.
         /// </summary>
         private SecretsConfig _secretsConfig;
+
+        /// <summary>
+        /// Full configuration instance for interpolation.
+        /// </summary>
+        private IConfiguration _configuration;
 
         /// <summary>
         /// Mock service scope factory for dependency injection in tests.
@@ -172,17 +178,17 @@ namespace BacklashBotTests
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            // Load configuration from appsettings.json
+            // Load configuration using ConfigurationHelper to properly interpolate secrets
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var appsettingsPath = Path.Combine(basePath, "appsettings.json");
-            var json = File.ReadAllText(appsettingsPath);
-            var doc = JsonDocument.Parse(json);
+            _configuration = BacklashCommon.Configuration.ConfigurationHelper.CreateConfigurationBuilder(basePath, Array.Empty<string>()).Build();
 
-            // Parse configs from JSON
-            _connectionString = doc.RootElement.GetProperty("DBConnection").GetProperty("DefaultConnection").GetString();
-            _dataConfig = JsonSerializer.Deserialize<BacklashBotDataConfig>(doc.RootElement.GetProperty("DBConnection").GetProperty("BacklashBotData"));
-            _kalshiConfig = JsonSerializer.Deserialize<KalshiConfig>(doc.RootElement.GetProperty("Kalshi"));
-            _secretsConfig = JsonSerializer.Deserialize<SecretsConfig>(doc.RootElement.GetProperty("Secrets"));
+            // Build the interpolated connection string
+            _connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(_configuration);
+
+            // Parse other configs from the loaded configuration
+            _dataConfig = _configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
+            _kalshiConfig = _configuration.GetSection(KalshiConfig.SectionName).Get<KalshiConfig>();
+            _secretsConfig = _configuration.GetSection(SecretsConfig.SectionName).Get<SecretsConfig>();
 
             // Initialize real context to query for dynamic test data
             var logger = new Mock<ILogger<BacklashBotContext>>().Object;
@@ -252,12 +258,17 @@ namespace BacklashBotTests
             Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyFile is missing in appsettings.json");
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
-            // Resolve the key file path using the loaded secrets config
+            // Interpolate placeholders in KalshiConfig (matching Program.cs)
+            var interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.KeyId, _configuration);
+            var interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.KeyFile, _configuration);
+
+            // Resolve the key file path to the secrets directory
             var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
-                kalshiConfig.KeyFile,
+                interpolatedKeyFile,
                 _secretsConfig,
                 Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot")));
 
+            kalshiConfig.KeyId = interpolatedKeyId;
             kalshiConfig.KeyFile = resolvedKeyFile;
 
             // Now validate that the resolved key file exists

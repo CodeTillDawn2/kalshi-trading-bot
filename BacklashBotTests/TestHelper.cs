@@ -19,10 +19,8 @@ namespace KalshiBotTests
         /// <returns>An IConfiguration instance loaded from the appsettings.json file.</returns>
         private static IConfiguration GetConfiguration()
         {
-            return new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..","..","..","..", "BacklashBot"))
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .Build();
+            var currentDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..","..", "..", "..",  "BacklashBot");
+            return BacklashCommon.Configuration.ConfigurationHelper.CreateConfigurationBuilder(currentDir, Array.Empty<string>()).Build();
         }
 
         /// <summary>

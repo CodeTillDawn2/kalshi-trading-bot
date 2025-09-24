@@ -97,6 +97,19 @@ namespace BacklashBotTests
 
             var kalshiConfig = _configuration.GetSection(KalshiConfig.SectionName).Get<KalshiConfig>();
 
+            // Interpolate placeholders in KalshiConfig (matching Program.cs)
+            var interpolatedKeyId = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.KeyId, _configuration);
+            var interpolatedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.InterpolateConfigurationValue(kalshiConfig.KeyFile, _configuration);
+
+            // Resolve the key file path to the secrets directory
+            var secretsConfig = _configuration.GetSection(BacklashCommon.Configuration.SecretsConfig.SectionName).Get<BacklashCommon.Configuration.SecretsConfig>();
+            var resolvedKeyFile = BacklashCommon.Configuration.ConfigurationHelper.ResolveSecretsFilePath(
+                interpolatedKeyFile,
+                secretsConfig,
+                Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot")));
+
+            kalshiConfig.KeyId = interpolatedKeyId;
+            kalshiConfig.KeyFile = resolvedKeyFile;
 
             // Validate configuration
             Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.BotKeyId is missing in appsettings.json");
@@ -106,7 +119,8 @@ namespace BacklashBotTests
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
-            var websocketConfig = _configuration.GetSection(KalshiWebSocketClientConfig.SectionName);
+            var websocketConfig = _configuration.GetSection(KalshiWebSocketClientConfig.SectionName).Get<KalshiWebSocketClientConfig>();
+            _websocketConfigOptions = Options.Create(websocketConfig);
 
             // Initialize real SqlDataService
             var connectionString = ConfigurationHelper.BuildConnectionString(_configuration);
