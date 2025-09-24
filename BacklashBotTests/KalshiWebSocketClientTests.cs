@@ -300,6 +300,7 @@ namespace KalshiBotTests
         [Test]
         public void ChannelEnableDisable_AllChannelsInitiallyDisabled()
         {
+            TestContext.WriteLine("Testing that all WebSocket channels are disabled by default when the client is initialized.");
             // Arrange - All channels should be disabled by default
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
 
@@ -308,6 +309,7 @@ namespace KalshiBotTests
             {
                 Assert.That(_client.IsChannelEnabled(channel), Is.False, $"Channel {channel} should be disabled by default");
             }
+            TestContext.WriteLine("Result: All channels are disabled by default as expected.");
         }
 
         /// <summary>
@@ -322,6 +324,7 @@ namespace KalshiBotTests
         [Test]
         public void EnableChannel_SingleChannel_EnablementWorks()
         {
+            TestContext.WriteLine("Testing that a single WebSocket channel can be successfully enabled.");
             // Arrange
             string channel = "orderbook";
 
@@ -331,6 +334,7 @@ namespace KalshiBotTests
             // Assert
             Assert.That(_client.IsChannelEnabled(channel), Is.True, $"Channel {channel} should be enabled");
             Assert.That(_client.GetEnabledChannels().Contains(channel), Is.True, $"Enabled channels should contain {channel}");
+            TestContext.WriteLine("Result: Single channel enabled successfully.");
         }
 
         /// <summary>
@@ -345,6 +349,7 @@ namespace KalshiBotTests
         [Test]
         public void DisableChannel_SingleChannel_DisablementWorks()
         {
+            TestContext.WriteLine("Testing that a single WebSocket channel can be successfully disabled.");
             // Arrange
             string channel = "orderbook";
             _client.EnableChannel(channel);
@@ -355,6 +360,7 @@ namespace KalshiBotTests
             // Assert
             Assert.That(_client.IsChannelEnabled(channel), Is.False, $"Channel {channel} should be disabled");
             Assert.That(_client.GetEnabledChannels().Contains(channel), Is.False, $"Enabled channels should not contain {channel}");
+            TestContext.WriteLine("Result: Single channel disabled successfully.");
         }
 
         /// <summary>
@@ -369,6 +375,7 @@ namespace KalshiBotTests
         [Test]
         public void EnableAllChannels_AllChannelsEnabled()
         {
+            TestContext.WriteLine("Testing that all WebSocket channels can be enabled simultaneously.");
             // Arrange
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
 
@@ -387,6 +394,7 @@ namespace KalshiBotTests
             {
                 Assert.That(enabledChannels.Contains(channel), Is.True, $"Enabled channels should contain {channel}");
             }
+            TestContext.WriteLine("Result: All channels enabled successfully.");
         }
 
         /// <summary>
@@ -401,6 +409,7 @@ namespace KalshiBotTests
         [Test]
         public void DisableAllChannels_AllChannelsDisabled()
         {
+            TestContext.WriteLine("Testing that all WebSocket channels can be disabled simultaneously.");
             // Arrange
             _client.EnableAllChannels();
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
@@ -416,6 +425,7 @@ namespace KalshiBotTests
 
             var enabledChannels = _client.GetEnabledChannels();
             Assert.That(enabledChannels.Count, Is.EqualTo(0), "No channels should be enabled");
+            TestContext.WriteLine("Result: All channels disabled successfully.");
         }
 
         #endregion
@@ -434,6 +444,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessOrderBookMessage_OrderBookSnapshot_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that orderbook snapshot messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""orderbook_snapshot"",
@@ -450,6 +461,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("orderbook_snapshot"))), Times.Once);
+            TestContext.WriteLine("Result: Orderbook snapshot message processed successfully.");
         }
 
         /// <summary>
@@ -464,6 +476,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessOrderBookMessage_OrderBookDelta_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that orderbook delta messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""orderbook_delta"",
@@ -479,6 +492,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("orderbook_delta"))), Times.Once);
+            TestContext.WriteLine("Result: Orderbook delta message processed successfully.");
         }
 
         /// <summary>
@@ -493,6 +507,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessTickerMessage_TickerData_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that ticker messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""ticker"",
@@ -513,6 +528,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("ticker"))), Times.Once);
+            TestContext.WriteLine("Result: Ticker message processed successfully.");
         }
 
         /// <summary>
@@ -527,6 +543,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessTradeMessage_TradeData_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that trade messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""trade"",
@@ -544,6 +561,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("trade"))), Times.Once);
+            TestContext.WriteLine("Result: Trade message processed successfully.");
         }
 
         /// <summary>
@@ -558,6 +576,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessFillMessage_FillData_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that fill messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""fill"",
@@ -574,6 +593,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("fill"))), Times.Once);
+            TestContext.WriteLine("Result: Fill message processed successfully.");
         }
 
         /// <summary>
@@ -588,6 +608,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessMarketLifecycleMessage_LifecycleData_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that market lifecycle messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""market_lifecycle_v2"",
@@ -603,6 +624,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("market_lifecycle"))), Times.Once);
+            TestContext.WriteLine("Result: Market lifecycle message processed successfully.");
         }
 
         /// <summary>
@@ -617,6 +639,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessEventLifecycleMessage_EventLifecycleData_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that event lifecycle messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""event_lifecycle"",
@@ -632,6 +655,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("event_lifecycle"))), Times.Once);
+            TestContext.WriteLine("Result: Event lifecycle message processed successfully.");
         }
 
         /// <summary>
@@ -646,6 +670,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessErrorMessage_ObjectError_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that error messages are correctly processed by the MessageProcessor without throwing exceptions.");
             // Arrange
             var message = @"{
                 ""type"": ""error"",
@@ -657,6 +682,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("error"))), Times.Once);
+            TestContext.WriteLine("Result: Error message processed successfully without exceptions.");
         }
 
         /// <summary>
@@ -671,6 +697,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessSubscribedMessage_SubscriptionConfirmation_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that subscription confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""subscribed"",
@@ -683,6 +710,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("subscribed"))), Times.Once);
+            TestContext.WriteLine("Result: Subscription confirmation message processed successfully.");
         }
 
         /// <summary>
@@ -697,6 +725,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessUnsubscribedMessage_UnsubscriptionConfirmation_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that unsubscription confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""unsubscribed"",
@@ -708,6 +737,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("unsubscribed"))), Times.Once);
+            TestContext.WriteLine("Result: Unsubscription confirmation message processed successfully.");
         }
 
         /// <summary>
@@ -722,6 +752,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ProcessOkMessage_UpdateConfirmation_MessageProcessorCalled()
         {
+            TestContext.WriteLine("Testing that OK confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""ok"",
@@ -733,6 +764,7 @@ namespace KalshiBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("ok"))), Times.Once);
+            TestContext.WriteLine("Result: OK confirmation message processed successfully.");
         }
 
         #endregion
@@ -751,6 +783,7 @@ namespace KalshiBotTests
         [Test]
         public async Task SubscribeToChannel_OrderBookChannel_SubscriptionManagerCalled()
         {
+            TestContext.WriteLine("Testing that subscribing to a specific channel correctly delegates to the SubscriptionManager.");
             // Arrange
             string channel = "orderbook";
             string[] marketTickers = { "TEST-123" };
@@ -763,6 +796,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.SubscribeToChannelAsync(channel, marketTickers),
                 Times.Once);
+            TestContext.WriteLine("Result: Subscription to channel delegated successfully.");
         }
 
         /// <summary>
@@ -778,6 +812,7 @@ namespace KalshiBotTests
         [Test]
         public async Task SubscribeToWatchedMarkets_WatchedMarketsSet_SubscriptionManagerCalled()
         {
+            TestContext.WriteLine("Testing that subscribing to watched markets correctly delegates to the SubscriptionManager for all enabled channels.");
             // Arrange
             var watchedMarkets = new HashSet<string> { "TEST-123", "TEST-456" };
             _client.WatchedMarkets = watchedMarkets;
@@ -799,6 +834,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.SubscribeToChannelAsync(It.IsAny<string>(), It.IsAny<string[]>()),
                 Times.AtLeastOnce);
+            TestContext.WriteLine("Result: Subscription to watched markets delegated successfully.");
         }
 
         /// <summary>
@@ -813,6 +849,7 @@ namespace KalshiBotTests
         [Test]
         public async Task UnsubscribeFromChannel_ChannelSpecified_SubscriptionManagerCalled()
         {
+            TestContext.WriteLine("Testing that unsubscribing from a specific channel correctly delegates to the SubscriptionManager.");
             // Arrange
             string channel = "orderbook";
 
@@ -823,6 +860,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.UnsubscribeFromChannelAsync(channel),
                 Times.Once);
+            TestContext.WriteLine("Result: Unsubscription from channel delegated successfully.");
         }
 
         /// <summary>
@@ -837,6 +875,7 @@ namespace KalshiBotTests
         [Test]
         public async Task UnsubscribeFromAll_AllChannels_UnsubscribeFromAllAsyncCalled()
         {
+            TestContext.WriteLine("Testing that unsubscribing from all channels correctly delegates to the SubscriptionManager.");
             // Act
             await _client.UnsubscribeFromAllAsync();
 
@@ -844,6 +883,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.UnsubscribeFromAllAsync(),
                 Times.Once);
+            TestContext.WriteLine("Result: Unsubscription from all channels delegated successfully.");
         }
 
         /// <summary>
@@ -858,6 +898,7 @@ namespace KalshiBotTests
         [Test]
         public void IsSubscribed_MarketAndChannel_SubscriptionManagerCalled()
         {
+            TestContext.WriteLine("Testing that checking subscription status correctly delegates to the SubscriptionManager.");
             // Arrange
             string marketTicker = "TEST-123";
             string channel = "orderbook";
@@ -869,6 +910,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.IsSubscribed(marketTicker, channel),
                 Times.Once);
+            TestContext.WriteLine("Result: Subscription status check delegated successfully.");
         }
 
         /// <summary>
@@ -883,6 +925,7 @@ namespace KalshiBotTests
         [Test]
         public void ResetEventCounts_Called_MessageProcessorResetEventCountsCalled()
         {
+            TestContext.WriteLine("Testing that resetting event counts correctly delegates to the MessageProcessor.");
             // Act
             _client.ResetEventCounts();
 
@@ -890,6 +933,7 @@ namespace KalshiBotTests
             _messageProcessorMock.Verify(
                 mp => mp.ResetEventCounts(),
                 Times.Once);
+            TestContext.WriteLine("Result: Event counts reset delegated successfully.");
         }
 
         #endregion
@@ -909,6 +953,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ConnectAsync_ConnectionManagerConnected_MessageProcessingStarted()
         {
+            TestContext.WriteLine("Testing that connecting to the WebSocket properly initializes all components.");
             // Arrange
             _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.IsConnected()).Returns(true);
@@ -920,6 +965,7 @@ namespace KalshiBotTests
             _connectionManagerMock.Verify(cm => cm.ConnectAsync(0), Times.Once);
             _messageProcessorMock.Verify(mp => mp.StartProcessingAsync(), Times.Once);
             _subscriptionManagerMock.Verify(sm => sm.StartAsync(), Times.Once);
+            TestContext.WriteLine("Result: WebSocket connection and component initialization completed successfully.");
         }
 
         /// <summary>
@@ -935,6 +981,7 @@ namespace KalshiBotTests
         [Test]
         public async Task ShutdownAsync_AllComponentsStopped()
         {
+            TestContext.WriteLine("Testing that shutting down the WebSocket client properly stops all components.");
             // Arrange
             _subscriptionManagerMock.Setup(sm => sm.UnsubscribeFromAllAsync()).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.StopAsync()).Returns(Task.CompletedTask);
@@ -947,6 +994,7 @@ namespace KalshiBotTests
             _subscriptionManagerMock.Verify(sm => sm.UnsubscribeFromAllAsync(), Times.Once);
             _connectionManagerMock.Verify(cm => cm.StopAsync(), Times.Once);
             _messageProcessorMock.Verify(mp => mp.StopProcessingAsync(), Times.Once);
+            TestContext.WriteLine("Result: WebSocket client shutdown completed successfully.");
         }
 
         #endregion

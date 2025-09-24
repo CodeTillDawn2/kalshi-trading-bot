@@ -121,6 +121,7 @@ namespace KalshiBotTests
         [Test]
         public void TestAnnouncementExtensions()
         {
+            TestContext.WriteLine("Testing AnnouncementExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Announcement)null).ToAnnouncementDTO());
             Assert.Throws<ArgumentNullException>(() => ((AnnouncementDTO)null).ToAnnouncement());
@@ -185,6 +186,7 @@ namespace KalshiBotTests
             var metrics = AnnouncementExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToAnnouncementDTO"), Is.True);
+            TestContext.WriteLine("Result: All AnnouncementExtensions validated successfully.");
         }
 
         /// <summary>
@@ -193,6 +195,7 @@ namespace KalshiBotTests
         [Test]
         public void TestBrainInstanceExtensions()
         {
+            TestContext.WriteLine("Testing BrainInstanceExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((BrainInstance)null).ToBrainInstanceDTO());
             Assert.Throws<ArgumentNullException>(() => ((BrainInstanceDTO)null).ToBrainInstance());
@@ -265,6 +268,7 @@ namespace KalshiBotTests
             var metrics = BrainInstanceExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToBrainInstanceDTO"), Is.True);
+            TestContext.WriteLine("Result: All BrainInstanceExtensions validated successfully.");
         }
 
         /// <summary>
@@ -273,6 +277,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCandlestickExtensions()
         {
+            TestContext.WriteLine("Testing CandlestickExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Candlestick)null).ToCandlestickDTO());
             Assert.Throws<ArgumentNullException>(() => ((CandlestickDTO)null).ToCandlestick());
@@ -363,6 +368,7 @@ namespace KalshiBotTests
             var metrics = CandlestickExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToCandlestickDTO"), Is.True);
+            TestContext.WriteLine("Result: All CandlestickExtensions validated successfully.");
         }
 
         #endregion
@@ -373,6 +379,7 @@ namespace KalshiBotTests
         [Test]
         public void TestEventExtensions()
         {
+            TestContext.WriteLine("Testing EventExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Event)null).ToEventDTO());
             Assert.Throws<ArgumentNullException>(() => ((EventDTO)null).ToEvent());
@@ -450,6 +457,7 @@ namespace KalshiBotTests
             var metrics = EventExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToEventDTO"), Is.True);
+            TestContext.WriteLine("Result: All EventExtensions validated successfully.");
         }
 
         /// <summary>
@@ -465,16 +473,17 @@ namespace KalshiBotTests
         [Test]
         public void TestRSICalculation()
         {
+            TestContext.WriteLine("Testing RSI calculation accuracy across multiple scenarios.");
             foreach (var scenario in TradingMetricScenarios.GetRSIScenarios())
             {
                 // Arrange
                 var candlesticks = scenario.Candlesticks.TakeLast(13 + 1).ToList();
-                Console.WriteLine($"Scenario: {scenario.Name}, Candlesticks Count: {candlesticks.Count}, Periods: 13");
-                Console.WriteLine($"Prices: [{string.Join(", ", candlesticks.Select(c => c.MidClose))}]");
+                TestContext.WriteLine($"Scenario: {scenario.Name}, Candlesticks Count: {candlesticks.Count}, Periods: 13");
+                TestContext.WriteLine($"Prices: [{string.Join(", ", candlesticks.Select(c => c.MidClose))}]");
 
                 // Act
                 var rsi = _tradingCalculator.CalculateRSI(candlesticks, 13);
-                Console.WriteLine($"Calculated RSI: {rsi}");
+                TestContext.WriteLine($"Calculated RSI: {rsi}");
 
                 // Assert
                 if (!scenario.ExpectedRSI.HasValue)
@@ -482,10 +491,11 @@ namespace KalshiBotTests
                 var expected = scenario.ExpectedRSI.Value;
                 var absoluteDiff = Math.Abs((decimal)(rsi - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedRSI.Value))) * 100 : absoluteDiff;
-                Console.WriteLine($"{scenario.Name}: RSI Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: RSI Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedRSI.Value);
                 Assert.That(rsi, Is.EqualTo((double)scenario.ExpectedRSI.Value).Within(margin), $"{scenario.Name}: RSI mismatch. Expected: {expected}, Actual: {rsi}");
             }
+            TestContext.WriteLine("Result: All RSI calculations validated successfully.");
         }
 
         /// <summary>
@@ -500,6 +510,7 @@ namespace KalshiBotTests
         [Test]
         public void TestMACDCalculation()
         {
+            TestContext.WriteLine("Testing MACD calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetMACDScenarios())
             {
                 // Arrange
@@ -515,24 +526,25 @@ namespace KalshiBotTests
                 var expectedMacd = scenario.ExpectedMACD.macdLine.Value;
                 var macdDiff = Math.Abs((decimal)(macdLine - expectedMacd));
                 var macdPercentageDiff = expectedMacd != 0 ? (macdDiff / Math.Abs((decimal)(scenario.ExpectedMACD.macdLine.Value))) * 100 : macdDiff;
-                Console.WriteLine($"{scenario.Name}: MACD Line Percentage Difference: {(expectedMacd != 0 ? $"{macdPercentageDiff:F6}%" : $"Absolute Diff: {macdDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: MACD Line Percentage Difference: {(expectedMacd != 0 ? $"{macdPercentageDiff:F6}%" : $"Absolute Diff: {macdDiff:F6}")}");
                 var macdMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.macdLine.Value);
                 Assert.That(macdLine, Is.EqualTo((double)scenario.ExpectedMACD.macdLine.Value).Within(macdMargin), $"{scenario.Name}: MACD Line mismatch");
 
                 var expectedSignal = scenario.ExpectedMACD.signalLine.Value;
                 var signalDiff = Math.Abs((decimal)(signalLine - expectedSignal));
                 var signalPercentageDiff = expectedSignal != 0 ? (signalDiff / Math.Abs((decimal)(scenario.ExpectedMACD.signalLine.Value))) * 100 : signalDiff;
-                Console.WriteLine($"{scenario.Name}: Signal Line Percentage Difference: {(expectedSignal != 0 ? $"{signalPercentageDiff:F6}%" : $"Absolute Diff: {signalDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: Signal Line Percentage Difference: {(expectedSignal != 0 ? $"{signalPercentageDiff:F6}%" : $"Absolute Diff: {signalDiff:F6}")}");
                 var signalMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.signalLine.Value);
                 Assert.That(signalLine, Is.EqualTo((double)scenario.ExpectedMACD.signalLine.Value).Within(signalMargin), $"{scenario.Name}: Signal Line mismatch");
 
                 var expectedHistogram = scenario.ExpectedMACD.histogram.Value;
                 var histogramDiff = Math.Abs((decimal)(histogram - expectedHistogram));
                 var histogramPercentageDiff = expectedHistogram != 0 ? (histogramDiff / Math.Abs((decimal)(scenario.ExpectedMACD.histogram.Value))) * 100 : histogramDiff;
-                Console.WriteLine($"{scenario.Name}: Histogram Percentage Difference: {(expectedHistogram != 0 ? $"{histogramPercentageDiff:F6}%" : $"Absolute Diff: {histogramDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: Histogram Percentage Difference: {(expectedHistogram != 0 ? $"{histogramPercentageDiff:F6}%" : $"Absolute Diff: {histogramDiff:F6}")}");
                 var histogramMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.histogram.Value);
                 Assert.That(histogram, Is.EqualTo((double)scenario.ExpectedMACD.histogram.Value).Within(histogramMargin), $"{scenario.Name}: Histogram mismatch");
             }
+            TestContext.WriteLine("Result: All MACD calculations validated successfully.");
         }
 
         /// <summary>
@@ -546,6 +558,7 @@ namespace KalshiBotTests
         [Test]
         public void TestEMACalculation()
         {
+            TestContext.WriteLine("Testing EMA calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetEMAScenarios())
             {
                 // Arrange
@@ -560,10 +573,11 @@ namespace KalshiBotTests
                 var expected = scenario.ExpectedEMA.Value;
                 var absoluteDiff = Math.Abs((decimal)(result - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedEMA.Value))) * 100 : absoluteDiff;
-                Console.WriteLine($"{scenario.Name}: EMA Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: EMA Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedEMA.Value);
                 Assert.That(result, Is.EqualTo((double)scenario.ExpectedEMA.Value).Within(margin), $"{scenario.Name}: EMA mismatch. Expected: {expected}, Actual: {result}");
             }
+            TestContext.WriteLine("Result: All EMA calculations validated successfully.");
         }
 
         /// <summary>
@@ -577,6 +591,7 @@ namespace KalshiBotTests
         [Test]
         public void TestBollingerBandsCalculation()
         {
+            TestContext.WriteLine("Testing Bollinger Bands calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetBollingerBandsScenarios())
             {
                 // Arrange
@@ -592,24 +607,25 @@ namespace KalshiBotTests
                 var expectedMiddle = scenario.ExpectedBollingerBands.middle.Value;
                 var middleDiff = Math.Abs((decimal)(middle - expectedMiddle));
                 var middlePercentageDiff = expectedMiddle != 0 ? (middleDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.middle.Value))) * 100 : middleDiff;
-                Console.WriteLine($"{scenario.Name}: Middle Band Percentage Difference: {(expectedMiddle != 0 ? $"{middlePercentageDiff:F6}%" : $"Absolute Diff: {middleDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: Middle Band Percentage Difference: {(expectedMiddle != 0 ? $"{middlePercentageDiff:F6}%" : $"Absolute Diff: {middleDiff:F6}")}");
                 var middleMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.middle.Value);
                 Assert.That(middle, Is.EqualTo((double)scenario.ExpectedBollingerBands.middle.Value).Within(middleMargin), $"{scenario.Name}: Middle band mismatch");
 
                 var expectedUpper = scenario.ExpectedBollingerBands.upper.Value;
                 var upperDiff = Math.Abs((decimal)(upper - expectedUpper));
                 var upperPercentageDiff = expectedUpper != 0 ? (upperDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.upper.Value))) * 100 : upperDiff;
-                Console.WriteLine($"{scenario.Name}: Upper Band Percentage Difference: {(expectedUpper != 0 ? $"{upperPercentageDiff:F6}%" : $"Absolute Diff: {upperDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: Upper Band Percentage Difference: {(expectedUpper != 0 ? $"{upperPercentageDiff:F6}%" : $"Absolute Diff: {upperDiff:F6}")}");
                 var upperMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.upper.Value);
                 Assert.That(upper, Is.EqualTo((double)scenario.ExpectedBollingerBands.upper.Value).Within(upperMargin), $"{scenario.Name}: Upper band mismatch");
 
                 var expectedLower = scenario.ExpectedBollingerBands.lower.Value;
                 var lowerDiff = Math.Abs((decimal)(lower - expectedLower));
                 var lowerPercentageDiff = expectedLower != 0 ? (lowerDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.lower.Value))) * 100 : lowerDiff;
-                Console.WriteLine($"{scenario.Name}: Lower Band Percentage Difference: {(expectedLower != 0 ? $"{lowerPercentageDiff:F6}%" : $"Absolute Diff: {lowerDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: Lower Band Percentage Difference: {(expectedLower != 0 ? $"{lowerPercentageDiff:F6}%" : $"Absolute Diff: {lowerDiff:F6}")}");
                 var lowerMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.lower.Value);
                 Assert.That(lower, Is.EqualTo((double)scenario.ExpectedBollingerBands.lower.Value).Within(lowerMargin), $"{scenario.Name}: Lower band mismatch");
             }
+            TestContext.WriteLine("Result: All Bollinger Bands calculations validated successfully.");
         }
 
         /// <summary>
@@ -624,6 +640,7 @@ namespace KalshiBotTests
         [Test]
         public void TestATRCalculation()
         {
+            TestContext.WriteLine("Testing ATR calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetATRScenarios())
             {
                 // Arrange
@@ -638,10 +655,11 @@ namespace KalshiBotTests
                 var expected = scenario.ExpectedATR.Value;
                 var absoluteDiff = Math.Abs((decimal)(result - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedATR.Value))) * 100 : absoluteDiff;
-                Console.WriteLine($"{scenario.Name}: ATR Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: ATR Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedATR.Value);
                 Assert.That(result, Is.EqualTo((double)scenario.ExpectedATR.Value).Within(margin), $"{scenario.Name}: ATR mismatch. Expected: {expected}, Actual: {result}");
             }
+            TestContext.WriteLine("Result: All ATR calculations validated successfully.");
         }
 
         /// <summary>
@@ -655,6 +673,7 @@ namespace KalshiBotTests
         [Test]
         public void TestVWAPCalculation()
         {
+            TestContext.WriteLine("Testing VWAP calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetVWAPScenarios())
             {
                 // Arrange
@@ -669,10 +688,11 @@ namespace KalshiBotTests
                 var expected = scenario.ExpectedVWAP.Value;
                 var absoluteDiff = Math.Abs(result.Value - (decimal)expected);
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedVWAP.Value))) * 100 : absoluteDiff;
-                Console.WriteLine($"{scenario.Name}: VWAP Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: VWAP Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedVWAP.Value);
                 Assert.That(result, Is.EqualTo((double)scenario.ExpectedVWAP.Value).Within(margin), $"{scenario.Name}: VWAP mismatch. Expected: {expected}, Actual: {result}");
             }
+            TestContext.WriteLine("Result: All VWAP calculations validated successfully.");
         }
 
         /// <summary>
@@ -687,6 +707,7 @@ namespace KalshiBotTests
         [Test]
         public void TestStochasticOscillatorCalculation()
         {
+            TestContext.WriteLine("Testing Stochastic Oscillator calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetStochasticScenarios())
             {
                 // Arrange
@@ -701,7 +722,7 @@ namespace KalshiBotTests
                 var expectedK = scenario.ExpectedStochastic.k.Value;
                 var kDiff = Math.Abs((decimal)(kResult - expectedK));
                 var kPercentageDiff = expectedK != 0 ? (kDiff / Math.Abs((decimal)(scenario.ExpectedStochastic.k.Value))) * 100 : kDiff;
-                Console.WriteLine($"{scenario.Name}: %K Percentage Difference: {(expectedK != 0 ? $"{kPercentageDiff:F6}%" : $"Absolute Diff: {kDiff:F6}")}");
+                TestContext.WriteLine($"{scenario.Name}: %K Percentage Difference: {(expectedK != 0 ? $"{kPercentageDiff:F6}%" : $"Absolute Diff: {kDiff:F6}")}");
                 var kMargin = _marginFactor * Math.Abs(scenario.ExpectedStochastic.k.Value);
                 Assert.That(kResult, Is.EqualTo((double)scenario.ExpectedStochastic.k.Value).Within(kMargin), $"{scenario.Name}: %K mismatch");
 
@@ -711,10 +732,11 @@ namespace KalshiBotTests
                     var expectedD = scenario.ExpectedStochastic.d.Value;
                     var dDiff = Math.Abs(dResult.GetValueOrDefault() - expectedD);
                     var dPercentageDiff = expectedD != 0 ? (dDiff / Math.Abs(scenario.ExpectedStochastic.d.Value)) * 100 : dDiff;
-                    Console.WriteLine($"{scenario.Name}: %D Percentage Difference: {(expectedD != 0 ? $"{dPercentageDiff:F6}%" : $"Absolute Diff: {dDiff:F6}")}");
+                    TestContext.WriteLine($"{scenario.Name}: %D Percentage Difference: {(expectedD != 0 ? $"{dPercentageDiff:F6}%" : $"Absolute Diff: {dDiff:F6}")}");
                 }
                 Assert.That(dResult, Is.EqualTo(scenario.ExpectedStochastic.d.HasValue ? (double)scenario.ExpectedStochastic.d.Value : null).Within(dMargin).Or.Null, $"{scenario.Name}: %D mismatch");
             }
+            TestContext.WriteLine("Result: All Stochastic Oscillator calculations validated successfully.");
         }
 
         /// <summary>
@@ -729,6 +751,7 @@ namespace KalshiBotTests
         [Test]
         public void TestOBVCalculation()
         {
+            TestContext.WriteLine("Testing OBV calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetOBVScenarios())
             {
                 // Arrange
@@ -740,6 +763,7 @@ namespace KalshiBotTests
                 // Assert
                 Assert.That(result, Is.EqualTo(scenario.ExpectedOBV), $"{scenario.Name}: OBV mismatch. Expected: {scenario.ExpectedOBV}, Actual: {result}");
             }
+            TestContext.WriteLine("Result: All OBV calculations validated successfully.");
         }
     }
 }

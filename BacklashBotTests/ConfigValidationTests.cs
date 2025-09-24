@@ -30,6 +30,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
+            TestContext.WriteLine("Testing validation of all configs from appsettings.json using reflective approach.");
             var configInstances = new Dictionary<string, object>();
 
             // Get all config types with SectionName from assemblies referenced by BacklashBot.csproj
@@ -64,11 +65,13 @@ namespace BacklashBotTests
                 ((MarketServiceDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
                 ValidateConfig(marketDataInstance, _configuration.GetSection(MarketServiceDataConfig.SectionName));
             }
+            TestContext.WriteLine("Result: All configs validated successfully from appsettings.json.");
         }
 
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
+            TestContext.WriteLine("Testing for unused configuration sections in appsettings.json using reflective approach.");
             var usedSections = new HashSet<string>();
 
             // Automatically collect all SectionName values from assemblies referenced by BacklashBot.csproj
@@ -108,6 +111,7 @@ namespace BacklashBotTests
             }
 
             Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
+            TestContext.WriteLine("Result: No unused sections found in appsettings.json.");
         }
 
         [Test]

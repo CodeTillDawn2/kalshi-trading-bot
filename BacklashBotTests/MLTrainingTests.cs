@@ -257,6 +257,7 @@ namespace KalshiBotTests
         [Category("ML")]
         public async Task Train_Evaluate_Flatten_Model_On_Real_Data()
         {
+            TestContext.WriteLine("Testing end-to-end ML training pipeline for price flattening prediction.");
             // 1) Load multiple markets from your real DB
             var markets = await LoadRealMarketsAsync(minRecordedHours: 1.0);
 
@@ -290,6 +291,7 @@ namespace KalshiBotTests
             // 5) Optional: Predict for the latest row
             var latest = FlattenPriceQuickstart.PredictLatestFromCsv(csvPath, modelPath, cfg);
             TestContext.Out.WriteLine($"Latest: cur={latest.CurrentYes:F2}, ?={latest.PredictedDelta:F2}, flat={latest.PredictedFlatten:F2}");
+            TestContext.WriteLine("Result: ML training pipeline completed successfully.");
         }
     }
 }

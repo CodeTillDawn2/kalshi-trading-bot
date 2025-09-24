@@ -381,21 +381,21 @@ namespace KalshiBotTests
         [Category(MarketDataCategory)]
         public async Task FetchMarketsAsync_WithStatusOpen_ReturnsProcessedMarkets()
         {
-            Console.WriteLine("🧪 Testing: Fetch Markets with Open Status");
-            Console.WriteLine("   Expected: API should return processed markets with no errors");
-            Console.WriteLine("   Parameters: status=open");
+            TestContext.WriteLine("Testing FetchMarketsAsync with status filter set to 'open'.");
+            TestContext.WriteLine("Expected: API should return processed markets with no errors");
+            TestContext.WriteLine("Parameters: status=open");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(status: KalshiConstants.Status_Open);
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} markets with {errorCount} errors");
 
             // Assert
             Assert.That(processedCount, Is.GreaterThan(0), "Expected some open markets to be processed");
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch - all markets should be processed successfully");
 
-            Console.WriteLine("✅ PASSED: Markets fetched successfully with open status");
+            TestContext.WriteLine("Result: FetchMarketsAsync with open status completed successfully.");
         }
 
         /// <summary>
@@ -407,21 +407,21 @@ namespace KalshiBotTests
         [Category(MarketDataCategory)]
         public async Task FetchMarketsAsync_WithSpecificTicker_ReturnsProcessedMarket()
         {
-            Console.WriteLine("🧪 Testing: Fetch Markets with Specific Ticker");
-            Console.WriteLine("   Expected: API should return exactly one processed market with no errors");
-            Console.WriteLine($"   Parameters: ticker={_testMarketTicker}");
+            TestContext.WriteLine("Testing FetchMarketsAsync with a specific market ticker filter.");
+            TestContext.WriteLine("Expected: API should return exactly one processed market with no errors");
+            TestContext.WriteLine($"Parameters: ticker={_testMarketTicker}");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(tickers: new[] { _testMarketTicker });
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} markets with {errorCount} errors");
 
             // Assert
             Assert.That(processedCount, Is.EqualTo(1), "Expected exactly one market to be processed");
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
 
-            Console.WriteLine("✅ PASSED: Specific market fetched successfully");
+            TestContext.WriteLine("Result: FetchMarketsAsync with specific ticker completed successfully.");
         }
 
         /// <summary>
@@ -433,9 +433,9 @@ namespace KalshiBotTests
         [Category(MetadataCategory)]
         public async Task FetchSeriesAsync_WithValidTicker_ReturnsSeriesData()
         {
-            Console.WriteLine("🧪 Testing: Fetch Series with Valid Ticker");
-            Console.WriteLine("   Expected: API should return series data with matching ticker");
-            Console.WriteLine($"   Parameters: series_ticker={_testSeriesTicker}");
+            TestContext.WriteLine("Testing FetchSeriesAsync with a valid series ticker.");
+            TestContext.WriteLine("Expected: API should return series data with matching ticker");
+            TestContext.WriteLine($"Parameters: series_ticker={_testSeriesTicker}");
 
             // Act
             var result = await _apiService.FetchSeriesAsync(_testSeriesTicker);
@@ -443,14 +443,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Ticker={result.Series.Ticker}, Title={result.Series.Title}, Category={result.Series.Category}");
+                TestContext.WriteLine($"Result: Ticker={result.Series.Ticker}, Title={result.Series.Title}, Category={result.Series.Category}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected series data to be returned");
             Assert.That(result.Series.Ticker, Is.EqualTo(_testSeriesTicker), "Ticker mismatch in response");
 
-            Console.WriteLine("✅ PASSED: Series data fetched successfully");
+            TestContext.WriteLine("Result: FetchSeriesAsync completed successfully.");
         }
 
         /// <summary>
@@ -464,9 +464,9 @@ namespace KalshiBotTests
             // Use the dynamically selected event ticker from setup
             var testEventTicker = _testEventTicker;
 
-            Console.WriteLine("🧪 Testing: Fetch Event with Valid Ticker");
-            Console.WriteLine("   Expected: API should return event data with nested markets");
-            Console.WriteLine($"   Parameters: event_ticker={testEventTicker} (dynamically selected), with_nested_markets=true");
+            TestContext.WriteLine("Testing FetchEventAsync with a valid event ticker and nested markets enabled.");
+            TestContext.WriteLine("Expected: API should return event data with nested markets");
+            TestContext.WriteLine($"Parameters: event_ticker={testEventTicker} (dynamically selected), with_nested_markets=true");
 
             // Act
             var result = await _apiService.FetchEventAsync(testEventTicker, withNestedMarkets: true);
@@ -474,14 +474,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Ticker={result.Event.EventTicker}, Title={result.Event.Title}, MarketCount={result.Event.Markets?.Count ?? 0}");
+                TestContext.WriteLine($"Result: Ticker={result.Event.EventTicker}, Title={result.Event.Title}, MarketCount={result.Event.Markets?.Count ?? 0}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected event data to be returned");
             Assert.That(result.Event.EventTicker, Is.EqualTo(testEventTicker), "Event ticker mismatch in response");
 
-            Console.WriteLine("✅ PASSED: Event data with nested markets fetched successfully");
+            TestContext.WriteLine("Result: FetchEventAsync with nested markets completed successfully.");
         }
 
         /// <summary>
@@ -492,21 +492,21 @@ namespace KalshiBotTests
         [Test]
         public async Task FetchPositionsAsync_ReturnsPositions()
         {
-            Console.WriteLine("🧪 Testing: Fetch Portfolio Positions");
-            Console.WriteLine("   Expected: API should return positions data with no errors");
-            Console.WriteLine("   Parameters: none (fetch all positions)");
+            TestContext.WriteLine("Testing FetchPositionsAsync to retrieve user's current positions.");
+            TestContext.WriteLine("Expected: API should return positions data with no errors");
+            TestContext.WriteLine("Parameters: none (fetch all positions)");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchPositionsAsync();
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} positions with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} positions with {errorCount} errors");
 
             // Assert
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
             // processedCount may be 0 if no positions, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Portfolio positions fetched successfully");
+            TestContext.WriteLine("Result: FetchPositionsAsync completed successfully.");
         }
 
         /// <summary>
@@ -518,22 +518,22 @@ namespace KalshiBotTests
         [Test]
         public async Task FetchCandlesticksAsync_WithValidParams_ReturnsCandlesticks()
         {
-            Console.WriteLine("🧪 Testing: Fetch Candlesticks with Valid Parameters");
-            Console.WriteLine("   Expected: API should return candlestick data with no errors");
-            Console.WriteLine($"   Parameters: series={_testSeriesTicker}, market={_testMarketTicker}, interval={TestInterval}");
+            TestContext.WriteLine("Testing FetchCandlesticksAsync with valid parameters.");
+            TestContext.WriteLine("Expected: API should return candlestick data with no errors");
+            TestContext.WriteLine($"Parameters: series={_testSeriesTicker}, market={_testMarketTicker}, interval={TestInterval}");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchCandlesticksAsync(
                 _testSeriesTicker, _testMarketTicker, TestInterval, _testStartTs);
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} candlesticks with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} candlesticks with {errorCount} errors");
 
             // Assert
             Assert.That(processedCount, Is.GreaterThan(0), "Expected some candlesticks to be processed");
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
 
-            Console.WriteLine("✅ PASSED: Candlestick data fetched successfully");
+            TestContext.WriteLine("Result: FetchCandlesticksAsync completed successfully.");
         }
 
         /// <summary>
@@ -545,20 +545,20 @@ namespace KalshiBotTests
         [Category(AccountDataCategory)]
         public async Task GetBalanceAsync_ReturnsPositiveBalance()
         {
-            Console.WriteLine("🧪 Testing: Get Account Balance");
-            Console.WriteLine("   Expected: API should return non-negative account balance");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetBalanceAsync to retrieve account balance.");
+            TestContext.WriteLine("Expected: API should return non-negative account balance");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var balance = await _apiService.GetBalanceAsync();
 
             // Output details
-            Console.WriteLine($"   Result: Account balance: {balance / 100m} USD");
+            TestContext.WriteLine($"Result: Account balance: {balance / 100m} USD");
 
             // Assert
             Assert.That(balance, Is.GreaterThanOrEqualTo(0), "Expected non-negative balance");
 
-            Console.WriteLine("✅ PASSED: Account balance retrieved successfully");
+            TestContext.WriteLine("Result: GetBalanceAsync completed successfully.");
         }
 
         /// <summary>
@@ -569,9 +569,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetExchangeStatusAsync_ReturnsStatus()
         {
-            Console.WriteLine("🧪 Testing: Get Exchange Status");
-            Console.WriteLine("   Expected: API should return exchange operational status");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetExchangeStatusAsync to retrieve exchange operational status.");
+            TestContext.WriteLine("Expected: API should return exchange operational status");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var status = await _apiService.GetExchangeStatusAsync();
@@ -579,13 +579,13 @@ namespace KalshiBotTests
             // Output details
             if (status != null)
             {
-                Console.WriteLine($"   Result: TradingActive={status.trading_active}, ExchangeActive={status.exchange_active}");
+                TestContext.WriteLine($"Result: TradingActive={status.trading_active}, ExchangeActive={status.exchange_active}");
             }
 
             // Assert
             Assert.That(status, Is.Not.Null, "Expected exchange status to be returned");
 
-            Console.WriteLine("✅ PASSED: Exchange status retrieved successfully");
+            TestContext.WriteLine("Result: GetExchangeStatusAsync completed successfully.");
         }
 
         /// <summary>
@@ -596,21 +596,21 @@ namespace KalshiBotTests
         [Test]
         public async Task FetchOrdersAsync_ReturnsOrders()
         {
-            Console.WriteLine("🧪 Testing: Fetch Orders with Status Filter");
-            Console.WriteLine("   Expected: API should return orders with no errors");
-            Console.WriteLine("   Parameters: status=executed");
+            TestContext.WriteLine("Testing FetchOrdersAsync with status filter.");
+            TestContext.WriteLine("Expected: API should return orders with no errors");
+            TestContext.WriteLine("Parameters: status=executed");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchOrdersAsync(status: "executed");
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} orders with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} orders with {errorCount} errors");
 
             // Assert
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
             // processedCount may be 0 if no orders, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Orders fetched successfully");
+            TestContext.WriteLine("Result: FetchOrdersAsync completed successfully.");
         }
 
         /// <summary>
@@ -621,9 +621,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetExchangeScheduleAsync_ReturnsSchedule()
         {
-            Console.WriteLine("🧪 Testing: Get Exchange Schedule");
-            Console.WriteLine("   Expected: API should return exchange trading hours schedule");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetExchangeScheduleAsync to retrieve trading schedule information.");
+            TestContext.WriteLine("Expected: API should return exchange trading hours schedule");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var schedule = await _apiService.GetExchangeScheduleAsync();
@@ -631,14 +631,14 @@ namespace KalshiBotTests
             // Output details
             if (schedule != null && schedule.Schedule.StandardHours.Any())
             {
-                Console.WriteLine($"   Result: Fetched {schedule.Schedule.StandardHours.Count} standard hours periods");
+                TestContext.WriteLine($"Result: Fetched {schedule.Schedule.StandardHours.Count} standard hours periods");
             }
 
             // Assert
             Assert.That(schedule, Is.Not.Null, "Expected schedule to be returned");
             Assert.That(schedule.Schedule.StandardHours, Is.Not.Empty, "Expected at least one standard hours period");
 
-            Console.WriteLine("✅ PASSED: Exchange schedule retrieved successfully");
+            TestContext.WriteLine("Result: GetExchangeScheduleAsync completed successfully.");
         }
 
         /// <summary>
@@ -649,21 +649,21 @@ namespace KalshiBotTests
         [Test]
         public async Task FetchAnnouncementsAsync_ReturnsAnnouncements()
         {
-            Console.WriteLine("🧪 Testing: Fetch Exchange Announcements");
-            Console.WriteLine("   Expected: API should return announcements with no errors");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing FetchAnnouncementsAsync to retrieve exchange announcements.");
+            TestContext.WriteLine("Expected: API should return announcements with no errors");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchAnnouncementsAsync();
 
             // Output details
-            Console.WriteLine($"   Result: Processed {processedCount} announcements with {errorCount} errors");
+            TestContext.WriteLine($"Result: Processed {processedCount} announcements with {errorCount} errors");
 
             // Assert
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
             // processedCount may be 0 if no announcements, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Announcements fetched successfully");
+            TestContext.WriteLine("Result: FetchAnnouncementsAsync completed successfully.");
         }
 
         /// <summary>
@@ -674,9 +674,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetTotalRestingOrderValueAsync_ReturnsValue()
         {
-            Console.WriteLine("🧪 Testing: Get Total Resting Order Value");
-            Console.WriteLine("   Expected: API should return total value of resting orders");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetTotalRestingOrderValueAsync to retrieve total resting order value.");
+            TestContext.WriteLine("Expected: API should return total value of resting orders");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var result = await _apiService.GetTotalRestingOrderValueAsync();
@@ -684,14 +684,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Total resting order value: {result.TotalValue}");
+                TestContext.WriteLine($"Result: Total resting order value: {result.TotalValue}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected total resting order value response");
             Assert.That(result.TotalValue, Is.GreaterThanOrEqualTo(0), "Expected non-negative total value");
 
-            Console.WriteLine("✅ PASSED: Total resting order value retrieved successfully");
+            TestContext.WriteLine("Result: GetTotalRestingOrderValueAsync completed successfully.");
         }
 
         /// <summary>
@@ -702,9 +702,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetOrdersQueuePositionsAsync_ReturnsQueuePositions()
         {
-            Console.WriteLine("🧪 Testing: Get Orders Queue Positions");
-            Console.WriteLine("   Expected: API should return queue positions for orders");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetOrdersQueuePositionsAsync to retrieve order queue positions.");
+            TestContext.WriteLine("Expected: API should return queue positions for orders");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var result = await _apiService.GetOrdersQueuePositionsAsync();
@@ -712,14 +712,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Retrieved {result.QueuePositions.Count} queue positions");
+                TestContext.WriteLine($"Result: Retrieved {result.QueuePositions.Count} queue positions");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected queue positions response");
             // Count may be 0 if no positions, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Orders queue positions retrieved successfully");
+            TestContext.WriteLine("Result: GetOrdersQueuePositionsAsync completed successfully.");
         }
 
         /// <summary>
@@ -730,9 +730,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetSettlementsAsync_ReturnsSettlements()
         {
-            Console.WriteLine("🧪 Testing: Get Portfolio Settlements");
-            Console.WriteLine("   Expected: API should return settlement data with pagination");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetSettlementsAsync to retrieve settlement information.");
+            TestContext.WriteLine("Expected: API should return settlement data with pagination");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var result = await _apiService.GetSettlementsAsync();
@@ -740,14 +740,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Retrieved {result.Settlements.Count} settlements");
+                TestContext.WriteLine($"Result: Retrieved {result.Settlements.Count} settlements");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected settlements response");
             // Count may be 0 if no settlements, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Settlements retrieved successfully");
+            TestContext.WriteLine("Result: GetSettlementsAsync completed successfully.");
         }
 
         /// <summary>
@@ -758,9 +758,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetFillsAsync_ReturnsFills()
         {
-            Console.WriteLine("🧪 Testing: Get Portfolio Fills");
-            Console.WriteLine("   Expected: API should return fill data with pagination");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetFillsAsync to retrieve fill information for executed orders.");
+            TestContext.WriteLine("Expected: API should return fill data with pagination");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var result = await _apiService.GetFillsAsync();
@@ -768,14 +768,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Retrieved {result.Fills.Count} fills");
+                TestContext.WriteLine($"Result: Retrieved {result.Fills.Count} fills");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected fills response");
             // Count may be 0 if no fills, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Fills retrieved successfully");
+            TestContext.WriteLine("Result: GetFillsAsync completed successfully.");
         }
 
         /// <summary>
@@ -786,9 +786,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetIncentiveProgramsAsync_ReturnsIncentivePrograms()
         {
-            Console.WriteLine("🧪 Testing: Get Incentive Programs");
-            Console.WriteLine("   Expected: API should return incentive programs with pagination");
-            Console.WriteLine("   Parameters: none");
+            TestContext.WriteLine("Testing GetIncentiveProgramsAsync to retrieve incentive program information.");
+            TestContext.WriteLine("Expected: API should return incentive programs with pagination");
+            TestContext.WriteLine("Parameters: none");
 
             // Act
             var result = await _apiService.GetIncentiveProgramsAsync();
@@ -796,14 +796,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Retrieved {result.IncentivePrograms.Count} incentive programs");
+                TestContext.WriteLine($"Result: Retrieved {result.IncentivePrograms.Count} incentive programs");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected incentive programs response");
             // Count may be 0 if no programs, so no strict assertion on count
 
-            Console.WriteLine("✅ PASSED: Incentive programs retrieved successfully");
+            TestContext.WriteLine("Result: GetIncentiveProgramsAsync completed successfully.");
         }
 
         /// <summary>
@@ -814,9 +814,9 @@ namespace KalshiBotTests
         [Test]
         public async Task GetEventMetadataAsync_WithValidEventTicker_ReturnsMetadata()
         {
-            Console.WriteLine("🧪 Testing: Get Event Metadata");
-            Console.WriteLine("   Expected: API should return metadata for specified event");
-            Console.WriteLine($"   Parameters: event_ticker={_testEventTicker}");
+            TestContext.WriteLine("Testing GetEventMetadataAsync with a valid event ticker.");
+            TestContext.WriteLine("Expected: API should return metadata for specified event");
+            TestContext.WriteLine($"Parameters: event_ticker={_testEventTicker}");
 
             // Act
             var result = await _apiService.GetEventMetadataAsync(_testEventTicker);
@@ -824,14 +824,14 @@ namespace KalshiBotTests
             // Output details
             if (result != null)
             {
-                Console.WriteLine($"   Result: Competition={result.Competition}, SettlementSources={result.SettlementSources.Count}");
+                TestContext.WriteLine($"Result: Competition={result.Competition}, SettlementSources={result.SettlementSources.Count}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected event metadata response");
             Assert.That(result.SettlementSources, Is.Not.Null.And.Not.Empty, "Expected SettlementSources to be populated");
 
-            Console.WriteLine("✅ PASSED: Event metadata retrieved successfully");
+            TestContext.WriteLine("Result: GetEventMetadataAsync completed successfully.");
         }
 
     }
