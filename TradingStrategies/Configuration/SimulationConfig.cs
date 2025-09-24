@@ -17,14 +17,6 @@ namespace TradingStrategies.Configuration
         public const string SectionName = "Simulator:Simulation";
 
         /// <summary>
-        /// Trading fee rate applied to all market executions in simulation.
-        /// Represents the taker fee percentage charged by the exchange.
-        /// Expressed as decimal (e.g., 0.07 for 7%).
-        /// </summary>
-        [Required(ErrorMessage = "The 'TakerFeeRate' is missing in the configuration.")]
-        public double TakerFeeRate { get; set; }
-
-        /// <summary>
         /// Minimum valid price for YES/NO contracts in the simulation.
         /// Used for price validation and order book bounds checking.
         /// </summary>

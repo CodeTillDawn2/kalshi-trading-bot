@@ -21,7 +21,7 @@ namespace TradingStrategies.Trading.Overseer
     /// It applies realistic trading fees and ensures FIFO order matching for accurate simulation results.
     /// Key simulation mechanics include:
     /// - Delta-based order book updates for efficiency
-    /// - Configurable fee calculation (default 0.07% taker fees)
+    /// - Accurate Kalshi fee calculation using parabolic formula
     /// - Position and cash tracking with proper accounting
     /// - Resting order management with expiration handling
     /// - Combo actions (take then rest) for advanced strategies
@@ -235,7 +235,7 @@ namespace TradingStrategies.Trading.Overseer
         ///
         /// Key implementation details for developers:
         /// - Uses FIFO order matching for realistic fill simulation
-        /// - Applies configurable taker fees (default 0.07%) on all market executions
+        /// - Applies accurate Kalshi taker fees using 0.07 * P * (1-P) formula on all market executions
         /// - Handles position direction (positive = long, negative = short)
         /// - Manages resting orders with expiration and proper cleanup
         /// - Prevents invalid states (insufficient cash, invalid prices)
@@ -265,6 +265,7 @@ namespace TradingStrategies.Trading.Overseer
             int qty = (action == ActionType.Exit) ? Math.Abs(Position) : _config.DefaultMarketOrderQuantity;
             int remainingQuantity = qty;
             double totalCost = 0;
+            double totalFee = 0;
 
             var bookToReduce = longSide ? SimulatedBook.NoBids : SimulatedBook.YesBids;
 
@@ -279,6 +280,7 @@ namespace TradingStrategies.Trading.Overseer
                 int fill = Math.Min(remainingQuantity, depth);
                 double levelPrice = LevelPriceFunc(p);
                 totalCost += fill * levelPrice;
+                totalFee += fill * (0.07 * levelPrice * (1.0 - levelPrice));
                 SimulatedBook.ReduceDepth(bookToReduce, p, fill);
                 remainingQuantity -= fill;
             }
@@ -311,7 +313,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // taker fees
-            tempCash -= _config.TakerFeeRate * totalCost;
+            tempCash -= totalFee;
 
             int posDelta = longSide ? filled : -filled;
             tempPosition += posDelta;
