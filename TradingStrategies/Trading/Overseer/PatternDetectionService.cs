@@ -226,13 +226,13 @@ namespace TradingStrategies.Trading.Overseer
         /// Filters patterns based on the configured pattern types.
         /// </summary>
         /// <param name="patterns">The raw detected patterns dictionary.</param>
-        /// <param name="allowedTypes">The list of allowed pattern types. If empty, all patterns are allowed.</param>
+        /// <param name="allowedTypes">The array of allowed pattern types. If contains "All", all patterns are allowed.</param>
         /// <returns>Filtered patterns dictionary.</returns>
         private Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> FilterPatternsByTypes(
             Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> patterns,
-            List<string> allowedTypes)
+            string[] allowedTypes)
         {
-            if (allowedTypes == null || allowedTypes.Count == 0)
+            if (allowedTypes == null || allowedTypes.Length == 0 || allowedTypes.Contains("All"))
             {
                 return patterns;
             }

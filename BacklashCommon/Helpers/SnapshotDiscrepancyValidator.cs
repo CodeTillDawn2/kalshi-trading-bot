@@ -76,8 +76,8 @@ namespace BacklashCommon.Helpers
                 result.IsValid = false;
             }
 
-            // Check if best prices overlap (BestYesBid >= BestYesAsk, indicating invalid market state)
-            if (snapshot.BestYesBid != 0 && snapshot.BestNoBid != 0 && snapshot.BestYesBid >= snapshot.BestYesAsk)
+            // Check if best prices overlap (BestYesBid >= BestNoBid, indicating invalid market state)
+            if (snapshot.BestYesBid != 0 && snapshot.BestNoBid != 0 && snapshot.BestYesBid >= snapshot.BestNoBid)
             {
                 result.DoPricesOverlap = true;
                 result.IsValid = false;

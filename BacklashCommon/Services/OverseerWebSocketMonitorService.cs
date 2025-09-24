@@ -42,9 +42,9 @@ namespace BacklashCommon.Services
             IServiceScopeFactory scopeFactory)
         {
             CancellationToken = _cancellationTokenSource.Token;
-            _scopeFactory = scopeFactory;
-            _webSocketClient = webSocketClient;
-            _logger = logger;
+            _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+            _webSocketClient = webSocketClient ?? throw new ArgumentNullException(nameof(webSocketClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _logger.LogDebug("OverseerWebSocketMonitorService instance created");
         }
 
@@ -215,6 +215,7 @@ namespace BacklashCommon.Services
                         _exchangeStatus = status.exchange_active;
                         _tradingStatus = status.trading_active;
                         _logger.LogDebug("Updated exchange status to {Status} and trading status to {tradingStatus}", _exchangeStatus, _tradingStatus);
+                        _isConnected = _webSocketClient.IsConnected();
 
                         if (status.exchange_active && !_isConnected)
                         {

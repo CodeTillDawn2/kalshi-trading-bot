@@ -135,10 +135,10 @@ namespace BacklashOverseer
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics
                 );
-                // Disable market-specific channels for overseer
-                client.DisableChannel(KalshiConstants.ScriptType_Feed_Orderbook);
-                client.DisableChannel(KalshiConstants.ScriptType_Feed_Ticker);
-                client.DisableChannel(KalshiConstants.ScriptType_Feed_Trade);
+                // Enable required channels for overseer (fill and lifecycle channels)
+                client.EnableChannel(KalshiConstants.ScriptType_Feed_Fill);
+                client.EnableChannel(KalshiConstants.ScriptType_Feed_Lifecycle);
+                client.EnableChannel(KalshiConstants.ScriptType_Feed_Event_Lifecycle);
                 return client;
             });
             services.AddScoped<ISqlDataService>(serviceProvider =>

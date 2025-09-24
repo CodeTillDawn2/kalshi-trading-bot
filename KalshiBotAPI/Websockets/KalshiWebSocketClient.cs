@@ -527,7 +527,7 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         public bool IsChannelEnabled(string channel)
         {
-            return _enabledChannels.GetOrAdd(channel, true); // Default to true if not set
+            return _enabledChannels.GetOrAdd(channel, false); // Default to false if not set
         }
 
         /// <summary>
@@ -581,15 +581,16 @@ namespace KalshiBotAPI.Websockets
         private void InitializeChannelStates()
         {
             // Initialize channels with appropriate default states
-            // Non-market-specific channels that should be enabled by default
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Fill] = true;
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Lifecycle] = true;
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Event_Lifecycle] = true;
+            // All channels should be disabled by default for security
+            // Non-market-specific channels
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Fill] = false;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Lifecycle] = false;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Event_Lifecycle] = false;
 
-            // Market-specific channels that should be enabled by default
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Orderbook] = true;
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Ticker] = true;
-            _enabledChannels[KalshiConstants.ScriptType_Feed_Trade] = true;
+            // Market-specific channels
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Orderbook] = false;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Ticker] = false;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Trade] = false;
         }
 
         public async Task StartReceivingAsync()

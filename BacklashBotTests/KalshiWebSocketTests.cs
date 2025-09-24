@@ -969,8 +969,9 @@ namespace BacklashBotTests
         {
             TestContext.WriteLine("Testing that connecting to the WebSocket properly initializes all components.");
             // Arrange
-            _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
-            _connectionManagerMock.Setup(cm => cm.IsConnected()).Returns(true);
+            bool isConnected = false;
+            _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask).Callback(() => isConnected = true);
+            _connectionManagerMock.Setup(cm => cm.IsConnected()).Returns(() => isConnected);
 
             // Act
             await _client.ConnectAsync();

@@ -5,7 +5,7 @@ namespace TradingStrategies.Configuration
     /// <summary>
     /// Configuration options for pattern detection parameters.
     /// </summary>
-    public class PatternDetectionServiceConfig
+    public class PatternDetectionServiceConfig : IValidatableObject
     {
         /// <summary>
         /// The configuration section name for PatternDetectionServiceConfig.
@@ -19,10 +19,21 @@ namespace TradingStrategies.Configuration
         public int LookbackWindow { get; set; }
 
         /// <summary>
-        /// The types of patterns to detect. If empty, all patterns are detected.
+        /// The types of patterns to detect. Use ["All"] to detect all patterns, or specify a list of pattern names.
         /// </summary>
         [Required(ErrorMessage = "The 'PatternTypes' is missing in the configuration.")]
-        public List<string> PatternTypes { get; set; } = null!;
+        public string[] PatternTypes { get; set; } = null!;
+
+        /// <summary>
+        /// Validates the configuration.
+        /// </summary>
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (PatternTypes.Contains("All") && PatternTypes.Length > 1)
+            {
+                yield return new ValidationResult("If 'All' is specified in PatternTypes, it must be the only entry.", new[] { nameof(PatternTypes) });
+            }
+        }
 
         /// <summary>
         /// Minimum price change threshold for significance check.

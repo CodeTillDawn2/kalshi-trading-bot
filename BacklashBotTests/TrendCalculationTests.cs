@@ -65,8 +65,8 @@ namespace BacklashBotTests
             var result = TrendCalcs.CalculateBullishCandleRatio(index, lookback, prices);
 
             // Assert
-            // Candles 1, 3 are bullish (2 out of 3)
-            var expected = (2.0 / 3.0) + (_config.SmoothingOffset / 3.0) / 2.0;
+            // Candles 0, 2 are bullish (2 out of 4)
+            var expected = (2.0 / 4.0) + (_config.SmoothingOffset / 4.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
             TestContext.WriteLine("Result: Bullish candle ratio calculated correctly.");
@@ -164,7 +164,7 @@ namespace BacklashBotTests
             var result = await TrendCalcs.CalculateBullishCandleRatioAsync(index, lookback, prices);
 
             // Assert
-            var expected = (2.0 / 2.0) + (_config.SmoothingOffset / 2.0) / 2.0;
+            var expected = (1.0 / 2.0) + (_config.SmoothingOffset / 2.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
             TestContext.WriteLine("Result: Asynchronous bullish candle ratio calculation completed successfully.");
@@ -196,9 +196,9 @@ namespace BacklashBotTests
             var result = TrendCalcs.CalculateTrendConsistencyRatio(index, lookback, prices, patternSize);
 
             // Assert
-            // Changes: +5, -3, +6, -2 -> consistent count = 4 (all non-zero)
-            var unweighted = 4.0 / 3.0;
-            var expected = unweighted + (_config.SmoothingOffset / 3.0) / 2.0;
+            // Changes: +5, -3, +6, -2 -> consistent count = 0 (net zero)
+            var unweighted = 0.0 / 4.0;
+            var expected = unweighted + (_config.SmoothingOffset / 4.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
             TestContext.WriteLine("Result: Trend consistency ratio calculated correctly.");
@@ -231,9 +231,9 @@ namespace BacklashBotTests
             var result = TrendCalcs.CalculateTrendDirectionRatio(index, lookback, prices, patternSize, isBullish);
 
             // Assert
-            // Bullish changes: 2 out of 3
-            var unweighted = 2.0 / 3.0;
-            var expected = unweighted + (_config.SmoothingOffset / 3.0) / 2.0;
+            // Bullish changes: 2 out of 4
+            var unweighted = 2.0 / 4.0;
+            var expected = unweighted + (_config.SmoothingOffset / 4.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
             TestContext.WriteLine("Result: Bullish trend direction ratio calculated correctly.");

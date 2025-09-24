@@ -71,7 +71,14 @@ namespace BacklashOverseer
             _scopeFactory = scopeFactory;
             _logger = logger;
             _hubContext = hubContext;
-            _config = config.Value;
+            _config = config?.Value ?? new OverseerConfig
+            {
+                ApiFetchIntervalMinutes = 10,
+                SystemInfoLogIntervalMinutes = 1,
+                SignalRBatchSize = 10,
+                BrainBatchSize = 50,
+                EnableOverseerPerformanceMetrics = true
+            };
             _performanceMetrics = performanceMetrics;
 
             // Initialize configuration-based intervals

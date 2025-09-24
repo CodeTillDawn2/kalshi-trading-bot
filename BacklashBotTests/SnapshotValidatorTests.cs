@@ -136,7 +136,7 @@ namespace BacklashBotTests
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 10,
+                BestYesBid = 8,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -173,17 +173,17 @@ namespace BacklashBotTests
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 10,
+                BestYesBid = 8,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
                 VelocityPerMinute_Bottom_Yes_Bid = 1.0,
-                OrderVolumePerMinute_YesBid = 0.6,
-                TradeVolumePerMinute_Yes = 0.6,
+                OrderVolumePerMinute_YesBid = 0.8,
+                TradeVolumePerMinute_Yes = 0.8,
                 VelocityPerMinute_Top_No_Bid = 1.0,
                 VelocityPerMinute_Bottom_No_Bid = 1.0,
-                OrderVolumePerMinute_NoBid = 0.6,
-                TradeVolumePerMinute_No = 0.6
+                OrderVolumePerMinute_NoBid = 0.8,
+                TradeVolumePerMinute_No = 0.8
             };
 
             // Act
@@ -210,7 +210,7 @@ namespace BacklashBotTests
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 10,
+                BestYesBid = 8,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -247,7 +247,7 @@ namespace BacklashBotTests
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 10,
+                BestYesBid = 8,
                 BestNoBid = 9,
                 ChangeMetricsMature = false,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,

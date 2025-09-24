@@ -133,7 +133,7 @@ namespace BacklashOverseer
             _logger = logger;
             _scopeFactory = scopeFactory;
             _brainService = brainService;
-            _config = config.Value;
+            _config = config?.Value ?? new OverseerHubConfig();
             _performanceMetrics = performanceMetrics;
         }
 
@@ -148,11 +148,18 @@ namespace BacklashOverseer
                 _connectedClients.Add(Context.ConnectionId);
             }
 
-            var httpContext = Context.GetHttpContext();
             var ipAddress = "unknown";
-            if (httpContext != null)
+            try
             {
-                ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                var httpContext = Context.GetHttpContext();
+                if (httpContext != null)
+                {
+                    ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                }
+            }
+            catch (NullReferenceException)
+            {
+                // Handle case in unit tests where HttpContext is not available
             }
 
             _logger.LogInformation("Client connected: {ConnectionId} from IP: {IPAddress}. Total clients: {ClientCount}",
@@ -207,6 +214,16 @@ namespace BacklashOverseer
                 _connectedClients.Clear();
                 _clientInfo.Clear();
             }
+        }
+
+        /// <summary>
+        /// Sets client info for testing purposes.
+        /// </summary>
+        /// <param name="connectionId">The connection ID.</param>
+        /// <param name="clientInfo">The client info.</param>
+        public static void SetClientInfoForTesting(string connectionId, ClientInfo clientInfo)
+        {
+            _clientInfo[connectionId] = clientInfo;
         }
 
         /// <summary>

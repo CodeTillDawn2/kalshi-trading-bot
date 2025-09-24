@@ -34,7 +34,6 @@ namespace TradingStrategies.Extensions
         public static CandleMids[] ToCandleMids(
             this IList<PseudoCandlestick> candles,
             string marketTicker,
-            PseudoCandlestickExtensionsConfig config = null,
             ILogger logger = null)
         {
             if (candles == null || candles.Count < 2)
@@ -60,7 +59,7 @@ namespace TradingStrategies.Extensions
                     Close = curr.MidClose,
                     High = curr.MidHigh,
                     Low = curr.MidLow,
-                    Volume = config != null ? Math.Round((double)curr.Volume, config.VolumePrecisionDigits) : (double)curr.Volume
+                    Volume = Math.Round((double)curr.Volume, 2) 
                 });
             }
 

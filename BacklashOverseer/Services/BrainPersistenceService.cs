@@ -155,7 +155,7 @@ namespace BacklashOverseer.Services
         /// This provides access to the complete set of brain configurations and states.
         /// </summary>
         /// <returns>An enumerable collection of all BrainPersistence objects.</returns>
-        public IEnumerable<BrainPersistence> GetAllBrains()
+        public virtual IEnumerable<BrainPersistence> GetAllBrains()
         {
             var stopwatch = Stopwatch.StartNew();
             try

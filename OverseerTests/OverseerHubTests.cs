@@ -208,19 +208,6 @@ namespace OverseerTests
             ), Times.Once);
         }
 
-        /// <summary>
-        /// Tests the Handshake method with valid parameters.
-        /// Verifies that client information is stored and authentication token is generated.
-        /// Note: This test is removed due to SignalR extension method mocking limitations.
-        /// </summary>
-        [Test]
-        [Ignore("SignalR extension methods cannot be mocked with Moq")]
-        public async Task Handshake_ValidParameters_StoresClientAndReturnsToken()
-        {
-            // This test cannot be implemented due to Moq limitations with extension methods
-            Assert.Pass("Test skipped due to mocking limitations");
-        }
-
 
         /// <summary>
         /// Tests the ProcessCheckIn method with valid check-in data.
@@ -319,6 +306,14 @@ namespace OverseerTests
             var callerMock = new Mock<ISingleClientProxy>();
             clientsMock.Setup(x => x.Caller).Returns(callerMock.Object);
             hub.SetClients(clientsMock.Object);
+
+            // Set up client info to pass the unregistered check
+            OverseerHub.SetClientInfoForTesting("test-connection-id", new OverseerHub.ClientInfo
+            {
+                ClientId = "test-client",
+                ClientName = "test-name",
+                ClientType = "test-type"
+            });
 
             // Act
             await hub.TestProcessCheckIn(null);

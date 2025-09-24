@@ -517,19 +517,24 @@ builder.Services.AddScoped<ISubscriptionManager>(sp => new KalshiBotAPI.Websocke
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
 ));
-builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
-    sp.GetRequiredService<IOptions<KalshiConfig>>(),
-    sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
-    sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
-    sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IBotReadyStatus>(),
-    sp.GetRequiredService<ISqlDataService>(),
-    sp.GetRequiredService<IWebSocketConnectionManager>(),
-    sp.GetRequiredService<ISubscriptionManager>(),
-    sp.GetRequiredService<IMessageProcessor>(),
-    sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
-    sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
-));
+builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
+    var client = new KalshiWebSocketClient(
+        sp.GetRequiredService<IOptions<KalshiConfig>>(),
+        sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
+        sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
+        sp.GetRequiredService<IStatusTrackerService>(),
+        sp.GetRequiredService<IBotReadyStatus>(),
+        sp.GetRequiredService<ISqlDataService>(),
+        sp.GetRequiredService<IWebSocketConnectionManager>(),
+        sp.GetRequiredService<ISubscriptionManager>(),
+        sp.GetRequiredService<IMessageProcessor>(),
+        sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+        sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
+    );
+    // Enable all channels for BacklashBot
+    client.EnableAllChannels();
+    return client;
+});
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
     new OvernightActivitiesHelper(
