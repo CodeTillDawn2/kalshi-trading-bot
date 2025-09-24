@@ -17,7 +17,7 @@ namespace OverseerBotShared.Tests
             Converters = { new ObjectDictionaryConverter() }
         };
 
-        [Fact]
+        [Fact(DisplayName = "End-to-end CheckInData flow: simulates SignalR transmission, verifies exact structure maintained")]
         public void EndToEnd_CheckInDataFlow_ShouldMaintainExactStructure()
         {
             // Arrange - Simulate what BacklashBot would send
@@ -87,7 +87,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.IsWebSocketConnected, receivedData.IsWebSocketConnected);
         }
 
-        [Fact]
+        [Fact(DisplayName = "End-to-end CheckInResponse flow: simulates SignalR transmission, verifies exact structure maintained")]
         public void EndToEnd_CheckInResponseFlow_ShouldMaintainExactStructure()
         {
             // Arrange - Simulate what Overseer would send back
@@ -113,7 +113,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalResponse.Timestamp, receivedResponse.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "End-to-end PerformanceMetrics flow: simulates SignalR transmission, verifies exact structure maintained")]
         public void EndToEnd_PerformanceMetricsFlow_ShouldMaintainExactStructure()
         {
             // Arrange - Simulate performance metrics transmission
@@ -166,7 +166,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalMetrics.ConfigurableMetrics, receivedMetrics.ConfigurableMetrics);
         }
 
-        [Fact]
+        [Fact(DisplayName = "Transmission with nulls: simulates SignalR with null values, verifies correct handling")]
         public void Transmission_WithNullValues_ShouldHandleCorrectly()
         {
             // Arrange - Test null value handling in transmission
@@ -217,7 +217,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(0, receivedData.TargetWatches);
         }
 
-        [Fact]
+        [Fact(DisplayName = "Multiple transmissions: simulates sequential SignalR sends, verifies consistency across all")]
         public void MultipleSequentialTransmissions_ShouldMaintainConsistency()
         {
             // Arrange - Test multiple transmissions
@@ -278,7 +278,7 @@ namespace OverseerBotShared.Tests
             }
         }
 
-        [Fact]
+        [Fact(DisplayName = "Error response transmission: simulates failed check-in SignalR, verifies error structure maintained")]
         public void ErrorResponseTransmission_ShouldMaintainExactStructure()
         {
             // Arrange - Test error response transmission
@@ -302,7 +302,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(errorResponse.Timestamp, receivedResponse.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "DTO property validation: creates and validates CheckInData/CheckInResponse properties, ensures integrity")]
         public void DTO_PropertyValidation_ShouldEnsureDataIntegrity()
         {
             // Test CheckInData validation
@@ -343,7 +343,7 @@ namespace OverseerBotShared.Tests
             Assert.True(checkInResponse.Timestamp > DateTime.MinValue);
         }
 
-        [Fact]
+        [Fact(DisplayName = "Complex nested structures: multiple round-trips, verifies integrity and consistent JSON")]
         public void ComplexNestedDataStructures_ShouldMaintainIntegrity()
         {
             // Arrange - Test complex nested structures

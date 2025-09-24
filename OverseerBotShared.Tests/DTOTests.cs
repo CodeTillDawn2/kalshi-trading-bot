@@ -4,7 +4,7 @@ namespace BacklashBot.Shared.Tests
 {
     public class DTOTests
     {
-        [Fact]
+        [Fact(DisplayName = "CheckInData: initializes with test values, verifies all properties match")]
         public void CheckInData_ShouldInitializeCorrectly()
         {
             // Arrange & Act
@@ -65,7 +65,7 @@ namespace BacklashBot.Shared.Tests
             Assert.True(checkInData.IsWebSocketConnected);
         }
 
-        [Fact]
+        [Fact(DisplayName = "CheckInResponse: initializes with success/message/tickers/timestamp, verifies values")]
         public void CheckInResponse_ShouldInitializeCorrectly()
         {
             // Arrange
@@ -87,7 +87,7 @@ namespace BacklashBot.Shared.Tests
             Assert.NotEqual(default, response.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "TargetTickersConfirmationResponse: initializes with success/brain/message/timestamp, verifies values")]
         public void TargetTickersConfirmationResponse_ShouldInitializeCorrectly()
         {
             // Arrange & Act
@@ -106,7 +106,7 @@ namespace BacklashBot.Shared.Tests
             Assert.NotEqual(default, response.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "PerformanceMetricsData: initializes with brain/timestamp/metrics, verifies values")]
         public void PerformanceMetricsData_ShouldInitializeCorrectly()
         {
             // Arrange
@@ -145,7 +145,7 @@ namespace BacklashBot.Shared.Tests
             Assert.NotEqual(default, metrics.MessageProcessorLastDuplicateWarningTime);
         }
 
-        [Fact]
+        [Fact(DisplayName = "BrainStatusData: initializes with comprehensive status data, verifies all properties")]
         public void BrainStatusData_ShouldInitializeCorrectly()
         {
             // Arrange
@@ -225,7 +225,7 @@ namespace BacklashBot.Shared.Tests
             Assert.Equal(watchedMarkets, brainStatus.WatchedMarkets);
         }
 
-        [Fact]
+        [Fact(DisplayName = "MarketWatchData: initializes with market/brain/interest data, verifies values")]
         public void MarketWatchData_ShouldInitializeCorrectly()
         {
             // Arrange & Act
@@ -248,7 +248,7 @@ namespace BacklashBot.Shared.Tests
             Assert.Equal(89.3, marketWatch.AverageWebsocketEventsPerMinute);
         }
 
-        [Fact]
+        [Fact(DisplayName = "HandshakeResponse: initializes with success/token/message, verifies values")]
         public void HandshakeResponse_ShouldInitializeCorrectly()
         {
             // Arrange & Act
@@ -265,7 +265,7 @@ namespace BacklashBot.Shared.Tests
             Assert.Equal("Handshake successful", response.Message);
         }
 
-        [Fact]
+        [Fact(DisplayName = "PerformanceMetricsResponse: initializes with success/message/timestamp, verifies values")]
         public void PerformanceMetricsResponse_ShouldInitializeCorrectly()
         {
             // Arrange & Act
@@ -282,7 +282,7 @@ namespace BacklashBot.Shared.Tests
             Assert.NotEqual(default, response.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "MessageResponse: initializes with success/type/timestamp/message, verifies values")]
         public void MessageResponse_ShouldInitializeCorrectly()
         {
             // Arrange & Act

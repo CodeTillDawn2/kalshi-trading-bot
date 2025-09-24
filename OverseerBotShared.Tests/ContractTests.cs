@@ -63,7 +63,7 @@ namespace OverseerBotShared.Tests
             Converters = { new ObjectDictionaryConverter() }
         };
 
-        [Fact]
+        [Fact(DisplayName = "CheckInData round-trip: serialize/deserialize maintains exact structure")]
         public void CheckInData_RoundTripSerialization_ShouldMaintainExactStructure()
         {
             // Arrange - Create a CheckInData with specific values
@@ -131,7 +131,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.IsWebSocketConnected, deserializedData.IsWebSocketConnected);
         }
 
-        [Fact]
+        [Fact(DisplayName = "CheckInResponse round-trip: serialize/deserialize maintains exact structure")]
         public void CheckInResponse_RoundTripSerialization_ShouldMaintainExactStructure()
         {
             // Arrange
@@ -155,7 +155,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalResponse.Timestamp, deserializedResponse.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "PerformanceMetricsData round-trip: serialize/deserialize maintains exact structure")]
         public void PerformanceMetricsData_RoundTripSerialization_ShouldMaintainExactStructure()
         {
             // Arrange
@@ -208,7 +208,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalMetrics.ConfigurableMetrics, deserializedMetrics.ConfigurableMetrics);
         }
 
-        [Fact]
+        [Fact(DisplayName = "TargetTickersConfirmationResponse round-trip: serialize/deserialize maintains exact structure")]
         public void TargetTickersConfirmationResponse_RoundTripSerialization_ShouldMaintainExactStructure()
         {
             // Arrange
@@ -232,7 +232,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalResponse.Timestamp, deserializedResponse.Timestamp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "DTOs with null values: serialize/deserialize correctly handles nulls")]
         public void DTOs_WithNullValues_ShouldSerializeDeserializeCorrectly()
         {
             // Arrange - Test null handling
@@ -281,7 +281,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.IsStartingUp, deserializedData.IsStartingUp);
         }
 
-        [Fact]
+        [Fact(DisplayName = "DTOs with complex structures: multiple round-trips maintain integrity")]
         public void DTOs_WithComplexNestedStructures_ShouldMaintainIntegrity()
         {
             // Arrange - Test complex nested structures
@@ -333,7 +333,7 @@ namespace OverseerBotShared.Tests
             Assert.Equal(json1, json2);
         }
 
-        [Fact]
+        [Fact(DisplayName = "DTO property order: different orders produce identical JSON and deserialize correctly")]
         public void DTO_PropertyOrder_ShouldNotAffectDeserialization()
         {
             // Arrange - Create two identical objects with different property orders in JSON
