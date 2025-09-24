@@ -20,7 +20,7 @@ namespace KalshiBotTests
         private static IConfiguration GetConfiguration()
         {
             return new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "BacklashBot"))
+                .SetBasePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..","..","..","..", "BacklashBot"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
         }
@@ -51,6 +51,16 @@ namespace KalshiBotTests
             ValidateCalculationConfig(config);
             return Options.Create(config);
         }
+        /// <summary>
+        /// Creates and returns an IOptions&lt;TradingSnapshotServiceConfig&gt; instance loaded from the appsettings.json file.
+        /// </summary>
+        /// <returns>An IOptions&lt;TradingSnapshotServiceConfig&gt; instance configured from the configuration file.</returns>
+        public static IOptions<BacklashCommon.Configuration.TradingSnapshotServiceConfig> GetTradingSnapshotServiceConfig()
+        {
+            var config = GetConfiguration().GetSection(BacklashCommon.Configuration.TradingSnapshotServiceConfig.SectionName).Get<BacklashCommon.Configuration.TradingSnapshotServiceConfig>();
+            return Options.Create(config);
+        }
+
 
 
         /// <summary>
