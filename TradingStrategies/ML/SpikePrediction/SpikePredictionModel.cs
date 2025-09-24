@@ -230,7 +230,7 @@ namespace TradingStrategies.ML.SpikePrediction
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Error loading snapshots for market {Ticker}", ticker);
+                        _logger.LogWarning("Error loading snapshots for market {Ticker}. Exception: {ExceptionMessage}, Inner: {InnerExceptionMessage}", ticker, ex.Message, ex.InnerException?.Message ?? "None");
                     }
 
                     return new { Ticker = ticker, Snapshots = new List<MarketSnapshot>() };
@@ -327,7 +327,7 @@ namespace TradingStrategies.ML.SpikePrediction
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error extracting features at index {Index}", currentIndex);
+                _logger.LogWarning("Error extracting features at index {Index}. Exception: {ExceptionMessage}, Inner: {InnerExceptionMessage}", currentIndex, ex.Message, ex.InnerException?.Message ?? "None");
                 return null;
             }
         }
@@ -562,7 +562,7 @@ namespace TradingStrategies.ML.SpikePrediction
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error extracting features from recent snapshots, using current snapshot only");
+                _logger.LogWarning("Error extracting features from recent snapshots, using current snapshot only. Exception: {ExceptionMessage}, Inner: {InnerExceptionMessage}", ex.Message, ex.InnerException?.Message ?? "None");
 
                 // Fallback to current snapshot only
                 return new SpikePredictionData

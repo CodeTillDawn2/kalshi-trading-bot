@@ -54,7 +54,7 @@ namespace TradingStrategies.Strategies.Strats
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Could not load ML model, strategy will return None actions until model is trained");
+                _logger.LogWarning("Could not load ML model, strategy will return None actions until model is trained. Exception: {ExceptionMessage}, Inner: {InnerExceptionMessage}", ex.Message, ex.InnerException?.Message ?? "None");
             }
         }
 

@@ -323,7 +323,7 @@ namespace BacklashBot.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Broadcast attempt {Attempt} failed", attempt);
+                        _logger.LogWarning(ex, "Broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                         if (attempt < _maxRetryAttempts)
                         {
                             await Task.Delay(_retryDelay, cancellationToken);
@@ -661,7 +661,7 @@ namespace BacklashBot.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Performance metrics broadcast attempt {Attempt} failed", attempt);
+                        _logger.LogWarning(ex, "Performance metrics broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                         if (attempt < _maxRetryAttempts)
                         {
                             await Task.Delay(_retryDelay, cancellationToken);

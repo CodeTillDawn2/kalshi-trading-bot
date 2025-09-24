@@ -1316,9 +1316,9 @@ namespace BacklashBot.Management
                     return;
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                _logger.LogWarning("AnalyzeMarketAsync was cancelled for {MarketTicker}", marketTicker);
+                _logger.LogWarning("AnalyzeMarketAsync was cancelled for {MarketTicker}. Exception: {ExceptionMessage}, Inner: {InnerExceptionMessage}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
             }
             catch (Exception ex)
             {

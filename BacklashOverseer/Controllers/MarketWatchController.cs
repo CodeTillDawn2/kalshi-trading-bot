@@ -357,7 +357,7 @@ namespace BacklashOverseer.Controllers
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogWarning(ex, "Failed to retrieve log data for brain instance {BrainInstanceName}", brainInstanceName);
+                                    _logger.LogWarning(ex, "Failed to retrieve log data for brain instance {BrainInstanceName}. Exception: {Message}, Inner: {Inner}", brainInstanceName, ex.Message, ex.InnerException?.Message ?? "None");
                                 }
                             }
                         }

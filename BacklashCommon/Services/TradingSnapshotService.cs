@@ -307,7 +307,7 @@ namespace BacklashCommon.Services
             {
                 stopwatch.Stop();
                 Interlocked.Decrement(ref _concurrentOperations);
-                _logger.LogWarning(ex, "Error saving snapshot at {Timestamp} after {ElapsedMilliseconds}ms", cacheSnapshot.Timestamp, stopwatch.ElapsedMilliseconds);
+                _logger.LogWarning(ex, "Error saving snapshot at {Timestamp} after {ElapsedMilliseconds}ms. Exception: {Message}, Inner: {Inner}", cacheSnapshot.Timestamp, stopwatch.ElapsedMilliseconds, ex.Message, ex.InnerException?.Message ?? "None");
                 return new List<string>();
             }
         }

@@ -359,7 +359,7 @@ namespace BacklashOverseer
                     }
                     catch (Exception dbEx)
                     {
-                        _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}", clientId);
+                        _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}. Exception: {Message}, Inner: {Inner}", clientId, dbEx.Message, dbEx.InnerException?.Message ?? "None");
                     }
                 }
 
@@ -495,7 +495,7 @@ namespace BacklashOverseer
                     }
                     catch (Exception brainEx)
                     {
-                        _logger.LogWarning(brainEx, "Failed to update brain service for {ClientName}", clientInfo.ClientName);
+                        _logger.LogWarning(brainEx, "Failed to update brain service for {ClientName}. Exception: {Message}, Inner: {Inner}", clientInfo.ClientName, brainEx.Message, brainEx.InnerException?.Message ?? "None");
                     }
                 }
 
@@ -512,7 +512,7 @@ namespace BacklashOverseer
                     }
                     catch (Exception tickerEx)
                     {
-                        _logger.LogWarning(tickerEx, "Failed to get target tickers for {ClientName}", clientInfo.ClientName);
+                        _logger.LogWarning(tickerEx, "Failed to get target tickers for {ClientName}. Exception: {Message}, Inner: {Inner}", clientInfo.ClientName, tickerEx.Message, tickerEx.InnerException?.Message ?? "None");
                         targetTickers = new string[0];
                     }
                 }
@@ -535,7 +535,7 @@ namespace BacklashOverseer
                     }
                     catch (Exception dbEx)
                     {
-                        _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
+                        _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}. Exception: {Message}, Inner: {Inner}", clientInfo.ClientId, dbEx.Message, dbEx.InnerException?.Message ?? "None");
                     }
                 }
 
@@ -695,7 +695,7 @@ namespace BacklashOverseer
                 }
                 catch (Exception brainEx)
                 {
-                    _logger.LogWarning(brainEx, "Failed to update performance metrics for {ClientName}", clientInfo.ClientName);
+                    _logger.LogWarning(brainEx, "Failed to update performance metrics for {ClientName}. Exception: {Message}, Inner: {Inner}", clientInfo.ClientName, brainEx.Message, brainEx.InnerException?.Message ?? "None");
                 }
 
 
@@ -720,7 +720,7 @@ namespace BacklashOverseer
                     }
                     catch (Exception dbEx)
                     {
-                        _logger.LogWarning(dbEx, "Failed to log PerformanceMetrics to database for client: {ClientId}", clientInfo.ClientId);
+                        _logger.LogWarning(dbEx, "Failed to log PerformanceMetrics to database for client: {ClientId}. Exception: {Message}, Inner: {Inner}", clientInfo.ClientId, dbEx.Message, dbEx.InnerException?.Message ?? "None");
                     }
                 }
 

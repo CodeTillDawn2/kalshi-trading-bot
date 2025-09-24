@@ -66,8 +66,8 @@ namespace OverseerBotShared
         public async Task HandleReconnectionErrorAsync(Exception exception)
         {
             var classification = ClassifyError(exception);
-            _logger.LogWarning(exception, "SignalR reconnection error: {ErrorType} - {Message}",
-                classification.Type, exception.Message);
+            _logger.LogWarning(exception, "SignalR reconnection error: {ErrorType} - {Message}, Inner: {Inner}",
+                classification.Type, exception.Message, exception.InnerException?.Message ?? "None");
 
             await ApplyErrorHandlingStrategyAsync(classification, exception, "Reconnection");
         }
@@ -163,7 +163,7 @@ namespace OverseerBotShared
 
         private async Task HandleNetworkErrorAsync(Exception exception, string context)
         {
-            _logger.LogWarning("Network error in {Context}. This may indicate connectivity issues. Error: {Message}", context, exception.Message);
+            _logger.LogWarning("Network error in {Context}. This may indicate connectivity issues. Error: {Message}, Inner: {Inner}", context, exception.Message, exception.InnerException?.Message ?? "None");
             // Could implement network diagnostics here
             await Task.CompletedTask;
         }
@@ -177,7 +177,7 @@ namespace OverseerBotShared
 
         private async Task HandleTimeoutErrorAsync(Exception exception, string context)
         {
-            _logger.LogWarning("Timeout error in {Context}. The operation took too long to complete. Error: {Message}", context, exception.Message);
+            _logger.LogWarning("Timeout error in {Context}. The operation took too long to complete. Error: {Message}, Inner: {Inner}", context, exception.Message, exception.InnerException?.Message ?? "None");
             // Could implement timeout configuration adjustments here
             await Task.CompletedTask;
         }

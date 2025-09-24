@@ -282,7 +282,7 @@ namespace KalshiBotAPI.Websockets
             }
             catch (WebSocketException ex) when (ex.Message.Contains("Failed to connect WebSocket on retry"))
             {
-                _logger.LogWarning(new WebSocketRetryFailedException(ex.Message, ex), "Failed to connect to a websocket");
+                _logger.LogWarning(new WebSocketRetryFailedException(ex.Message, ex), "Failed to connect to a websocket. Exception: {Message}, Inner: {Inner}", ex.Message, ex.InnerException?.Message ?? "None");
                 if (_enableMetrics)
                 {
                     TrackConnectionFailure("WebSocketException");

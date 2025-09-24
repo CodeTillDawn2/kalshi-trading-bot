@@ -123,7 +123,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error cleaning up Parquet files in {MarketDir}", marketDir);
+                _logger.LogWarning(ex, "Error cleaning up Parquet files in {MarketDir}. Exception: {Message}, Inner: {Inner}", marketDir, ex.Message, ex.InnerException?.Message ?? "None");
             }
             return filesCleaned;
         }
@@ -243,8 +243,8 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning("Error updating last candlestick metadata for {MarketTicker}: {Message}",
-                        marketTicker, ex.Message);
+                    _logger.LogWarning("Error updating last candlestick metadata for {MarketTicker}: {Message}, Inner: {Inner}",
+                        marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
 
                 marketData.RefreshCandlestickMetadata();
@@ -264,12 +264,12 @@ namespace BacklashBot.Services
                     new CandlestickTransientFailureException(marketTicker
                     , $"Transient failure while updating candlesticks for market {marketTicker}"
                     , ex),
-                    "Transient failure while updating candlesticks for market {MarketTicker}", marketTicker);
+                    "Transient failure while updating candlesticks for market {MarketTicker}. Exception: {Message}, Inner: {Inner}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Failed to update candlesticks for {marketTicker}.", ex),
-                    "Failed to update candlesticks for {MarketTicker}", marketTicker);
+                    "Failed to update candlesticks for {MarketTicker}. Exception: {Message}, Inner: {Inner}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
             }
         }
 
@@ -349,7 +349,7 @@ namespace BacklashBot.Services
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogWarning("Error loading candlesticks for {Interval}, market {MarketTicker}: {Message}", interval, marketTicker, ex.Message);
+                                _logger.LogWarning("Error loading candlesticks for {Interval}, market {MarketTicker}: {Message}, Inner: {Inner}", interval, marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
                                 newCandlesticks = new List<CandlestickData>();
                             }
 
@@ -441,7 +441,7 @@ namespace BacklashBot.Services
                         new CandlestickTransientFailureException(marketTicker
                         , $"Transient failure while updating candlesticks in PopulateMarketDataAsync for market {marketTicker}"
                         , ex),
-                        "Transient failure while updating candlesticks in PopulateMarketDataAsync for market {market}", marketTicker);
+                        "Transient failure while updating candlesticks in PopulateMarketDataAsync for market {market}. Exception: {Message}, Inner: {Inner}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 catch (AggregateException ex)
                 {
@@ -540,7 +540,7 @@ namespace BacklashBot.Services
                     new CandlestickTransientFailureException(marketTicker
                     , $"Transient failure while populating market data for market {marketTicker}"
                     , ex),
-                    "Transient failure while populating market data for market {MarketTicker}", marketTicker);
+                    "Transient failure while populating market data for market {MarketTicker}. Exception: {Message}, Inner: {Inner}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
             }
             catch (Exception ex)
             {
@@ -992,7 +992,7 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Attempt {Attempt} failed to save Parquet file: {Message}", attempt, ex.Message);
+                    _logger.LogWarning(ex, "Attempt {Attempt} failed to save Parquet file: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                     if (attempt < maxAttempts && File.Exists(filePath))
                     {
                         await Task.Run(() => File.Delete(filePath));
@@ -1078,7 +1078,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error reading Parquet file {FilePath}: {Message}", filePath, ex.Message);
+                _logger.LogWarning(ex, "Error reading Parquet file {FilePath}: {Message}, Inner: {Inner}", filePath, ex.Message, ex.InnerException?.Message ?? "None");
                 try
                 {
                     if (File.Exists(filePath))

@@ -228,7 +228,7 @@ namespace OverseerBotShared
         {
             if (exception != null)
             {
-                _logger.LogWarning(exception, "SignalR connection closed unexpectedly");
+                _logger.LogWarning(exception, "SignalR connection closed unexpectedly. Exception: {Message}, Inner: {Inner}", exception.Message, exception.InnerException?.Message ?? "None");
             }
             else
             {

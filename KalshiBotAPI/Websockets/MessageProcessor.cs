@@ -594,9 +594,9 @@ namespace KalshiBotAPI.Websockets
                     LogPerformanceMetrics();
                 }
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
-                _logger.LogWarning("The input does not contain any JSON tokens. Raw: {RawMessage}", message);
+                _logger.LogWarning("The input does not contain any JSON tokens. Raw: {RawMessage}. Exception: {Message}, Inner: {Inner}", message, ex.Message, ex.InnerException?.Message ?? "None");
             }
             catch (Exception ex)
             {
@@ -808,7 +808,7 @@ namespace KalshiBotAPI.Websockets
                 {
                     _logger.LogError(ex, "Error processing order book update message. Could not parse market ticker.");
                 }
-                _logger.LogWarning(new OrderbookTransientFailureException(marketTickerProp.GetString(), "", ex), "Problem processing order book update message");
+                _logger.LogWarning(new OrderbookTransientFailureException(marketTickerProp.GetString(), "", ex), "Problem processing order book update message. Exception: {Message}, Inner: {Inner}", ex.Message, ex.InnerException?.Message ?? "None");
             }
         }
 
