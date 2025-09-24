@@ -145,6 +145,19 @@ namespace KalshiBotData.Data
                               IEnumerable<ISqlDataServicePerformanceMetrics> performanceMetricsReceivers)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+
+            // Validate connection string format early to prevent worker task failures
+            if (string.IsNullOrWhiteSpace(_connectionString))
+                throw new ArgumentException("Connection string cannot be empty.", nameof(connectionString));
+            try
+            {
+                _ = new SqlConnectionStringBuilder(_connectionString);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException("Invalid connection string format.", nameof(connectionString), ex);
+            }
+
             _logger = logger;
             _startTime = DateTime.UtcNow;
             _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();

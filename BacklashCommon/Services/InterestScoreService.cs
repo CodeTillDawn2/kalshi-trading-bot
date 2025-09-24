@@ -458,7 +458,7 @@ CalculateMarketInterestScoreAsync(
             catch (Exception ex)
             {
                 RecordScoringOperationTime(DateTime.UtcNow - startTime);
-                _logger.LogError(ex, "Failed to calculate MarketInterestScore for market.");
+                _logger.LogError("Failed to calculate MarketInterestScore for market. Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", ex.Message, ex.InnerException?.Message ?? "None");
                 throw;
             }
         }

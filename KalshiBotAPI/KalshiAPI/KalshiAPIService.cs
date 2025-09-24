@@ -1040,7 +1040,7 @@ namespace KalshiBotAPI.KalshiAPI
             catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
             {
                 stopwatch.Stop();
-                _logger.LogWarning(ex, "Duplicate position encountered while saving event data");
+                _logger.LogWarning("Duplicate position encountered while saving event data Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", ex.Message, ex.InnerException?.Message ?? "None");
                 return (0, 1);
             }
             catch (OperationCanceledException)

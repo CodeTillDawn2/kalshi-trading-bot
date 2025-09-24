@@ -108,7 +108,7 @@ namespace BacklashCommon.Helpers
                 catch (Exception ex)
                 {
                     if (_metricsEnabled) Interlocked.Increment(ref _errorCount);
-                    _logger.LogWarning(ex, "Failed to retrieve snapshots for market {MarketTicker}. Retrying after delay.", marketTicker);
+                    _logger.LogWarning("Failed to retrieve snapshots for market {MarketTicker}. Retrying after delay. Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
                     if (stopwatch != null)
                     {
                         stopwatch.Stop();
@@ -128,7 +128,7 @@ namespace BacklashCommon.Helpers
                     catch (Exception retryEx)
                     {
                         if (_metricsEnabled) Interlocked.Increment(ref _errorCount);
-                        _logger.LogError(retryEx, "Failed to retrieve snapshots for market {MarketTicker} after retry. Skipping.", marketTicker);
+                        _logger.LogError("Failed to retrieve snapshots for market {MarketTicker} after retry. Skipping. Exception: {retryEx.Message}. Inner: {retryEx.InnerException?.Message ?? \"None\"}", marketTicker, retryEx.Message, retryEx.InnerException?.Message ?? "None");
                         if (stopwatch != null)
                         {
                             stopwatch.Stop();

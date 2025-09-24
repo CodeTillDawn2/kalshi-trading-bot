@@ -308,7 +308,7 @@ namespace BacklashBotData.Data
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                 {
                     // Duplicate key violation - this is expected when multiple bots are running
-                    _logger?.LogWarning(ex, "Duplicate event key {EventTicker} encountered during save, continuing", dto.event_ticker);
+                    _logger?.LogWarning("Duplicate event key {EventTicker} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.event_ticker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 else
                 {
@@ -341,7 +341,7 @@ namespace BacklashBotData.Data
                     if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                     {
                         // Duplicate key violation - this is expected when multiple bots are running
-                        _logger?.LogWarning(ex, "Duplicate event key {EventTicker} encountered during save, continuing", dto.event_ticker);
+                        _logger?.LogWarning("Duplicate event key {EventTicker} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.event_ticker, ex.Message, ex.InnerException?.Message ?? "None");
                     }
                     else
                     {
@@ -486,7 +486,7 @@ namespace BacklashBotData.Data
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                 {
                     // Duplicate key violation - this is expected when multiple bots are running
-                    _logger?.LogWarning(ex, "Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                    _logger?.LogWarning("Duplicate market key {MarketTicker} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.market_ticker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 else
                 {
@@ -543,7 +543,7 @@ namespace BacklashBotData.Data
                     if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                     {
                         // Duplicate key violation - this is expected when multiple bots are running
-                        _logger?.LogWarning(ex, "Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                        _logger?.LogWarning("Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
                         failureCount++;
                     }
                     else
@@ -973,7 +973,7 @@ namespace BacklashBotData.Data
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                 {
                     // Duplicate key violation - this is expected when multiple bots are running
-                    _logger?.LogWarning(ex, "Duplicate market watch key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                    _logger?.LogWarning("Duplicate market watch key {MarketTicker} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.market_ticker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 else
                 {
@@ -1112,7 +1112,7 @@ namespace BacklashBotData.Data
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                 {
                     // Duplicate key violation - this is expected when multiple bots are running
-                    _logger?.LogWarning(ex, "Duplicate order key {OrderId} encountered during save, continuing", dto.OrderId);
+                    _logger?.LogWarning("Duplicate order key {OrderId} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.OrderId, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 else
                 {
@@ -1165,7 +1165,7 @@ namespace BacklashBotData.Data
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
                 {
                     // Duplicate key violation - this is expected when multiple bots are running
-                    _logger?.LogWarning(ex, "Duplicate snapshot key {MarketTicker} {SnapshotDate} encountered during save, continuing", dto.MarketTicker, dto.SnapshotDate);
+                    _logger?.LogWarning("Duplicate snapshot key {MarketTicker} {SnapshotDate} encountered during save, continuing. Exception: {ExceptionMessage}. Inner: {InnerMessage}", dto.MarketTicker, dto.SnapshotDate, ex.Message, ex.InnerException?.Message ?? "None");
                 }
                 else
                 {

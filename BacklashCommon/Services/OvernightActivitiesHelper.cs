@@ -524,7 +524,7 @@ namespace BacklashCommon.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to log resource usage for {Operation}", operationName);
+                _logger.LogWarning("Failed to log resource usage for {Operation} Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", operationName, ex.Message, ex.InnerException?.Message ?? "None");
             }
         }
 

@@ -769,7 +769,7 @@ namespace BacklashOverseer.Controllers
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogError(ex, "Failed to retrieve brains data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
+                _logger.LogError("Failed to retrieve brains data in {ElapsedMilliseconds}ms Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", stopwatch.ElapsedMilliseconds, ex.Message, ex.InnerException?.Message ?? "None");
                 return StatusCode(500, new { error = "Failed to retrieve brains data", details = ex.Message });
             }
         }

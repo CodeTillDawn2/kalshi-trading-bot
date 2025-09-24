@@ -469,7 +469,7 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to log brain persistence state");
+                _logger?.LogError("Failed to log brain persistence state Exception: {ex.Message}. Inner: {ex.InnerException?.Message ?? \"None\"}", ex.Message, ex.InnerException?.Message ?? "None");
             }
         }
 
