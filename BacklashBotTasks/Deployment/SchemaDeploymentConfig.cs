@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace KalshiBotTasks
+namespace BacklashBotTasks
 {
     /// <summary>
     /// Configuration options for the SchemaDeployment functionality, including deployment paths and formatting settings.

@@ -1,5 +1,6 @@
 using BacklashBot.Configuration;
 using BacklashBotData.Data;
+using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using NJsonSchema;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace KalshiBotTasks
+namespace BacklashBotTasks
 {
     /// <summary>
     /// NUnit test fixture for validating schema deployment functionality in the trading simulator.
@@ -77,11 +78,9 @@ namespace KalshiBotTasks
                 throw new InvalidOperationException("BasePath configuration is required and cannot be null or empty.");
             }
 
-            // Load configuration with configured basePath
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+            // Load configuration with configured basePath using ConfigurationHelper
+            var configBuilder = ConfigurationHelper.CreateConfigurationBuilder(basePath, Array.Empty<string>());
+            _configuration = configBuilder.Build();
 
             // Setup dependency injection
             var serviceCollection = new ServiceCollection();
@@ -141,10 +140,23 @@ namespace KalshiBotTasks
         /// and that schemas are properly versioned and stored.
         /// </remarks>
         [Test]
+        [Explicit]
         public async Task DeploySchema_InsertsSchemaRecord()
         {
-            // Act
-            await _schemaDeployment.DeploySchemaAsync();
+            TestContext.Out.WriteLine("Starting schema deployment workflow test for CacheSnapshot...");
+            TestContext.Out.WriteLine("This generates a schema, saves it to database, and validates the deployment pipeline.");
+
+            try
+            {
+                // Act
+                await _schemaDeployment.DeploySchemaAsync();
+                TestContext.Out.WriteLine("Schema deployment completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine($"Schema deployment failed: {ex.Message}");
+                throw;
+            }
 
             // Assert
             var savedSchemas = await _context.GetSnapshotSchemas();

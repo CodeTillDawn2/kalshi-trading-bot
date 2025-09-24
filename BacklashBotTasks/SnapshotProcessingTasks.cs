@@ -13,6 +13,7 @@ using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
 using BacklashDTOs;
+using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
@@ -28,16 +29,15 @@ using TradingSimulator.Strategies;
 using TradingStrategies.ML.SpikePrediction;
 
 
-namespace KalshiBotTasks
+namespace BacklashBotTasks
 {
     /// <summary>
-    /// Test fixture class for executing and validating trading simulator tasks.
-    /// This class provides comprehensive testing capabilities for overnight activities,
-    /// snapshot processing, market data validation, and discrepancy reporting.
-    /// It serves as an integration test suite for the trading bot's core operational workflows.
+    /// Test fixture class for snapshot processing and validation tasks.
+    /// This class provides testing capabilities for snapshot upgrades, schema validation,
+    /// and data integrity checks.
     /// </summary>
     [TestFixture]
-    public class ExecutableTasks
+    public class SnapshotProcessingTasks
     {
         private TradingSnapshotService _snapshotService;
         private OvernightActivitiesHelper _overnightService;
@@ -142,24 +142,14 @@ namespace KalshiBotTasks
         /// Initializes the test fixture by setting up dependency injection services,
         /// configuring application settings, and preparing mock objects for testing.
         /// This method creates a comprehensive service provider with all required dependencies
-        /// for executing trading simulator tasks and overnight activities.
+        /// for executing snapshot processing tasks.
         /// </summary>
         [SetUp]
         public void Setup()
         {
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var baseConfig = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .Build();
-
-            var configuration = new ConfigurationBuilder()
-                .AddConfiguration(baseConfig)
-                .AddSecretsConfiguration(basePath, baseConfig)
-                .Build();
-            this.config = configuration;
-
-            this.config = configuration;
+            var configBuilder = ConfigurationHelper.CreateConfigurationBuilder(basePath, Array.Empty<string>());
+            this.config = configBuilder.Build();
 
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             var apiLoggerMock = new Mock<ILogger<IKalshiAPIService>>(); // Align to IKalshiAPIService to match constructor
@@ -261,71 +251,18 @@ namespace KalshiBotTasks
 
 
         /// <summary>
-        /// Test method that executes the complete overnight task workflow.
-        /// This includes market data refresh, interest score calculations, snapshot imports,
-        /// market cleanup, and snapshot group generation.
-        /// </summary>
-        [Test]
-        public async Task ExecuteOvernightTasks()
-        {
-            var scopeFactory = _serviceProvider!.GetRequiredService<IServiceScopeFactory>();
-            await _overnightService.RunOvernightTasks(scopeFactory);
-        }
-
-        /// <summary>
-        /// Test method that generates snapshot groups from raw market data.
-        /// This process organizes snapshots into valid time periods for analysis,
-        /// filtering out invalid data and creating structured groups for trading evaluation.
-        /// </summary>
-        [Test]
-        public async Task GenerateSnapshotGroups()
-        {
-            await _snapshotGroupHelper.GenerateSnapshotGroups();
-        }
-
-        /// <summary>
-        /// Test method that removes markets from the database that have ended
-        /// but were never recorded with snapshot data. This cleanup operation
-        /// helps maintain database integrity by removing stale market entries.
-        /// </summary>
-        [Test]
-        public async Task DeleteUnrecordedMarkets()
-        {
-            await _overnightService.DeleteUnrecordedMarkets(_scopeFactory, new CancellationToken());
-        }
-
-
-        /// <summary>
-        /// Test method that removes processed snapshot data from disk storage.
-        /// This cleanup operation deletes candlestick data files for markets that have
-        /// completed their processing lifecycle, freeing up storage space.
-        /// </summary>
-        [Test]
-        public async Task DeleteProcessedSnapshots()
-        {
-            await _overnightService.DeleteProcessedSnapshots(_scopeFactory, new CancellationToken());
-        }
-
-        /// <summary>
-        /// Test method that cleans up candlestick data folders for closed markets.
-        /// This removes directories for markets that have ended to free up storage space.
-        /// </summary>
-        [Test]
-        public async Task CleanUpClosedMarketCandlesticks()
-        {
-            await _overnightService.CleanUpClosedMarketCandlesticks(_scopeFactory, new CancellationToken());
-        }
-
-
-        /// <summary>
         /// Test method that performs comprehensive snapshot upgrade and validation processing.
         /// This method processes unvalidated snapshots in batches, performs schema upgrades,
         /// validates data integrity, and generates discrepancy reports. It handles market
         /// categorization, JSON serialization updates, and comprehensive error tracking.
         /// </summary>
         [Test]
+        [Explicit]
         public async Task UpgradeSnapshots()
         {
+            TestContext.Out.WriteLine("Starting comprehensive snapshot upgrade and validation processing...");
+            TestContext.Out.WriteLine("This processes unvalidated snapshots in batches, performs schema upgrades, validates data integrity, and generates discrepancy reports.");
+
             bool performValidation = false; // Flag to enable/disable validation
             bool saveUpdatedJson = true;
             var startTime = DateTime.UtcNow;
@@ -880,93 +817,6 @@ namespace KalshiBotTasks
                 }
                 await orderbookWriter.WriteLineAsync($"Total Markets Affected: {_missingOrderbooks.Keys.Count}");
                 await orderbookWriter.WriteLineAsync($"Total Missing Orderbooks: {_missingOrderbookCount}");
-            }
-        }
-
-        /// <summary>
-        /// Test method that creates and trains the spike prediction ML model.
-        /// This method loads historical market data, trains the model using ML.NET,
-        /// evaluates performance, and saves the trained model to disk.
-        /// </summary>
-        [Test]
-        public async Task CreateSpikePredictionModel()
-        {
-            TestContext.Out.WriteLine("Starting spike prediction model creation...");
-
-            // Get available market tickers from database
-            var markets = await _dbContext.GetMarkets();
-            var marketTickers = markets
-                .Where(m => m.market_ticker != null)
-                .Select(m => m.market_ticker!)
-                .ToList();
-
-            if (!marketTickers.Any())
-            {
-                TestContext.Out.WriteLine("No market tickers found in database. Skipping model creation.");
-                return;
-            }
-
-            TestContext.Out.WriteLine($"Found {marketTickers.Count} markets for training data");
-
-            // Create model configuration
-            var config = new SpikePredictionConfig
-            {
-                SpikeThreshold = 0.15, // 15% price spike threshold
-                PredictionWindow = TimeSpan.FromMinutes(10),
-                LagMinutes = 5,
-                ModelPath = "spike_prediction_model.zip",
-                PredictionThreshold = 0.7,
-                NumberOfTrees = 100,
-                MinimumLeafSize = 10,
-                MaximumDepth = 10
-            };
-
-            // Create model instance
-            var model = new SpikePredictionModel(_spikeLoggerMock.Object, _snapshotService, config);
-
-            try
-            {
-                // Load training data
-                TestContext.Out.WriteLine("Loading training data...");
-                var trainingData = await model.LoadTrainingDataAsync(
-                    marketTickers,
-                    DateTime.UtcNow.AddDays(-30), // Last 30 days
-                    DateTime.UtcNow);
-
-                if (!trainingData.Any())
-                {
-                    TestContext.Out.WriteLine("No training data available. Skipping model training.");
-                    return;
-                }
-
-                TestContext.Out.WriteLine($"Loaded {trainingData.Count} training samples");
-
-                // Split data for training and testing
-                var splitIndex = (int)(trainingData.Count * 0.8);
-                var trainData = trainingData.Take(splitIndex).ToList();
-                var testData = trainingData.Skip(splitIndex).ToList();
-
-                TestContext.Out.WriteLine($"Training set: {trainData.Count} samples, Test set: {testData.Count} samples");
-
-                // Train model
-                TestContext.Out.WriteLine("Training model...");
-                model.TrainModel(trainData);
-
-                // Evaluate model
-                TestContext.Out.WriteLine("Evaluating model performance...");
-                model.EvaluateModel(testData);
-
-                // Save model
-                TestContext.Out.WriteLine("Saving trained model...");
-                model.SaveModel();
-
-                TestContext.Out.WriteLine("Spike prediction model creation completed successfully!");
-                TestContext.Out.WriteLine($"Model saved to: {config.ModelPath}");
-            }
-            catch (Exception ex)
-            {
-                TestContext.Out.WriteLine($"Error during model creation: {ex.Message}");
-                throw;
             }
         }
 
