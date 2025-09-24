@@ -100,20 +100,7 @@ Provides market data population and candlestick synchronization functionality.</
       <h4><a class="xref" href="BacklashBot.Services.HealthCheckService.html">HealthCheckService</a></h4>
       <section><p>Implementation of IHealthCheckService to verify dependent services are operational.</p>
 </section>
-      <h4><a class="xref" href="BacklashBot.Services.InterestScoreService.html">InterestScoreService</a></h4>
-      <section><p>Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.
-This service evaluates market attractiveness by analyzing spread characteristics, trading volume,
-liquidity patterns, and market continuity to provide quantitative scores for market selection.</p>
-<p>Features:</p>
-<ul>
-<li>Configurable cache duration for performance optimization</li>
-<li>Comprehensive performance metrics collection and monitoring</li>
-<li>Input validation for market tickers and weight parameters</li>
-<li>Thread-safe operations for concurrent access</li>
-<li>Automatic metrics logging with configurable intervals</li>
-</ul>
-</section>
-      <h4><a class="xref" href="BacklashBot.Services.KaslhiBotScopeManagerService.html">KaslhiBotScopeManagerService</a></h4>
+      <h4><a class="xref" href="BacklashBot.Services.KalshiBotScopeManagerService.html">KalshiBotScopeManagerService</a></h4>
       <section><p>Service for managing dependency injection scopes in the Kalshi trading bot system.
 This service handles the creation, initialization, and disposal of service scopes,
 ensuring proper resource management and access to scoped services throughout the application.
@@ -175,16 +162,16 @@ All calculations are designed for event-driven contracts with prices bounded bet
 Depends on CalculationConfig for indicator parameters, includes async methods for performance in high-frequency scenarios,
 and incorporates comprehensive input validation including null checks, empty list handling, and data integrity checks with warnings.</p>
 </section>
-      <h4><a class="xref" href="BacklashBot.Services.TradingSnapshotService.html">TradingSnapshotService</a></h4>
-      <section><p>Service responsible for managing trading snapshot operations, including saving market data snapshots to disk
-and loading them for analysis. This service handles snapshot validation, timing controls, and schema management
-to ensure reliable data persistence and retrieval for trading strategy evaluation.</p>
-</section>
       <h4><a class="xref" href="BacklashBot.Services.WebSocketMonitorService.html">WebSocketMonitorService</a></h4>
       <section><p>Service responsible for monitoring the Kalshi exchange status and managing WebSocket connection lifecycle.
 This service periodically checks the exchange's operational status and automatically connects/disconnects
 the WebSocket client based on exchange availability and bot initialization state. It ensures reliable
 real-time data streaming while handling connection failures and exchange downtime gracefully.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.WebSocketMonitorServiceConfig.html">WebSocketMonitorServiceConfig</a></h4>
+      <section><p>Configuration options for the WebSocketMonitorService behavior, including monitoring intervals
+and performance metrics settings. This configuration is loaded from the
+&quot;Websocket:WebSocketMonitor&quot; section of the application configuration.</p>
 </section>
 
 

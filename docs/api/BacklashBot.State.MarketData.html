@@ -126,13 +126,13 @@
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData__ctor_BacklashDTOs_Data_MarketDTO_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_Interfaces_IMarketData__TradingStrategies_Helpers_Interfaces_ITradingCalculator_BacklashBot_Services_Interfaces_IOrderbookChangeTracker_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_CalculationConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.%23ctor(BacklashDTOs.Data.MarketDTO%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.State.Interfaces.IMarketData%7D%2CTradingStrategies.Helpers.Interfaces.ITradingCalculator%2CBacklashBot.Services.Interfaces.IOrderbookChangeTracker%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.CalculationConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData__ctor_BacklashDTOs_Data_MarketDTO_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_Interfaces_IMarketData__TradingStrategies_Helpers_Interfaces_ITradingCalculator_BacklashBot_Services_Interfaces_IOrderbookChangeTracker_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_MarketServiceDataConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.%23ctor(BacklashDTOs.Data.MarketDTO%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.State.Interfaces.IMarketData%7D%2CTradingStrategies.Helpers.Interfaces.ITradingCalculator%2CBacklashBot.Services.Interfaces.IOrderbookChangeTracker%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.MarketServiceDataConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L164">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L163">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData__ctor_" data-uid="BacklashBot.State.MarketData.#ctor*"></a>
-  <h4 id="BacklashBot_State_MarketData__ctor_BacklashDTOs_Data_MarketDTO_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_Interfaces_IMarketData__TradingStrategies_Helpers_Interfaces_ITradingCalculator_BacklashBot_Services_Interfaces_IOrderbookChangeTracker_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_CalculationConfig__" data-uid="BacklashBot.State.MarketData.#ctor(BacklashDTOs.Data.MarketDTO,Microsoft.Extensions.Logging.ILogger{BacklashBot.State.Interfaces.IMarketData},TradingStrategies.Helpers.Interfaces.ITradingCalculator,BacklashBot.Services.Interfaces.IOrderbookChangeTracker,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.CalculationConfig})">MarketData(MarketDTO, ILogger&lt;IMarketData&gt;, ITradingCalculator, IOrderbookChangeTracker, IOptions&lt;CalculationConfig&gt;)</h4>
+  <h4 id="BacklashBot_State_MarketData__ctor_BacklashDTOs_Data_MarketDTO_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_Interfaces_IMarketData__TradingStrategies_Helpers_Interfaces_ITradingCalculator_BacklashBot_Services_Interfaces_IOrderbookChangeTracker_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_MarketServiceDataConfig__" data-uid="BacklashBot.State.MarketData.#ctor(BacklashDTOs.Data.MarketDTO,Microsoft.Extensions.Logging.ILogger{BacklashBot.State.Interfaces.IMarketData},TradingStrategies.Helpers.Interfaces.ITradingCalculator,BacklashBot.Services.Interfaces.IOrderbookChangeTracker,Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.MarketServiceDataConfig})">MarketData(MarketDTO, ILogger&lt;IMarketData&gt;, ITradingCalculator, IOrderbookChangeTracker, IOptions&lt;MarketServiceDataConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the MarketData class for a specific market.
 Sets up all data collections, dependencies, and initial state for market data tracking.
 Initializes candlestick dictionaries for minute, hour, and day timeframes, and configures
@@ -141,7 +141,7 @@ calculation parameters from the provided configuration.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MarketData(MarketDTO market, ILogger&lt;IMarketData&gt; logger, ITradingCalculator tradingCalculator, IOrderbookChangeTracker changeTracker, IOptions&lt;CalculationConfig&gt; calculationConfig)</code></pre>
+    <pre><code class="lang-csharp hljs">public MarketData(MarketDTO market, ILogger&lt;IMarketData&gt; logger, ITradingCalculator tradingCalculator, IOrderbookChangeTracker changeTracker, IOptions&lt;MarketServiceDataConfig&gt; marketDataConfig)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -178,8 +178,8 @@ calculation parameters from the provided configuration.</p>
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="TradingStrategies.Configuration.CalculationConfig.html">CalculationConfig</a>&gt;</td>
-        <td><span class="parametername">calculationConfig</span></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.MarketServiceDataConfig.html">MarketServiceDataConfig</a>&gt;</td>
+        <td><span class="parametername">marketDataConfig</span></td>
         <td><p>Configuration options for calculation parameters and thresholds, allowing runtime customization.</p>
 </td>
       </tr>
@@ -208,7 +208,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ADX.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ADX%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L501">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L506">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ADX_" data-uid="BacklashBot.State.MarketData.ADX*"></a>
   <h4 id="BacklashBot_State_MarketData_ADX" data-uid="BacklashBot.State.MarketData.ADX">ADX</h4>
@@ -238,7 +238,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ATR_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ATR_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L917">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L923">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ATR_Long_" data-uid="BacklashBot.State.MarketData.ATR_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_ATR_Long" data-uid="BacklashBot.State.MarketData.ATR_Long">ATR_Long</h4>
@@ -268,7 +268,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ATR_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ATR_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L912">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L918">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ATR_Medium_" data-uid="BacklashBot.State.MarketData.ATR_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_ATR_Medium" data-uid="BacklashBot.State.MarketData.ATR_Medium">ATR_Medium</h4>
@@ -298,7 +298,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AllSupportResistanceLevels.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AllSupportResistanceLevels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1376">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1424">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AllSupportResistanceLevels_" data-uid="BacklashBot.State.MarketData.AllSupportResistanceLevels*"></a>
   <h4 id="BacklashBot_State_MarketData_AllSupportResistanceLevels" data-uid="BacklashBot.State.MarketData.AllSupportResistanceLevels">AllSupportResistanceLevels</h4>
@@ -328,7 +328,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AllTimeHighNo_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AllTimeHighNo_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1050">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1056">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AllTimeHighNo_Bid_" data-uid="BacklashBot.State.MarketData.AllTimeHighNo_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_AllTimeHighNo_Bid" data-uid="BacklashBot.State.MarketData.AllTimeHighNo_Bid">AllTimeHighNo_Bid</h4>
@@ -358,7 +358,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AllTimeHighYes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AllTimeHighYes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1049">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1055">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AllTimeHighYes_Bid_" data-uid="BacklashBot.State.MarketData.AllTimeHighYes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_AllTimeHighYes_Bid" data-uid="BacklashBot.State.MarketData.AllTimeHighYes_Bid">AllTimeHighYes_Bid</h4>
@@ -388,7 +388,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AllTimeLowNo_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AllTimeLowNo_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1052">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1058">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AllTimeLowNo_Bid_" data-uid="BacklashBot.State.MarketData.AllTimeLowNo_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_AllTimeLowNo_Bid" data-uid="BacklashBot.State.MarketData.AllTimeLowNo_Bid">AllTimeLowNo_Bid</h4>
@@ -418,7 +418,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AllTimeLowYes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AllTimeLowYes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1051">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1057">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AllTimeLowYes_Bid_" data-uid="BacklashBot.State.MarketData.AllTimeLowYes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_AllTimeLowYes_Bid" data-uid="BacklashBot.State.MarketData.AllTimeLowYes_Bid">AllTimeLowYes_Bid</h4>
@@ -448,7 +448,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AverageTradeSize_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AverageTradeSize_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L392">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L391">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AverageTradeSize_No_" data-uid="BacklashBot.State.MarketData.AverageTradeSize_No*"></a>
   <h4 id="BacklashBot_State_MarketData_AverageTradeSize_No" data-uid="BacklashBot.State.MarketData.AverageTradeSize_No">AverageTradeSize_No</h4>
@@ -478,7 +478,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_AverageTradeSize_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.AverageTradeSize_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L391">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L390">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_AverageTradeSize_Yes_" data-uid="BacklashBot.State.MarketData.AverageTradeSize_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_AverageTradeSize_Yes" data-uid="BacklashBot.State.MarketData.AverageTradeSize_Yes">AverageTradeSize_Yes</h4>
@@ -508,7 +508,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BestNoAsk.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BestNoAsk%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L469">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L468">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BestNoAsk_" data-uid="BacklashBot.State.MarketData.BestNoAsk*"></a>
   <h4 id="BacklashBot_State_MarketData_BestNoAsk" data-uid="BacklashBot.State.MarketData.BestNoAsk">BestNoAsk</h4>
@@ -538,7 +538,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BestNoBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BestNoBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L467">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L466">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BestNoBid_" data-uid="BacklashBot.State.MarketData.BestNoBid*"></a>
   <h4 id="BacklashBot_State_MarketData_BestNoBid" data-uid="BacklashBot.State.MarketData.BestNoBid">BestNoBid</h4>
@@ -568,7 +568,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BestYesAsk.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BestYesAsk%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L468">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L467">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BestYesAsk_" data-uid="BacklashBot.State.MarketData.BestYesAsk*"></a>
   <h4 id="BacklashBot_State_MarketData_BestYesAsk" data-uid="BacklashBot.State.MarketData.BestYesAsk">BestYesAsk</h4>
@@ -598,7 +598,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BestYesBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BestYesBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L466">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L465">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BestYesBid_" data-uid="BacklashBot.State.MarketData.BestYesBid*"></a>
   <h4 id="BacklashBot_State_MarketData_BestYesBid" data-uid="BacklashBot.State.MarketData.BestYesBid">BestYesBid</h4>
@@ -628,7 +628,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BidCountImbalance.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BidCountImbalance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L497">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L502">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BidCountImbalance_" data-uid="BacklashBot.State.MarketData.BidCountImbalance*"></a>
   <h4 id="BacklashBot_State_MarketData_BidCountImbalance" data-uid="BacklashBot.State.MarketData.BidCountImbalance">BidCountImbalance</h4>
@@ -658,7 +658,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BidRange_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BidRange_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L490">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L495">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BidRange_No_" data-uid="BacklashBot.State.MarketData.BidRange_No*"></a>
   <h4 id="BacklashBot_State_MarketData_BidRange_No" data-uid="BacklashBot.State.MarketData.BidRange_No">BidRange_No</h4>
@@ -688,7 +688,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BidRange_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BidRange_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L488">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L493">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BidRange_Yes_" data-uid="BacklashBot.State.MarketData.BidRange_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_BidRange_Yes" data-uid="BacklashBot.State.MarketData.BidRange_Yes">BidRange_Yes</h4>
@@ -718,7 +718,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BidVolumeImbalance.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BidVolumeImbalance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L498">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L503">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BidVolumeImbalance_" data-uid="BacklashBot.State.MarketData.BidVolumeImbalance*"></a>
   <h4 id="BacklashBot_State_MarketData_BidVolumeImbalance" data-uid="BacklashBot.State.MarketData.BidVolumeImbalance">BidVolumeImbalance</h4>
@@ -748,7 +748,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BollingerBands_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BollingerBands_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L902">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L908">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BollingerBands_Long_" data-uid="BacklashBot.State.MarketData.BollingerBands_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_BollingerBands_Long" data-uid="BacklashBot.State.MarketData.BollingerBands_Long">BollingerBands_Long</h4>
@@ -778,7 +778,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BollingerBands_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BollingerBands_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L892">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L898">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BollingerBands_Medium_" data-uid="BacklashBot.State.MarketData.BollingerBands_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_BollingerBands_Medium" data-uid="BacklashBot.State.MarketData.BollingerBands_Medium">BollingerBands_Medium</h4>
@@ -808,7 +808,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BuyinPrice.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BuyinPrice%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1065">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1071">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BuyinPrice_" data-uid="BacklashBot.State.MarketData.BuyinPrice*"></a>
   <h4 id="BacklashBot_State_MarketData_BuyinPrice" data-uid="BacklashBot.State.MarketData.BuyinPrice">BuyinPrice</h4>
@@ -838,7 +838,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CanCloseEarly.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CanCloseEarly%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1368">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1416">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CanCloseEarly_" data-uid="BacklashBot.State.MarketData.CanCloseEarly*"></a>
   <h4 id="BacklashBot_State_MarketData_CanCloseEarly" data-uid="BacklashBot.State.MarketData.CanCloseEarly">CanCloseEarly</h4>
@@ -868,7 +868,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_Candlesticks.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.Candlesticks%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1042">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1048">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_Candlesticks_" data-uid="BacklashBot.State.MarketData.Candlesticks*"></a>
   <h4 id="BacklashBot_State_MarketData_Candlesticks" data-uid="BacklashBot.State.MarketData.Candlesticks">Candlesticks</h4>
@@ -898,7 +898,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ChangeMetricsMature.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ChangeMetricsMature%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L150">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L149">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ChangeMetricsMature_" data-uid="BacklashBot.State.MarketData.ChangeMetricsMature*"></a>
   <h4 id="BacklashBot_State_MarketData_ChangeMetricsMature" data-uid="BacklashBot.State.MarketData.ChangeMetricsMature">ChangeMetricsMature</h4>
@@ -928,7 +928,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ChangeTracker.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ChangeTracker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L382">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L381">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ChangeTracker_" data-uid="BacklashBot.State.MarketData.ChangeTracker*"></a>
   <h4 id="BacklashBot_State_MarketData_ChangeTracker" data-uid="BacklashBot.State.MarketData.ChangeTracker">ChangeTracker</h4>
@@ -958,7 +958,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentAverageTradeSize_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentAverageTradeSize_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1472">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1520">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentAverageTradeSize_No_" data-uid="BacklashBot.State.MarketData.CurrentAverageTradeSize_No*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentAverageTradeSize_No" data-uid="BacklashBot.State.MarketData.CurrentAverageTradeSize_No">CurrentAverageTradeSize_No</h4>
@@ -988,7 +988,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentAverageTradeSize_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentAverageTradeSize_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1466">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1514">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentAverageTradeSize_Yes_" data-uid="BacklashBot.State.MarketData.CurrentAverageTradeSize_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentAverageTradeSize_Yes" data-uid="BacklashBot.State.MarketData.CurrentAverageTradeSize_Yes">CurrentAverageTradeSize_Yes</h4>
@@ -1018,7 +1018,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1460">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1508">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_No_" data-uid="BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_No*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_No" data-uid="BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_No">CurrentNonTradeRelatedOrderCount_No</h4>
@@ -1048,7 +1048,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1454">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1502">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_Yes_" data-uid="BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentNonTradeRelatedOrderCount_Yes" data-uid="BacklashBot.State.MarketData.CurrentNonTradeRelatedOrderCount_Yes">CurrentNonTradeRelatedOrderCount_Yes</h4>
@@ -1078,7 +1078,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_NoBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_NoBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1448">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1496">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_NoBid_" data-uid="BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_NoBid*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_NoBid" data-uid="BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_NoBid">CurrentOrderVolumePerMinute_NoBid</h4>
@@ -1108,7 +1108,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_YesBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_YesBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1442">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1490">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_YesBid_" data-uid="BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_YesBid*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentOrderVolumePerMinute_YesBid" data-uid="BacklashBot.State.MarketData.CurrentOrderVolumePerMinute_YesBid">CurrentOrderVolumePerMinute_YesBid</h4>
@@ -1138,7 +1138,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentPriceSource.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentPriceSource%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1046">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1052">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentPriceSource_" data-uid="BacklashBot.State.MarketData.CurrentPriceSource*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentPriceSource" data-uid="BacklashBot.State.MarketData.CurrentPriceSource">CurrentPriceSource</h4>
@@ -1168,7 +1168,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeCount_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeCount_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1436">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1484">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeCount_No_" data-uid="BacklashBot.State.MarketData.CurrentTradeCount_No*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeCount_No" data-uid="BacklashBot.State.MarketData.CurrentTradeCount_No">CurrentTradeCount_No</h4>
@@ -1198,7 +1198,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeCount_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeCount_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1430">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1478">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeCount_Yes_" data-uid="BacklashBot.State.MarketData.CurrentTradeCount_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeCount_Yes" data-uid="BacklashBot.State.MarketData.CurrentTradeCount_Yes">CurrentTradeCount_Yes</h4>
@@ -1228,7 +1228,7 @@ calculation parameters from the provided configuration.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeRatePerMinute_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeRatePerMinute_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1412">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1460">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeRatePerMinute_No_" data-uid="BacklashBot.State.MarketData.CurrentTradeRatePerMinute_No*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeRatePerMinute_No" data-uid="BacklashBot.State.MarketData.CurrentTradeRatePerMinute_No">CurrentTradeRatePerMinute_No</h4>
@@ -1260,7 +1260,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeRatePerMinute_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeRatePerMinute_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1402">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1450">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeRatePerMinute_Yes_" data-uid="BacklashBot.State.MarketData.CurrentTradeRatePerMinute_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeRatePerMinute_Yes" data-uid="BacklashBot.State.MarketData.CurrentTradeRatePerMinute_Yes">CurrentTradeRatePerMinute_Yes</h4>
@@ -1292,7 +1292,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1418">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1466">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_No_" data-uid="BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_No*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_No" data-uid="BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_No">CurrentTradeVolumePerMinute_No</h4>
@@ -1322,7 +1322,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1424">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1472">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_Yes_" data-uid="BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_CurrentTradeVolumePerMinute_Yes" data-uid="BacklashBot.State.MarketData.CurrentTradeVolumePerMinute_Yes">CurrentTradeVolumePerMinute_Yes</h4>
@@ -1352,7 +1352,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtBestNoAsk.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtBestNoAsk%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L483">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L488">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtBestNoAsk_" data-uid="BacklashBot.State.MarketData.DepthAtBestNoAsk*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtBestNoAsk" data-uid="BacklashBot.State.MarketData.DepthAtBestNoAsk">DepthAtBestNoAsk</h4>
@@ -1382,7 +1382,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtBestNoBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtBestNoBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L479">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L484">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtBestNoBid_" data-uid="BacklashBot.State.MarketData.DepthAtBestNoBid*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtBestNoBid" data-uid="BacklashBot.State.MarketData.DepthAtBestNoBid">DepthAtBestNoBid</h4>
@@ -1412,7 +1412,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtBestYesAsk.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtBestYesAsk%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L482">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L487">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtBestYesAsk_" data-uid="BacklashBot.State.MarketData.DepthAtBestYesAsk*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtBestYesAsk" data-uid="BacklashBot.State.MarketData.DepthAtBestYesAsk">DepthAtBestYesAsk</h4>
@@ -1442,7 +1442,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtBestYesBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtBestYesBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L476">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L481">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtBestYesBid_" data-uid="BacklashBot.State.MarketData.DepthAtBestYesBid*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtBestYesBid" data-uid="BacklashBot.State.MarketData.DepthAtBestYesBid">DepthAtBestYesBid</h4>
@@ -1472,7 +1472,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtTop4NoBids.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtTop4NoBids%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L526">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L531">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtTop4NoBids_" data-uid="BacklashBot.State.MarketData.DepthAtTop4NoBids*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtTop4NoBids" data-uid="BacklashBot.State.MarketData.DepthAtTop4NoBids">DepthAtTop4NoBids</h4>
@@ -1502,7 +1502,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_DepthAtTop4YesBids.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.DepthAtTop4YesBids%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L521">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L526">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_DepthAtTop4YesBids_" data-uid="BacklashBot.State.MarketData.DepthAtTop4YesBids*"></a>
   <h4 id="BacklashBot_State_MarketData_DepthAtTop4YesBids" data-uid="BacklashBot.State.MarketData.DepthAtTop4YesBids">DepthAtTop4YesBids</h4>
@@ -1532,7 +1532,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_EMA_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.EMA_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L887">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L893">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_EMA_Long_" data-uid="BacklashBot.State.MarketData.EMA_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_EMA_Long" data-uid="BacklashBot.State.MarketData.EMA_Long">EMA_Long</h4>
@@ -1562,7 +1562,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_EMA_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.EMA_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L882">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L888">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_EMA_Medium_" data-uid="BacklashBot.State.MarketData.EMA_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_EMA_Medium" data-uid="BacklashBot.State.MarketData.EMA_Medium">EMA_Medium</h4>
@@ -1592,7 +1592,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ExpectedFees.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ExpectedFees%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L349">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L348">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ExpectedFees_" data-uid="BacklashBot.State.MarketData.ExpectedFees*"></a>
   <h4 id="BacklashBot_State_MarketData_ExpectedFees" data-uid="BacklashBot.State.MarketData.ExpectedFees">ExpectedFees</h4>
@@ -1622,7 +1622,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_FeesPaid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.FeesPaid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1071">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1077">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_FeesPaid_" data-uid="BacklashBot.State.MarketData.FeesPaid*"></a>
   <h4 id="BacklashBot_State_MarketData_FeesPaid" data-uid="BacklashBot.State.MarketData.FeesPaid">FeesPaid</h4>
@@ -1652,7 +1652,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_GoodBadPriceNo.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.GoodBadPriceNo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1058">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1064">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_GoodBadPriceNo_" data-uid="BacklashBot.State.MarketData.GoodBadPriceNo*"></a>
   <h4 id="BacklashBot_State_MarketData_GoodBadPriceNo" data-uid="BacklashBot.State.MarketData.GoodBadPriceNo">GoodBadPriceNo</h4>
@@ -1682,7 +1682,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_GoodBadPriceYes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.GoodBadPriceYes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1057">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1063">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_GoodBadPriceYes_" data-uid="BacklashBot.State.MarketData.GoodBadPriceYes*"></a>
   <h4 id="BacklashBot_State_MarketData_GoodBadPriceYes" data-uid="BacklashBot.State.MarketData.GoodBadPriceYes">GoodBadPriceYes</h4>
@@ -1712,7 +1712,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_HighestVolume_Day.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.HighestVolume_Day%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L513">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L518">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_HighestVolume_Day_" data-uid="BacklashBot.State.MarketData.HighestVolume_Day*"></a>
   <h4 id="BacklashBot_State_MarketData_HighestVolume_Day" data-uid="BacklashBot.State.MarketData.HighestVolume_Day">HighestVolume_Day</h4>
@@ -1742,7 +1742,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_HighestVolume_Hour.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.HighestVolume_Hour%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L514">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L519">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_HighestVolume_Hour_" data-uid="BacklashBot.State.MarketData.HighestVolume_Hour*"></a>
   <h4 id="BacklashBot_State_MarketData_HighestVolume_Hour" data-uid="BacklashBot.State.MarketData.HighestVolume_Hour">HighestVolume_Hour</h4>
@@ -1772,7 +1772,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_HighestVolume_Minute.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.HighestVolume_Minute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L515">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L520">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_HighestVolume_Minute_" data-uid="BacklashBot.State.MarketData.HighestVolume_Minute*"></a>
   <h4 id="BacklashBot_State_MarketData_HighestVolume_Minute" data-uid="BacklashBot.State.MarketData.HighestVolume_Minute">HighestVolume_Minute</h4>
@@ -1802,7 +1802,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_HoldTime.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.HoldTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1341">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1389">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_HoldTime_" data-uid="BacklashBot.State.MarketData.HoldTime*"></a>
   <h4 id="BacklashBot_State_MarketData_HoldTime" data-uid="BacklashBot.State.MarketData.HoldTime">HoldTime</h4>
@@ -1832,7 +1832,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LastOrderbookEventTimestamp.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LastOrderbookEventTimestamp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L362">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L361">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LastOrderbookEventTimestamp_" data-uid="BacklashBot.State.MarketData.LastOrderbookEventTimestamp*"></a>
   <h4 id="BacklashBot_State_MarketData_LastOrderbookEventTimestamp" data-uid="BacklashBot.State.MarketData.LastOrderbookEventTimestamp">LastOrderbookEventTimestamp</h4>
@@ -1862,7 +1862,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LastSnapshotTaken.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LastSnapshotTaken%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L367">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L366">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LastSnapshotTaken_" data-uid="BacklashBot.State.MarketData.LastSnapshotTaken*"></a>
   <h4 id="BacklashBot_State_MarketData_LastSnapshotTaken" data-uid="BacklashBot.State.MarketData.LastSnapshotTaken">LastSnapshotTaken</h4>
@@ -1892,7 +1892,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LastSuccessfulSync.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LastSuccessfulSync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L87">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L86">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LastSuccessfulSync_" data-uid="BacklashBot.State.MarketData.LastSuccessfulSync*"></a>
   <h4 id="BacklashBot_State_MarketData_LastSuccessfulSync" data-uid="BacklashBot.State.MarketData.LastSuccessfulSync">LastSuccessfulSync</h4>
@@ -1922,7 +1922,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LastWebSocketMessageReceived.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LastWebSocketMessageReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1045">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1051">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LastWebSocketMessageReceived_" data-uid="BacklashBot.State.MarketData.LastWebSocketMessageReceived*"></a>
   <h4 id="BacklashBot_State_MarketData_LastWebSocketMessageReceived" data-uid="BacklashBot.State.MarketData.LastWebSocketMessageReceived">LastWebSocketMessageReceived</h4>
@@ -1952,7 +1952,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LevelCount_Bottom_No_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LevelCount_Bottom_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L410">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L409">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LevelCount_Bottom_No_Bid_" data-uid="BacklashBot.State.MarketData.LevelCount_Bottom_No_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_LevelCount_Bottom_No_Bid" data-uid="BacklashBot.State.MarketData.LevelCount_Bottom_No_Bid">LevelCount_Bottom_No_Bid</h4>
@@ -1982,7 +1982,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LevelCount_Bottom_Yes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LevelCount_Bottom_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L411">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L410">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LevelCount_Bottom_Yes_Bid_" data-uid="BacklashBot.State.MarketData.LevelCount_Bottom_Yes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_LevelCount_Bottom_Yes_Bid" data-uid="BacklashBot.State.MarketData.LevelCount_Bottom_Yes_Bid">LevelCount_Bottom_Yes_Bid</h4>
@@ -2012,7 +2012,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LevelCount_Top_No_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LevelCount_Top_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L409">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L408">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LevelCount_Top_No_Bid_" data-uid="BacklashBot.State.MarketData.LevelCount_Top_No_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_LevelCount_Top_No_Bid" data-uid="BacklashBot.State.MarketData.LevelCount_Top_No_Bid">LevelCount_Top_No_Bid</h4>
@@ -2042,7 +2042,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_LevelCount_Top_Yes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.LevelCount_Top_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L408">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L407">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_LevelCount_Top_Yes_Bid_" data-uid="BacklashBot.State.MarketData.LevelCount_Top_Yes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_LevelCount_Top_Yes_Bid" data-uid="BacklashBot.State.MarketData.LevelCount_Top_Yes_Bid">LevelCount_Top_Yes_Bid</h4>
@@ -2072,7 +2072,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MACD_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MACD_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L872">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L878">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MACD_Long_" data-uid="BacklashBot.State.MarketData.MACD_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_MACD_Long" data-uid="BacklashBot.State.MarketData.MACD_Long">MACD_Long</h4>
@@ -2102,7 +2102,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MACD_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MACD_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L862">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L868">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MACD_Medium_" data-uid="BacklashBot.State.MarketData.MACD_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_MACD_Medium" data-uid="BacklashBot.State.MarketData.MACD_Medium">MACD_Medium</h4>
@@ -2132,7 +2132,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketAge.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketAge%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1353">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1401">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketAge_" data-uid="BacklashBot.State.MarketData.MarketAge*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketAge" data-uid="BacklashBot.State.MarketData.MarketAge">MarketAge</h4>
@@ -2162,7 +2162,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketBehaviorNo.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketBehaviorNo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1060">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1066">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketBehaviorNo_" data-uid="BacklashBot.State.MarketData.MarketBehaviorNo*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketBehaviorNo" data-uid="BacklashBot.State.MarketData.MarketBehaviorNo">MarketBehaviorNo</h4>
@@ -2192,7 +2192,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketBehaviorYes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketBehaviorYes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1059">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1065">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketBehaviorYes_" data-uid="BacklashBot.State.MarketData.MarketBehaviorYes*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketBehaviorYes" data-uid="BacklashBot.State.MarketData.MarketBehaviorYes">MarketBehaviorYes</h4>
@@ -2222,7 +2222,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketCategory.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketCategory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L70">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketCategory_" data-uid="BacklashBot.State.MarketData.MarketCategory*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketCategory" data-uid="BacklashBot.State.MarketData.MarketCategory">MarketCategory</h4>
@@ -2252,7 +2252,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketExposure.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketExposure%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1064">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1070">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketExposure_" data-uid="BacklashBot.State.MarketData.MarketExposure*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketExposure" data-uid="BacklashBot.State.MarketData.MarketExposure">MarketExposure</h4>
@@ -2282,7 +2282,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketInfo.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketInfo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1041">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1047">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketInfo_" data-uid="BacklashBot.State.MarketData.MarketInfo*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketInfo" data-uid="BacklashBot.State.MarketData.MarketInfo">MarketInfo</h4>
@@ -2312,7 +2312,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketStatus.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L73">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketStatus_" data-uid="BacklashBot.State.MarketData.MarketStatus*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketStatus" data-uid="BacklashBot.State.MarketData.MarketStatus">MarketStatus</h4>
@@ -2342,7 +2342,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketTicker.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketTicker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1040">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1046">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketTicker_" data-uid="BacklashBot.State.MarketData.MarketTicker*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketTicker" data-uid="BacklashBot.State.MarketData.MarketTicker">MarketTicker</h4>
@@ -2372,7 +2372,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MarketType.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MarketType%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L146">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L145">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MarketType_" data-uid="BacklashBot.State.MarketData.MarketType*"></a>
   <h4 id="BacklashBot_State_MarketData_MarketType" data-uid="BacklashBot.State.MarketData.MarketType">MarketType</h4>
@@ -2402,7 +2402,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_MinusDI.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.MinusDI%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L503">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L508">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_MinusDI_" data-uid="BacklashBot.State.MarketData.MinusDI*"></a>
   <h4 id="BacklashBot_State_MarketData_MinusDI" data-uid="BacklashBot.State.MarketData.MinusDI">MinusDI</h4>
@@ -2432,7 +2432,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NoBidCenterOfMass.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NoBidCenterOfMass%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L536">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L541">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NoBidCenterOfMass_" data-uid="BacklashBot.State.MarketData.NoBidCenterOfMass*"></a>
   <h4 id="BacklashBot_State_MarketData_NoBidCenterOfMass" data-uid="BacklashBot.State.MarketData.NoBidCenterOfMass">NoBidCenterOfMass</h4>
@@ -2462,7 +2462,7 @@ Represents the most recent trade rate calculated from live data.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NoBidSlopePerMinute_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NoBidSlopePerMinute_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L144">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L143">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NoBidSlopePerMinute_Medium_" data-uid="BacklashBot.State.MarketData.NoBidSlopePerMinute_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_NoBidSlopePerMinute_Medium" data-uid="BacklashBot.State.MarketData.NoBidSlopePerMinute_Medium">NoBidSlopePerMinute_Medium</h4>
@@ -2494,7 +2494,7 @@ Represents the rate of change for no bid prices over a medium time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NoBidSlopePerMinute_Short.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NoBidSlopePerMinute_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L134">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L133">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NoBidSlopePerMinute_Short_" data-uid="BacklashBot.State.MarketData.NoBidSlopePerMinute_Short*"></a>
   <h4 id="BacklashBot_State_MarketData_NoBidSlopePerMinute_Short" data-uid="BacklashBot.State.MarketData.NoBidSlopePerMinute_Short">NoBidSlopePerMinute_Short</h4>
@@ -2526,7 +2526,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NoSpread.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NoSpread%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L472">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L471">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NoSpread_" data-uid="BacklashBot.State.MarketData.NoSpread*"></a>
   <h4 id="BacklashBot_State_MarketData_NoSpread" data-uid="BacklashBot.State.MarketData.NoSpread">NoSpread</h4>
@@ -2556,7 +2556,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NonTradeRelatedOrderCount_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NonTradeRelatedOrderCount_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L396">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L395">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NonTradeRelatedOrderCount_No_" data-uid="BacklashBot.State.MarketData.NonTradeRelatedOrderCount_No*"></a>
   <h4 id="BacklashBot_State_MarketData_NonTradeRelatedOrderCount_No" data-uid="BacklashBot.State.MarketData.NonTradeRelatedOrderCount_No">NonTradeRelatedOrderCount_No</h4>
@@ -2586,7 +2586,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_NonTradeRelatedOrderCount_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.NonTradeRelatedOrderCount_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L395">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L394">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_NonTradeRelatedOrderCount_Yes_" data-uid="BacklashBot.State.MarketData.NonTradeRelatedOrderCount_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_NonTradeRelatedOrderCount_Yes" data-uid="BacklashBot.State.MarketData.NonTradeRelatedOrderCount_Yes">NonTradeRelatedOrderCount_Yes</h4>
@@ -2616,7 +2616,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_OBV_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.OBV_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L964">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L970">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_OBV_Long_" data-uid="BacklashBot.State.MarketData.OBV_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_OBV_Long" data-uid="BacklashBot.State.MarketData.OBV_Long">OBV_Long</h4>
@@ -2646,7 +2646,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_OBV_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.OBV_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L959">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L965">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_OBV_Medium_" data-uid="BacklashBot.State.MarketData.OBV_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_OBV_Medium" data-uid="BacklashBot.State.MarketData.OBV_Medium">OBV_Medium</h4>
@@ -2676,7 +2676,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_OrderVolumePerMinute_NoBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.OrderVolumePerMinute_NoBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L464">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L463">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_OrderVolumePerMinute_NoBid_" data-uid="BacklashBot.State.MarketData.OrderVolumePerMinute_NoBid*"></a>
   <h4 id="BacklashBot_State_MarketData_OrderVolumePerMinute_NoBid" data-uid="BacklashBot.State.MarketData.OrderVolumePerMinute_NoBid">OrderVolumePerMinute_NoBid</h4>
@@ -2706,7 +2706,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_OrderVolumePerMinute_YesBid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.OrderVolumePerMinute_YesBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L463">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L462">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_OrderVolumePerMinute_YesBid_" data-uid="BacklashBot.State.MarketData.OrderVolumePerMinute_YesBid*"></a>
   <h4 id="BacklashBot_State_MarketData_OrderVolumePerMinute_YesBid" data-uid="BacklashBot.State.MarketData.OrderVolumePerMinute_YesBid">OrderVolumePerMinute_YesBid</h4>
@@ -2736,7 +2736,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_OrderbookData.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.OrderbookData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1044">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1050">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_OrderbookData_" data-uid="BacklashBot.State.MarketData.OrderbookData*"></a>
   <h4 id="BacklashBot_State_MarketData_OrderbookData" data-uid="BacklashBot.State.MarketData.OrderbookData">OrderbookData</h4>
@@ -2766,7 +2766,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PSAR.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PSAR%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L500">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L505">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PSAR_" data-uid="BacklashBot.State.MarketData.PSAR*"></a>
   <h4 id="BacklashBot_State_MarketData_PSAR" data-uid="BacklashBot.State.MarketData.PSAR">PSAR</h4>
@@ -2796,7 +2796,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PlusDI.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PlusDI%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L502">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L507">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PlusDI_" data-uid="BacklashBot.State.MarketData.PlusDI*"></a>
   <h4 id="BacklashBot_State_MarketData_PlusDI" data-uid="BacklashBot.State.MarketData.PlusDI">PlusDI</h4>
@@ -2826,7 +2826,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionDownside.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionDownside%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1067">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1073">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionDownside_" data-uid="BacklashBot.State.MarketData.PositionDownside*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionDownside" data-uid="BacklashBot.State.MarketData.PositionDownside">PositionDownside</h4>
@@ -2856,7 +2856,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionROI.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionROI%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1073">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1079">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionROI_" data-uid="BacklashBot.State.MarketData.PositionROI*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionROI" data-uid="BacklashBot.State.MarketData.PositionROI">PositionROI</h4>
@@ -2886,7 +2886,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionROIAmt.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionROIAmt%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1068">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1074">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionROIAmt_" data-uid="BacklashBot.State.MarketData.PositionROIAmt*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionROIAmt" data-uid="BacklashBot.State.MarketData.PositionROIAmt">PositionROIAmt</h4>
@@ -2916,7 +2916,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionSide.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionSide%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1063">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1069">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionSide_" data-uid="BacklashBot.State.MarketData.PositionSide*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionSide" data-uid="BacklashBot.State.MarketData.PositionSide">PositionSide</h4>
@@ -2946,7 +2946,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionSize.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionSize%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1062">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1068">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionSize_" data-uid="BacklashBot.State.MarketData.PositionSize*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionSize" data-uid="BacklashBot.State.MarketData.PositionSize">PositionSize</h4>
@@ -2976,7 +2976,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_PositionUpside.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.PositionUpside%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1066">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1072">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_PositionUpside_" data-uid="BacklashBot.State.MarketData.PositionUpside*"></a>
   <h4 id="BacklashBot_State_MarketData_PositionUpside" data-uid="BacklashBot.State.MarketData.PositionUpside">PositionUpside</h4>
@@ -3006,7 +3006,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_Positions.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.Positions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1061">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1067">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_Positions_" data-uid="BacklashBot.State.MarketData.Positions*"></a>
   <h4 id="BacklashBot_State_MarketData_Positions" data-uid="BacklashBot.State.MarketData.Positions">Positions</h4>
@@ -3036,7 +3036,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RSI_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RSI_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L857">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L863">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RSI_Long_" data-uid="BacklashBot.State.MarketData.RSI_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_RSI_Long" data-uid="BacklashBot.State.MarketData.RSI_Long">RSI_Long</h4>
@@ -3066,7 +3066,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RSI_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RSI_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L852">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L858">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RSI_Medium_" data-uid="BacklashBot.State.MarketData.RSI_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_RSI_Medium" data-uid="BacklashBot.State.MarketData.RSI_Medium">RSI_Medium</h4>
@@ -3096,7 +3096,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RSI_Short.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RSI_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L847">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L853">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RSI_Short_" data-uid="BacklashBot.State.MarketData.RSI_Short*"></a>
   <h4 id="BacklashBot_State_MarketData_RSI_Short" data-uid="BacklashBot.State.MarketData.RSI_Short">RSI_Short</h4>
@@ -3126,7 +3126,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RealizedPnl.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RealizedPnl%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1070">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1076">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RealizedPnl_" data-uid="BacklashBot.State.MarketData.RealizedPnl*"></a>
   <h4 id="BacklashBot_State_MarketData_RealizedPnl" data-uid="BacklashBot.State.MarketData.RealizedPnl">RealizedPnl</h4>
@@ -3156,7 +3156,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_ReceivedFirstSnapshot.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.ReceivedFirstSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L474">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L473">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_ReceivedFirstSnapshot_" data-uid="BacklashBot.State.MarketData.ReceivedFirstSnapshot*"></a>
   <h4 id="BacklashBot_State_MarketData_ReceivedFirstSnapshot" data-uid="BacklashBot.State.MarketData.ReceivedFirstSnapshot">ReceivedFirstSnapshot</h4>
@@ -3186,7 +3186,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentCandlesticks.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentCandlesticks%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1334">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1382">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentCandlesticks_" data-uid="BacklashBot.State.MarketData.RecentCandlesticks*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentCandlesticks" data-uid="BacklashBot.State.MarketData.RecentCandlesticks">RecentCandlesticks</h4>
@@ -3216,7 +3216,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentHighNo_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentHighNo_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1054">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1060">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentHighNo_Bid_" data-uid="BacklashBot.State.MarketData.RecentHighNo_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentHighNo_Bid" data-uid="BacklashBot.State.MarketData.RecentHighNo_Bid">RecentHighNo_Bid</h4>
@@ -3246,7 +3246,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentHighYes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentHighYes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1053">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1059">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentHighYes_Bid_" data-uid="BacklashBot.State.MarketData.RecentHighYes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentHighYes_Bid" data-uid="BacklashBot.State.MarketData.RecentHighYes_Bid">RecentHighYes_Bid</h4>
@@ -3276,7 +3276,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentLowNo_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentLowNo_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1056">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1062">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentLowNo_Bid_" data-uid="BacklashBot.State.MarketData.RecentLowNo_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentLowNo_Bid" data-uid="BacklashBot.State.MarketData.RecentLowNo_Bid">RecentLowNo_Bid</h4>
@@ -3306,7 +3306,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentLowYes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentLowYes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1055">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1061">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentLowYes_Bid_" data-uid="BacklashBot.State.MarketData.RecentLowYes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentLowYes_Bid" data-uid="BacklashBot.State.MarketData.RecentLowYes_Bid">RecentLowYes_Bid</h4>
@@ -3336,7 +3336,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentVolume_LastHour.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentVolume_LastHour%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L516">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L521">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentVolume_LastHour_" data-uid="BacklashBot.State.MarketData.RecentVolume_LastHour*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentVolume_LastHour" data-uid="BacklashBot.State.MarketData.RecentVolume_LastHour">RecentVolume_LastHour</h4>
@@ -3366,7 +3366,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentVolume_LastMonth.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentVolume_LastMonth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L518">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L523">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentVolume_LastMonth_" data-uid="BacklashBot.State.MarketData.RecentVolume_LastMonth*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentVolume_LastMonth" data-uid="BacklashBot.State.MarketData.RecentVolume_LastMonth">RecentVolume_LastMonth</h4>
@@ -3396,7 +3396,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecentVolume_LastThreeHours.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecentVolume_LastThreeHours%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L517">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L522">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecentVolume_LastThreeHours_" data-uid="BacklashBot.State.MarketData.RecentVolume_LastThreeHours*"></a>
   <h4 id="BacklashBot_State_MarketData_RecentVolume_LastThreeHours" data-uid="BacklashBot.State.MarketData.RecentVolume_LastThreeHours">RecentVolume_LastThreeHours</h4>
@@ -3426,7 +3426,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RestingOrders.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RestingOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1072">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1078">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RestingOrders_" data-uid="BacklashBot.State.MarketData.RestingOrders*"></a>
   <h4 id="BacklashBot_State_MarketData_RestingOrders" data-uid="BacklashBot.State.MarketData.RestingOrders">RestingOrders</h4>
@@ -3456,7 +3456,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_StochasticOscillator_Long.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.StochasticOscillator_Long%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L950">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L956">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_StochasticOscillator_Long_" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Long*"></a>
   <h4 id="BacklashBot_State_MarketData_StochasticOscillator_Long" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Long">StochasticOscillator_Long</h4>
@@ -3486,7 +3486,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_StochasticOscillator_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.StochasticOscillator_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L941">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L947">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_StochasticOscillator_Medium_" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_StochasticOscillator_Medium" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Medium">StochasticOscillator_Medium</h4>
@@ -3516,7 +3516,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_StochasticOscillator_Short.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.StochasticOscillator_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L932">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L938">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_StochasticOscillator_Short_" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Short*"></a>
   <h4 id="BacklashBot_State_MarketData_StochasticOscillator_Short" data-uid="BacklashBot.State.MarketData.StochasticOscillator_Short">StochasticOscillator_Short</h4>
@@ -3546,7 +3546,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TickerPriceNo.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TickerPriceNo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1048">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1054">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TickerPriceNo_" data-uid="BacklashBot.State.MarketData.TickerPriceNo*"></a>
   <h4 id="BacklashBot_State_MarketData_TickerPriceNo" data-uid="BacklashBot.State.MarketData.TickerPriceNo">TickerPriceNo</h4>
@@ -3576,7 +3576,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TickerPriceYes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TickerPriceYes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1047">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1053">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TickerPriceYes_" data-uid="BacklashBot.State.MarketData.TickerPriceYes*"></a>
   <h4 id="BacklashBot_State_MarketData_TickerPriceYes" data-uid="BacklashBot.State.MarketData.TickerPriceYes">TickerPriceYes</h4>
@@ -3606,7 +3606,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_Tickers.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.Tickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1043">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1049">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_Tickers_" data-uid="BacklashBot.State.MarketData.Tickers*"></a>
   <h4 id="BacklashBot_State_MarketData_Tickers" data-uid="BacklashBot.State.MarketData.Tickers">Tickers</h4>
@@ -3636,7 +3636,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TimeLeft.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TimeLeft%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1360">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1408">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TimeLeft_" data-uid="BacklashBot.State.MarketData.TimeLeft*"></a>
   <h4 id="BacklashBot_State_MarketData_TimeLeft" data-uid="BacklashBot.State.MarketData.TimeLeft">TimeLeft</h4>
@@ -3666,7 +3666,7 @@ Represents the rate of change for no bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TolerancePercentage.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TolerancePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L357">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L356">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TolerancePercentage_" data-uid="BacklashBot.State.MarketData.TolerancePercentage*"></a>
   <h4 id="BacklashBot_State_MarketData_TolerancePercentage" data-uid="BacklashBot.State.MarketData.TolerancePercentage">TolerancePercentage</h4>
@@ -3700,7 +3700,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TopTenPercentLevelDepth_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TopTenPercentLevelDepth_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L486">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L491">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TopTenPercentLevelDepth_No_" data-uid="BacklashBot.State.MarketData.TopTenPercentLevelDepth_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TopTenPercentLevelDepth_No" data-uid="BacklashBot.State.MarketData.TopTenPercentLevelDepth_No">TopTenPercentLevelDepth_No</h4>
@@ -3730,7 +3730,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TopTenPercentLevelDepth_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TopTenPercentLevelDepth_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L485">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L490">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TopTenPercentLevelDepth_Yes_" data-uid="BacklashBot.State.MarketData.TopTenPercentLevelDepth_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TopTenPercentLevelDepth_Yes" data-uid="BacklashBot.State.MarketData.TopTenPercentLevelDepth_Yes">TopTenPercentLevelDepth_Yes</h4>
@@ -3760,7 +3760,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TotalBidContracts_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TotalBidContracts_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L494">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L499">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TotalBidContracts_No_" data-uid="BacklashBot.State.MarketData.TotalBidContracts_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TotalBidContracts_No" data-uid="BacklashBot.State.MarketData.TotalBidContracts_No">TotalBidContracts_No</h4>
@@ -3790,7 +3790,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TotalBidContracts_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TotalBidContracts_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L493">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L498">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TotalBidContracts_Yes_" data-uid="BacklashBot.State.MarketData.TotalBidContracts_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TotalBidContracts_Yes" data-uid="BacklashBot.State.MarketData.TotalBidContracts_Yes">TotalBidContracts_Yes</h4>
@@ -3820,7 +3820,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TotalBidVolume_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TotalBidVolume_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L496">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L501">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TotalBidVolume_No_" data-uid="BacklashBot.State.MarketData.TotalBidVolume_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TotalBidVolume_No" data-uid="BacklashBot.State.MarketData.TotalBidVolume_No">TotalBidVolume_No</h4>
@@ -3850,7 +3850,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TotalBidVolume_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TotalBidVolume_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L495">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L500">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TotalBidVolume_Yes_" data-uid="BacklashBot.State.MarketData.TotalBidVolume_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TotalBidVolume_Yes" data-uid="BacklashBot.State.MarketData.TotalBidVolume_Yes">TotalBidVolume_Yes</h4>
@@ -3880,7 +3880,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TotalPositionTraded.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TotalPositionTraded%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1069">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1075">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TotalPositionTraded_" data-uid="BacklashBot.State.MarketData.TotalPositionTraded*"></a>
   <h4 id="BacklashBot_State_MarketData_TotalPositionTraded" data-uid="BacklashBot.State.MarketData.TotalPositionTraded">TotalPositionTraded</h4>
@@ -3910,7 +3910,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeCount_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeCount_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L394">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L393">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeCount_No_" data-uid="BacklashBot.State.MarketData.TradeCount_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeCount_No" data-uid="BacklashBot.State.MarketData.TradeCount_No">TradeCount_No</h4>
@@ -3940,7 +3940,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeCount_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeCount_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L393">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L392">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeCount_Yes_" data-uid="BacklashBot.State.MarketData.TradeCount_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeCount_Yes" data-uid="BacklashBot.State.MarketData.TradeCount_Yes">TradeCount_Yes</h4>
@@ -3970,7 +3970,7 @@ Must be non-negative.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeRatePerMinute_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeRatePerMinute_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L458">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L457">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeRatePerMinute_No_" data-uid="BacklashBot.State.MarketData.TradeRatePerMinute_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeRatePerMinute_No" data-uid="BacklashBot.State.MarketData.TradeRatePerMinute_No">TradeRatePerMinute_No</h4>
@@ -4002,7 +4002,7 @@ Represents the number of trades executed for no contracts in the last minute.</p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeRatePerMinute_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeRatePerMinute_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L453">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L452">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeRatePerMinute_Yes_" data-uid="BacklashBot.State.MarketData.TradeRatePerMinute_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeRatePerMinute_Yes" data-uid="BacklashBot.State.MarketData.TradeRatePerMinute_Yes">TradeRatePerMinute_Yes</h4>
@@ -4034,7 +4034,7 @@ Represents the number of trades executed for yes contracts in the last minute.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeVolumePerMinute_No.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeVolumePerMinute_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L448">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L447">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeVolumePerMinute_No_" data-uid="BacklashBot.State.MarketData.TradeVolumePerMinute_No*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeVolumePerMinute_No" data-uid="BacklashBot.State.MarketData.TradeVolumePerMinute_No">TradeVolumePerMinute_No</h4>
@@ -4066,7 +4066,7 @@ Represents the volume of trades executed for no contracts in the last minute.</p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_TradeVolumePerMinute_Yes.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.TradeVolumePerMinute_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L443">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L442">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_TradeVolumePerMinute_Yes_" data-uid="BacklashBot.State.MarketData.TradeVolumePerMinute_Yes*"></a>
   <h4 id="BacklashBot_State_MarketData_TradeVolumePerMinute_Yes" data-uid="BacklashBot.State.MarketData.TradeVolumePerMinute_Yes">TradeVolumePerMinute_Yes</h4>
@@ -4098,7 +4098,7 @@ Represents the volume of trades executed for yes contracts in the last minute.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VWAP_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VWAP_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L927">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L933">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VWAP_Medium_" data-uid="BacklashBot.State.MarketData.VWAP_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_VWAP_Medium" data-uid="BacklashBot.State.MarketData.VWAP_Medium">VWAP_Medium</h4>
@@ -4128,7 +4128,7 @@ Represents the volume of trades executed for yes contracts in the last minute.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VWAP_Short.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VWAP_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L922">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L928">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VWAP_Short_" data-uid="BacklashBot.State.MarketData.VWAP_Short*"></a>
   <h4 id="BacklashBot_State_MarketData_VWAP_Short" data-uid="BacklashBot.State.MarketData.VWAP_Short">VWAP_Short</h4>
@@ -4158,7 +4158,7 @@ Represents the volume of trades executed for yes contracts in the last minute.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VelocityPerMinute_Bottom_No_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VelocityPerMinute_Bottom_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L432">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L431">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VelocityPerMinute_Bottom_No_Bid_" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Bottom_No_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_VelocityPerMinute_Bottom_No_Bid" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Bottom_No_Bid">VelocityPerMinute_Bottom_No_Bid</h4>
@@ -4190,7 +4190,7 @@ Calculated from order book change metrics to track market momentum.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VelocityPerMinute_Bottom_Yes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VelocityPerMinute_Bottom_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L427">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L426">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VelocityPerMinute_Bottom_Yes_Bid_" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Bottom_Yes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_VelocityPerMinute_Bottom_Yes_Bid" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Bottom_Yes_Bid">VelocityPerMinute_Bottom_Yes_Bid</h4>
@@ -4222,7 +4222,7 @@ Calculated from order book change metrics to track market momentum.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VelocityPerMinute_Top_No_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VelocityPerMinute_Top_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L422">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L421">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VelocityPerMinute_Top_No_Bid_" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Top_No_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_VelocityPerMinute_Top_No_Bid" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Top_No_Bid">VelocityPerMinute_Top_No_Bid</h4>
@@ -4254,7 +4254,7 @@ Calculated from order book change metrics to track market momentum.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_VelocityPerMinute_Top_Yes_Bid.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.VelocityPerMinute_Top_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L417">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L416">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_VelocityPerMinute_Top_Yes_Bid_" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Top_Yes_Bid*"></a>
   <h4 id="BacklashBot_State_MarketData_VelocityPerMinute_Top_Yes_Bid" data-uid="BacklashBot.State.MarketData.VelocityPerMinute_Top_Yes_Bid">VelocityPerMinute_Top_Yes_Bid</h4>
@@ -4283,10 +4283,42 @@ Calculated from order book change metrics to track market momentum.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_WebSocketHealthy.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.WebSocketHealthy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L479">View Source</a>
+  </span>
+  <a id="BacklashBot_State_MarketData_WebSocketHealthy_" data-uid="BacklashBot.State.MarketData.WebSocketHealthy*"></a>
+  <h4 id="BacklashBot_State_MarketData_WebSocketHealthy" data-uid="BacklashBot.State.MarketData.WebSocketHealthy">WebSocketHealthy</h4>
+  <div class="markdown level1 summary"><p>Indicates whether the WebSocket connection is healthy for this market.
+When false, snapshot creation should be skipped to avoid saving incomplete data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool WebSocketHealthy { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_YesBidCenterOfMass.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.YesBidCenterOfMass%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L532">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L537">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_YesBidCenterOfMass_" data-uid="BacklashBot.State.MarketData.YesBidCenterOfMass*"></a>
   <h4 id="BacklashBot_State_MarketData_YesBidCenterOfMass" data-uid="BacklashBot.State.MarketData.YesBidCenterOfMass">YesBidCenterOfMass</h4>
@@ -4316,7 +4348,7 @@ Calculated from order book change metrics to track market momentum.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_YesBidSlopePerMinute_Medium.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.YesBidSlopePerMinute_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L139">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L138">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_YesBidSlopePerMinute_Medium_" data-uid="BacklashBot.State.MarketData.YesBidSlopePerMinute_Medium*"></a>
   <h4 id="BacklashBot_State_MarketData_YesBidSlopePerMinute_Medium" data-uid="BacklashBot.State.MarketData.YesBidSlopePerMinute_Medium">YesBidSlopePerMinute_Medium</h4>
@@ -4348,7 +4380,7 @@ Represents the rate of change for yes bid prices over a medium time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_YesBidSlopePerMinute_Short.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.YesBidSlopePerMinute_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L129">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L128">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_YesBidSlopePerMinute_Short_" data-uid="BacklashBot.State.MarketData.YesBidSlopePerMinute_Short*"></a>
   <h4 id="BacklashBot_State_MarketData_YesBidSlopePerMinute_Short" data-uid="BacklashBot.State.MarketData.YesBidSlopePerMinute_Short">YesBidSlopePerMinute_Short</h4>
@@ -4380,7 +4412,7 @@ Represents the rate of change for yes bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_YesSpread.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.YesSpread%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L471">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L470">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_YesSpread_" data-uid="BacklashBot.State.MarketData.YesSpread*"></a>
   <h4 id="BacklashBot_State_MarketData_YesSpread" data-uid="BacklashBot.State.MarketData.YesSpread">YesSpread</h4>
@@ -4412,7 +4444,7 @@ Represents the rate of change for yes bid prices over a short time period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_BuildPseudoCandlesticks_System_String_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.BuildPseudoCandlesticks(System.String%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1085">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1091">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_BuildPseudoCandlesticks_" data-uid="BacklashBot.State.MarketData.BuildPseudoCandlesticks*"></a>
   <h4 id="BacklashBot_State_MarketData_BuildPseudoCandlesticks_System_String_System_Int32_" data-uid="BacklashBot.State.MarketData.BuildPseudoCandlesticks(System.String,System.Int32)">BuildPseudoCandlesticks(string, int)</h4>
@@ -4472,7 +4504,7 @@ while maintaining correctness. All processing is offloaded to background threads
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_GetBids_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.GetBids(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L328">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L327">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_GetBids_" data-uid="BacklashBot.State.MarketData.GetBids*"></a>
   <h4 id="BacklashBot_State_MarketData_GetBids_System_String_" data-uid="BacklashBot.State.MarketData.GetBids(System.String)">GetBids(string)</h4>
@@ -4522,7 +4554,7 @@ while maintaining correctness. All processing is offloaded to background threads
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_GetFilteredSupportResistanceLevels.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.GetFilteredSupportResistanceLevels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1479">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L1527">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_GetFilteredSupportResistanceLevels_" data-uid="BacklashBot.State.MarketData.GetFilteredSupportResistanceLevels*"></a>
   <h4 id="BacklashBot_State_MarketData_GetFilteredSupportResistanceLevels" data-uid="BacklashBot.State.MarketData.GetFilteredSupportResistanceLevels">GetFilteredSupportResistanceLevels()</h4>
@@ -4552,7 +4584,7 @@ while maintaining correctness. All processing is offloaded to background threads
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RecalculateOrderbookChangeMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RecalculateOrderbookChangeMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L377">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L376">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RecalculateOrderbookChangeMetrics_" data-uid="BacklashBot.State.MarketData.RecalculateOrderbookChangeMetrics*"></a>
   <h4 id="BacklashBot_State_MarketData_RecalculateOrderbookChangeMetrics" data-uid="BacklashBot.State.MarketData.RecalculateOrderbookChangeMetrics">RecalculateOrderbookChangeMetrics()</h4>
@@ -4569,7 +4601,7 @@ This method triggers a full recalculation of velocities, trade rates, and other 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RefreshAllMetadata.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RefreshAllMetadata%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L572">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L577">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RefreshAllMetadata_" data-uid="BacklashBot.State.MarketData.RefreshAllMetadata*"></a>
   <h4 id="BacklashBot_State_MarketData_RefreshAllMetadata" data-uid="BacklashBot.State.MarketData.RefreshAllMetadata">RefreshAllMetadata()</h4>
@@ -4603,7 +4635,7 @@ and asynchronous methods for ticker data to ensure non-blocking updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RefreshCandlestickMetadata.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RefreshCandlestickMetadata%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L579">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L584">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RefreshCandlestickMetadata_" data-uid="BacklashBot.State.MarketData.RefreshCandlestickMetadata*"></a>
   <h4 id="BacklashBot_State_MarketData_RefreshCandlestickMetadata" data-uid="BacklashBot.State.MarketData.RefreshCandlestickMetadata">RefreshCandlestickMetadata()</h4>
@@ -4618,7 +4650,7 @@ and asynchronous methods for ticker data to ensure non-blocking updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RefreshPositionMetadata.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RefreshPositionMetadata%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L970">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L976">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RefreshPositionMetadata_" data-uid="BacklashBot.State.MarketData.RefreshPositionMetadata*"></a>
   <h4 id="BacklashBot_State_MarketData_RefreshPositionMetadata" data-uid="BacklashBot.State.MarketData.RefreshPositionMetadata">RefreshPositionMetadata()</h4>
@@ -4633,7 +4665,7 @@ and asynchronous methods for ticker data to ensure non-blocking updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_RefreshTickerMetadata.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.RefreshTickerMetadata%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L635">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L640">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_RefreshTickerMetadata_" data-uid="BacklashBot.State.MarketData.RefreshTickerMetadata*"></a>
   <h4 id="BacklashBot_State_MarketData_RefreshTickerMetadata" data-uid="BacklashBot.State.MarketData.RefreshTickerMetadata">RefreshTickerMetadata()</h4>
@@ -4666,7 +4698,7 @@ This method performs validation on ticker data and triggers asynchronous calcula
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_UpdateCurrentPrice_System_Int32_System_Int32_System_DateTime_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.UpdateCurrentPrice(System.Int32%2CSystem.Int32%2CSystem.DateTime%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L548">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L553">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_UpdateCurrentPrice_" data-uid="BacklashBot.State.MarketData.UpdateCurrentPrice*"></a>
   <h4 id="BacklashBot_State_MarketData_UpdateCurrentPrice_System_Int32_System_Int32_System_DateTime_System_String_" data-uid="BacklashBot.State.MarketData.UpdateCurrentPrice(System.Int32,System.Int32,System.DateTime,System.String)">UpdateCurrentPrice(int, int, DateTime, string)</h4>
@@ -4719,7 +4751,7 @@ This method ensures that only the most recent price updates are retained, based 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData_UpdateTradingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData.UpdateTradingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L741">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L746">View Source</a>
   </span>
   <a id="BacklashBot_State_MarketData_UpdateTradingMetrics_" data-uid="BacklashBot.State.MarketData.UpdateTradingMetrics*"></a>
   <h4 id="BacklashBot_State_MarketData_UpdateTradingMetrics" data-uid="BacklashBot.State.MarketData.UpdateTradingMetrics">UpdateTradingMetrics()</h4>
@@ -4764,7 +4796,7 @@ to maintain system responsiveness. All calculations are offloaded to background 
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_MarketData.md&amp;value=---%0Auid%3A%20BacklashBot.State.MarketData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L53" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/MarketData.cs/#L52" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

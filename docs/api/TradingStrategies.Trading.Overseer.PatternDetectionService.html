@@ -152,19 +152,19 @@ Async versions are provided for better performance in high-throughput scenarios.
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_Microsoft_Extensions_Configuration_IConfiguration_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.%23ctor(Microsoft.Extensions.Configuration.IConfiguration%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_PatternDetectionServiceConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.%23ctor(Microsoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.PatternDetectionServiceConfig%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L113">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L67">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_Microsoft_Extensions_Configuration_IConfiguration_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">PatternDetectionService(IConfiguration, IPerformanceMonitor?)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the PatternDetectionService with configuration from appsettings.json.</p>
+  <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_PatternDetectionServiceConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.PatternDetectionServiceConfig},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">PatternDetectionService(IOptions&lt;PatternDetectionServiceConfig&gt;, IPerformanceMonitor?)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the PatternDetectionService with the specified configuration.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public PatternDetectionService(IConfiguration configuration, IPerformanceMonitor? performanceMonitor = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public PatternDetectionService(IOptions&lt;PatternDetectionServiceConfig&gt; config, IPerformanceMonitor? performanceMonitor = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -177,48 +177,7 @@ Async versions are provided for better performance in high-throughput scenarios.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
-        <td><span class="parametername">configuration</span></td>
-        <td><p>The configuration instance for reading settings from appsettings.json.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
-        <td><span class="parametername">performanceMonitor</span></td>
-        <td><p>Optional performance monitor for recording metrics.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_TradingStrategies_Trading_Overseer_PatternDetectionConfig_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.%23ctor(TradingStrategies.Trading.Overseer.PatternDetectionConfig%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L133">View Source</a>
-  </span>
-  <a id="TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_TradingStrategies_Trading_Overseer_PatternDetectionConfig_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(TradingStrategies.Trading.Overseer.PatternDetectionConfig,BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">PatternDetectionService(PatternDetectionConfig, IPerformanceMonitor?)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the PatternDetectionService with the specified configuration.
-This constructor is for backward compatibility and testing purposes.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public PatternDetectionService(PatternDetectionConfig config, IPerformanceMonitor? performanceMonitor = null)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="TradingStrategies.Trading.Overseer.PatternDetectionConfig.html">PatternDetectionConfig</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="TradingStrategies.Configuration.PatternDetectionServiceConfig.html">PatternDetectionServiceConfig</a>&gt;</td>
         <td><span class="parametername">config</span></td>
         <td><p>The configuration for pattern detection parameters.</p>
 </td>
@@ -238,7 +197,7 @@ This constructor is for backward compatibility and testing purposes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService_EnablePatternImageGeneration.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.EnablePatternImageGeneration%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L143">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L77">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PatternDetectionService_EnablePatternImageGeneration_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.EnablePatternImageGeneration*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService_EnablePatternImageGeneration" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.EnablePatternImageGeneration">EnablePatternImageGeneration</h4>
@@ -272,7 +231,7 @@ This setting controls whether visualization images are generated for detected pa
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatterns_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns(BacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L174">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L108">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatterns_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatterns_BacklashDTOs_MarketSnapshot_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns(BacklashDTOs.MarketSnapshot)">DetectPatterns(MarketSnapshot)</h4>
@@ -365,7 +324,7 @@ with appropriate fallback behavior ensuring system stability.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatternsAsync_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync(BacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L326">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L260">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatternsAsync_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatternsAsync_BacklashDTOs_MarketSnapshot_" data-uid="TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync(BacklashDTOs.MarketSnapshot)">DetectPatternsAsync(MarketSnapshot)</h4>
@@ -424,7 +383,7 @@ Uses the enhanced configuration and metrics for optimal performance.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PatternDetectionService.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PatternDetectionService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L103" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PatternDetectionService.cs/#L56" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

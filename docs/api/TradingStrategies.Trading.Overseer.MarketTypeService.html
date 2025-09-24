@@ -141,19 +141,19 @@ Cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMi
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_MarketTypeService__ctor_TradingStrategies_Configuration_TradingConfig_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.MarketTypeService.%23ctor(TradingStrategies.Configuration.TradingConfig)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_MarketTypeService__ctor_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_MarketTypeServiceConfig__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.MarketTypeService.%23ctor(Microsoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.MarketTypeServiceConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/MarketTypeService.cs/#L93">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_MarketTypeService__ctor_" data-uid="TradingStrategies.Trading.Overseer.MarketTypeService.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_MarketTypeService__ctor_TradingStrategies_Configuration_TradingConfig_" data-uid="TradingStrategies.Trading.Overseer.MarketTypeService.#ctor(TradingStrategies.Configuration.TradingConfig)">MarketTypeService(TradingConfig?)</h4>
+  <h4 id="TradingStrategies_Trading_Overseer_MarketTypeService__ctor_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_MarketTypeServiceConfig__" data-uid="TradingStrategies.Trading.Overseer.MarketTypeService.#ctor(Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.MarketTypeServiceConfig})">MarketTypeService(IOptions&lt;MarketTypeServiceConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the MarketTypeService class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MarketTypeService(TradingConfig? config = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MarketTypeService(IOptions&lt;MarketTypeServiceConfig&gt; config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -166,17 +166,17 @@ Cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMi
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="TradingStrategies.Configuration.TradingConfig.html">TradingConfig</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="TradingStrategies.Configuration.MarketTypeServiceConfig.html">MarketTypeServiceConfig</a>&gt;</td>
         <td><span class="parametername">config</span></td>
-        <td><p>The trading configuration containing settings for cache expiration and performance metrics. If null, defaults are used.</p>
+        <td><p>The market type service configuration containing settings for cache expiration and performance metrics.</p>
 </td>
       </tr>
     </tbody>
   </table>
-  <h5 id="TradingStrategies_Trading_Overseer_MarketTypeService__ctor_TradingStrategies_Configuration_TradingConfig__remarks">Remarks</h5>
+  <h5 id="TradingStrategies_Trading_Overseer_MarketTypeService__ctor_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_MarketTypeServiceConfig___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
-The cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMinutes in appsettings.json.
-Performance metrics collection can be enabled/disabled via TradingConfig:MarketTypeService_EnablePerformanceMetrics.
+The cache expiration can be configured via MarketTypeServiceConfig:CacheExpirationMinutes in appsettings.json.
+Performance metrics collection can be enabled/disabled via MarketTypeServiceConfig:EnablePerformanceMetrics.
 This constructor sets up the service for immediate use in market type classification.</p>
 </div>
   <h3 id="methods">Methods

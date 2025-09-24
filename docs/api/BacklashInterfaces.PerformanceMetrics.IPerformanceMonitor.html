@@ -101,6 +101,70 @@ is disabled and provides clear visibility into which components are recording me
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordDelayedApiCallMetrics_System_String_System_Int64_System_Double_System_Int64_System_Int32_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordDelayedApiCallMetrics(System.String%2CSystem.Int64%2CSystem.Double%2CSystem.Int64%2CSystem.Int32%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L65">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordDelayedApiCallMetrics_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordDelayedApiCallMetrics*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordDelayedApiCallMetrics_System_String_System_Int64_System_Double_System_Int64_System_Int32_System_Boolean_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordDelayedApiCallMetrics(System.String,System.Int64,System.Double,System.Int64,System.Int32,System.Boolean)">RecordDelayedApiCallMetrics(string, long, double, long, int, bool)</h4>
+  <div class="markdown level1 summary"><p>Records metrics for delayed API calls due to rate limiting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordDelayedApiCallMetrics(string componentName, long totalDelayedCalls, double averageWaitTimeMs, long maxWaitTimeMs, int currentQueueDepth, bool metricsEnabled)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">componentName</span></td>
+        <td><p>The name of the component (e.g., &quot;MessageProcessor&quot;).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">totalDelayedCalls</span></td>
+        <td><p>Total number of API calls that were delayed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">averageWaitTimeMs</span></td>
+        <td><p>Average wait time in milliseconds for delayed calls.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">maxWaitTimeMs</span></td>
+        <td><p>Maximum wait time in milliseconds for any delayed call.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">currentQueueDepth</span></td>
+        <td><p>Current number of items in the delay queue.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">metricsEnabled</span></td>
+        <td><p>Whether performance metrics are enabled for the calling class/component.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">

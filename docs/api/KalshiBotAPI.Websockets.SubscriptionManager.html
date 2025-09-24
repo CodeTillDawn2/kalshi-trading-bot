@@ -89,7 +89,8 @@ for reliable market data streaming with proper error handling and recovery mecha
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
-    <div class="level1"><span class="xref">SubscriptionManager</span></div>
+    <div class="level1"><a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html">BaseSubscriptionManager</a></div>
+    <div class="level2"><span class="xref">SubscriptionManager</span></div>
   </div>
   <div class="implements">
     <h5>Implements</h5>
@@ -97,6 +98,18 @@ for reliable market data streaming with proper error handling and recovery mecha
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html#KalshiBotAPI_Websockets_BaseSubscriptionManager__logger">BaseSubscriptionManager._logger</a>
+    </div>
+    <div>
+      <a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html#KalshiBotAPI_Websockets_BaseSubscriptionManager__connectionManager">BaseSubscriptionManager._connectionManager</a>
+    </div>
+    <div>
+      <a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html#KalshiBotAPI_Websockets_BaseSubscriptionManager__statusTrackerService">BaseSubscriptionManager._statusTrackerService</a>
+    </div>
+    <div>
+      <a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html#KalshiBotAPI_Websockets_BaseSubscriptionManager__performanceMetrics">BaseSubscriptionManager._performanceMetrics</a>
+    </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
     </div>
@@ -123,26 +136,26 @@ for reliable market data streaming with proper error handling and recovery mecha
   <h6><strong>Assembly</strong>: KalshiBotAPI.dll</h6>
   <h5 id="KalshiBotAPI_Websockets_SubscriptionManager_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class SubscriptionManager : ISubscriptionManager</code></pre>
+    <pre><code class="lang-csharp hljs">public class SubscriptionManager : BaseSubscriptionManager, ISubscriptionManager</code></pre>
   </div>
   <h3 id="constructors">Constructors
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_SubscriptionManager__KalshiBotAPI_WebSockets_Interfaces_IWebSocketConnectionManager_BacklashBot_State_Interfaces_IDataCache_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Configuration_IConfiguration_BacklashInterfaces_PerformanceMetrics_ISubscriptionManagerPerformanceMetrics_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotAPI.Websockets.SubscriptionManager%7D%2CKalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager%2CBacklashBot.State.Interfaces.IDataCache%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CMicrosoft.Extensions.Configuration.IConfiguration%2CBacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_SubscriptionManager__KalshiBotAPI_WebSockets_Interfaces_IWebSocketConnectionManager_BacklashBot_State_Interfaces_IDataCache_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_SubscriptionManagerConfig__BacklashInterfaces_PerformanceMetrics_ISubscriptionManagerPerformanceMetrics_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotAPI.Websockets.SubscriptionManager%7D%2CKalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager%2CBacklashBot.State.Interfaces.IDataCache%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CMicrosoft.Extensions.Options.IOptions%7BKalshiBotAPI.Configuration.SubscriptionManagerConfig%7D%2CBacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L82">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L96">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager__ctor_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.#ctor*"></a>
-  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_SubscriptionManager__KalshiBotAPI_WebSockets_Interfaces_IWebSocketConnectionManager_BacklashBot_State_Interfaces_IDataCache_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Configuration_IConfiguration_BacklashInterfaces_PerformanceMetrics_ISubscriptionManagerPerformanceMetrics_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.SubscriptionManager},KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager,BacklashBot.State.Interfaces.IDataCache,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.Configuration.IConfiguration,BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics)">SubscriptionManager(ILogger&lt;SubscriptionManager&gt;, IWebSocketConnectionManager, IDataCache, IStatusTrackerService, IConfiguration, ISubscriptionManagerPerformanceMetrics?)</h4>
+  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_SubscriptionManager__KalshiBotAPI_WebSockets_Interfaces_IWebSocketConnectionManager_BacklashBot_State_Interfaces_IDataCache_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_SubscriptionManagerConfig__BacklashInterfaces_PerformanceMetrics_ISubscriptionManagerPerformanceMetrics_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.SubscriptionManager},KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager,BacklashBot.State.Interfaces.IDataCache,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.SubscriptionManagerConfig},BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics)">SubscriptionManager(ILogger&lt;SubscriptionManager&gt;, IWebSocketConnectionManager, IDataCache, IStatusTrackerService, IOptions&lt;SubscriptionManagerConfig&gt;, ISubscriptionManagerPerformanceMetrics?)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the SubscriptionManager with required dependencies.
 Sets up internal data structures for subscription management, state tracking, and queue processing.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SubscriptionManager(ILogger&lt;SubscriptionManager&gt; logger, IWebSocketConnectionManager connectionManager, IDataCache dataCache, IStatusTrackerService statusTrackerService, IConfiguration configuration, ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public SubscriptionManager(ILogger&lt;SubscriptionManager&gt; logger, IWebSocketConnectionManager connectionManager, IDataCache dataCache, IStatusTrackerService statusTrackerService, IOptions&lt;SubscriptionManagerConfig&gt; config, ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -179,9 +192,9 @@ Sets up internal data structures for subscription management, state tracking, an
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
-        <td><span class="parametername">configuration</span></td>
-        <td><p>Configuration for subscription manager settings.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="KalshiBotAPI.Configuration.SubscriptionManagerConfig.html">SubscriptionManagerConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration options for subscription manager settings.</p>
 </td>
       </tr>
       <tr>
@@ -199,7 +212,7 @@ Sets up internal data structures for subscription management, state tracking, an
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_ChannelSubscriptionSemaphoreCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.ChannelSubscriptionSemaphoreCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L197">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L174">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_ChannelSubscriptionSemaphoreCount_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ChannelSubscriptionSemaphoreCount*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_ChannelSubscriptionSemaphoreCount" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ChannelSubscriptionSemaphoreCount">ChannelSubscriptionSemaphoreCount</h4>
@@ -231,7 +244,7 @@ Indicates whether channel subscription operations are currently being processed.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_EventCounts.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.EventCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L185">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L162">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_EventCounts_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.EventCounts*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_EventCounts" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.EventCounts">EventCounts</h4>
@@ -263,7 +276,7 @@ Used for monitoring and diagnostics of WebSocket message traffic.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_QueuedSubscriptionUpdatesCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.QueuedSubscriptionUpdatesCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L203">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L180">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_QueuedSubscriptionUpdatesCount_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.QueuedSubscriptionUpdatesCount*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_QueuedSubscriptionUpdatesCount" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.QueuedSubscriptionUpdatesCount">QueuedSubscriptionUpdatesCount</h4>
@@ -295,7 +308,7 @@ Used for monitoring the backlog of subscription operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_SubscriptionUpdateSemaphoreCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.SubscriptionUpdateSemaphoreCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L191">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L168">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_SubscriptionUpdateSemaphoreCount_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscriptionUpdateSemaphoreCount*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_SubscriptionUpdateSemaphoreCount" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscriptionUpdateSemaphoreCount">SubscriptionUpdateSemaphoreCount</h4>
@@ -327,7 +340,7 @@ Indicates whether subscription updates are currently being processed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_WatchedMarkets.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.WatchedMarkets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L175">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L152">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_WatchedMarkets_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.WatchedMarkets*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_WatchedMarkets" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.WatchedMarkets">WatchedMarkets</h4>
@@ -337,7 +350,7 @@ This property is synchronized with the data cache for persistence across applica
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public HashSet&lt;string&gt; WatchedMarkets { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public override HashSet&lt;string&gt; WatchedMarkets { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -354,6 +367,8 @@ This property is synchronized with the data cache for persistence across applica
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="KalshiBotAPI.Websockets.BaseSubscriptionManager.html#KalshiBotAPI_Websockets_BaseSubscriptionManager_WatchedMarkets">BaseSubscriptionManager.WatchedMarkets</a></div>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -361,7 +376,7 @@ This property is synchronized with the data cache for persistence across applica
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_CanSubscribeToMarket_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.CanSubscribeToMarket(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L851">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L919">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_CanSubscribeToMarket_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.CanSubscribeToMarket*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_CanSubscribeToMarket_System_String_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.CanSubscribeToMarket(System.String,System.String)">CanSubscribeToMarket(string, string)</h4>
@@ -417,7 +432,7 @@ This property is synchronized with the data cache for persistence across applica
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_ClearOrderBookQueue_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.ClearOrderBookQueue(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L877">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L945">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_ClearOrderBookQueue_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ClearOrderBookQueue*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_ClearOrderBookQueue_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ClearOrderBookQueue(System.String)">ClearOrderBookQueue(string)</h4>
@@ -452,7 +467,7 @@ Used when resetting market data or handling market-specific cleanup operations.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GenerateNextMessageId.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GenerateNextMessageId%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1178">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1365">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GenerateNextMessageId_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GenerateNextMessageId*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GenerateNextMessageId" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GenerateNextMessageId">GenerateNextMessageId()</h4>
@@ -485,7 +500,7 @@ Uses thread-safe increment to ensure unique IDs across concurrent operations.</p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GetChannelName_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GetChannelName(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1171">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1358">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GetChannelName_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetChannelName*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GetChannelName_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetChannelName(System.String)">GetChannelName(string)</h4>
@@ -536,7 +551,7 @@ Maps user-friendly action names to the actual channel names used by Kalshi's Web
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GetEventCountsByMarket_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GetEventCountsByMarket(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L970">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1038">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GetEventCountsByMarket_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetEventCountsByMarket*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GetEventCountsByMarket_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetEventCountsByMarket(System.String)">GetEventCountsByMarket(string)</h4>
@@ -576,7 +591,7 @@ Currently returns default values as market-specific counting is not implemented.
     </thead>
     <tbody>
       <tr>
-        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.orderbookevents">orderbookEvents</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tradeevents">tradeEvents</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tickerevents">tickerEvents</a>)</td>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.eventqueuecount">EventQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tickerqueuecount">TickerQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.notificationqueuecount">NotificationQueueCount</a>)</td>
         <td><p>A tuple containing counts for orderbook, trade, and ticker events.</p>
 </td>
       </tr>
@@ -587,7 +602,7 @@ Currently returns default values as market-specific counting is not implemented.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GetLockMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GetLockMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1249">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1436">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GetLockMetrics_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetLockMetrics*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GetLockMetrics" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetLockMetrics">GetLockMetrics()</h4>
@@ -619,7 +634,7 @@ Currently returns default values as market-specific counting is not implemented.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GetPendingConfirm_System_Int32_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GetPendingConfirm(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1332">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1522">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GetPendingConfirm_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetPendingConfirm*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GetPendingConfirm_System_Int32_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetPendingConfirm(System.Int32)">GetPendingConfirm(int)</h4>
@@ -670,7 +685,7 @@ Used to get details about outstanding subscription requests.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1220">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1407">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_GetPerformanceMetrics_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetPerformanceMetrics*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_GetPerformanceMetrics" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
@@ -702,7 +717,7 @@ Used to get details about outstanding subscription requests.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_IsSubscribed_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.IsSubscribed(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L838">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L906">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_IsSubscribed_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.IsSubscribed*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_IsSubscribed_System_String_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.IsSubscribed(System.String,System.String)">IsSubscribed(string, string)</h4>
@@ -755,10 +770,78 @@ Used to get details about outstanding subscription requests.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketHealthy_System_String___.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketHealthy(System.String%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1544">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketHealthy_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketHealthy*"></a>
+  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketHealthy_System_String___" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketHealthy(System.String[])">RaiseMarketWebSocketHealthy(string[])</h4>
+  <div class="markdown level1 summary"><p>Raises the MarketWebSocketHealthy event for the specified markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RaiseMarketWebSocketHealthy(string[] markets)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><span class="parametername">markets</span></td>
+        <td><p>Array of market tickers that have restored WebSocket connections.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketUnhealthy_System_String___.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketUnhealthy(System.String%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1535">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketUnhealthy_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketUnhealthy*"></a>
+  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_RaiseMarketWebSocketUnhealthy_System_String___" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RaiseMarketWebSocketUnhealthy(System.String[])">RaiseMarketWebSocketUnhealthy(string[])</h4>
+  <div class="markdown level1 summary"><p>Raises the MarketWebSocketUnhealthy event for the specified markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RaiseMarketWebSocketUnhealthy(string[] markets)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><span class="parametername">markets</span></td>
+        <td><p>Array of market tickers that have unhealthy WebSocket connections.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_RemovePendingConfirmation_System_Int32_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.RemovePendingConfirmation(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1312">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1502">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_RemovePendingConfirmation_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RemovePendingConfirmation*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_RemovePendingConfirmation_System_Int32_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.RemovePendingConfirmation(System.Int32)">RemovePendingConfirmation(int)</h4>
@@ -809,7 +892,7 @@ Called when a confirmation response is received or when a timeout occurs.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_ResetEventCounts.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.ResetEventCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L959">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1027">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_ResetEventCounts_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ResetEventCounts*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_ResetEventCounts" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ResetEventCounts">ResetEventCounts()</h4>
@@ -826,7 +909,7 @@ Used for resetting monitoring statistics or starting fresh counting periods.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_ResubscribeAsync_System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.ResubscribeAsync(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L785">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L771">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_ResubscribeAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ResubscribeAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_ResubscribeAsync_System_Boolean_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.ResubscribeAsync(System.Boolean)">ResubscribeAsync(bool)</h4>
@@ -877,7 +960,7 @@ Used to restore subscriptions after connection recovery or when forcing a comple
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_SetSubscriptionState_System_String_System_String_BacklashInterfaces_Enums_SubscriptionState_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.SetSubscriptionState(System.String%2CSystem.String%2CBacklashInterfaces.Enums.SubscriptionState)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L866">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L934">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_SetSubscriptionState_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SetSubscriptionState*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_SetSubscriptionState_System_String_System_String_BacklashInterfaces_Enums_SubscriptionState_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SetSubscriptionState(System.String,System.String,BacklashInterfaces.Enums.SubscriptionState)">SetSubscriptionState(string, string, SubscriptionState)</h4>
@@ -924,7 +1007,7 @@ Used to track the lifecycle of subscription operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_StartAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.StartAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L137">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L114">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_StartAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.StartAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_StartAsync" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.StartAsync">StartAsync()</h4>
@@ -957,7 +1040,7 @@ Initializes the subscription queue processor, pending confirmation monitor, and 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_StopAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.StopAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L151">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L128">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_StopAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.StopAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_StopAsync" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.StopAsync">StopAsync()</h4>
@@ -990,7 +1073,7 @@ Ensures proper cleanup of subscription processing tasks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToChannelAsync_System_String_System_String___.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToChannelAsync(System.String%2CSystem.String%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L213">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L190">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToChannelAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToChannelAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToChannelAsync_System_String_System_String___" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToChannelAsync(System.String,System.String[])">SubscribeToChannelAsync(string, string[])</h4>
@@ -1048,7 +1131,7 @@ state management and error handling for connection issues.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToWatchedMarketsAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToWatchedMarketsAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L424">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L409">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToWatchedMarketsAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToWatchedMarketsAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_SubscribeToWatchedMarketsAsync" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.SubscribeToWatchedMarketsAsync">SubscribeToWatchedMarketsAsync()</h4>
@@ -1082,7 +1165,7 @@ receive real-time data for all supported channel types.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromAllAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromAllAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L715">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L701">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromAllAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromAllAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromAllAsync" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromAllAsync">UnsubscribeFromAllAsync()</h4>
@@ -1115,7 +1198,7 @@ Sends unsubscription requests for all active subscriptions and cleans up local s
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromChannelAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromChannelAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L637">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L623">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromChannelAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromChannelAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_UnsubscribeFromChannelAsync_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UnsubscribeFromChannelAsync(System.String)">UnsubscribeFromChannelAsync(string)</h4>
@@ -1166,7 +1249,7 @@ Sends an unsubscription request to the server and cleans up local state.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionAsync_System_String_System_String___System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionAsync(System.String%2CSystem.String%5B%5D%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L477">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L462">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionAsync_System_String_System_String___System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionAsync(System.String,System.String[],System.String)">UpdateSubscriptionAsync(string, string[], string)</h4>
@@ -1229,7 +1312,7 @@ Handles both adding new markets to an existing subscription and removing markets
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionStateFromConfirmationAsync_System_Int32_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(System.Int32%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1281">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L1468">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionStateFromConfirmationAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionStateFromConfirmationAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_UpdateSubscriptionStateFromConfirmationAsync_System_Int32_System_String_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(System.Int32,System.String)">UpdateSubscriptionStateFromConfirmationAsync(int, string)</h4>
@@ -1286,7 +1369,7 @@ Sets the subscription ID and marks all markets in the channel as subscribed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_WaitForEmptyOrderBookQueueAsync_System_String_System_TimeSpan_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.WaitForEmptyOrderBookQueueAsync(System.String%2CSystem.TimeSpan)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L913">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L981">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_SubscriptionManager_WaitForEmptyOrderBookQueueAsync_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.WaitForEmptyOrderBookQueueAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_WaitForEmptyOrderBookQueueAsync_System_String_System_TimeSpan_" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.WaitForEmptyOrderBookQueueAsync(System.String,System.TimeSpan)">WaitForEmptyOrderBookQueueAsync(string, TimeSpan)</h4>
@@ -1338,6 +1421,68 @@ Used to ensure all pending updates are processed before proceeding with operatio
       </tr>
     </tbody>
   </table>
+  <h3 id="events">Events
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_MarketWebSocketHealthy.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.MarketWebSocketHealthy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L79">View Source</a>
+  </span>
+  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_MarketWebSocketHealthy" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.MarketWebSocketHealthy">MarketWebSocketHealthy</h4>
+  <div class="markdown level1 summary"><p>Event raised when WebSocket health is restored for specific markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;string[]&gt;? MarketWebSocketHealthy</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager_MarketWebSocketUnhealthy.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager.MarketWebSocketUnhealthy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L74">View Source</a>
+  </span>
+  <h4 id="KalshiBotAPI_Websockets_SubscriptionManager_MarketWebSocketUnhealthy" data-uid="KalshiBotAPI.Websockets.SubscriptionManager.MarketWebSocketUnhealthy">MarketWebSocketUnhealthy</h4>
+  <div class="markdown level1 summary"><p>Event raised when WebSocket health becomes unhealthy for specific markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;string[]&gt;? MarketWebSocketUnhealthy</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.html">ISubscriptionManager</a>
@@ -1354,7 +1499,7 @@ Used to ensure all pending updates are processed before proceeding with operatio
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_SubscriptionManager.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.SubscriptionManager%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L19" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/SubscriptionManager.cs/#L20" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

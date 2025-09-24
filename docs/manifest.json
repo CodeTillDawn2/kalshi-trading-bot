@@ -12,31 +12,227 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.yml",
+      "source_relative_path": "api/BacklashBot.Configuration.BrainStatusServiceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html"
+          "relative_path": "api/BacklashBot.Configuration.BrainStatusServiceConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.yml\" sourcestartlinenumber=\"1\">Represents the result of a snapshot validation operation, containing flags for specific discrepancy types\nand an overall validity indicator.</p>\n"
+      "Title": "BacklashBot.Configuration.BrainStatusServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.BrainStatusServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for BrainStatusService-specific settings.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.yml",
+      "source_relative_path": "api/BacklashBot.Configuration.BroadcastServiceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.html"
+          "relative_path": "api/BacklashBot.Configuration.BroadcastServiceConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "BacklashBot.Helpers.SnapshotDiscrepancyValidator",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.yml\" sourcestartlinenumber=\"1\">Provides static methods for validating market snapshots to detect data discrepancies and ensure data integrity.\nThis validator is used to filter out invalid snapshots before processing or saving them, preventing downstream issues\nfrom corrupted or inconsistent market data.</p>\n"
+      "Title": "BacklashBot.Configuration.BroadcastServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.BroadcastServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for BroadcastService settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.CandlestickServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.CandlestickServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.CandlestickServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.CandlestickServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for CandlestickService settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.CentralBrainConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.CentralBrainConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.CentralBrainConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.CentralBrainConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for CentralBrain-specific settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.CentralErrorHandlerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.CentralErrorHandlerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.CentralErrorHandlerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.CentralErrorHandlerConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the CentralErrorHandler component that manages error processing,\ncatastrophic failure detection, and internet connectivity monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.CentralPerformanceMonitorConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.CentralPerformanceMonitorConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.CentralPerformanceMonitorConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.CentralPerformanceMonitorConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for CentralPerformanceMonitor settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.GeneralExecutionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.GeneralExecutionConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.GeneralExecutionConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.GeneralExecutionConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for general execution settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for KalshiBotScopeManagerService settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.MarketDataInitializerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.MarketDataInitializerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.MarketDataInitializerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.MarketDataInitializerConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for MarketDataInitializer settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.MarketRefreshServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.MarketRefreshServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.MarketRefreshServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.MarketRefreshServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for MarketRefreshService parameters.\nControls refresh intervals, thresholds, and performance metrics for market data synchronization.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.MarketServiceDataConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.MarketServiceDataConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.MarketServiceDataConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.MarketServiceDataConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for market data settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.OrderbookChangeTrackerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.OrderbookChangeTrackerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.OrderbookChangeTrackerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.OrderbookChangeTrackerConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OrderbookChangeTracker service parameters.\nControls queue sizes, cleanup thresholds, and performance metrics for orderbook change tracking.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.OverseerClientServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.OverseerClientServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.OverseerClientServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.OverseerClientServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OverseerClientService settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.QueueMonitoringConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.QueueMonitoringConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.QueueMonitoringConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.QueueMonitoringConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for queue monitoring and alert settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.TargetCalculationServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.TargetCalculationServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration.TargetCalculationServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Configuration.TargetCalculationServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for TargetCalculationService-specific settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Configuration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Configuration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Configuration",
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -79,62 +275,6 @@
       "IsMRef": true,
       "Title": "BacklashBot.Hubs.BacklashBotHub",
       "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.BacklashBotHub.yml\" sourcestartlinenumber=\"1\">SignalR hub for managing real-time communication between the BacklashBot trading system and connected clients.\nHandles client connections, handshakes, check-ins, and message routing to the Overseer system.\nProvides methods for broadcasting trading data, confirming target tickers, and processing overseer responses.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Hubs.CheckInData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Hubs.CheckInData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Hubs.CheckInData",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.CheckInData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive information about a brain instance's current state.\nUsed for periodic check-ins to report status, performance metrics, and configuration to the Overseer.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Hubs.CheckInResponse.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Hubs.CheckInResponse.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Hubs.CheckInResponse",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.CheckInResponse.yml\" sourcestartlinenumber=\"1\">Response structure for check-in acknowledgments from the Overseer.\nContains success status, optional message, and target tickers for the brain to monitor.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Hubs.PerformanceMetricsData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Hubs.PerformanceMetricsData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Hubs.PerformanceMetricsData",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.PerformanceMetricsData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.\nUsed for detailed performance monitoring and analytics, including database operations,\nWebSocket metrics, queue depths, and system resource utilization.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Hubs.TargetTickersConfirmationResponse.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Hubs.TargetTickersConfirmationResponse.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Hubs.TargetTickersConfirmationResponse",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.TargetTickersConfirmationResponse.yml\" sourcestartlinenumber=\"1\">Response structure for target tickers confirmation acknowledgments.\nUsed to confirm that the brain has successfully received and processed target market assignments.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -260,7 +400,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IBrainStatusService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IBrainStatusService.yml\" sourcestartlinenumber=\"1\">IBrainStatusService</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IBrainStatusService.yml\" sourcestartlinenumber=\"1\">Interface for brain status service that manages brain instance initialization and status.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -320,20 +460,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Management.Interfaces.IMarketAnalysisHelper",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.yml\" sourcestartlinenumber=\"1\">IMarketAnalysisHelper</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Management.Interfaces.IMarketManagerService.yml",
       "output": {
         ".html": {
@@ -359,6 +485,20 @@
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IOvernightActivitiesHelper",
       "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.yml\" sourcestartlinenumber=\"1\">IOvernightActivitiesHelper</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Management.Interfaces.ISnapshotGroupHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Management.Interfaces.ISnapshotGroupHelper.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Management.Interfaces.ISnapshotGroupHelper",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.ISnapshotGroupHelper.yml\" sourcestartlinenumber=\"1\">IMarketAnalysisHelper</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -401,20 +541,6 @@
       "IsMRef": true,
       "Title": "BacklashBot.Management.ManagedMarketManagerService",
       "Summary": "<p sourcefile=\"api/BacklashBot.Management.ManagedMarketManagerService.yml\" sourcestartlinenumber=\"1\">Implements managed market management strategy for the Kalshi trading bot.\nUses dynamic target calculation based on performance metrics rather than fixed counts.\nAutomatically adjusts market watch counts based on system usage, queue depths, and\nperformance indicators to optimize resource utilization and market coverage.\nIncludes input validation for brain configuration parameters with warning logs for invalid values.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Management.MarketAnalysisHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Management.MarketAnalysisHelper.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Management.MarketAnalysisHelper",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Management.MarketAnalysisHelper.yml\" sourcestartlinenumber=\"1\">Helper service for performing market analysis operations, specifically generating snapshot groups\nfrom raw market snapshots by filtering markets and processing them into valid time periods.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -569,20 +695,6 @@
       "IsMRef": true,
       "Title": "BacklashBot.Services.HealthCheckService",
       "Summary": "<p sourcefile=\"api/BacklashBot.Services.HealthCheckService.yml\" sourcestartlinenumber=\"1\">Implementation of IHealthCheckService to verify dependent services are operational.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Services.InterestScoreService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Services.InterestScoreService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Services.InterestScoreService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"1\">Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.\nThis service evaluates market attractiveness by analyzing spread characteristics, trading volume,\nliquidity patterns, and market continuity to provide quantitative scores for market selection.</p>\n<p sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"5\">Features:</p>\n<ul sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"6\">\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"6\">Configurable cache duration for performance optimization</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"7\">Comprehensive performance metrics collection and monitoring</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"8\">Input validation for market tickers and weight parameters</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"9\">Thread-safe operations for concurrent access</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"10\">Automatic metrics logging with configurable intervals</li>\n</ul>\n"
     },
     {
       "type": "ManagedReference",
@@ -768,17 +880,17 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Services.KaslhiBotScopeManagerService.yml",
+      "source_relative_path": "api/BacklashBot.Services.KalshiBotScopeManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BacklashBot.Services.KaslhiBotScopeManagerService.html"
+          "relative_path": "api/BacklashBot.Services.KalshiBotScopeManagerService.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "BacklashBot.Services.KaslhiBotScopeManagerService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.KaslhiBotScopeManagerService.yml\" sourcestartlinenumber=\"1\">Service for managing dependency injection scopes in the Kalshi trading bot system.\nThis service handles the creation, initialization, and disposal of service scopes,\nensuring proper resource management and access to scoped services throughout the application.\nIncludes configurable performance metrics for monitoring scope efficiency.</p>\n"
+      "Title": "BacklashBot.Services.KalshiBotScopeManagerService",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.KalshiBotScopeManagerService.yml\" sourcestartlinenumber=\"1\">Service for managing dependency injection scopes in the Kalshi trading bot system.\nThis service handles the creation, initialization, and disposal of service scopes,\nensuring proper resource management and access to scoped services throughout the application.\nIncludes configurable performance metrics for monitoring scope efficiency.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -908,20 +1020,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Services.TradingSnapshotService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Services.TradingSnapshotService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Services.TradingSnapshotService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.TradingSnapshotService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing trading snapshot operations, including saving market data snapshots to disk\nand loading them for analysis. This service handles snapshot validation, timing controls, and schema management\nto ensure reliable data persistence and retrieval for trading strategy evaluation.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Services.WebSocketMonitorService.yml",
       "output": {
         ".html": {
@@ -936,6 +1034,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Services.WebSocketMonitorServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Services.WebSocketMonitorServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Services.WebSocketMonitorServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.WebSocketMonitorServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the WebSocketMonitorService behavior, including monitoring intervals\nand performance metrics settings. This configuration is loaded from the\n&quot;Websocket:WebSocketMonitor&quot; section of the application configuration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Services.yml",
       "output": {
         ".html": {
@@ -947,6 +1059,20 @@
       "IsMRef": true,
       "Title": "BacklashBot.Services",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.State.CalculationsConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.State.CalculationsConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.State.CalculationsConfig",
+      "Summary": "<p sourcefile=\"api/BacklashBot.State.CalculationsConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for calculation parameters used in MarketData.\nThis replaces the eliminated CalculationConfig from TradingStrategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1213,118 +1339,6 @@
       "IsMRef": true,
       "Title": "BacklashDTOs.CandlestickData",
       "Summary": "<p sourcefile=\"api/BacklashDTOs.CandlestickData.yml\" sourcestartlinenumber=\"1\">Represents candlestick data for a market.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.CentralBrainConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.CentralBrainConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.CentralBrainConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.CentralBrainConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the CentralBrain component.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.ErrorHandlerConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.ErrorHandlerConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.ErrorHandlerConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.ErrorHandlerConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the CentralErrorHandler component that manages error processing,\ncatastrophic failure detection, and internet connectivity monitoring.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.ExecutionConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.ExecutionConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.ExecutionConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.ExecutionConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for execution settings.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.InterestScoreConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.InterestScoreConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.InterestScoreConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.InterestScoreConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for InterestScoreService settings.\nControls cache duration, performance monitoring, and operational parameters\nfor the interest scoring system. These settings can be configured via appsettings.json\nand are injected through dependency injection.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.LoggingConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.LoggingConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.LoggingConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.LoggingConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for logging settings.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.MarketDataConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.MarketDataConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.MarketDataConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.MarketDataConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for market data settings.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.SimulatorConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.SimulatorConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration.SimulatorConfig",
-      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.SimulatorConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for trading simulator settings.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashDTOs.Configuration.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashDTOs.Configuration.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashDTOs.Configuration",
-      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -3526,17 +3540,87 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.CheckInData.yml",
+      "source_relative_path": "api/BacklashOverseer.Config.BrainPersistenceServiceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BacklashOverseer.CheckInData.html"
+          "relative_path": "api/BacklashOverseer.Config.BrainPersistenceServiceConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "BacklashOverseer.CheckInData",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.CheckInData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive information about a brain instance's current state,\nused during periodic check-in operations to report status to the overseer system.</p>\n"
+      "Title": "BacklashOverseer.Config.BrainPersistenceServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Config.BrainPersistenceServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the BrainPersistenceService.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Config.MarketWatchControllerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Config.MarketWatchControllerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Config.MarketWatchControllerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Config.MarketWatchControllerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the MarketWatchController behavior, including cache durations\nand performance metrics settings. This configuration is loaded from the\n&quot;Endpoints:MarketWatchController&quot; section of the application configuration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Config.OverseerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Config.OverseerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Config.OverseerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Config.OverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the Overseer system.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Config.OverseerHubConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Config.OverseerHubConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Config.OverseerHubConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Config.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Config.SnapshotAggregationServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Config.SnapshotAggregationServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Config.SnapshotAggregationServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Config.SnapshotAggregationServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the SnapshotAggregationService behavior, including performance metrics settings.\nThis configuration is loaded from the &quot;SnapshotAggregationService&quot; section of the application configuration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Config.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Config.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Config",
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -3596,34 +3680,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.Models.BrainStatusData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.Models.BrainStatusData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.Models.BrainStatusData",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.BrainStatusData.yml\" sourcestartlinenumber=\"1\">Data transfer object representing the current status and configuration of a brain instance.\nUsed for communication between the brain and overseer systems, containing real-time\noperational data, performance metrics, and market watch information.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.Models.MarketWatchData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.Models.MarketWatchData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.Models.MarketWatchData",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.MarketWatchData.yml\" sourcestartlinenumber=\"1\">Contains detailed information about a market being watched by a brain instance.\nIncludes interest scoring data, watch history, and performance metrics for the specific market.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashOverseer.Models.MetricHistory.yml",
       "output": {
         ".html": {
@@ -3666,20 +3722,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.OverseerConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.OverseerConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.OverseerConfig",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the Overseer system.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashOverseer.OverseerHub.ClientInfo.yml",
       "output": {
         ".html": {
@@ -3705,20 +3747,6 @@
       "IsMRef": true,
       "Title": "BacklashOverseer.OverseerHub",
       "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHub.yml\" sourcestartlinenumber=\"1\">SignalR hub that manages real-time communication between the Kalshi trading bot overseer\nand connected clients. This hub handles client connections, authentication via handshakes,\nperiodic status check-ins from brain instances, and broadcasting of trading data and updates.\nIt serves as the central communication point for the overseer system, enabling real-time\nmonitoring and control of trading bot operations.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.OverseerHubConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.OverseerHubConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.OverseerHubConfig",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3750,20 +3778,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.PerformanceMetricsData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.PerformanceMetricsData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.PerformanceMetricsData",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.PerformanceMetricsData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.\nUsed for detailed performance monitoring and analytics, including database operations,\nWebSocket metrics, queue depths, and system resource utilization.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashOverseer.Services.BrainPersistenceService.yml",
       "output": {
         ".html": {
@@ -3774,21 +3788,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashOverseer.Services.BrainPersistenceService",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing brain instance states with configurable persistence options.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It supports both\nin-memory storage and optional database persistence for recovery after application restarts.\nThe service includes configurable history retention, performance metrics collection,\nbatch operations, and comprehensive health monitoring.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.Services.BrainPersistenceServiceConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.Services.BrainPersistenceServiceConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.Services.BrainPersistenceServiceConfig",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.BrainPersistenceServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the BrainPersistenceService.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing brain instance states with database persistence.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It supports\nin-memory storage and database persistence for recovery after application restarts.\nThe service includes configurable history retention, performance metrics collection,\nbatch operations, and comprehensive health monitoring.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3848,20 +3848,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.State.OverseerReadyConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.State.OverseerReadyConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.State.OverseerReadyConfig",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.State.OverseerReadyConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OverseerReadyStatus default states.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashOverseer.State.OverseerReadyStatus.yml",
       "output": {
         ".html": {
@@ -3904,20 +3890,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashOverseer.WebSocketMonitorServiceLite.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashOverseer.WebSocketMonitorServiceLite.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashOverseer.WebSocketMonitorServiceLite",
-      "Summary": "<p sourcefile=\"api/BacklashOverseer.WebSocketMonitorServiceLite.yml\" sourcestartlinenumber=\"1\">Lightweight service for monitoring WebSocket connections and exchange status.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashOverseer.yml",
       "output": {
         ".html": {
@@ -3932,31 +3904,17 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotAPI.Configuration.CandlestickCushionConfig.yml",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.KalshiAPIServiceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/KalshiBotAPI.Configuration.CandlestickCushionConfig.html"
+          "relative_path": "api/KalshiBotAPI.Configuration.KalshiAPIServiceConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "KalshiBotAPI.Configuration.CandlestickCushionConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.CandlestickCushionConfig.yml\" sourcestartlinenumber=\"1\">Configuration for candlestick cushion seconds.\nDefines the overlap period in seconds to prevent data gaps when fetching historical data in chunks.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotAPI.Configuration.CandlestickLookbackConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.yml\" sourcestartlinenumber=\"1\">Configuration for candlestick lookback periods in days.\nDefines the maximum historical data range to fetch for each time interval.</p>\n"
+      "Title": "KalshiBotAPI.Configuration.KalshiAPIServiceConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.KalshiAPIServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for KalshiAPIService operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3970,7 +3928,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.Configuration.KalshiConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.KalshiConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the Kalshi API integration.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.KalshiConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for core Kalshi API integration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.KalshiWebSocketClientConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.KalshiWebSocketClientConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.KalshiWebSocketClientConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.KalshiWebSocketClientConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for KalshiWebSocketClient operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3984,7 +3956,49 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.Configuration.MessageProcessorConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.MessageProcessorConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the MessageProcessor component.\nControls message batching, queue sizes, timeouts, and performance monitoring.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.MessageProcessorConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for MessageProcessor operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.SubscriptionManagerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.SubscriptionManagerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.SubscriptionManagerConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.SubscriptionManagerConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for SubscriptionManager operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.WebSocketConnectionManagerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.WebSocketConnectionManagerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.WebSocketConnectionManagerConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.WebSocketConnectionManagerConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for WebSocketConnectionManager operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.WebSocketMonitorConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.WebSocketMonitorConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.WebSocketMonitorConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.WebSocketMonitorConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for WebSocketMonitor operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4068,7 +4082,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.yml\" sourcestartlinenumber=\"1\">ISubscriptionManager</p>\n"
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -4097,6 +4111,20 @@
       "IsMRef": true,
       "Title": "KalshiBotAPI.WebSockets.Interfaces",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Websockets.BaseSubscriptionManager.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Websockets.BaseSubscriptionManager.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Websockets.BaseSubscriptionManager",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Websockets.BaseSubscriptionManager.yml\" sourcestartlinenumber=\"1\">Base class for managing WebSocket channel subscriptions for real-time market data from Kalshi's trading platform.\nHandles subscription lifecycle, state tracking, confirmation processing, and queue management\nfor reliable market data streaming with proper error handling and recovery mechanisms.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4576,45 +4604,59 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Classification.SnapshotPeriodHelper.yml",
+      "source_relative_path": "api/TradingStrategies.Configuration.DataLoaderConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/TradingStrategies.Classification.SnapshotPeriodHelper.html"
+          "relative_path": "api/TradingStrategies.Configuration.DataLoaderConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "TradingStrategies.Classification.SnapshotPeriodHelper",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Classification.SnapshotPeriodHelper.yml\" sourcestartlinenumber=\"1\">Provides functionality for processing and grouping market snapshots into valid analysis periods.\nThis class implements the core logic for identifying continuous market periods based on time gaps\nand price stability, ensuring that only stable market conditions are used for trading strategy\nevaluation and backtesting. It handles the serialization of snapshot groups to disk and their\nsubsequent loading for analysis. Supports async operations, parallel processing, and progress reporting.</p>\n"
+      "Title": "TradingStrategies.Configuration.DataLoaderConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.DataLoaderConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for data loader settings.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Classification.yml",
+      "source_relative_path": "api/TradingStrategies.Configuration.EquityCalculatorConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/TradingStrategies.Classification.html"
+          "relative_path": "api/TradingStrategies.Configuration.EquityCalculatorConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "TradingStrategies.Classification",
-      "Summary": null
+      "Title": "TradingStrategies.Configuration.EquityCalculatorConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.EquityCalculatorConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for EquityCalculator parameters.\nControls performance metrics collection for equity calculations.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Configuration.CalculationConfig.yml",
+      "source_relative_path": "api/TradingStrategies.Configuration.MarketTypeServiceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/TradingStrategies.Configuration.CalculationConfig.html"
+          "relative_path": "api/TradingStrategies.Configuration.MarketTypeServiceConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "TradingStrategies.Configuration.CalculationConfig",
-      "Summary": null
+      "Title": "TradingStrategies.Configuration.MarketTypeServiceConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.MarketTypeServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the MarketTypeService.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Configuration.PatternDetectionServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Configuration.PatternDetectionServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Configuration.PatternDetectionServiceConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.PatternDetectionServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for pattern detection parameters.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4632,31 +4674,59 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Configuration.SnapshotConfig.yml",
+      "source_relative_path": "api/TradingStrategies.Configuration.SimulationEngineConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/TradingStrategies.Configuration.SnapshotConfig.html"
+          "relative_path": "api/TradingStrategies.Configuration.SimulationEngineConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "TradingStrategies.Configuration.SnapshotConfig",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.SnapshotConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing snapshot-related parameters used throughout the trading bot system.\nThese settings control snapshot timing tolerances, schema versioning, and data persistence behavior\nfor market data snapshots used in trading strategy evaluation and backtesting.</p>\n"
+      "Title": "TradingStrategies.Configuration.SimulationEngineConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.SimulationEngineConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the SimulationEngine.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Configuration.TradingConfig.yml",
+      "source_relative_path": "api/TradingStrategies.Configuration.StrategySelectionHelperConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "api/TradingStrategies.Configuration.TradingConfig.html"
+          "relative_path": "api/TradingStrategies.Configuration.StrategySelectionHelperConfig.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "TradingStrategies.Configuration.TradingConfig",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.TradingConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.\nThese settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals\nused throughout the trading strategy execution pipeline. Values are injected via dependency injection\nand consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.\nThe class includes data validation attributes and a Validate() method to ensure parameters are within acceptable ranges.</p>\n"
+      "Title": "TradingStrategies.Configuration.StrategySelectionHelperConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.StrategySelectionHelperConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the StrategySelectionHelper.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Configuration.TradingOverseerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Configuration.TradingOverseerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Configuration.TradingOverseerConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.TradingOverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the TradingOverseer behavior, including performance metrics settings.\nThis configuration is loaded from the &quot;TradingOverseer&quot; section of the application configuration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Configuration.TradingSimulatorServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Configuration.TradingSimulatorServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Configuration.TradingSimulatorServiceConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.TradingSimulatorServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for trading simulator settings.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5290,20 +5360,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Helpers.MarketTypeHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Helpers.MarketTypeHelper.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Helpers.MarketTypeHelper",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Helpers.MarketTypeHelper.yml\" sourcestartlinenumber=\"1\">Provides functionality to classify market types based on various trading conditions extracted from market snapshots.\nThis helper uses a rule-based system with priority ordering to determine the most appropriate market type\nfor a given set of market conditions, enabling trading strategies to adapt their behavior accordingly.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.yml",
       "output": {
         ".html": {
@@ -5455,20 +5511,6 @@
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.PathPerformance",
       "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PathPerformance.yml\" sourcestartlinenumber=\"1\">Represents the performance metrics for a complete trading path or simulation run.\nThis class aggregates key performance indicators including profit/loss, equity changes,\ntrade counts, and market state transitions for comprehensive analysis of trading outcomes.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.PatternDetectionConfig",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for pattern detection parameters.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5694,11 +5736,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "api/toc.json"
-        },
         ".html": {
           "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
         }
       },
       "version": ""
@@ -5727,11 +5769,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "toc.json"
-        },
         ".html": {
           "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
         }
       },
       "version": ""

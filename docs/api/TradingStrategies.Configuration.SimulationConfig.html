@@ -123,6 +123,38 @@ Includes comprehensive data validation to prevent invalid parameter combinations
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class SimulationConfig</code></pre>
   </div>
+  <h3 id="fields">Fields
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_SectionName.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.SectionName%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L17">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Configuration_SimulationConfig_SectionName" data-uid="TradingStrategies.Configuration.SimulationConfig.SectionName">SectionName</h4>
+  <div class="markdown level1 summary"><p>The configuration section name for SimulationConfig.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string SectionName = &quot;Simulator:Simulation&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
 </h3>
   <span class="small pull-right mobile-hide">
@@ -130,7 +162,7 @@ Includes comprehensive data validation to prevent invalid parameter combinations
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_AsyncBatchSize.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L77">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L31">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SimulationConfig_AsyncBatchSize_" data-uid="TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize*"></a>
   <h4 id="TradingStrategies_Configuration_SimulationConfig_AsyncBatchSize" data-uid="TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize">AsyncBatchSize</h4>
@@ -140,7 +172,7 @@ Controls how many snapshots are processed concurrently in async operations.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 1000, ErrorMessage = &quot;AsyncBatchSize must be between 1 and 1000.&quot;)]
+    <pre><code class="lang-csharp hljs">[Required(ErrorMessage = &quot;The &#39;AsyncBatchSize&#39; is missing in the configuration.&quot;)]
 public int AsyncBatchSize { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
@@ -160,112 +192,10 @@ public int AsyncBatchSize { get; set; }</code></pre>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_AsyncTimeoutSeconds.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L84">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_AsyncTimeoutSeconds_" data-uid="TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_AsyncTimeoutSeconds" data-uid="TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds">AsyncTimeoutSeconds</h4>
-  <div class="markdown level1 summary"><p>Timeout for async operations in seconds.
-Prevents hanging operations during large dataset processing.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 3600, ErrorMessage = &quot;AsyncTimeoutSeconds must be between 1 and 3600.&quot;)]
-public int AsyncTimeoutSeconds { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_BandWidthRatioThreshold.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L126">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_BandWidthRatioThreshold_" data-uid="TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_BandWidthRatioThreshold" data-uid="TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold">BandWidthRatioThreshold</h4>
-  <div class="markdown level1 summary"><p>Band width ratio threshold for classification and analysis decisions.
-Used in strategies that involve band-based technical analysis (e.g., Bollinger bands).
-Represents the minimum band width ratio required to trigger certain trading conditions.
-Expressed as decimal (e.g., 0.1 for 10% band width ratio).</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(0, 1, ErrorMessage = &quot;BandWidthRatioThreshold must be between 0 and 1.&quot;)]
-public double BandWidthRatioThreshold { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_ComboPositionSizePercentage.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L41">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_ComboPositionSizePercentage_" data-uid="TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_ComboPositionSizePercentage" data-uid="TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage">ComboPositionSizePercentage</h4>
-  <div class="markdown level1 summary"><p>Position sizing percentage for combo orders (LongPostAsk/ShortPostYes).
-Determines what percentage of current position to rest after market execution.
-Expressed as decimal (e.g., 1.0 for 100%).</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(0.1, 2, ErrorMessage = &quot;ComboPositionSizePercentage must be between 0.1 and 2.0.&quot;)]
-public double ComboPositionSizePercentage { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_DecisionThresholdMs.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L117">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L49">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SimulationConfig_DecisionThresholdMs_" data-uid="TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs*"></a>
   <h4 id="TradingStrategies_Configuration_SimulationConfig_DecisionThresholdMs" data-uid="TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs">DecisionThresholdMs</h4>
@@ -277,42 +207,8 @@ Lower values provide more sensitive monitoring for high-performance requirements
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 1000, ErrorMessage = &quot;DecisionThresholdMs must be between 1 and 1000.&quot;)]
+    <pre><code class="lang-csharp hljs">[Required(ErrorMessage = &quot;The &#39;DecisionThresholdMs&#39; is missing in the configuration.&quot;)]
 public int DecisionThresholdMs { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_DefaultMarketOrderQuantity.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L92">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_DefaultMarketOrderQuantity_" data-uid="TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_DefaultMarketOrderQuantity" data-uid="TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity">DefaultMarketOrderQuantity</h4>
-  <div class="markdown level1 summary"><p>Default quantity for market orders when not specified in ActionDecision.Quantity.
-Used as fallback quantity for Long/Short actions. Controls the base contract count
-for market executions in simulation scenarios.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 1000, ErrorMessage = &quot;DefaultMarketOrderQuantity must be between 1 and 1000.&quot;)]
-public int DefaultMarketOrderQuantity { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -334,7 +230,7 @@ public int DefaultMarketOrderQuantity { get; set; }</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_EnableDecisionTiming.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L109">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L40">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SimulationConfig_EnableDecisionTiming_" data-uid="TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming*"></a>
   <h4 id="TradingStrategies_Configuration_SimulationConfig_EnableDecisionTiming" data-uid="TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming">EnableDecisionTiming</h4>
@@ -346,7 +242,8 @@ and bottleneck identification in high-frequency scenarios.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool EnableDecisionTiming { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required(ErrorMessage = &quot;The &#39;EnableDecisionTiming&#39; is missing in the configuration.&quot;)]
+public bool EnableDecisionTiming { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -365,20 +262,22 @@ and bottleneck identification in high-frequency scenarios.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_EnableDetailedPerformanceLogging.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_EnablePerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.EnablePerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L58">View Source</a>
   </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_EnableDetailedPerformanceLogging_" data-uid="TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_EnableDetailedPerformanceLogging" data-uid="TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging">EnableDetailedPerformanceLogging</h4>
-  <div class="markdown level1 summary"><p>Enable detailed performance logging for high-frequency scenarios.
-When enabled, collects timing data for each simulation step.</p>
+  <a id="TradingStrategies_Configuration_SimulationConfig_EnablePerformanceMetrics_" data-uid="TradingStrategies.Configuration.SimulationConfig.EnablePerformanceMetrics*"></a>
+  <h4 id="TradingStrategies_Configuration_SimulationConfig_EnablePerformanceMetrics" data-uid="TradingStrategies.Configuration.SimulationConfig.EnablePerformanceMetrics">EnablePerformanceMetrics</h4>
+  <div class="markdown level1 summary"><p>Enable collection of performance metrics in StrategySimulation.
+When disabled, skips collection of execution timing, memory usage, trade counts, and apply timing
+to improve performance in high-throughput scenarios. Decision timing is controlled separately.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool EnableDetailedPerformanceLogging { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required(ErrorMessage = &quot;The &#39;EnablePerformanceMetrics&#39; is missing in the configuration.&quot;)]
+public bool EnablePerformanceMetrics { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -391,173 +290,6 @@ When enabled, collects timing data for each simulation step.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_MaxContractPrice.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.MaxContractPrice%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L33">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_MaxContractPrice_" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxContractPrice*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_MaxContractPrice" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxContractPrice">MaxContractPrice</h4>
-  <div class="markdown level1 summary"><p>Maximum valid price for YES/NO contracts in the simulation.
-Used for price validation and order book bounds checking.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 99, ErrorMessage = &quot;MaxContractPrice must be between 1 and 99.&quot;)]
-public int MaxContractPrice { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_MaxRestingOrders.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L48">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_MaxRestingOrders_" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_MaxRestingOrders" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders">MaxRestingOrders</h4>
-  <div class="markdown level1 summary"><p>Maximum number of resting orders allowed per simulation.
-Prevents memory issues with excessive order accumulation.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 10000, ErrorMessage = &quot;MaxRestingOrders must be between 1 and 10000.&quot;)]
-public int MaxRestingOrders { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_MaxTradesPerSnapshot.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L100">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_MaxTradesPerSnapshot_" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_MaxTradesPerSnapshot" data-uid="TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot">MaxTradesPerSnapshot</h4>
-  <div class="markdown level1 summary"><p>Maximum number of trades allowed per snapshot processing cycle.
-Prevents excessive trading activity and potential performance degradation
-in high-frequency trading scenarios. Acts as a circuit breaker for runaway strategies.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 1000, ErrorMessage = &quot;MaxTradesPerSnapshot must be between 1 and 1000.&quot;)]
-public int MaxTradesPerSnapshot { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_MemoryThresholdMB.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L64">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_MemoryThresholdMB_" data-uid="TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_MemoryThresholdMB" data-uid="TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB">MemoryThresholdMB</h4>
-  <div class="markdown level1 summary"><p>Memory usage threshold for triggering garbage collection hints.
-If peak memory usage exceeds this threshold (in MB),
-the system may suggest optimization measures.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(10, 10000, ErrorMessage = &quot;MemoryThresholdMB must be between 10 and 10000.&quot;)]
-public int MemoryThresholdMB { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_MinContractPrice.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.MinContractPrice%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L26">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_MinContractPrice_" data-uid="TradingStrategies.Configuration.SimulationConfig.MinContractPrice*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_MinContractPrice" data-uid="TradingStrategies.Configuration.SimulationConfig.MinContractPrice">MinContractPrice</h4>
-  <div class="markdown level1 summary"><p>Minimum valid price for YES/NO contracts in the simulation.
-Used for price validation and order book bounds checking.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 99, ErrorMessage = &quot;MinContractPrice must be between 1 and 99.&quot;)]
-public int MinContractPrice { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -567,7 +299,7 @@ public int MinContractPrice { get; set; }</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_PerformanceThresholdMs.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L56">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L24">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SimulationConfig_PerformanceThresholdMs_" data-uid="TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs*"></a>
   <h4 id="TradingStrategies_Configuration_SimulationConfig_PerformanceThresholdMs" data-uid="TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs">PerformanceThresholdMs</h4>
@@ -578,110 +310,8 @@ additional performance metrics will be collected.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 10000, ErrorMessage = &quot;PerformanceThresholdMs must be between 1 and 10000.&quot;)]
+    <pre><code class="lang-csharp hljs">[Required(ErrorMessage = &quot;The &#39;PerformanceThresholdMs&#39; is missing in the configuration.&quot;)]
 public int PerformanceThresholdMs { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_Simulation_EnablePerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L143">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_Simulation_EnablePerformanceMetrics_" data-uid="TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_Simulation_EnablePerformanceMetrics" data-uid="TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics">Simulation_EnablePerformanceMetrics</h4>
-  <div class="markdown level1 summary"><p>Enable collection of performance metrics in StrategySimulation.
-When disabled, skips collection of execution timing, memory usage, trade counts, and apply timing
-to improve performance in high-throughput scenarios. Decision timing is controlled separately.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool Simulation_EnablePerformanceMetrics { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_TakerFeeRate.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.TakerFeeRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L19">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_TakerFeeRate_" data-uid="TradingStrategies.Configuration.SimulationConfig.TakerFeeRate*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_TakerFeeRate" data-uid="TradingStrategies.Configuration.SimulationConfig.TakerFeeRate">TakerFeeRate</h4>
-  <div class="markdown level1 summary"><p>Trading fee rate applied to all market executions in simulation.
-Represents the taker fee percentage charged by the exchange.
-Expressed as decimal (e.g., 0.07 for 7%).</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(0, 1, ErrorMessage = &quot;TakerFeeRate must be between 0 and 1.&quot;)]
-public double TakerFeeRate { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SimulationConfig_TradeRateLimitPerSnapshot.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SimulationConfig.cs/#L135">View Source</a>
-  </span>
-  <a id="TradingStrategies_Configuration_SimulationConfig_TradeRateLimitPerSnapshot_" data-uid="TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot*"></a>
-  <h4 id="TradingStrategies_Configuration_SimulationConfig_TradeRateLimitPerSnapshot" data-uid="TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot">TradeRateLimitPerSnapshot</h4>
-  <div class="markdown level1 summary"><p>Trade rate limit per snapshot for high-frequency trading scenarios.
-Limits the number of trading actions that can be executed within a single
-snapshot processing cycle. Helps prevent market impact and maintains
-realistic trading behavior under high-frequency conditions.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Range(1, 100, ErrorMessage = &quot;TradeRateLimitPerSnapshot must be between 1 and 100.&quot;)]
-public int TradeRateLimitPerSnapshot { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">

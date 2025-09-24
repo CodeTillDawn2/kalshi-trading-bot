@@ -129,19 +129,19 @@ providing access to the brain lock and session identifier in a thread-safe manne
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_BrainStatusService__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.BrainStatusService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_BrainStatusServiceConfig__System_String_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_BrainStatusService__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CMicrosoft.Extensions.Options.IOptions%7BBacklashCommon.Configuration.InstanceNameConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.BrainStatusServiceConfig%7D%2CSystem.String%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.BrainStatusService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L34">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L37">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService__ctor_" data-uid="BacklashBot.Management.BrainStatusService.#ctor*"></a>
-  <h4 id="BacklashBot_Management_BrainStatusService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_BrainStatusService__" data-uid="BacklashBot.Management.BrainStatusService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig},Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.BrainStatusService})">BrainStatusService(IServiceScopeFactory, IOptions&lt;ExecutionConfig&gt;, ILogger&lt;BrainStatusService&gt;)</h4>
+  <h4 id="BacklashBot_Management_BrainStatusService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_BrainStatusServiceConfig__System_String_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_BrainStatusService__" data-uid="BacklashBot.Management.BrainStatusService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptions{BacklashCommon.Configuration.InstanceNameConfig},Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.BrainStatusServiceConfig},System.String,Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.BrainStatusService})">BrainStatusService(IServiceScopeFactory, IOptions&lt;InstanceNameConfig&gt;, IOptions&lt;BrainStatusServiceConfig&gt;, string, ILogger&lt;BrainStatusService&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="BacklashBot.Management.BrainStatusService.html">BrainStatusService</a> class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions&lt;ExecutionConfig&gt; executionConfig, ILogger&lt;BrainStatusService&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions&lt;InstanceNameConfig&gt; instanceNameConfig, IOptions&lt;BrainStatusServiceConfig&gt; brainStatusConfig, string sessionIdentifier, ILogger&lt;BrainStatusService&gt; logger)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -160,9 +160,21 @@ providing access to the brain lock and session identifier in a thread-safe manne
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashDTOs.Configuration.ExecutionConfig.html">ExecutionConfig</a>&gt;</td>
-        <td><span class="parametername">executionConfig</span></td>
-        <td><p>Configuration options for execution settings.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<span class="xref">InstanceNameConfig</span>&gt;</td>
+        <td><span class="parametername">instanceNameConfig</span></td>
+        <td><p>Configuration options for general execution settings.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.BrainStatusServiceConfig.html">BrainStatusServiceConfig</a>&gt;</td>
+        <td><span class="parametername">brainStatusConfig</span></td>
+        <td><p>Configuration options for brain status settings.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">sessionIdentifier</span></td>
+        <td><p>The pre-generated session identifier.</p>
 </td>
       </tr>
       <tr>
@@ -180,7 +192,7 @@ providing access to the brain lock and session identifier in a thread-safe manne
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService_BrainLock.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.BrainLock%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L55">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L62">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService_BrainLock_" data-uid="BacklashBot.Management.BrainStatusService.BrainLock*"></a>
   <h4 id="BacklashBot_Management_BrainStatusService_BrainLock" data-uid="BacklashBot.Management.BrainStatusService.BrainLock">BrainLock</h4>
@@ -227,7 +239,7 @@ providing access to the brain lock and session identifier in a thread-safe manne
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService_SessionIdentifier.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.SessionIdentifier%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L78">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService_SessionIdentifier_" data-uid="BacklashBot.Management.BrainStatusService.SessionIdentifier*"></a>
   <h4 id="BacklashBot_Management_BrainStatusService_SessionIdentifier" data-uid="BacklashBot.Management.BrainStatusService.SessionIdentifier">SessionIdentifier</h4>
@@ -276,7 +288,7 @@ providing access to the brain lock and session identifier in a thread-safe manne
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService_Dispose.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L178">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L158">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService_Dispose_" data-uid="BacklashBot.Management.BrainStatusService.Dispose*"></a>
   <h4 id="BacklashBot_Management_BrainStatusService_Dispose" data-uid="BacklashBot.Management.BrainStatusService.Dispose">Dispose()</h4>
@@ -293,7 +305,7 @@ Currently no unmanaged resources are held, so this is a no-op.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService_EnsureInitializedAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.EnsureInitializedAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L88">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L95">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService_EnsureInitializedAsync_" data-uid="BacklashBot.Management.BrainStatusService.EnsureInitializedAsync*"></a>
   <h4 id="BacklashBot_Management_BrainStatusService_EnsureInitializedAsync" data-uid="BacklashBot.Management.BrainStatusService.EnsureInitializedAsync">EnsureInitializedAsync()</h4>
@@ -326,7 +338,7 @@ Uses double-checked locking to prevent multiple initialization attempts.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_BrainStatusService_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Management.BrainStatusService.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L169">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/BrainStatusService.cs/#L149">View Source</a>
   </span>
   <a id="BacklashBot_Management_BrainStatusService_GetPerformanceMetrics_" data-uid="BacklashBot.Management.BrainStatusService.GetPerformanceMetrics*"></a>
   <h4 id="BacklashBot_Management_BrainStatusService_GetPerformanceMetrics" data-uid="BacklashBot.Management.BrainStatusService.GetPerformanceMetrics">GetPerformanceMetrics()</h4>

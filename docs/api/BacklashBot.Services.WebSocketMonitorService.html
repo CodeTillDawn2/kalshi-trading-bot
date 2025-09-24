@@ -90,7 +90,8 @@ real-time data streaming while handling connection failures and exchange downtim
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
-    <div class="level1"><span class="xref">WebSocketMonitorService</span></div>
+    <div class="level1"><span class="xref">BaseWebSocketMonitorService</span></div>
+    <div class="level2"><span class="xref">WebSocketMonitorService</span></div>
   </div>
   <div class="implements">
     <h5>Implements</h5>
@@ -98,6 +99,33 @@ real-time data streaming while handling connection failures and exchange downtim
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._logger</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._performanceMonitor</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._readyStatus</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._isConnected</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._monitorTask</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._scopeFactory</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._webSocketClient</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService._cancellationTokenSource</span>
+    </div>
+    <div>
+      <span class="xref">BaseWebSocketMonitorService.CancellationToken</span>
+    </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
     </div>
@@ -124,7 +152,7 @@ real-time data streaming while handling connection failures and exchange downtim
   <h6><strong>Assembly</strong>: BacklashBot.dll</h6>
   <h5 id="BacklashBot_Services_WebSocketMonitorService_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class WebSocketMonitorService : IWebSocketMonitorService</code></pre>
+    <pre><code class="lang-csharp hljs">public class WebSocketMonitorService : BaseWebSocketMonitorService, IWebSocketMonitorService</code></pre>
   </div>
   <h5 id="BacklashBot_Services_WebSocketMonitorService_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>The service implements a background monitoring loop that:</p>
@@ -140,19 +168,19 @@ real-time data streaming while handling connection failures and exchange downtim
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IWebSocketMonitorService%7D%2CMicrosoft.Extensions.Configuration.IConfiguration%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IBotReadyStatus%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Options_IOptions_BacklashBot_Services_WebSocketMonitorServiceConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IWebSocketMonitorService%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Services.WebSocketMonitorServiceConfig%7D%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IBotReadyStatus%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L89">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L91">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService__ctor_" data-uid="BacklashBot.Services.WebSocketMonitorService.#ctor*"></a>
-  <h4 id="BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_" data-uid="BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)">WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger&lt;IWebSocketMonitorService&gt;, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)</h4>
+  <h4 id="BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Options_IOptions_BacklashBot_Services_WebSocketMonitorServiceConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_" data-uid="BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Options.IOptions{BacklashBot.Services.WebSocketMonitorServiceConfig},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)">WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger&lt;IWebSocketMonitorService&gt;, IOptions&lt;WebSocketMonitorServiceConfig&gt;, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the WebSocketMonitorService with required dependencies.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public WebSocketMonitorService(IServiceScopeFactory scopeFactory, IServiceFactory serviceFactory, ILogger&lt;IWebSocketMonitorService&gt; logger, IConfiguration configuration, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus, IStatusTrackerService statusTrackerService, ICentralPerformanceMonitor centralPerformanceMonitor)</code></pre>
+    <pre><code class="lang-csharp hljs">public WebSocketMonitorService(IServiceScopeFactory scopeFactory, IServiceFactory serviceFactory, ILogger&lt;IWebSocketMonitorService&gt; logger, IOptions&lt;WebSocketMonitorServiceConfig&gt; config, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus, IStatusTrackerService statusTrackerService, ICentralPerformanceMonitor centralPerformanceMonitor)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -183,9 +211,9 @@ real-time data streaming while handling connection failures and exchange downtim
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
-        <td><span class="parametername">configuration</span></td>
-        <td><p>Configuration provider for customizable settings.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Services.WebSocketMonitorServiceConfig.html">WebSocketMonitorServiceConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration options for WebSocketMonitorService behavior, including monitoring intervals and performance metrics settings.</p>
 </td>
       </tr>
       <tr>
@@ -221,7 +249,7 @@ real-time data streaming while handling connection failures and exchange downtim
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_GetExtendedMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L253">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L254">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_GetExtendedMetrics_" data-uid="BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_GetExtendedMetrics" data-uid="BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics">GetExtendedMetrics()</h4>
@@ -254,7 +282,7 @@ Only returns meaningful data when metrics collection is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_GetMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.GetMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L243">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L244">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_GetMetrics_" data-uid="BacklashBot.Services.WebSocketMonitorService.GetMetrics*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_GetMetrics" data-uid="BacklashBot.Services.WebSocketMonitorService.GetMetrics">GetMetrics()</h4>
@@ -286,7 +314,7 @@ Only returns meaningful data when metrics collection is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_IsConnected.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.IsConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L429">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L430">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_IsConnected_" data-uid="BacklashBot.Services.WebSocketMonitorService.IsConnected*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_IsConnected" data-uid="BacklashBot.Services.WebSocketMonitorService.IsConnected">IsConnected()</h4>
@@ -314,15 +342,79 @@ Only returns meaningful data when metrics collection is enabled.</p>
     </tbody>
   </table>
   <h5 id="BacklashBot_Services_WebSocketMonitorService_IsConnected_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>This method checks the actual WebSocket connection state rather than relying on internal flags.
-If there's a discrepancy between the monitor's flag and actual connection, it logs a warning.</p>
+  <div class="markdown level1 remarks"><p>This method checks the actual WebSocket connection state directly from the WebSocket client.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_MonitorAndManageWebSocketConnectionAsync_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.MonitorAndManageWebSocketConnectionAsync(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L469">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_WebSocketMonitorService_MonitorAndManageWebSocketConnectionAsync_" data-uid="BacklashBot.Services.WebSocketMonitorService.MonitorAndManageWebSocketConnectionAsync*"></a>
+  <h4 id="BacklashBot_Services_WebSocketMonitorService_MonitorAndManageWebSocketConnectionAsync_System_Boolean_" data-uid="BacklashBot.Services.WebSocketMonitorService.MonitorAndManageWebSocketConnectionAsync(System.Boolean)">MonitorAndManageWebSocketConnectionAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Core monitoring method that checks exchange status and manages WebSocket connection state.
+This method runs continuously (or once if immediate) to monitor exchange availability and
+connect/disconnect the WebSocket client as appropriate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override Task MonitorAndManageWebSocketConnectionAsync(bool immediate = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">immediate</span></td>
+        <td><p>If true, performs a single check and returns. If false, runs continuous monitoring loop.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous monitoring operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">BaseWebSocketMonitorService.MonitorAndManageWebSocketConnectionAsync(bool)</a></div>
+  <h5 id="BacklashBot_Services_WebSocketMonitorService_MonitorAndManageWebSocketConnectionAsync_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The monitoring logic:</p>
+<ul>
+<li>Checks exchange status via API call</li>
+<li>Updates data cache with current exchange and trading status</li>
+<li>Connects WebSocket when exchange is active and initialization is complete</li>
+<li>Disconnects WebSocket when exchange becomes inactive</li>
+<li>Handles errors with appropriate retry delays</li>
+<li>Respects cancellation tokens for graceful shutdown</li>
+</ul>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_RecordMessageProcessed.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L363">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L364">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_RecordMessageProcessed_" data-uid="BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_RecordMessageProcessed" data-uid="BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed">RecordMessageProcessed()</h4>
@@ -339,7 +431,7 @@ Only records when metrics collection is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_RecordWebSocketLatency_System_Int64_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(System.Int64)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L350">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L351">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_RecordWebSocketLatency_" data-uid="BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_RecordWebSocketLatency_System_Int64_" data-uid="BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(System.Int64)">RecordWebSocketLatency(long)</h4>
@@ -374,7 +466,7 @@ Only records when metrics collection is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_SetQueueDepth_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L382">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L383">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_SetQueueDepth_" data-uid="BacklashBot.Services.WebSocketMonitorService.SetQueueDepth*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_SetQueueDepth_System_Int32_" data-uid="BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(System.Int32)">SetQueueDepth(int)</h4>
@@ -409,7 +501,7 @@ Only records when metrics collection is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_ShutdownAsync_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.ShutdownAsync(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L161">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L163">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_ShutdownAsync_" data-uid="BacklashBot.Services.WebSocketMonitorService.ShutdownAsync*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_ShutdownAsync_System_Threading_CancellationToken_" data-uid="BacklashBot.Services.WebSocketMonitorService.ShutdownAsync(System.Threading.CancellationToken)">ShutdownAsync(CancellationToken)</h4>
@@ -468,7 +560,7 @@ and waiting for the monitoring task to complete.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_StartServices_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.StartServices(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L126">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L128">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_StartServices_" data-uid="BacklashBot.Services.WebSocketMonitorService.StartServices*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_StartServices_System_Threading_CancellationToken_" data-uid="BacklashBot.Services.WebSocketMonitorService.StartServices(System.Threading.CancellationToken)">StartServices(CancellationToken)</h4>
@@ -507,7 +599,7 @@ The task checks exchange status every minute and manages WebSocket connection st
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService_TriggerConnectionCheckAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService.TriggerConnectionCheckAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L233">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L234">View Source</a>
   </span>
   <a id="BacklashBot_Services_WebSocketMonitorService_TriggerConnectionCheckAsync_" data-uid="BacklashBot.Services.WebSocketMonitorService.TriggerConnectionCheckAsync*"></a>
   <h4 id="BacklashBot_Services_WebSocketMonitorService_TriggerConnectionCheckAsync" data-uid="BacklashBot.Services.WebSocketMonitorService.TriggerConnectionCheckAsync">TriggerConnectionCheckAsync()</h4>
@@ -555,7 +647,7 @@ The check is performed synchronously without waiting for the next scheduled moni
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_WebSocketMonitorService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.WebSocketMonitorService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L25" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/WebSocketMonitorService.cs/#L28" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

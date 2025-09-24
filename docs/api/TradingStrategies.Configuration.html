@@ -85,8 +85,19 @@
     <h3 id="classes">
 Classes
 </h3>
-      <h4><a class="xref" href="TradingStrategies.Configuration.CalculationConfig.html">CalculationConfig</a></h4>
-      <section></section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.DataLoaderConfig.html">DataLoaderConfig</a></h4>
+      <section><p>Configuration class for data loader settings.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.EquityCalculatorConfig.html">EquityCalculatorConfig</a></h4>
+      <section><p>Configuration class for EquityCalculator parameters.
+Controls performance metrics collection for equity calculations.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.MarketTypeServiceConfig.html">MarketTypeServiceConfig</a></h4>
+      <section><p>Configuration options for the MarketTypeService.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.PatternDetectionServiceConfig.html">PatternDetectionServiceConfig</a></h4>
+      <section><p>Configuration options for pattern detection parameters.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Configuration.SimulationConfig.html">SimulationConfig</a></h4>
       <section><p>Configuration class containing simulation-related parameters used throughout the trading bot system.
 These settings control simulation behavior, fees, position sizing, and performance thresholds
@@ -94,17 +105,18 @@ for strategy backtesting and evaluation. Values are injected via dependency inje
 and used by StrategySimulation class for accurate market simulation.
 Includes comprehensive data validation to prevent invalid parameter combinations.</p>
 </section>
-      <h4><a class="xref" href="TradingStrategies.Configuration.SnapshotConfig.html">SnapshotConfig</a></h4>
-      <section><p>Configuration class containing snapshot-related parameters used throughout the trading bot system.
-These settings control snapshot timing tolerances, schema versioning, and data persistence behavior
-for market data snapshots used in trading strategy evaluation and backtesting.</p>
+      <h4><a class="xref" href="TradingStrategies.Configuration.SimulationEngineConfig.html">SimulationEngineConfig</a></h4>
+      <section><p>Configuration settings for the SimulationEngine.</p>
 </section>
-      <h4><a class="xref" href="TradingStrategies.Configuration.TradingConfig.html">TradingConfig</a></h4>
-      <section><p>Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.
-These settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals
-used throughout the trading strategy execution pipeline. Values are injected via dependency injection
-and consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.
-The class includes data validation attributes and a Validate() method to ensure parameters are within acceptable ranges.</p>
+      <h4><a class="xref" href="TradingStrategies.Configuration.StrategySelectionHelperConfig.html">StrategySelectionHelperConfig</a></h4>
+      <section><p>Configuration options for the StrategySelectionHelper.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.TradingOverseerConfig.html">TradingOverseerConfig</a></h4>
+      <section><p>Configuration options for the TradingOverseer behavior, including performance metrics settings.
+This configuration is loaded from the &quot;TradingOverseer&quot; section of the application configuration.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Configuration.TradingSimulatorServiceConfig.html">TradingSimulatorServiceConfig</a></h4>
+      <section><p>Configuration class for trading simulator settings.</p>
 </section>
 
 
