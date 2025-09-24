@@ -44,7 +44,7 @@ namespace BacklashIntegrationTests
         /// Tests that the DatabaseLoggerProvider can be instantiated without errors.
         /// This verifies that the logger provider setup does not hang during creation.
         /// </summary>
-        [Test]
+        [Test(Description = "Verifies that the DatabaseLoggerProvider can be instantiated without errors, ensuring the logger provider setup does not hang during creation.")]
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
             // Arrange - Load configs from DI
@@ -72,7 +72,7 @@ namespace BacklashIntegrationTests
         /// Tests that the DatabaseLoggerProvider can create a logger and log an entry without hanging.
         /// This integration test verifies the full logging pipeline works end-to-end.
         /// </summary>
-        [Test]
+        [Test(Description = "Verifies that the DatabaseLoggerProvider can create a logger and log an entry without hanging, confirming the full logging pipeline works end-to-end.")]
         public void DatabaseLoggerProvider_CanLogEntry()
         {
             // Arrange - Load configs from DI

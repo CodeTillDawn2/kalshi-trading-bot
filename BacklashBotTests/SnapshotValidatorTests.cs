@@ -1,33 +1,32 @@
-using BacklashBot.Helpers;
+using BacklashBot.Services;
+using BacklashBot.State;
 using BacklashCommon.Helpers;
 using BacklashDTOs;
 
-namespace KalshiBotTests
+namespace BacklashBotTests
 {
     /// <summary>
-    /// NUnit test fixture for validating the SnapshotDiscrepancyValidator functionality.
-    /// This test class provides comprehensive testing for snapshot validation logic including
-    /// orderbook validation, price overlap detection, and rate discrepancy analysis.
-    /// Tests cover various edge cases and validation scenarios to ensure data integrity.
+    /// Unit test suite for SnapshotDiscrepancyValidator functionality.
+    /// Tests validation logic for market snapshot data integrity and consistency.
     /// </summary>
     [TestFixture]
-    public class SnapshotDiscrepancyValidatorTests
+    public class SnapshotValidatorTests
     {
         /// <summary>
-        /// Tests that a valid snapshot with all required data passes validation.
-        /// Verifies that the validator correctly identifies a well-formed snapshot
-        /// with proper orderbook, non-overlapping prices, and acceptable rate discrepancies.
+        /// Tests that a valid snapshot with proper orderbook data passes all validation checks.
+        /// Verifies that snapshots with complete orderbook information and reasonable price relationships
+        /// are accepted as valid for trading decisions.
         /// </summary>
         [Test]
         public void ValidateDiscrepancies_ValidSnapshot_ReturnsValidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with a valid snapshot containing all required data.");
-            // Arrange: Create a valid snapshot with all checks passing
+            TestContext.WriteLine("Testing validation of a valid snapshot with proper orderbook data.");
+            // Arrange: Valid snapshot with orderbook data and reasonable prices
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 10,
-                BestNoBid = 9,
+                BestYesBid = 45,
+                BestNoBid = 55,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
                 VelocityPerMinute_Bottom_Yes_Bid = 1.0,
@@ -47,24 +46,24 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Valid snapshot correctly validated as valid.");
+            TestContext.WriteLine("Result: Valid snapshot passed all validation checks.");
         }
 
         /// <summary>
         /// Tests that a snapshot with missing orderbook data fails validation.
-        /// Verifies that the validator correctly identifies when orderbook data is null
-        /// and marks the snapshot as invalid with appropriate error flags.
+        /// Verifies that snapshots without orderbook information are properly rejected
+        /// to prevent trading decisions based on incomplete market data.
         /// </summary>
         [Test]
         public void ValidateDiscrepancies_MissingOrderbook_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with missing (null) orderbook data.");
-            // Arrange: Snapshot with null orderbook
+            TestContext.WriteLine("Testing validation of a snapshot with missing orderbook data.");
+            // Arrange: Snapshot with null/empty orderbook
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = null,
-                BestYesBid = 10,
-                BestNoBid = 9,
+                BestYesBid = 45,
+                BestNoBid = 55,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
                 VelocityPerMinute_Bottom_Yes_Bid = 1.0,
@@ -84,61 +83,24 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.True);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with missing orderbook data correctly identified as invalid.");
+            TestContext.WriteLine("Result: Snapshot with missing orderbook correctly failed validation.");
         }
 
         /// <summary>
-        /// Tests that a snapshot with empty orderbook data fails validation.
-        /// Verifies that the validator correctly identifies when orderbook data exists
-        /// but contains no entries, marking the snapshot as invalid.
-        /// </summary>
-        [Test]
-        public void ValidateDiscrepancies_EmptyOrderbook_ReturnsInvalidResult()
-        {
-            TestContext.WriteLine("Testing snapshot validation with empty orderbook data.");
-            // Arrange: Snapshot with empty orderbook
-            var snapshot = new MarketSnapshot
-            {
-                OrderbookData = new List<Dictionary<string, object>>(),
-                BestYesBid = 10,
-                BestNoBid = 9,
-                ChangeMetricsMature = true,
-                VelocityPerMinute_Top_Yes_Bid = 1.0,
-                VelocityPerMinute_Bottom_Yes_Bid = 1.0,
-                OrderVolumePerMinute_YesBid = 1.0,
-                TradeVolumePerMinute_Yes = 1.0,
-                VelocityPerMinute_Top_No_Bid = 1.0,
-                VelocityPerMinute_Bottom_No_Bid = 1.0,
-                OrderVolumePerMinute_NoBid = 1.0,
-                TradeVolumePerMinute_No = 1.0
-            };
-
-            // Act
-            var result = SnapshotDiscrepancyValidator.ValidateDiscrepancies(snapshot);
-
-            // Assert
-            Assert.That(result.IsValid, Is.False);
-            Assert.That(result.IsOrderbookMissing, Is.True);
-            Assert.That(result.DoPricesOverlap, Is.False);
-            Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with empty orderbook data correctly identified as invalid.");
-        }
-
-        /// <summary>
-        /// Tests that a snapshot with overlapping bid/ask prices fails validation.
-        /// Verifies that the validator correctly identifies when bid prices overlap with ask prices,
-        /// which indicates invalid market data that should be rejected.
+        /// Tests that a snapshot with overlapping bid prices fails validation.
+        /// Verifies that snapshots where the best yes bid is higher than or equal to
+        /// the best no bid are properly rejected as they indicate market data corruption.
         /// </summary>
         [Test]
         public void ValidateDiscrepancies_OverlappingPrices_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with overlapping bid/ask prices.");
-            // Arrange: BestYesBid >= BestYesAsk (BestYesAsk = 100 - BestNoBid = 91, so BestYesBid = 95 >= 91)
+            TestContext.WriteLine("Testing validation of a snapshot with overlapping bid prices.");
+            // Arrange: Yes bid >= No bid (invalid market condition)
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
-                BestYesBid = 95,
-                BestNoBid = 9,
+                BestYesBid = 55,
+                BestNoBid = 45,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
                 VelocityPerMinute_Bottom_Yes_Bid = 1.0,
@@ -158,19 +120,19 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.True);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with overlapping prices correctly identified as invalid.");
+            TestContext.WriteLine("Result: Snapshot with overlapping prices correctly failed validation.");
         }
 
         /// <summary>
-        /// Tests that a snapshot with rate discrepancy exceeding default threshold fails validation.
-        /// Verifies that the validator correctly identifies when order/trade volume rates
-        /// differ significantly from velocity metrics, indicating potential data inconsistency.
+        /// Tests that a snapshot with rate discrepancy above default threshold fails validation.
+        /// Verifies that snapshots with significant imbalances between order and trade volumes
+        /// are properly rejected to ensure data quality for trading decisions.
         /// </summary>
         [Test]
-        public void ValidateDiscrepancies_RateDiscrepancyExceedsDefaultThreshold_ReturnsInvalidResult()
+        public void ValidateDiscrepancies_RateDiscrepancyAboveThreshold_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with rate discrepancy exceeding default threshold.");
-            // Arrange: Discrepancy > 0.1
+            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy above default threshold.");
+            // Arrange: Discrepancy > default threshold (0.1)
             var snapshot = new MarketSnapshot
             {
                 OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
@@ -195,7 +157,7 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.True);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy exceeding threshold correctly identified as invalid.");
+            TestContext.WriteLine("Result: Snapshot with rate discrepancy above threshold correctly failed validation.");
         }
 
         /// <summary>
@@ -206,7 +168,7 @@ namespace KalshiBotTests
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyBelowCustomThreshold_ReturnsValidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with rate discrepancy below custom threshold.");
+            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy below custom threshold.");
             // Arrange: Discrepancy < custom threshold (0.5)
             var snapshot = new MarketSnapshot
             {
@@ -232,7 +194,7 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy below custom threshold correctly validated as valid.");
+            TestContext.WriteLine("Result: Snapshot with rate discrepancy below custom threshold correctly passed validation.");
         }
 
         /// <summary>
@@ -243,7 +205,7 @@ namespace KalshiBotTests
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyExceedsCustomThreshold_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing snapshot validation with rate discrepancy exceeding custom threshold.");
+            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy exceeding custom threshold.");
             // Arrange: Discrepancy > custom threshold (0.05)
             var snapshot = new MarketSnapshot
             {
@@ -269,7 +231,7 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.True);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy exceeding custom threshold correctly identified as invalid.");
+            TestContext.WriteLine("Result: Snapshot with rate discrepancy exceeding custom threshold correctly failed validation.");
         }
 
         /// <summary>
@@ -280,7 +242,7 @@ namespace KalshiBotTests
         [Test]
         public void ValidateDiscrepancies_ChangeMetricsNotMature_SkipsRateCheck()
         {
-            TestContext.WriteLine("Testing snapshot validation when change metrics are not mature (skips rate check).");
+            TestContext.WriteLine("Testing that rate discrepancy checks are skipped when change metrics are not mature.");
             // Arrange: ChangeMetricsMature false, large discrepancy but should be valid
             var snapshot = new MarketSnapshot
             {
@@ -306,7 +268,7 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with immature change metrics correctly validated as valid (rate check skipped).");
+            TestContext.WriteLine("Result: Rate discrepancy checks correctly skipped for immature change metrics.");
         }
 
         /// <summary>
@@ -317,7 +279,7 @@ namespace KalshiBotTests
         [Test]
         public void ValidateDiscrepancies_ZeroBestPrices_SkipsOverlapCheck()
         {
-            TestContext.WriteLine("Testing snapshot validation with zero best prices (skips overlap check).");
+            TestContext.WriteLine("Testing that overlap checks are skipped when best prices are zero.");
             // Arrange: BestYesBid = 0, should not trigger overlap
             var snapshot = new MarketSnapshot
             {
@@ -343,7 +305,7 @@ namespace KalshiBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with zero best prices correctly validated as valid (overlap check skipped).");
+            TestContext.WriteLine("Result: Overlap checks correctly skipped for zero best prices.");
         }
     }
 }

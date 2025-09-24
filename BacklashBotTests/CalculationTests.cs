@@ -7,13 +7,14 @@ using BacklashCommon.Services;
 using BacklashDTOs.Data;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
+using KalshiBotTests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace KalshiBotTests
+namespace BacklashBotTests
 {
     /// <summary>
     /// Comprehensive unit test suite for validating the accuracy of technical indicator calculations

@@ -3,14 +3,14 @@ using BacklashPatterns;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace KalshiBotTests
+namespace BacklashBotTests
 {
     /// <summary>
     /// Unit test suite for TrendCalcs class.
     /// Tests calculation accuracy, input validation, and edge cases.
     /// </summary>
     [TestFixture]
-    public class TrendCalcsTests
+    public class TrendCalculationTests
     {
         private Mock<ILogger> _loggerMock;
         private TrendCalculationConfig _config;
@@ -23,6 +23,7 @@ namespace KalshiBotTests
         [SetUp]
         public void Setup()
         {
+            TestContext.WriteLine("Setting up TrendCalculationTests environment.");
             _loggerMock = new Mock<ILogger>();
             _config = new TrendCalculationConfig
             {
@@ -36,6 +37,7 @@ namespace KalshiBotTests
             };
             TrendCalcs.SetConfig(_config);
             TrendCalcs.SetLogger(_loggerMock.Object);
+            TestContext.WriteLine("Result: TrendCalculationTests setup completed.");
         }
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateBullishCandleRatio_ValidInput()
         {
-            TestContext.WriteLine("Testing CalculateBullishCandleRatio method with valid input parameters.");
+            TestContext.WriteLine("Testing CalculateBullishCandleRatio with valid input parameters.");
             // Arrange
             var prices = new[]
             {
@@ -67,7 +69,7 @@ namespace KalshiBotTests
             var expected = (2.0 / 3.0) + (_config.SmoothingOffset / 3.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
-            TestContext.WriteLine("Result: Bullish candle ratio calculated correctly with valid input.");
+            TestContext.WriteLine("Result: Bullish candle ratio calculated correctly.");
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateBullishCandleRatio_NullPrices()
         {
-            TestContext.WriteLine("Testing CalculateBullishCandleRatio method with null prices array.");
+            TestContext.WriteLine("Testing CalculateBullishCandleRatio with null prices array.");
             // Arrange
             CandleMids[] prices = null;
             int index = 0;
@@ -90,7 +92,7 @@ namespace KalshiBotTests
             // Assert
             Assert.That(result, Is.EqualTo(0.0));
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
-            TestContext.WriteLine("Result: Null prices handled gracefully, returning 0.0 and logging warning.");
+            TestContext.WriteLine("Result: Null prices handled correctly with warning logged.");
         }
 
         /// <summary>
@@ -101,7 +103,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateBullishCandleRatio_InvalidIndex()
         {
-            TestContext.WriteLine("Testing CalculateBullishCandleRatio method with invalid index parameter.");
+            TestContext.WriteLine("Testing CalculateBullishCandleRatio with invalid index parameter.");
             // Arrange
             var prices = new[] { new CandleMids { Open = 100, Close = 105 } };
             int index = 5; // Out of bounds
@@ -113,7 +115,7 @@ namespace KalshiBotTests
             // Assert
             Assert.That(result, Is.EqualTo(0.0));
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
-            TestContext.WriteLine("Result: Invalid index handled gracefully, returning 0.0 and logging warning.");
+            TestContext.WriteLine("Result: Invalid index handled correctly with warning logged.");
         }
 
         /// <summary>
@@ -124,7 +126,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateBullishCandleRatio_LookbackOutOfRange()
         {
-            TestContext.WriteLine("Testing CalculateBullishCandleRatio method with lookback parameter exceeding maximum allowed value.");
+            TestContext.WriteLine("Testing CalculateBullishCandleRatio with lookback parameter exceeding maximum allowed value.");
             // Arrange
             var prices = new[] { new CandleMids { Open = 100, Close = 105 } };
             int index = 0;
@@ -136,7 +138,7 @@ namespace KalshiBotTests
             // Assert
             Assert.That(result, Is.EqualTo(0.0)); // Since lookback gets clamped and no data
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
-            TestContext.WriteLine("Result: Out-of-range lookback handled gracefully, returning 0.0 and logging warning.");
+            TestContext.WriteLine("Result: Out-of-range lookback handled correctly with warning logged.");
         }
 
         /// <summary>
@@ -165,7 +167,7 @@ namespace KalshiBotTests
             var expected = (2.0 / 2.0) + (_config.SmoothingOffset / 2.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
-            TestContext.WriteLine("Result: Asynchronous method produced correct bullish candle ratio.");
+            TestContext.WriteLine("Result: Asynchronous bullish candle ratio calculation completed successfully.");
         }
 
         /// <summary>
@@ -176,7 +178,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateTrendConsistencyRatio_ValidInput()
         {
-            TestContext.WriteLine("Testing CalculateTrendConsistencyRatio method with valid input parameters.");
+            TestContext.WriteLine("Testing CalculateTrendConsistencyRatio with valid input parameters.");
             // Arrange
             var prices = new[]
             {
@@ -199,7 +201,7 @@ namespace KalshiBotTests
             var expected = unweighted + (_config.SmoothingOffset / 3.0) / 2.0;
             expected = Math.Min(expected, 1.0);
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
-            TestContext.WriteLine("Result: Trend consistency ratio calculated correctly with valid input.");
+            TestContext.WriteLine("Result: Trend consistency ratio calculated correctly.");
         }
 
         /// <summary>
@@ -210,7 +212,7 @@ namespace KalshiBotTests
         [Test]
         public void TestCalculateTrendDirectionRatio_Bullish()
         {
-            TestContext.WriteLine("Testing CalculateTrendDirectionRatio method for bullish trend detection.");
+            TestContext.WriteLine("Testing CalculateTrendDirectionRatio for bullish trend detection.");
             // Arrange
             var prices = new[]
             {

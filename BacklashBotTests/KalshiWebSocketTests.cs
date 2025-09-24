@@ -15,7 +15,7 @@ using Moq;
 using System.Net.WebSockets;
 using System.Text.Json;
 
-namespace KalshiBotTests
+namespace BacklashBotTests
 {
     /// <summary>
     /// Comprehensive NUnit test fixture for validating the KalshiWebSocketClient functionality.
@@ -36,7 +36,7 @@ namespace KalshiBotTests
     /// </para>
     /// </remarks>
     [TestFixture]
-    public class KalshiWebSocketClientTests
+    public class KalshiWebSocketTests
     {
         private Mock<ILogger<KalshiWebSocketClient>> _loggerMock;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;

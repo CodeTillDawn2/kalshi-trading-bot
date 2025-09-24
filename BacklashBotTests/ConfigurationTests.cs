@@ -12,7 +12,7 @@ using TradingStrategies.Configuration;
 namespace BacklashBotTests
 {
     [TestFixture]
-    public class ConfigValidationTests
+    public class ConfigurationTests
     {
         private IConfiguration _configuration;
 
@@ -30,12 +30,11 @@ namespace BacklashBotTests
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
-            TestContext.WriteLine("Testing validation of all configs from appsettings.json using reflective approach.");
+            TestContext.WriteLine("Testing validation of all configurations from appsettings.json using reflection.");
             var configInstances = new Dictionary<string, object>();
 
             // Get all config types with SectionName from assemblies referenced by BacklashBot.csproj
-            var assemblies = new[]
-            {
+            var assemblies = new[] {
                 typeof(BacklashBotDataConfig).Assembly, // BacklashBotData
                 typeof(KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(GeneralExecutionConfig).Assembly, // BacklashDTOs
@@ -65,18 +64,17 @@ namespace BacklashBotTests
                 ((MarketServiceDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
                 ValidateConfig(marketDataInstance, _configuration.GetSection(MarketServiceDataConfig.SectionName));
             }
-            TestContext.WriteLine("Result: All configs validated successfully from appsettings.json.");
+            TestContext.WriteLine("Result: All configurations validated successfully.");
         }
 
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
-            TestContext.WriteLine("Testing for unused configuration sections in appsettings.json using reflective approach.");
+            TestContext.WriteLine("Testing for unused configuration sections in appsettings.json using reflection.");
             var usedSections = new HashSet<string>();
 
             // Automatically collect all SectionName values from assemblies referenced by BacklashBot.csproj
-            var assemblies = new[]
-            {
+            var assemblies = new[] {
                 typeof(BacklashBotDataConfig).Assembly, // BacklashBotData
                 typeof(KalshiAPIServiceConfig).Assembly, // KalshiBotAPI
                 typeof(SecretsConfig).Assembly, // BacklashCommon
@@ -111,12 +109,13 @@ namespace BacklashBotTests
             }
 
             Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
-            TestContext.WriteLine("Result: No unused sections found in appsettings.json.");
+            TestContext.WriteLine("Result: No unused configuration sections found.");
         }
 
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {
+            TestContext.WriteLine("Testing secrets interpolation and key file existence.");
             // Set up configuration with secrets loaded
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var builder = new ConfigurationBuilder()
@@ -147,7 +146,6 @@ namespace BacklashBotTests
             TestContext.WriteLine($"KalshiConfig.KeyFile (raw): {kalshiConfig.KeyFile}");
 
             // The raw binding will still have placeholders - this is expected
-            // We need to test the interpolation separately
             Assert.That(kalshiConfig.KeyId, Does.Contain("{"),
                 $"Raw KalshiConfig.KeyId should contain placeholders: {kalshiConfig.KeyId}");
             Assert.That(kalshiConfig.KeyFile, Does.Contain("{"),
@@ -198,6 +196,7 @@ namespace BacklashBotTests
             TestContext.WriteLine($"✓ Key file exists: {keyFilePath}");
             TestContext.WriteLine($"✓ Kalshi KeyId: {MaskKeyId(interpolatedKeyId)}");
             TestContext.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
+            TestContext.WriteLine("Result: Secrets interpolation and key file validation completed successfully.");
         }
 
         private void ValidateConfig(object config, IConfigurationSection section)
