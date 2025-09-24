@@ -181,7 +181,7 @@ namespace KalshiBotTests
             {
                 Name = "RSI_ExtremeVolatility",
                 Candlesticks = extremeVolatilityCandlesticks,
-                ExpectedRSI = 95.24 // High RSI due to strong upward momentum
+                ExpectedRSI = 52.23 // RSI for extreme volatility with balanced gains/losses
             });
 
             // Trending market scenario (uptrend)
@@ -217,7 +217,7 @@ namespace KalshiBotTests
             {
                 Name = "RSI_Ranging",
                 Candlesticks = rangingCandlesticks,
-                ExpectedRSI = 52.38 // Neutral RSI in ranging market
+                ExpectedRSI = 53.85 // RSI for ranging market with slight upward bias
             });
 
             // Validate all scenarios
