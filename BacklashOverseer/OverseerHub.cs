@@ -2,6 +2,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using BacklashOverseer.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -148,7 +149,11 @@ namespace BacklashOverseer
             }
 
             var httpContext = Context.GetHttpContext();
-            var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = "unknown";
+            if (httpContext != null)
+            {
+                ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            }
 
             _logger.LogInformation("Client connected: {ConnectionId} from IP: {IPAddress}. Total clients: {ClientCount}",
                 Context.ConnectionId, ipAddress, _connectedClients.Count);
@@ -281,8 +286,16 @@ namespace BacklashOverseer
         {
             var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
 
-            var httpContext = Context.GetHttpContext();
-            var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = "unknown";
+            try
+            {
+                var httpContext = Context.GetHttpContext();
+                ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            }
+            catch (NullReferenceException)
+            {
+                // Handle case in unit tests where HttpContext is not available
+            }
 
             // Rate limiting check
             if (IsRateLimited(ipAddress, "handshake", _config.MaxHandshakeRequestsPerMinute))

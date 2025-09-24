@@ -1583,7 +1583,7 @@ namespace BacklashBot.Management
                     ApiExecutionTimes = ApiExecutionTimes,
 
                     // Configurable metrics
-                    ConfigurableMetrics = GetConfigurableMetrics()
+                    ConfigurableMetrics = (Dictionary<string, object>)GetConfigurableMetrics()
                 };
 
                 // Get the broadcast service and send the metrics

@@ -1,6 +1,7 @@
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System.IO;
+using System.Net;
 
 namespace OverseerTests
 {
@@ -37,8 +39,11 @@ namespace OverseerTests
         public void Setup()
         {
             // Load configuration from appsettings.json using DI
+            var testAssemblyPath = typeof(OverseerHubTests).Assembly.Location;
+            var testDirectory = Path.GetDirectoryName(testAssemblyPath);
+            var projectDirectory = Path.GetFullPath(Path.Combine(testDirectory, "../../../../BacklashOverseer"));
             var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../../BacklashOverseer"))
+                .SetBasePath(projectDirectory)
                 .AddJsonFile("appsettings.json");
             var configuration = configBuilder.Build();
 

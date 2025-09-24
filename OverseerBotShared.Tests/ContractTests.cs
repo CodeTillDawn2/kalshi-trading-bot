@@ -1,7 +1,54 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OverseerBotShared.Tests
 {
+    /// <summary>
+    /// Custom JSON converter for Dictionary<string, object> that preserves actual .NET types
+    /// instead of converting everything to JsonElement during deserialization.
+    /// </summary>
+    public class ObjectDictionaryConverter : JsonConverter<Dictionary<string, object>>
+    {
+        public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(ref reader, options);
+            return dict.ToDictionary(kvp => kvp.Key, kvp => ConvertJsonElement(kvp.Value));
+        }
+
+        private object ConvertJsonElement(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.String:
+                    return element.GetString()!;
+                case JsonValueKind.Number:
+                    if (element.TryGetInt32(out int i)) return i;
+                    if (element.TryGetInt64(out long l)) return l;
+                    return element.GetDouble();
+                case JsonValueKind.True:
+                    return true;
+                case JsonValueKind.False:
+                    return false;
+                case JsonValueKind.Null:
+                    return null!;
+                default:
+                    // For complex objects, return as string representation
+                    return element.ToString();
+            }
+        }
+
+        public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            foreach (var kvp in value)
+            {
+                writer.WritePropertyName(kvp.Key);
+                JsonSerializer.Serialize(writer, kvp.Value, kvp.Value?.GetType() ?? typeof(object), options);
+            }
+            writer.WriteEndObject();
+        }
+    }
+
     /// <summary>
     /// Contract tests to ensure DTOs maintain exact structure consistency
     /// between serialization (sending) and deserialization (receiving).
@@ -12,7 +59,8 @@ namespace OverseerBotShared.Tests
         private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
+            Converters = { new ObjectDictionaryConverter() }
         };
 
         [Fact]

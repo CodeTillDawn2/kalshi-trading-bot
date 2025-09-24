@@ -71,25 +71,12 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Add logging services
+            // Add logging services - disable default ASP.NET Core logging, only use custom DatabaseLogger
             services.AddLogging(builder =>
             {
                 builder.ClearProviders();
-                builder.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
-                builder.AddFilter("Microsoft.AspNetCore.StaticFiles", LogLevel.Warning);
-                builder.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.Warning);
-                builder.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
-                builder.AddConsole();
-                var loggingConfig = Configuration.GetSection(LoggingConfig.SectionName).Get<LoggingConfig>();
-                if (loggingConfig != null)
-                {
-                    var consoleLogLevel = Enum.Parse<LogLevel>(loggingConfig.ConsoleLogLevel, true);
-                    builder.SetMinimumLevel(consoleLogLevel);
-                }
-                else
-                {
-                    builder.SetMinimumLevel(LogLevel.Debug);
-                }
+                // Set minimum level to Trace to allow DatabaseLogger to handle its own filtering
+                builder.SetMinimumLevel(LogLevel.Trace);
             });
 
             // Add database logging services

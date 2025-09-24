@@ -691,6 +691,9 @@ namespace BacklashOverseer.Controllers
                     _cache.Set(AllBrainInstancesCacheKey, brainInstances, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
                 }
 
+                // Filter to only show brains with activity in the last 48 hours
+                brainInstances = brainInstances.Where(bi => bi.LastSeen.HasValue && bi.LastSeen.Value > DateTime.UtcNow.AddHours(-48)).ToList();
+
                 // Get all market watches
                 List<MarketWatchDTO> marketWatches;
                 if (_cache.TryGetValue("AllMarketWatches", out var cachedMarketWatches))

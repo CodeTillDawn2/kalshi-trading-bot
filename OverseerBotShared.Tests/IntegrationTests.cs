@@ -13,7 +13,8 @@ namespace OverseerBotShared.Tests
         private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
+            Converters = { new ObjectDictionaryConverter() }
         };
 
         [Fact]

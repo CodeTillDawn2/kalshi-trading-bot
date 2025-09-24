@@ -193,7 +193,7 @@ namespace OverseerBotShared
         /// <summary>
         /// Gets or sets the configurable metrics for GUI consumption.
         /// </summary>
-        public IReadOnlyDictionary<string, object>? ConfigurableMetrics { get; set; }
+        public Dictionary<string, object> ConfigurableMetrics { get; set; } = new();
     }
 
     /// <summary>
