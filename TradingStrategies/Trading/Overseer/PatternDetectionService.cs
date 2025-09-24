@@ -1,6 +1,7 @@
 using BacklashDTOs;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashPatterns;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
 using TradingStrategies.Extensions;
@@ -63,9 +64,9 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
-        public PatternDetectionService(PatternDetectionServiceConfig config, IPerformanceMonitor? performanceMonitor = null)
+        public PatternDetectionService(IOptions<PatternDetectionServiceConfig> config, IPerformanceMonitor? performanceMonitor = null)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _performanceMonitor = performanceMonitor;
         }
 

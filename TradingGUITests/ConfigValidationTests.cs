@@ -40,7 +40,6 @@ namespace TradingGUITests
                 typeof(TradingStrategies.Configuration.DataLoaderConfig).Assembly, // TradingStrategies
                 typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly, // TradingGUI itself
                 typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
-                typeof(BacklashBot.Configuration.BrainStatusServiceConfig).Assembly // BacklashBot
             };
 
             var configTypes = assemblies

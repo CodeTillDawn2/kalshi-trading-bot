@@ -152,7 +152,7 @@ namespace TradingStrategies.Trading.Overseer
         {
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
             _stopwatch.Restart();
-            long memoryBefore = _config.Simulation_EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
+            long memoryBefore = _config.EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
             _tradeCountThisSnapshot = 0;
 
             // Apply deltas if previous snapshot provided
@@ -195,26 +195,22 @@ namespace TradingStrategies.Trading.Overseer
             applyStopwatch.Start();
             ApplyAction(decision, effectiveSnapshot);
             applyStopwatch.Stop();
-            if (_config.Simulation_EnablePerformanceMetrics)
+            if (_config.EnablePerformanceMetrics)
                 _applyTimes.Add(applyStopwatch.Elapsed);
 
             _stopwatch.Stop();
-            if (_config.Simulation_EnablePerformanceMetrics)
+            if (_config.EnablePerformanceMetrics)
                 _executionTimes.Add(_stopwatch.Elapsed);
-            long memoryAfter = _config.Simulation_EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
-            if (_config.Simulation_EnablePerformanceMetrics)
+            long memoryAfter = _config.EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
+            if (_config.EnablePerformanceMetrics)
                 _memoryUsages.Add(memoryAfter);
 
             // Enhanced performance monitoring
-            if (_config.EnableDetailedPerformanceLogging && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
+            if (_config.EnablePerformanceMetrics && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
             {
                 Console.WriteLine($"Performance warning: ProcessSnapshot took {_stopwatch.Elapsed.TotalMilliseconds:F2}ms, Memory: {memoryAfter / 1024 / 1024}MB");
             }
 
-            if (memoryAfter > _config.MemoryThresholdMB * 1024 * 1024)
-            {
-                Console.WriteLine($"Memory warning: Peak usage {memoryAfter / 1024 / 1024}MB exceeds threshold {_config.MemoryThresholdMB}MB");
-            }
         }
 
 
@@ -247,22 +243,19 @@ namespace TradingStrategies.Trading.Overseer
             var action = decision.Type;
             if (action == ActionType.None) return;
 
-            bool isComboLongPostAsk = action == ActionType.LongPostAsk;
-            bool isComboShortPostYes = action == ActionType.ShortPostYes;
-
             if (action == ActionType.PostYes || action == ActionType.PostAsk || action == ActionType.Cancel)
             {
                 HandleLimitAction(decision, effectiveSnapshot);
                 return;
             }
 
-            bool longSide = action == ActionType.Long  || action == ActionType.Exit && Position < 0 || isComboLongPostAsk;
-            bool shortSide = action == ActionType.Short || action == ActionType.Exit && Position > 0 || isComboShortPostYes;
+            bool longSide = action == ActionType.Long  || action == ActionType.Exit && Position < 0;
+            bool shortSide = action == ActionType.Short || action == ActionType.Exit && Position > 0;
             if (!longSide && !shortSide) return;
 
             string tradeSide = longSide ? "no" : "yes";
 
-            int qty = (action == ActionType.Exit) ? Math.Abs(Position) : _config.DefaultMarketOrderQuantity;
+            int qty = (action == ActionType.Exit) ? Math.Abs(Position) : 100;
             int remainingQuantity = qty;
             double totalCost = 0;
             double totalFee = 0;
@@ -272,7 +265,7 @@ namespace TradingStrategies.Trading.Overseer
             bool isPaying = longSide || (shortSide && action != ActionType.Exit);
             double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
-            for (int p = _config.MaxContractPrice; p >= _config.MinContractPrice; p--)
+            for (int p = 100; p >= 0; p--)
             {
                 if (remainingQuantity <= 0) break;
                 if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
@@ -288,16 +281,12 @@ namespace TradingStrategies.Trading.Overseer
             int filled = qty - remainingQuantity;
             if (filled == 0) return;
 
-            if (_config.Simulation_EnablePerformanceMetrics)
+            if (_config.EnablePerformanceMetrics)
             {
                 _totalTradesExecuted++;
                 _tradeCountThisSnapshot++;
             }
 
-            if (_tradeCountThisSnapshot > _config.TradeRateLimitPerSnapshot)
-            {
-                Console.WriteLine($"Trade rate limit exceeded: {_tradeCountThisSnapshot} trades in this snapshot, limit is {_config.TradeRateLimitPerSnapshot}");
-            }
 
             double tempCash = Cash;
             int tempPosition = Position;
@@ -332,53 +321,6 @@ namespace TradingStrategies.Trading.Overseer
                 return;
             }
 
-            // Pre-cancel any existing resting orders (replace, don't stack)
-            if (isComboLongPostAsk || isComboShortPostYes)
-            {
-                foreach (var order in SimulatedRestingOrders)
-                {
-                    bool isYesSide = order.side == "yes";
-                    int bookPrice =
-                        (order.action == "sell" && isYesSide) ? (100 - order.price) :
-                        (order.action == "buy"  && !isYesSide) ? (100 - order.price) :
-                        order.price;
-
-                    var targetBook =
-                        (order.action == "buy"  && isYesSide) || (order.action == "sell" && !isYesSide)
-                        ? SimulatedBook.YesBids
-                        : SimulatedBook.NoBids;
-
-                    SimulatedBook.ReduceDepth(targetBook, bookPrice, order.count);
-                }
-                SimulatedRestingOrders.Clear();
-            }
-
-            // Combo  take then rest  sized to configurable percentage of current position
-            if (isComboLongPostAsk && Position > 0)
-            {
-                int sellYesPrice = decision.Price;   // Configurable price range (default 1..99 YES ask)
-                int noBidPrice = 100 - sellYesPrice;
-                int postQuantity = (int)(Position * _config.ComboPositionSizePercentage);         // Configurable percentage of position
-                if (sellYesPrice > 0 && sellYesPrice < 100 && noBidPrice >= 1 && noBidPrice <= 99 && postQuantity > 0)
-                {
-                    if (SimulatedBook.NoBids[noBidPrice] == null)
-                        SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
-                    SimulatedBook.NoBids[noBidPrice].Add((postQuantity, effectiveSnapshot.Timestamp));
-                    SimulatedRestingOrders.Add(("sell", "yes", "limit", postQuantity, sellYesPrice, decision.Expiration));
-                }
-            }
-            else if (isComboShortPostYes && Position < 0)
-            {
-                int yesBidPrice = decision.Price;    // Configurable price range (default 1..99 YES bid)
-                int postQuantity = (int)(-Position * _config.ComboPositionSizePercentage);         // Configurable percentage of position
-                if (yesBidPrice > 0 && yesBidPrice < 100 && postQuantity > 0)
-                {
-                    if (SimulatedBook.YesBids[yesBidPrice] == null)
-                        SimulatedBook.YesBids[yesBidPrice] = new List<(int count, DateTime timestamp)>();
-                    SimulatedBook.YesBids[yesBidPrice].Add((postQuantity, effectiveSnapshot.Timestamp));
-                    SimulatedRestingOrders.Add(("buy", "yes", "limit", postQuantity, yesBidPrice, decision.Expiration));
-                }
-            }
         }
 
 
@@ -423,7 +365,7 @@ namespace TradingStrategies.Trading.Overseer
                     else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
                     int toCancel = o.count;
-                    if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
+                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
                     {
                         var lst = book[bookPrice];
                         for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
@@ -447,7 +389,7 @@ namespace TradingStrategies.Trading.Overseer
             int limitPrice = decision.Price;
             int qty = decision.Quantity;
             DateTime? exp = decision.Expiration;
-            if (limitPrice < _config.MinContractPrice || limitPrice > _config.MaxContractPrice || qty <= 0) return;
+            if (limitPrice < 0 || limitPrice > 100 || qty <= 0) return;
 
             if (action == ActionType.PostYes)
             {
@@ -458,7 +400,7 @@ namespace TradingStrategies.Trading.Overseer
             else // PostAsk (sell YES) => rests on NO bids at (100 - ask)
             {
                 int noBidPrice = 100 - limitPrice;
-                if (noBidPrice < _config.MinContractPrice || noBidPrice > _config.MaxContractPrice) return;
+                if (noBidPrice < 0 || noBidPrice > 100) return;
                 if (SimulatedBook.NoBids[noBidPrice] == null)
                     SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
                 SimulatedBook.NoBids[noBidPrice].Add((qty, effectiveSnapshot.Timestamp));
@@ -550,7 +492,7 @@ namespace TradingStrategies.Trading.Overseer
                 if (o.expiration.HasValue && o.expiration < currentTime)
                 {
                     int toCancel = o.count;
-                    if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
+                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
                     {
                         var lst = book[bookPrice];
                         for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
@@ -572,7 +514,7 @@ namespace TradingStrategies.Trading.Overseer
 
                 // Respect FIFO: your fill begins only after everything *ahead* of you has been consumed.
                 int totalDepth = 0;
-                if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
+                if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
                     totalDepth = book[bookPrice].Sum(t => t.count);
 
                 int depthAhead = Math.Max(0, totalDepth - o.count);
@@ -748,15 +690,11 @@ namespace TradingStrategies.Trading.Overseer
             _memoryUsages.Add(memoryAfter);
 
             // Enhanced performance monitoring
-            if (_config.EnableDetailedPerformanceLogging && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
+            if (_config.EnablePerformanceMetrics && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
             {
                 Console.WriteLine($"Performance warning: ProcessSnapshotAsync took {_stopwatch.Elapsed.TotalMilliseconds:F2}ms, Memory: {memoryAfter / 1024 / 1024}MB");
             }
 
-            if (memoryAfter > _config.MemoryThresholdMB * 1024 * 1024)
-            {
-                Console.WriteLine($"Memory warning: Peak usage {memoryAfter / 1024 / 1024}MB exceeds threshold {_config.MemoryThresholdMB}MB");
-            }
         }
 
         /// <summary>
@@ -821,9 +759,7 @@ namespace TradingStrategies.Trading.Overseer
                 ["PeakMemoryUsage"] = PeakMemoryUsage,
                 ["TotalSnapshotsProcessed"] = _executionTimes.Count,
                 ["PerformanceThresholdMs"] = _config.PerformanceThresholdMs,
-                ["MemoryThresholdMB"] = _config.MemoryThresholdMB,
                 ["SlowOperationsCount"] = _executionTimes.Count(t => t.TotalMilliseconds > _config.PerformanceThresholdMs),
-                ["HighMemoryOperationsCount"] = _memoryUsages.Count(m => m > _config.MemoryThresholdMB * 1024 * 1024),
                 ["RestingOrdersCount"] = SimulatedRestingOrders.Count,
                 ["CurrentPosition"] = Position,
                 ["CurrentCash"] = Cash,
@@ -831,13 +767,10 @@ namespace TradingStrategies.Trading.Overseer
                 ["AverageDecisionTimeMs"] = _decisionTimes.Count > 0 ? _decisionTimes.Average(t => t.TotalMilliseconds) : 0,
                 ["AverageApplyTimeMs"] = _applyTimes.Count > 0 ? _applyTimes.Average(t => t.TotalMilliseconds) : 0,
                 ["SlowDecisionsCount"] = _decisionTimes.Count(t => t.TotalMilliseconds > _config.DecisionThresholdMs),
-                ["DecisionThresholdMs"] = _config.DecisionThresholdMs,
-                ["BandWidthRatioThreshold"] = _config.BandWidthRatioThreshold,
-                ["TradeRateLimitPerSnapshot"] = _config.TradeRateLimitPerSnapshot
             };
 
             // Automatically record to performance monitor if provided
-            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics, _config.Simulation_EnablePerformanceMetrics);
+            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics, _config.EnablePerformanceMetrics);
 
             return metrics;
         }

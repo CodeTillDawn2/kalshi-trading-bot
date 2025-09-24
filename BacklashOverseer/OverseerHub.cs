@@ -133,7 +133,7 @@ namespace BacklashOverseer
             _logger = logger;
             _scopeFactory = scopeFactory;
             _brainService = brainService;
-            _config = config?.Value ?? new OverseerHubConfig();
+            _config = config?.Value;
             _performanceMetrics = performanceMetrics;
         }
 

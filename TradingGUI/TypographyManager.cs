@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TradingGUI.Configuration;
 
 namespace TradingGUI
 {
@@ -71,56 +72,6 @@ namespace TradingGUI
     }
 
     /// <summary>
-    /// Configuration class for TypographyManager settings.
-    /// </summary>
-    public class TypographyConfig
-    {
-        /// <summary>
-        /// Preferred fonts for primary text, in order of preference.
-        /// Includes a wide range for better cross-platform compatibility.
-        /// </summary>
-        public string[] PreferredFonts { get; set; } = {
-            "Segoe UI",
-            "Microsoft Sans Serif",
-            "Arial",
-            "Helvetica",
-            "Tahoma",
-            "Verdana",
-            "Calibri",
-            "System"
-        };
-
-        /// <summary>
-        /// Preferred monospace fonts, in order of preference.
-        /// Includes common monospace fonts for better compatibility.
-        /// </summary>
-        public string[] MonospaceFonts { get; set; } = {
-            "Consolas",
-            "Source Code Pro",
-            "Fira Code",
-            "Courier New",
-            "Monaco",
-            "Lucida Console",
-            "DejaVu Sans Mono"
-        };
-
-        /// <summary>
-        /// Minimum allowed scale factor to prevent too small fonts.
-        /// </summary>
-        public float MinScaleFactor { get; set; } = 0.5f;
-
-        /// <summary>
-        /// Maximum allowed scale factor to prevent too large fonts.
-        /// </summary>
-        public float MaxScaleFactor { get; set; } = 3.0f;
-
-        /// <summary>
-        /// Default scale factor for normal displays.
-        /// </summary>
-        public float DefaultScaleFactor { get; set; } = 1.0f;
-    }
-
-    /// <summary>
     /// Manages typography for the Windows Forms GUI application, providing consistent font selection,
     /// sizing, and scaling across different display configurations. This singleton class ensures
     /// that all UI elements use appropriate fonts that are universally available and handle DPI scaling
@@ -142,29 +93,36 @@ namespace TradingGUI
         /// <summary>
         /// Loads typography configuration from appsettings.json.
         /// </summary>
-        /// <returns>TypographyConfig instance loaded from configuration file, or default if loading fails.</returns>
+        /// <returns>TypographyConfig instance loaded from configuration file.</returns>
+        /// <exception cref="FileNotFoundException">Thrown if appsettings.json is not found.</exception>
+        /// <exception cref="KeyNotFoundException">Thrown if the Typography section is not found.</exception>
+        /// <exception cref="InvalidDataException">Thrown if deserialization fails.</exception>
         private static TypographyConfig LoadTypographyConfig()
         {
-            try
+            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+            if (!File.Exists(configPath))
             {
-                string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
-                if (File.Exists(configPath))
+                throw new FileNotFoundException("appsettings.json not found.", configPath);
+            }
+            string json = File.ReadAllText(configPath);
+            using (JsonDocument doc = JsonDocument.Parse(json))
+            {
+                // Navigate to GUI:Typography section
+                if (!doc.RootElement.TryGetProperty("GUI", out JsonElement guiElement))
                 {
-                    string json = File.ReadAllText(configPath);
-                    using (JsonDocument doc = JsonDocument.Parse(json))
-                    {
-                        if (doc.RootElement.TryGetProperty("Typography", out JsonElement typographyElement))
-                        {
-                            return JsonSerializer.Deserialize<TypographyConfig>(typographyElement.GetRawText()) ?? new TypographyConfig();
-                        }
-                    }
+                    throw new KeyNotFoundException($"GUI section not found in appsettings.json.");
                 }
+                if (!guiElement.TryGetProperty("Typography", out JsonElement typographyElement))
+                {
+                    throw new KeyNotFoundException($"Typography section 'GUI:Typography' not found in appsettings.json.");
+                }
+                var config = JsonSerializer.Deserialize<TypographyConfig>(typographyElement.GetRawText());
+                if (config == null)
+                {
+                    throw new InvalidDataException("Failed to deserialize Typography configuration.");
+                }
+                return config;
             }
-            catch
-            {
-                // Fall back to default if loading fails
-            }
-            return new TypographyConfig();
         }
 
         /// <summary>
@@ -216,10 +174,10 @@ namespace TradingGUI
 
         /// <summary>
         /// Finds the best available font from the provided list of font names.
-        /// Returns the first font that is available on the system, or "Microsoft Sans Serif" as ultimate fallback.
         /// </summary>
         /// <param name="fontNames">Array of font names to check for availability.</param>
-        /// <returns>The name of the first available font, or "Microsoft Sans Serif" if none are available.</returns>
+        /// <returns>The name of the first available font.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if no font from the list is available.</exception>
         private string GetBestAvailableFont(string[] fontNames)
         {
             foreach (var fontName in fontNames)
@@ -229,7 +187,7 @@ namespace TradingGUI
                     return fontName;
                 }
             }
-            return "Microsoft Sans Serif"; // Ultimate fallback
+            throw new InvalidOperationException("No available font found from the configured preferred fonts list.");
         }
 
         /// <summary>

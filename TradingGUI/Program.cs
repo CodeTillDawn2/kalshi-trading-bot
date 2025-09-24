@@ -1,8 +1,10 @@
 using BacklashBotData.Data;
+using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Management;
@@ -28,6 +30,14 @@ namespace TradingGUI
             services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
 
+            // Add logging
+            services.AddLogging(logging =>
+            {
+                logging.AddConfiguration(configuration.GetSection("Logging"));
+                logging.AddConsole();
+                logging.AddDebug();
+            });
+
             // Add connection string access (matching BacklashBot pattern)
             var connectionString = ConfigurationHelper.BuildConnectionString(configuration);
             if (!string.IsNullOrEmpty(connectionString))
@@ -35,8 +45,23 @@ namespace TradingGUI
                 services.AddSingleton(connectionString);
             }
 
-            // Register database context
-            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
+            // Register BacklashBotData configuration
+            services.AddOptions<BacklashBotDataConfig>()
+                .Bind(configuration.GetSection(BacklashBotDataConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            // Register database context with factory method
+            services.AddDbContext<BacklashBotContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+            services.AddTransient<BacklashBotContext>(provider =>
+            {
+                var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
+                var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
+                return new BacklashBotContext(connectionString, logger, dataConfig);
+            });
 
             // Register TradingSimulatorService
             services.AddScoped<TradingSimulatorService>();

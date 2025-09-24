@@ -126,12 +126,19 @@ namespace TradingSimulator
         /// </summary>
         public void Setup()
         {
-            // Use the BacklashOverseer directory for configuration
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "BacklashOverseer"));
+            // Load configuration from TradingGUI directory
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
+
+            // Load secrets configuration
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+            configBuilder.AddSecretsConfiguration(basePath, config);
+            config = configBuilder.Build();
 
             _snapshotLoggerMock = new Mock<ILogger<ITradingSnapshotService>>();
             _serviceFactory = new Mock<IServiceFactory>().Object;
@@ -154,6 +161,10 @@ namespace TradingSimulator
             services.AddSingleton<IConfiguration>(config);
             services.AddSingleton(connectionString);
             services.AddSingleton(dataConfig);
+
+            // Add logging services
+            services.AddLogging();
+
             services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
 
@@ -163,6 +174,10 @@ namespace TradingSimulator
             services.Configure<SnapshotPeriodHelperConfig>(config.GetSection(SnapshotPeriodHelperConfig.SectionName));
             services.Configure<TradingSnapshotServiceConfig>(config.GetSection(TradingSnapshotServiceConfig.SectionName));
             services.Configure<DataLoaderConfig>(config.GetSection(DataLoaderConfig.SectionName));
+            services.Configure<PatternDetectionServiceConfig>(config.GetSection(PatternDetectionServiceConfig.SectionName));
+            services.Configure<StrategySelectionHelperConfig>(config.GetSection(StrategySelectionHelperConfig.SectionName));
+            services.Configure<MarketTypeServiceConfig>(config.GetSection(MarketTypeServiceConfig.SectionName));
+            services.Configure<SnapshotGroupHelperConfig>(config.GetSection(SnapshotGroupHelperConfig.SectionName));
 
             // Add services required by TradingOverseer
             services.AddScoped<MarketTypeService>();
@@ -187,7 +202,7 @@ namespace TradingSimulator
             var equityCalculator = serviceProvider.GetRequiredService<EquityCalculator>();
             var tradingOverseerConfig = Options.Create(config.GetSection(TradingOverseerConfig.SectionName).Get<TradingOverseerConfig>()!);
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, simulationEngine, equityCalculator, tradingOverseerConfig, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _dataStorageConfig, null, null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _dataStorageConfig, serviceProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>(), null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();

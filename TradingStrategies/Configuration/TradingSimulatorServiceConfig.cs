@@ -10,7 +10,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// The configuration section name for TradingSimulatorServiceConfig.
         /// </summary>
-        public const string SectionName = "TradingSimulatorService";
+        public const string SectionName = "Simulator:TradingSimulatorService";
 
         /// <summary>
         /// Gets or sets the directory path where simulation cache files and reports are stored.

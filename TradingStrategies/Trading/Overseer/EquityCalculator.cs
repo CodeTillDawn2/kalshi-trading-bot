@@ -1,4 +1,5 @@
 using BacklashDTOs;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
 
@@ -36,9 +37,9 @@ namespace TradingStrategies.Trading.Overseer
         /// Initializes a new instance of the EquityCalculator class.
         /// </summary>
         /// <param name="config">The equity calculator configuration containing performance metrics settings.</param>
-        public EquityCalculator(EquityCalculatorConfig config)
+        public EquityCalculator(IOptions<EquityCalculatorConfig> config)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>
