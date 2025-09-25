@@ -3,7 +3,10 @@ using BacklashDTOs.KalshiAPI;
 namespace BacklashBot.KalshiAPI.Interfaces
 {
     /// <summary>
-    /// Interface for interacting with the Kalshi API to fetch market data, positions, orders, and other trading information.
+    /// Defines the contract for services that interact with the Kalshi trading platform API.
+    /// This interface provides methods for fetching market data, managing positions and orders,
+    /// retrieving account information, and accessing exchange status and schedules.
+    /// Implementations should handle authentication, error handling, and data transformation.
     /// </summary>
     public interface IKalshiAPIService
     {

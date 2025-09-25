@@ -722,7 +722,8 @@ namespace BacklashBotData.Data.Interfaces
         IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics();
 
         /// <summary>
-        /// Resets the performance metrics.
+        /// Resets all accumulated performance metrics for database operations to their initial state.
+        /// This clears success counts, failure counts, total times, and average times for all tracked operations.
         /// </summary>
         void ResetPerformanceMetrics();
         #endregion

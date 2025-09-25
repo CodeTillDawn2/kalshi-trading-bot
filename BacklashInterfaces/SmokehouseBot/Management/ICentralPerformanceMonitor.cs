@@ -1,8 +1,19 @@
 namespace BacklashBot.Management.Interfaces
 {
+    /// <summary>
+    /// Defines the contract for a centralized performance monitoring service that tracks
+    /// system performance metrics across various components including queues, WebSocket connections,
+    /// database operations, and market analysis activities.
+    /// </summary>
     public interface ICentralPerformanceMonitor : BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor
     {
-        // Note: RecordExecutionTime methods are inherited from IPerformanceMonitor
+        /// <summary>
+        /// Records the execution time for a given operation.
+        /// </summary>
+        /// <param name="operationName">The name of the operation being timed.</param>
+        /// <param name="executionTime">The time taken to execute the operation.</param>
+        void RecordExecutionTime(string operationName, TimeSpan executionTime);
+
         // Additional methods specific to central performance monitoring:
         Task StartTimer();
         (double EventQueueAvg, double TickerQueueAvg, double NotificationQueueAvg, double OrderBookQueueAvg) GetQueueCountRollingAverages();
