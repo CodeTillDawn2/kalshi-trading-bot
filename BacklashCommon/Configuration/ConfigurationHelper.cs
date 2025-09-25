@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace BacklashCommon.Configuration
@@ -81,17 +82,48 @@ namespace BacklashCommon.Configuration
         /// </summary>
         /// <param name="configuration">The configuration instance containing the connection string template and secrets.</param>
         /// <returns>The fully interpolated connection string, or null if not configured.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when required database credentials are missing or connection string is invalid.</exception>
         public static string BuildConnectionString(IConfiguration configuration)
         {
             var connectionString = configuration["DBConnection:DefaultConnection"];
             if (string.IsNullOrEmpty(connectionString))
             {
-                return null;
+                throw new InvalidOperationException("DBConnection:DefaultConnection is not configured in appsettings.json");
+            }
+
+            // Get the secret values
+            var username = configuration["Database:Username"];
+            var password = configuration["Database:Password"];
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new InvalidOperationException("Database:Username is not configured. Ensure secrets are properly loaded from the Secrets directory.");
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new InvalidOperationException("Database:Password is not configured. Ensure secrets are properly loaded from the Secrets directory.");
             }
 
             // Replace placeholders with actual secret values
-            connectionString = connectionString.Replace("{Database:Username}", configuration["Database:Username"]);
-            connectionString = connectionString.Replace("{Database:Password}", configuration["Database:Password"]);
+            connectionString = connectionString.Replace("{Database:Username}", username);
+            connectionString = connectionString.Replace("{Database:Password}", password);
+
+            // Validate that no placeholders remain
+            if (connectionString.Contains("{Database:Username}") || connectionString.Contains("{Database:Password}"))
+            {
+                throw new InvalidOperationException("Connection string still contains unreplaced placeholders. Check secret configuration.");
+            }
+
+            // Validate the connection string format
+            try
+            {
+                _ = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException($"Invalid connection string format: {ex.Message}", ex);
+            }
 
             return connectionString;
         }

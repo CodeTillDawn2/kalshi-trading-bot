@@ -66,6 +66,11 @@ if not exist "%OUTPUT_PATH%" (
         pause >nul
         exit /b 1
     )
+) else (
+    echo INFO: Cleaning existing files in output directory...
+    del /q /s /f "%OUTPUT_PATH%\*.*" 2>nul
+    for /d %%i in ("%OUTPUT_PATH%\*") do rmdir /s /q "%%i" 2>nul
+    echo Output directory cleaned.
 )
 echo Output directory ready.
 echo.
@@ -154,7 +159,7 @@ echo Creating zip file...
 :: Create a temporary PowerShell script for better reliability
 set "TEMP_PS_SCRIPT=%TEMP%\deploy_zip_%TIMESTAMP%.ps1"
 echo $ErrorActionPreference = 'Stop' > "%TEMP_PS_SCRIPT%"
-echo $outputPath = '%PROJECT_DIR%' >> "%TEMP_PS_SCRIPT%"
+echo $outputPath = '%OUTPUT_PATH%' >> "%TEMP_PS_SCRIPT%"
 echo $zipDestPath = '%FALLBACK_FOLDER%' >> "%TEMP_PS_SCRIPT%"
 echo $finalPath = '%ZIP_DEST_PATH%' >> "%TEMP_PS_SCRIPT%"
 echo $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss' >> "%TEMP_PS_SCRIPT%"
@@ -171,7 +176,7 @@ echo         if ($zipDestPath -ne $finalPath) { >> "%TEMP_PS_SCRIPT%"
 echo             $finalDestPath = Join-Path -Path $finalPath -ChildPath $zipName >> "%TEMP_PS_SCRIPT%"
 echo             Move-Item -Path $destPath -Destination $finalDestPath -Force >> "%TEMP_PS_SCRIPT%"
 echo             Write-Host "Moved zip to: $finalDestPath" >> "%TEMP_PS_SCRIPT%"
-echo             Remove-Item $destPath -Force >> "%TEMP_PS_SCRIPT%"
+echo             Remove-Item $destPath -Force -ErrorAction SilentlyContinue >> "%TEMP_PS_SCRIPT%"
 echo             Write-Host "Cleaned up local zip: $destPath" >> "%TEMP_PS_SCRIPT%"
 echo         } >> "%TEMP_PS_SCRIPT%"
 echo     } catch { >> "%TEMP_PS_SCRIPT%"

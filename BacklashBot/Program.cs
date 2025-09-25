@@ -237,7 +237,7 @@ builder.Services.AddOptions<InstanceNameConfig>()
     .ValidateOnStart();
 
 var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(builder.Configuration);
-builder.Services.AddSingleton(connectionString);
+builder.Services.AddSingleton(new BacklashCommon.Configuration.ConnectionStringProvider(connectionString));
 
 // Generate session identifier early to avoid circular dependency
 var sessionIdentifier = GenerateSessionIdentifier();
@@ -420,11 +420,12 @@ builder.Services.AddScoped<IBacklashBotContext>(provider =>
 {
     var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
     var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-    return new BacklashBotContext(connectionString, logger, dataConfig);
+    var connStr = provider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
+    return new BacklashBotContext(connStr, logger, dataConfig);
 });
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
     sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
-    sp.GetRequiredService<string>(), // connectionString
+    sp.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value, // connectionString
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
@@ -438,7 +439,7 @@ builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
     var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
     var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
     var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
-    var connectionString = serviceProvider.GetRequiredService<string>();
+    var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
     return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
 });
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
