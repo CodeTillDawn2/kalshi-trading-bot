@@ -8,15 +8,15 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn></NoWarn>
-    <WarningsAsErrors>CS1591</WarningsAsErrors>
+    <WarningsAsErrors>CS1570;CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>CS1591</WarningsAsErrors>
+    <WarningsAsErrors>CS1570;CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <WarningsAsErrors>CS1591</WarningsAsErrors>
+    <WarningsAsErrors>CS1570;CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,3 +32,4 @@
     <PackageReference Include="NJsonSchema" Version="11.3.2" />
   </ItemGroup>
 </Project>
+

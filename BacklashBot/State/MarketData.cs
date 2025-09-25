@@ -4,45 +4,6 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-/// <summary>
-/// Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
-/// from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
-/// information used in trading decisions, technical analysis, and snapshot creation.
-///
-/// The MarketData class maintains:
-/// - Current order book state with bid/ask prices and depths
-/// - Historical candlestick data across multiple timeframes (minute, hour, day)
-/// - Real-time ticker updates and price movements
-/// - Position information and P&amp;L calculations
-/// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
-/// - Order book change velocities and trade metrics
-/// - Support/resistance levels and market metadata
-///
-/// Data integrity is ensured through comprehensive input validation:
-/// - Candlestick data validation for non-negative prices (0-100), valid timestamps, and reasonable values
-/// - Ticker data validation for price ranges, volume, and timestamp integrity
-/// - Orderbook data validation for price bounds, quantities, and side validity
-/// - Position data validation for size reasonableness, exposure bounds, and update timestamps
-/// Invalid data triggers informative warnings via logging but processing continues to maintain system resilience.
-///
-/// Data is updated through various mechanisms:
-/// - WebSocket events for real-time order book and ticker updates
-/// - Periodic API calls for position and market information
-/// - Asynchronous background calculations for technical indicators and metrics to avoid blocking
-/// - Historical data loading from candlestick storage
-///
-/// Performance optimizations include:
-/// - Efficient data structures and minimized LINQ queries
-/// - Parallel processing for CPU-intensive calculations
-/// - Binary search for large dataset lookups
-/// - Asynchronous operations to maintain responsiveness
-///
-/// Calculation parameters such as tolerance percentages, fee rates, time periods for slope calculations,
-/// and lookback periods are configurable via CalculationConfig to allow runtime customization without code changes.
-///
-/// This class implements the IMarketData interface and is used throughout the trading bot
-/// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
-/// </summary>
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using TradingStrategies.Helpers.Interfaces;
@@ -58,7 +19,7 @@ namespace BacklashBot.State
     /// - Current order book state with bid/ask prices and depths
     /// - Historical candlestick data across multiple timeframes (minute, hour, day)
     /// - Real-time ticker updates and price movements
-    /// - Position information and P&L calculations
+    /// - Position information and PandL calculations
     /// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
     /// - Order book change velocities and trade metrics
     /// - Support/resistance levels and market metadata
@@ -1503,7 +1464,7 @@ namespace BacklashBot.State
         public string MarketBehaviorNo { get => _marketBehaviorNo; set => _marketBehaviorNo = value; }
         /// <summary>
         /// Gets or sets the collection of market position data.
-        /// Contains information about current positions, including size, exposure, and P&L.
+        /// Contains information about current positions, including size, exposure, and PandL.
         /// </summary>
         public List<MarketPositionDTO> Positions { get => _positions; set => _positions = value; }
         /// <summary>

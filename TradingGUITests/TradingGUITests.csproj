@@ -14,7 +14,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn></NoWarn>
-    <WarningsAsErrors>CS1591</WarningsAsErrors>
+    <WarningsAsErrors>CS1570;CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,3 +49,4 @@
   </ItemGroup>
 
 </Project>
+

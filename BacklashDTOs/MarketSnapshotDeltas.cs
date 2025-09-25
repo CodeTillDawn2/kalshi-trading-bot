@@ -149,9 +149,9 @@ namespace BacklashDTOs
         /// <returns>The total traded or null if unchanged.</returns>
         public long? TotalTraded() => Changed("TotalTraded") ? _current.TotalTraded : (long?)null;
         /// <summary>
-        /// Gets the realized P&L if it has changed, otherwise null.
+        /// Gets the realized PandL if it has changed, otherwise null.
         /// </summary>
-        /// <returns>The realized P&L or null if unchanged.</returns>
+        /// <returns>The realized PandL or null if unchanged.</returns>
         public double? RealizedPnl() => Changed("RealizedPnl") ? _current.RealizedPnl : (double?)null;
         /// <summary>
         /// Gets the fees paid if it has changed, otherwise null.

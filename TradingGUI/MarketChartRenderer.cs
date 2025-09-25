@@ -1,11 +1,4 @@
-/// <summary>
-/// Provides static methods for rendering market data charts using ScottPlot.
-/// This class is responsible for loading cached market data from JSON files,
-/// merging multiple data sources if necessary, and plotting various market series
-/// (bids, asks, trades, events) onto a ScottPlot chart control. It handles
-/// data aggregation, sorting, and visualization to support trading analysis
-/// and simulation in the GUI application.
-/// </summary>
+
 using ScottPlot;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -14,6 +7,14 @@ using TradingSimulator;
 
 namespace TradingGUI.Charting
 {
+    /// <summary>
+    /// Provides static methods for rendering market data charts using ScottPlot.
+    /// This class is responsible for loading cached market data from JSON files,
+    /// merging multiple data sources if necessary, and plotting various market series
+    /// (bids, asks, trades, events) onto a ScottPlot chart control. It handles
+    /// data aggregation, sorting, and visualization to support trading analysis
+    /// and simulation in the GUI application.
+    /// </summary>
     internal static class MarketChartRenderer
     {
         private static class ChartConfig
