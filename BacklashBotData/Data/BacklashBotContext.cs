@@ -287,6 +287,10 @@ namespace BacklashBotData.Data
         }
 
 
+        /// <summary>
+        /// Adds or updates an event in the database.
+        /// </summary>
+        /// <param name="dto">The event DTO to add or update.</param>
         public async Task AddOrUpdateEvent(EventDTO dto)
         {
             Event? existingEvent = await Events.FirstOrDefaultAsync(x => x.event_ticker == dto.event_ticker);
@@ -318,6 +322,10 @@ namespace BacklashBotData.Data
             }
         }
 
+        /// <summary>
+        /// Adds or updates multiple events in the database.
+        /// </summary>
+        /// <param name="dtos">The list of event DTOs to add or update.</param>
         public async Task AddOrUpdateEvents(List<EventDTO> dtos)
         {
             foreach (EventDTO dto in dtos)
@@ -1728,6 +1736,11 @@ namespace BacklashBotData.Data
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Gets overseer info by host name.
+        /// </summary>
+        /// <param name="hostName">The host name to filter by.</param>
+        /// <returns>The overseer info DTO if found, null otherwise.</returns>
         public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName)
         {
             return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);

@@ -3,59 +3,31 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
-    /// <summary>MarubozuPattern</summary>
-    /// <summary>MarubozuPattern</summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
-    /// <summary>
-    /// </summary>
+
     public class MarubozuPattern : PatternDefinition
-    /// <summary>
-    /// </summary>
+
     {
         /// <summary>
         /// Minimum total range for the candle to be considered significant.
         /// Loosest: 1.0 (allows smaller significant moves); Strictest: 5.0 (requires large moves).
         /// </summary>
         public static double MinRange { get; } = 3.0;
-        /// <summary>
-        /// </summary>
+
 
         /// <summary>
         /// Threshold for trend strength to validate prior trend context.
         /// Loosest: 0.1 (very weak trend); Strictest: 0.8 (strong trend required).
         /// </summary>
         public static double TrendThreshold { get; } = 0.5;
-        /// <summary>
-        /// </summary>
+
         /// <summary>
         /// Gets the base name of the pattern.
         /// </summary>
         public const string BaseName = "Marubozu";
+
+        /// <summary>
+        /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
         /// Gets the description of the pattern.

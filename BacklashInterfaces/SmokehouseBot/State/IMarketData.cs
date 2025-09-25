@@ -5,22 +5,77 @@ using System.Collections.Concurrent;
 
 namespace BacklashBot.State.Interfaces
 {
-
-
+    /// <summary>
+    /// Defines the comprehensive contract for market data representation, containing
+    /// all trading-related information, metrics, and analysis data for a specific market.
+    /// This interface provides access to real-time and historical market data, positions,
+    /// technical indicators, and trading metrics.
+    /// </summary>
     public interface IMarketData
     {
+        /// <summary>
+        /// Gets or sets the timestamp of the last successful data synchronization.
+        /// </summary>
         DateTime LastSuccessfulSync { get; set; }
+
+        /// <summary>
+        /// Gets or sets the market ticker symbol.
+        /// </summary>
         string MarketTicker { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of market (e.g., binary, multi-outcome).
+        /// </summary>
         string MarketType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the detailed market information DTO.
+        /// </summary>
         MarketDTO MarketInfo { get; set; }
+
+        /// <summary>
+        /// Gets the dictionary of candlestick data organized by timeframe.
+        /// </summary>
         Dictionary<string, List<CandlestickData>> Candlesticks { get; }
+
+        /// <summary>
+        /// Gets or sets the concurrent bag of ticker data updates.
+        /// </summary>
         ConcurrentBag<TickerDTO> Tickers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of order book data entries.
+        /// </summary>
         List<OrderbookData> OrderbookData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last WebSocket message received.
+        /// </summary>
         DateTime LastWebSocketMessageReceived { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last order book event.
+        /// </summary>
         DateTime LastOrderbookEventTimestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp when the last snapshot was taken.
+        /// </summary>
         DateTime LastSnapshotTaken { get; set; }
+
+        /// <summary>
+        /// Gets the source of the current price data.
+        /// </summary>
         string CurrentPriceSource { get; }
+
+        /// <summary>
+        /// Gets the current ticker price information for the "Yes" side.
+        /// </summary>
         (int Ask, int Bid, DateTime When) TickerPriceYes { get; }
+
+        /// <summary>
+        /// Gets the current ticker price information for the "No" side.
+        /// </summary>
         (int Ask, int Bid, DateTime When) TickerPriceNo { get; }
         (int Bid, DateTime When) AllTimeHighYes_Bid { get; set; }
         (int Bid, DateTime When) AllTimeHighNo_Bid { get; }
@@ -125,16 +180,72 @@ namespace BacklashBot.State.Interfaces
         TimeSpan? MarketAge { get; }
         TimeSpan? TimeLeft { get; }
         bool CanCloseEarly { get; }
+        /// <summary>
+        /// Gets or sets the list of all support and resistance levels for the market.
+        /// </summary>
         List<SupportResistanceLevel> AllSupportResistanceLevels { get; set; }
+
+        /// <summary>
+        /// Gets the bid order book data for the specified side.
+        /// </summary>
+        /// <param name="side">The side to get bids for ("Yes" or "No"). Defaults to empty string for all.</param>
+        /// <returns>A list of order book data entries for bids.</returns>
         List<OrderbookData> GetBids(string side = "");
+
+        /// <summary>
+        /// Updates the current price with the specified values.
+        /// </summary>
+        /// <param name="yesAsk">The ask price for the "Yes" side.</param>
+        /// <param name="yesBid">The bid price for the "Yes" side.</param>
+        /// <param name="timestamp">The timestamp of the price update.</param>
+        /// <param name="source">The source of the price data.</param>
         void UpdateCurrentPrice(int yesAsk, int yesBid, DateTime timestamp, string source);
+
+        /// <summary>
+        /// Refreshes all metadata for the market asynchronously.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         Task RefreshAllMetadata();
+
+        /// <summary>
+        /// Refreshes candlestick metadata.
+        /// </summary>
         void RefreshCandlestickMetadata();
+
+        /// <summary>
+        /// Refreshes ticker metadata asynchronously.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         Task RefreshTickerMetadata();
+
+        /// <summary>
+        /// Refreshes position metadata.
+        /// </summary>
         void RefreshPositionMetadata();
+
+        /// <summary>
+        /// Recalculates order book change metrics.
+        /// </summary>
         void RecalculateOrderbookChangeMetrics();
+
+        /// <summary>
+        /// Builds pseudo candlesticks for the specified period and lookback.
+        /// </summary>
+        /// <param name="period">The period for the pseudo candlesticks.</param>
+        /// <param name="lookbackPeriods">The number of lookback periods (default 34).</param>
+        /// <returns>A list of pseudo candlesticks.</returns>
         Task<List<PseudoCandlestick>> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
+
+        /// <summary>
+        /// Gets the filtered list of support and resistance levels.
+        /// </summary>
+        /// <returns>A list of filtered support and resistance levels.</returns>
         List<SupportResistanceLevel> GetFilteredSupportResistanceLevels();
+
+        /// <summary>
+        /// Updates trading metrics asynchronously.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         Task UpdateTradingMetrics();
 
         double YesBidSlopePerMinute_Short { get; set; }

@@ -13,71 +13,71 @@ namespace BacklashInterfaces.Enums
         public enum MarketType
         {
             /// <summary>
-            /// Default for unmapped or undefined market conditions
+            /// Represents an undefined or unmapped market condition, used as a default value when the market type cannot be determined.
             /// </summary>
             Undefined,
             /// <summary>
-            /// Market with low liquidity, difficult to trade without impacting prices
+            /// Represents a market with low liquidity, where trading large volumes can significantly impact prices due to limited market depth.
             /// </summary>
             LowLiquidity,
             /// <summary>
-            /// Market with prices oscillating within a range, suitable for mean-reversion strategies
+            /// Represents a market with prices oscillating within a defined range, making it suitable for mean-reversion trading strategies.
             /// </summary>
             Bouncing,
             /// <summary>
-            /// Market with consistent price movement in one direction, suitable for momentum strategies
+            /// Represents a market with consistent price movement in one direction, ideal for momentum-based trading strategies.
             /// </summary>
             Trending,
             /// <summary>
-            /// Market is experiencing significant fluctuations
+            /// Represents a market experiencing significant price fluctuations and high volatility.
             /// </summary>
             Volatile,
             /// <summary>
-            /// Market with minimal price movement, low activity, and stable conditions
+            /// Represents a market with minimal price movement, low trading activity, and stable conditions.
             /// </summary>
             Stagnant,
             /// <summary>
-            /// Market with high uncertainty, often in balanced or unclear outcomes
+            /// Represents a market with high uncertainty, often characterized by balanced probabilities or unclear outcomes.
             /// </summary>
             HighUncertainty,
             /// <summary>
-            /// Trending market with high activity levels
+            /// Represents a trending market with high levels of trading activity and volume.
             /// </summary>
             TrendingActive,
             /// <summary>
-            /// Volatile market driven by specific events
+            /// Represents a volatile market driven by specific events or news catalysts.
             /// </summary>
             VolatileEvents,
             /// <summary>
-            /// Stable market influenced by macroeconomic factors
+            /// Represents a stable market influenced by macroeconomic factors and indicators.
             /// </summary>
             StableMacro,
             /// <summary>
-            /// Volatile market with seasonal or predictable patterns
+            /// Represents a volatile market with seasonal or predictable patterns in price movement.
             /// </summary>
             SeasonalVolatile,
             /// <summary>
-            /// Market driven by news and sentiment
+            /// Represents a market primarily driven by news events and market sentiment.
             /// </summary>
             NewsDriven,
             /// <summary>
-            /// Trending market in technology or innovation sectors
+            /// Represents a trending market in technology or innovation-related sectors.
             /// </summary>
             TechTrend,
             /// <summary>
-            /// Momentum-driven market in financial assets
+            /// Represents a momentum-driven market in financial assets and instruments.
             /// </summary>
             FinancialMomentum,
             /// <summary>
-            /// Market close to resolution with high volatility
+            /// Represents a market close to resolution with high volatility due to impending settlement.
             /// </summary>
             ImminentCloseVolatile,
             /// <summary>
-            /// Long-term stable market
+            /// Represents a long-term stable market with predictable behavior over extended periods.
             /// </summary>
             FarStable,
             /// <summary>
-            /// Event-specific market like awards or launches
+            /// Represents an event-specific market such as awards, launches, or one-time occurrences.
             /// </summary>
             EventDriven
 
@@ -88,36 +88,40 @@ namespace BacklashInterfaces.Enums
         public enum ActionType
         {
             /// <summary>
-            /// No action to be taken
+            /// Indicates that no trading action should be taken at this time.
             /// </summary>
             None,
             /// <summary>
-            /// Exit an existing position
+            /// Indicates the action to exit an existing trading position completely.
             /// </summary>
             Exit,
             /// <summary>
-            /// Enter a long position (buy)
+            /// Indicates the action to enter a long position by buying the asset.
             /// </summary>
             Long,
             /// <summary>
-            /// Enter a short position (sell)
+            /// Indicates the action to enter a short position by selling the asset.
             /// </summary>
             Short,
             /// <summary>
-            /// Limit buy yes (or equiv)
+            /// Indicates the action to place a limit buy order for the 'yes' outcome.
             /// </summary>
             PostYes,
             /// <summary>
-            /// Limit sell yes
+            /// Indicates the action to place a limit sell order for the 'yes' outcome.
             /// </summary>
             PostAsk,
             /// <summary>
-            /// Cancel resting
+            /// Indicates the action to cancel any resting orders in the market.
             /// </summary>
             Cancel,
-            /// <summary>Market long, then immediately post a YES ask (resting sell) for what you just bought</summary>
+            /// <summary>
+            /// Indicates a market long position followed by immediately posting a resting sell order for the purchased amount.
+            /// </summary>
             LongPostAsk,
-            /// <summary>Market short, then immediately post a YES bid (resting buy) for what you just sold</summary>
+            /// <summary>
+            /// Indicates a market short position followed by immediately posting a resting buy order for the sold amount.
+            /// </summary>
             ShortPostYes
         }
 
@@ -127,31 +131,31 @@ namespace BacklashInterfaces.Enums
         public enum ComparisonOperator
         {
             /// <summary>
-            /// Condition where value is greater than a threshold
+            /// Represents a condition where a value is greater than a specified threshold.
             /// </summary>
             GreaterThan,
             /// <summary>
-            /// Condition where value is less than a threshold
+            /// Represents a condition where a value is less than a specified threshold.
             /// </summary>
             LessThan,
             /// <summary>
-            /// Condition where value is equal to a threshold
+            /// Represents a condition where a value is equal to a specified threshold.
             /// </summary>
             EqualTo,
             /// <summary>
-            /// Condition where value is greater than or equal to a threshold
+            /// Represents a condition where a value is greater than or equal to a specified threshold.
             /// </summary>
             GreaterThanOrEqual,
             /// <summary>
-            /// Condition where value is less than or equal to a threshold
+            /// Represents a condition where a value is less than or equal to a specified threshold.
             /// </summary>
             LessThanOrEqual,
             /// <summary>
-            /// Condition where a value exists
+            /// Represents a condition where a value exists or is present.
             /// </summary>
             Exists,
             /// <summary>
-            /// Condition where a value does not exist
+            /// Represents a condition where a value does not exist or is absent.
             /// </summary>
             NotExists
         }
@@ -162,19 +166,19 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_PriceMovement
         {
             /// <summary>
-            /// Price is consistently moving in one direction (up or down)
+            /// Indicates that the price is consistently moving in one direction, either upward or downward.
             /// </summary>
             Trending,
             /// <summary>
-            /// Price is oscillating within a defined range without a clear trend
+            /// Indicates that the price is oscillating within a defined range without establishing a clear trend.
             /// </summary>
             Bouncing,
             /// <summary>
-            /// Price is experiencing significant fluctuations
+            /// Indicates that the price is experiencing significant and rapid fluctuations.
             /// </summary>
             Volatile,
             /// <summary>
-            /// Price is relatively steady with minimal movement
+            /// Indicates that the price is relatively steady with minimal movement or changes.
             /// </summary>
             Stable
         }
@@ -185,15 +189,15 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_Liquidity
         {
             /// <summary>
-            /// Easy to trade without significantly affecting prices
+            /// Indicates high liquidity, making it easy to trade large volumes without significantly affecting prices.
             /// </summary>
             High,
             /// <summary>
-            /// Difficult to trade without affecting prices
+            /// Indicates low liquidity, making it difficult to trade without impacting market prices.
             /// </summary>
             Low,
             /// <summary>
-            /// Average liquidity, neither particularly high nor low
+            /// Indicates moderate liquidity, providing average trading conditions neither particularly high nor low.
             /// </summary>
             Moderate
         }
@@ -204,15 +208,15 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_ClosingTime
         {
             /// <summary>
-            /// A long time remains until expiry (e.g., weeks or months)
+            /// Indicates that a long time remains until market expiry, such as weeks or months.
             /// </summary>
             Far,
             /// <summary>
-            /// Close to expiry (e.g., days or hours)
+            /// Indicates that the market is close to expiry, such as days or hours remaining.
             /// </summary>
             Near,
             /// <summary>
-            /// Very close to expiry (e.g., minutes or hours)
+            /// Indicates that the market is very close to expiry, such as minutes or hours remaining.
             /// </summary>
             Imminent
         }
@@ -223,15 +227,15 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_ActivityLevel
         {
             /// <summary>
-            /// Lots of trading activity (e.g., high volume or frequent trades)
+            /// Indicates high trading activity, characterized by high volume or frequent trades.
             /// </summary>
             High,
             /// <summary>
-            /// Little trading activity (e.g., low volume or infrequent trades)
+            /// Indicates low trading activity, characterized by low volume or infrequent trades.
             /// </summary>
             Low,
             /// <summary>
-            /// Average trading activity, neither particularly high nor low
+            /// Indicates moderate trading activity, neither particularly high nor low in volume or frequency.
             /// </summary>
             Moderate
         }
@@ -242,11 +246,11 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_UncertaintySignal
         {
             /// <summary>
-            /// Outcome is unclear or highly uncertain
+            /// Indicates that the market outcome is unclear or highly uncertain.
             /// </summary>
             High,
             /// <summary>
-            /// Outcome is relatively clear or certain
+            /// Indicates that the market outcome is relatively clear or certain.
             /// </summary>
             Low
         }
@@ -257,87 +261,87 @@ namespace BacklashInterfaces.Enums
         public enum Conditions_MarketCategory
         {
             /// <summary>
-            /// Markets related to climate and weather conditions.
+            /// Represents markets related to climate and weather conditions and predictions.
             /// </summary>
             ClimateAndWeather,
 
             /// <summary>
-            /// Markets related to companies and corporate events.
+            /// Represents markets related to companies and corporate events or performance.
             /// </summary>
             Companies,
 
             /// <summary>
-            /// Markets related to COVID-19 and pandemic conditions.
+            /// Represents markets related to COVID-19 and pandemic conditions and impacts.
             /// </summary>
             COVID19,
 
             /// <summary>
-            /// Markets related to cryptocurrency and blockchain.
+            /// Represents markets related to cryptocurrency and blockchain technology.
             /// </summary>
             Crypto,
 
             /// <summary>
-            /// Markets related to economic indicators and conditions.
+            /// Represents markets related to economic indicators and macroeconomic conditions.
             /// </summary>
             Economics,
 
             /// <summary>
-            /// Markets related to education and academic topics.
+            /// Represents markets related to education and academic topics or events.
             /// </summary>
             Education,
 
             /// <summary>
-            /// Markets related to elections and political voting.
+            /// Represents markets related to elections and political voting outcomes.
             /// </summary>
             Elections,
 
             /// <summary>
-            /// Markets related to entertainment and media.
+            /// Represents markets related to entertainment and media industry events.
             /// </summary>
             Entertainment,
 
             /// <summary>
-            /// Markets related to financial markets and instruments.
+            /// Represents markets related to financial markets and investment instruments.
             /// </summary>
             Financials,
 
             /// <summary>
-            /// Markets related to health and medical topics.
+            /// Represents markets related to health and medical topics or advancements.
             /// </summary>
             Health,
 
             /// <summary>
-            /// Markets related to mentions and social media buzz.
+            /// Represents markets related to mentions and social media buzz or trends.
             /// </summary>
             Mentions,
 
             /// <summary>
-            /// Markets related to politics and government.
+            /// Represents markets related to politics and government actions or policies.
             /// </summary>
             Politics,
 
             /// <summary>
-            /// Markets related to science and technology.
+            /// Represents markets related to science and technology innovations or discoveries.
             /// </summary>
             ScienceAndTechnology,
 
             /// <summary>
-            /// Markets related to social issues and culture.
+            /// Represents markets related to social issues and cultural topics or events.
             /// </summary>
             Social,
 
             /// <summary>
-            /// Markets related to sports and athletics.
+            /// Represents markets related to sports and athletic competitions or events.
             /// </summary>
             Sports,
 
             /// <summary>
-            /// Markets related to transportation and travel.
+            /// Represents markets related to transportation and travel industry conditions.
             /// </summary>
             Transportation,
 
             /// <summary>
-            /// Markets related to world events and global topics.
+            /// Represents markets related to world events and global topics or occurrences.
             /// </summary>
             World
         }

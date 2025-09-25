@@ -27,7 +27,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for the first and fifth candles relative to the lookback average range.
         /// Purpose: Ensures the first and fifth candles are significant compared to prior volatility.
         /// Default: 1.0 (equal to average range)
-        /// Range: 0.5�2.0 (0.5 for less strict significance, 2.0 for very strong signals).
+        /// Range: 0.5-2.0 (0.5 for less strict significance, 2.0 for very strong signals).
         /// </summary>
         public static double MinBodyToAvgRangeRatio { get; set; } = 0.5;
 
@@ -35,7 +35,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum body size for the middle three consolidation candles relative to the lookback average range.
         /// Purpose: Ensures the consolidation candles have small bodies, indicating low volatility.
         /// Default: 0.5 (half the average range)
-        /// Range: 0.3�1.0 (0.3 for very tight consolidation, 1.0 for slightly broader consolidation).
+        /// Range: 0.3-1.0 (0.3 for very tight consolidation, 1.0 for slightly broader consolidation).
         /// </summary>
         public static double ConsolidationBodyToAvgRangeMax { get; set; } = 1.0;
 
@@ -43,7 +43,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum total range for each of the middle three consolidation candles relative to the lookback average range.
         /// Purpose: Ensures each consolidation candle has a small range, reinforcing a tight consolidation.
         /// Default: 1.0 (equal to average range)
-        /// Range: 0.5�1.5 (0.5 for tighter ranges, 1.5 for broader acceptable ranges).
+        /// Range: 0.5-1.5 (0.5 for tighter ranges, 1.5 for broader acceptable ranges).
         /// </summary>
         public static double ConsolidationRangeToAvgRangeMax { get; set; } = 2.0;
 
@@ -51,7 +51,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum consolidation range (max high - min low of middle three candles) relative to the lookback average range.
         /// Purpose: Ensures the consolidation period is tight compared to prior volatility.
         /// Default: 2.0 (twice the average range)
-        /// Range: 1.5�3.0 (1.5 for very tight consolidation, 3.0 for slightly broader consolidation).
+        /// Range: 1.5-3.0 (1.5 for very tight consolidation, 3.0 for slightly broader consolidation).
         /// </summary>
         public static double ConsolidationTightRangeMax { get; set; } = 4.0;
 
@@ -59,26 +59,55 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend (downtrend for bullish, uptrend for bearish) before the pattern.
         /// Default: 0.6 (60% of candles in trend direction)
-        /// Range: 0.5�0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
+        /// Range: 0.5-0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
         /// </summary>
         public static double TrendDirectionRatioMin { get; set; } = 0.3;
 
+        /// <summary>
+        /// Gets the base name for the Breakaway pattern.
+        /// </summary>
         public const string BaseName = "Breakaway";
+
+        /// <summary>
+        /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
+        /// </summary>
         public override string Name => BaseName + "_" + Direction.ToString();
+
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern with a strong bearish candle, three consolidation candles, and a bullish breakout candle. Signals potential reversal from downtrend to uptrend."
             : "A bearish reversal pattern with a strong bullish candle, three consolidation candles, and a bearish breakout candle. Signals potential reversal from uptrend to downtrend.";
+
         /// <summary>
         /// Gets the direction of the pattern.
         /// </summary>
         public override PatternDirection Direction { get; }
+
+        /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the BreakawayPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (five candles).</param>
+        /// <param name="direction">The direction of the pattern.</param>
         public BreakawayPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
             Direction = direction;

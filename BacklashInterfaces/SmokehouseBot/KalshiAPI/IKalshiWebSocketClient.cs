@@ -4,60 +4,97 @@ using System.Collections.Concurrent;
 
 namespace KalshiBotAPI.WebSockets.Interfaces
 {
-    /// <summary>IKalshiWebSocketClient</summary>
-    /// <summary>IKalshiWebSocketClient</summary>
+    /// <summary>
+    /// Defines the contract for a WebSocket client that handles real-time communication
+    /// with the Kalshi trading platform, including market data subscriptions and event handling.
+    /// </summary>
     public interface IKalshiWebSocketClient
-    /// <summary>Gets or sets the TickerReceived.</summary>
-    /// <summary>Gets or sets the OrderBookReceived.</summary>
     {
-        /// <summary>Gets or sets the MarketLifecycleReceived.</summary>
-        /// <summary>Gets or sets the TradeReceived.</summary>
+        /// <summary>
+        /// Occurs when an order book update is received.
+        /// </summary>
         event EventHandler<OrderBookEventArgs> OrderBookReceived;
-        /// <summary>Gets or sets the MarketLifecycleReceived.</summary>
+
+        /// <summary>
+        /// Occurs when a ticker update is received.
+        /// </summary>
         event EventHandler<TickerEventArgs> TickerReceived;
-        /// <summary>Gets or sets the EventCounts.</summary>
-        /// <summary>Gets or sets the MessageReceived.</summary>
+
+        /// <summary>
+        /// Occurs when a trade event is received.
+        /// </summary>
         event EventHandler<TradeEventArgs> TradeReceived;
-        /// <summary>Gets or sets the ChannelSubscriptionSemaphoreCount.</summary>
-        /// <summary>Gets or sets the IsTradingActive.</summary>
+
+        /// <summary>
+        /// Occurs when a fill event is received.
+        /// </summary>
         event EventHandler<FillEventArgs> FillReceived;
-        /// <summary>Gets or sets the PendingConfirmsCount.</summary>
-        /// <summary>Gets or sets the ConnectSemaphoreCount.</summary>
+
+        /// <summary>
+        /// Occurs when a market lifecycle event is received.
+        /// </summary>
         event EventHandler<MarketLifecycleEventArgs> MarketLifecycleReceived;
-        /// <summary>ConnectAsync</summary>
-        /// <summary>Gets or sets the ChannelSubscriptionSemaphoreCount.</summary>
+
+        /// <summary>
+        /// Occurs when an event lifecycle event is received.
+        /// </summary>
         event EventHandler<EventLifecycleEventArgs> EventLifecycleReceived;
-        /// <summary>UnsubscribeFromChannelAsync</summary>
-        /// <summary>Gets or sets the OrderBookMessageQueueCount.</summary>
+
+        /// <summary>
+        /// Occurs when a message is received.
+        /// </summary>
         event EventHandler<DateTime> MessageReceived;
-        /// <summary>Gets or sets the WatchedMarkets.</summary>
 
-        /// <summary>WaitForEmptyOrderBookQueueAsync</summary>
-        /// <summary>ConnectAsync</summary>
+        /// <summary>
+        /// Gets or sets a value indicating whether trading is currently active.
+        /// </summary>
         bool IsTradingActive { get; set; }
-        /// <summary>CanSubscribeToMarket</summary>
-        /// <summary>SubscribeToChannelAsync</summary>
-        ConcurrentDictionary<string, long> EventCounts { get; }
-        /// <summary>DisableReconnect</summary>
-        /// <summary>UnsubscribeFromAllAsync</summary>
-        int ConnectSemaphoreCount { get; }
-        /// <summary>ResetEventCounts</summary>
-        /// <summary>ResetConnectionAsync</summary>
-        int SubscriptionUpdateSemaphoreCount { get; }
-        /// <summary>ResubscribeAsync</summary>
-        /// <summary>WaitForEmptyOrderBookQueueAsync</summary>
-        int ChannelSubscriptionSemaphoreCount { get; }
-        /// <summary>IsSubscribed</summary>
-        int QueuedSubscriptionUpdatesCount { get; }
-        /// <summary>SetSubscriptionState</summary>
-        int OrderBookMessageQueueCount { get; }
-        /// <summary>DisableReconnect</summary>
-        int PendingConfirmsCount { get; }
-        /// <summary>GenerateNextMessageId</summary>
-        HashSet<string> WatchedMarkets { get; set; }
-        /// <summary>GetChannelName</summary>
 
-        /// <summary>ResubscribeAsync</summary>
+        /// <summary>
+        /// Gets the concurrent dictionary containing event counts.
+        /// </summary>
+        ConcurrentDictionary<string, long> EventCounts { get; }
+
+        /// <summary>
+        /// Gets the count of connection semaphore.
+        /// </summary>
+        int ConnectSemaphoreCount { get; }
+
+        /// <summary>
+        /// Gets the count of subscription update semaphore.
+        /// </summary>
+        int SubscriptionUpdateSemaphoreCount { get; }
+
+        /// <summary>
+        /// Gets the count of channel subscription semaphore.
+        /// </summary>
+        int ChannelSubscriptionSemaphoreCount { get; }
+
+        /// <summary>
+        /// Gets the count of queued subscription updates.
+        /// </summary>
+        int QueuedSubscriptionUpdatesCount { get; }
+
+        /// <summary>
+        /// Gets the count of order book message queue.
+        /// </summary>
+        int OrderBookMessageQueueCount { get; }
+
+        /// <summary>
+        /// Gets the count of pending confirms.
+        /// </summary>
+        int PendingConfirmsCount { get; }
+
+        /// <summary>
+        /// Gets or sets the hash set of watched market tickers.
+        /// </summary>
+        HashSet<string> WatchedMarkets { get; set; }
+
+        /// <summary>
+        /// Connects to the WebSocket asynchronously with optional retry count.
+        /// </summary>
+        /// <param name="retryCount">The number of retry attempts (default 0).</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         Task ConnectAsync(int retryCount = 0);
         /// <summary>GetEventCountsByMarket</summary>
         Task SubscribeToWatchedMarketsAsync();

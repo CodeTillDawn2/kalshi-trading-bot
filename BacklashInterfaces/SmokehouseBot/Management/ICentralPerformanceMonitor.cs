@@ -15,23 +15,78 @@ namespace BacklashBot.Management.Interfaces
         void RecordExecutionTime(string operationName, TimeSpan executionTime);
 
         // Additional methods specific to central performance monitoring:
+        /// <summary>
+        /// Starts the performance monitoring timer.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         Task StartTimer();
+
+        /// <summary>
+        /// Gets the rolling averages for queue counts across different queue types.
+        /// </summary>
+        /// <returns>A tuple containing the average counts for event, ticker, notification, and order book queues.</returns>
         (double EventQueueAvg, double TickerQueueAvg, double NotificationQueueAvg, double OrderBookQueueAvg) GetQueueCountRollingAverages();
+
+        /// <summary>
+        /// Calculates the average number of WebSocket events received for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to calculate averages for.</param>
+        /// <returns>The average number of WebSocket events received.</returns>
         double CalculateAverageWebsocketEventsReceived(string marketTicker);
+
+        /// <summary>
+        /// Gets the percentage of time queues have high counts.
+        /// </summary>
+        /// <returns>The percentage of time queues are at high levels.</returns>
         double GetQueueHighCountPercentage();
 
+        /// <summary>
+        /// Gets or sets the duration of the last refresh cycle in seconds.
+        /// </summary>
         double LastRefreshCycleSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interval between refresh cycles.
+        /// </summary>
         double LastRefreshCycleInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of markets processed in the last refresh cycle.
+        /// </summary>
         int LastRefreshMarketCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the usage percentage during the last refresh cycle.
+        /// </summary>
         double LastRefreshUsagePercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the last refresh cycle time was acceptable.
+        /// </summary>
         bool LastRefreshTimeAcceptable { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the system is currently starting up.
+        /// </summary>
         bool IsStartingUp { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the system is currently shutting down.
+        /// </summary>
         bool IsShuttingDown { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time of the last performance sample.
+        /// </summary>
         DateTime? LastPerformanceSampleDate { get; set; }
+
+        /// <summary>
+        /// Gets the brain instance identifier.
+        /// </summary>
         string BrainInstance { get; }
 
         /// <summary>
-        /// Gets whether WebSocketConnectionManager performance metrics are being recorded.
+        /// Gets a value indicating whether performance metrics for the WebSocket connection manager are currently being recorded.
         /// </summary>
         bool WebSocketConnectionManagerMetricsRecording { get; }
 
