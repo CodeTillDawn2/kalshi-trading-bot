@@ -3,6 +3,11 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents the Unique 3 River pattern, a three-candle bullish reversal pattern in a downtrend.
+    /// Consists of a strong bearish candle followed by a smaller bearish candle and a bullish candle that opens below the second close and closes above it.
+    /// Indicates potential exhaustion of sellers and possible trend reversal upward.
+    /// </summary>
     public class Unique3RiverPattern : PatternDefinition
     {
         /// <summary>

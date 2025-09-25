@@ -52,6 +52,10 @@ namespace BacklashBot.Management
             _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
         }
 
+        /// <summary>
+        /// Clears the lists of markets to add after reset and markets to reset.
+        /// This method is thread-safe using a lock to prevent concurrent modifications.
+        /// </summary>
         public new void ClearMarketsToReset()
         {
             lock (_resetLock)
@@ -62,6 +66,11 @@ namespace BacklashBot.Management
         }
 
 
+        /// <summary>
+        /// Handles market resets by refreshing markets and resetting them asynchronously.
+        /// Catches and logs any exceptions that occur during the reset process.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation</returns>
         public new async Task HandleMarketResets()
         {
             try
@@ -79,6 +88,11 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Triggers a market reset for the specified market ticker by adding it to the reset list.
+        /// This method is thread-safe using a lock to prevent concurrent modifications.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market to reset</param>
         public new void TriggerMarketReset(string marketTicker)
         {
             lock (_resetLock)

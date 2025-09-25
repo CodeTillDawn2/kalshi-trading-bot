@@ -11,11 +11,17 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBotTests
 {
+    /// <summary>
+    /// Test fixture for validating configuration settings and secrets interpolation.
+    /// </summary>
     [TestFixture]
     public class ConfigurationTests
     {
         private IConfiguration _configuration;
 
+        /// <summary>
+        /// Sets up the test fixture by loading the configuration from appsettings.json.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -27,6 +33,10 @@ namespace BacklashBotTests
             _configuration = builder.Build();
         }
 
+        /// <summary>
+        /// Validates that all configuration classes can be successfully bound from appsettings.json
+        /// using reflection to discover config types with SectionName fields.
+        /// </summary>
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
@@ -67,6 +77,10 @@ namespace BacklashBotTests
             TestContext.WriteLine("Result: All configurations validated successfully.");
         }
 
+        /// <summary>
+        /// Validates that there are no unused configuration sections in appsettings.json
+        /// by comparing all configuration keys against known SectionName values from config classes.
+        /// </summary>
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
@@ -112,6 +126,11 @@ namespace BacklashBotTests
             TestContext.WriteLine("Result: No unused configuration sections found.");
         }
 
+        /// <summary>
+        /// Validates that secrets interpolation works correctly and that the interpolated key file exists.
+        /// Tests the ConfigurationHelper.InterpolateConfigurationValue method and verifies
+        /// that secrets are properly loaded and interpolated from configuration placeholders.
+        /// </summary>
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {

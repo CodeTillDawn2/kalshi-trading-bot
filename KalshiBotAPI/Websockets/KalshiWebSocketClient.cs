@@ -331,6 +331,13 @@ namespace KalshiBotAPI.Websockets
         /// <param name="state">The new subscription state.</param>
         public void SetSubscriptionState(string marketTicker, string channel, SubscriptionState state) => _subscriptionManager.SetSubscriptionState(marketTicker, channel, state);
 
+        /// <summary>
+        /// Updates the subscription for a specific action with the given market tickers and channel action.
+        /// </summary>
+        /// <param name="action">The subscription action to update.</param>
+        /// <param name="marketTickers">Array of market tickers to subscribe to.</param>
+        /// <param name="channelAction">The channel action for the subscription.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -345,17 +352,28 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Resets all event counts to zero.
+        /// </summary>
         public void ResetEventCounts()
         {
             _messageProcessor.ResetEventCounts();
         }
 
+        /// <summary>
+        /// Clears the order book queue for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to clear the queue for.</param>
         public void ClearOrderBookQueue(string marketTicker)
         {
             _messageProcessor.ClearOrderBookQueue(marketTicker);
         }
 
-
+        /// <summary>
+        /// Connects to the WebSocket with optional retry count.
+        /// </summary>
+        /// <param name="retryCount">The number of retry attempts (default is 0).</param>
+        /// <returns>A task representing the asynchronous connection operation.</returns>
         public async Task ConnectAsync(int retryCount = 0)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -395,11 +413,20 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Gets the event counts (orderbook, trade, ticker) for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get event counts for.</param>
+        /// <returns>A tuple containing the counts of orderbook events, trade events, and ticker events.</returns>
         public (int orderbookEvents, int tradeEvents, int tickerEvents) GetEventCountsByMarket(string marketTicker)
         {
             return _messageProcessor.GetEventCountsByMarket(marketTicker);
         }
 
+        /// <summary>
+        /// Subscribes to all watched markets for enabled channels.
+        /// </summary>
+        /// <returns>A task representing the asynchronous subscription operation.</returns>
         public async Task SubscribeToWatchedMarketsAsync()
         {
             if (!_connectionManager.IsConnected())
@@ -437,42 +464,81 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Disables automatic WebSocket reconnection.
+        /// </summary>
         public void DisableReconnect()
         {
             _logger.LogDebug("Disabling WebSocket reconnection.");
             _allowReconnect = false;
         }
 
+        /// <summary>
+        /// Enables automatic WebSocket reconnection.
+        /// </summary>
         public void EnableReconnect()
         {
             _logger.LogDebug("Enabling WebSocket reconnection.");
             _allowReconnect = true;
         }
 
+        /// <summary>
+        /// Waits for the order book queue to be empty for a specific market ticker within the specified timeout.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to wait for.</param>
+        /// <param name="timeout">The maximum time to wait.</param>
+        /// <returns>A task representing the asynchronous wait operation.</returns>
         public async Task WaitForEmptyOrderBookQueueAsync(string marketTicker, TimeSpan timeout)
         {
             await _messageProcessor.WaitForEmptyOrderBookQueueAsync(marketTicker, timeout);
         }
 
+        /// <summary>
+        /// Resets the WebSocket connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous reset operation.</returns>
         public async Task ResetConnectionAsync()
         {
             await _connectionManager.ResetConnectionAsync();
         }
 
+        /// <summary>
+        /// Checks if the WebSocket is currently connected.
+        /// </summary>
+        /// <returns>True if connected, false otherwise.</returns>
         public bool IsConnected() => _connectionManager.IsConnected();
 
+        /// <summary>
+        /// Resubscribes to all channels, optionally forcing the resubscription.
+        /// </summary>
+        /// <param name="force">Whether to force the resubscription even if already subscribed.</param>
+        /// <returns>A task representing the asynchronous resubscription operation.</returns>
         public async Task ResubscribeAsync(bool force = false)
         {
             await _subscriptionManager.ResubscribeAsync(force);
         }
 
+        /// <summary>
+        /// Gets the channel name for a given action.
+        /// </summary>
+        /// <param name="action">The action to get the channel name for.</param>
+        /// <returns>The channel name corresponding to the action.</returns>
         public string GetChannelName(string action) => _subscriptionManager.GetChannelName(action);
 
+        /// <summary>
+        /// Sends a message through the WebSocket connection.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <returns>A task representing the asynchronous send operation.</returns>
         public async Task SendMessageAsync(string message)
         {
             await _connectionManager.SendMessageAsync(message);
         }
 
+        /// <summary>
+        /// Unsubscribes from all channels.
+        /// </summary>
+        /// <returns>A task representing the asynchronous unsubscription operation.</returns>
         public async Task UnsubscribeFromAllAsync()
         {
             await _subscriptionManager.UnsubscribeFromAllAsync();
@@ -487,6 +553,12 @@ namespace KalshiBotAPI.Websockets
 
 
 
+        /// <summary>
+        /// Subscribes to a specific channel for the given market tickers.
+        /// </summary>
+        /// <param name="action">The channel action to subscribe to.</param>
+        /// <param name="marketTickers">Array of market tickers to subscribe for this channel.</param>
+        /// <returns>A task representing the asynchronous subscription operation.</returns>
         public async Task SubscribeToChannelAsync(string action, string[] marketTickers)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -499,6 +571,10 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Generates the next unique message ID for WebSocket messages.
+        /// </summary>
+        /// <returns>The next message ID.</returns>
         public int GenerateNextMessageId()
         {
             return _subscriptionManager.GenerateNextMessageId();
@@ -593,6 +669,11 @@ namespace KalshiBotAPI.Websockets
             _enabledChannels[KalshiConstants.ScriptType_Feed_Trade] = false;
         }
 
+        /// <summary>
+        /// Starts the asynchronous WebSocket message receiving loop.
+        /// This method runs in the background and continuously receives messages from the WebSocket connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StartReceivingAsync()
         {
             _logger.LogInformation("Starting WebSocket message receiving loop");

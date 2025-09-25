@@ -2,16 +2,31 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Configuration class for the OrderBookService, containing settings for semaphore timeouts, queue limits, and performance metrics.
+    /// </summary>
     public class OrderBookServiceConfig
     {
+        /// <summary>
+        /// The configuration section name for OrderBookService settings.
+        /// </summary>
         public const string SectionName = "WatchedMarkets:OrderBookService";
 
+        /// <summary>
+        /// The timeout in milliseconds for semaphore operations in the OrderBookService.
+        /// </summary>
         [Required(ErrorMessage = "The 'SemaphoreTimeoutMs' is missing in the configuration.")]
         public int SemaphoreTimeoutMs { get; set; }
 
+        /// <summary>
+        /// The maximum number of items allowed in the order book queue.
+        /// </summary>
         [Required(ErrorMessage = "The 'QueueLimit' is missing in the configuration.")]
         public int QueueLimit { get; set; }
 
+        /// <summary>
+        /// The timeout in milliseconds for semaphore operations on the event queue.
+        /// </summary>
         [Required(ErrorMessage = "The 'EventQueueSemaphoreTimeoutMs' is missing in the configuration.")]
         public int EventQueueSemaphoreTimeoutMs { get; set; }
 

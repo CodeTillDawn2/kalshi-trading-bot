@@ -42,6 +42,9 @@ namespace BacklashBot.Services
 
         private readonly bool _enablePerformanceMetrics;
 
+        /// <summary>
+        /// Occurs when the market is determined to be invalid during event validation.
+        /// </summary>
         public event EventHandler<string> MarketInvalid;
 
         private readonly ConcurrentQueue<OrderbookChange> _orderbookChanges = new ConcurrentQueue<OrderbookChange>();
@@ -1437,7 +1440,14 @@ namespace BacklashBot.Services
         #endregion
 
         #region Velocity and Rate Calculations
-        // Revised GetBottomNoVelocityPerMinute (remove 5.0 parameter)
+        /// <summary>
+        /// Calculates the velocity per minute for bottom-level "no" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels below the threshold.
+        /// </summary>
+        /// <param name="noBids">The list of "no" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1490,6 +1500,13 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Gets the count of bid levels that are at or above the specified lower bound price.
+        /// Used for determining the number of "top" price levels in the orderbook.
+        /// </summary>
+        /// <param name="Bids">The list of orderbook bid data to analyze</param>
+        /// <param name="lowerBound">The minimum price threshold for counting levels</param>
+        /// <returns>The number of bid levels at or above the lower bound price</returns>
         public int GetTopLevels(List<OrderbookData> Bids, int lowerBound)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1500,6 +1517,13 @@ namespace BacklashBot.Services
             return Bids.Where(x => x.Price >= lowerBound).Count();
         }
 
+        /// <summary>
+        /// Gets the count of bid levels that are below the specified upper bound price.
+        /// Used for determining the number of "bottom" price levels in the orderbook.
+        /// </summary>
+        /// <param name="Bids">The list of orderbook bid data to analyze</param>
+        /// <param name="upperBound">The maximum price threshold for counting levels</param>
+        /// <returns>The number of bid levels below the upper bound price</returns>
         public int GetBottomLevels(List<OrderbookData> Bids, int upperBound)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1510,7 +1534,14 @@ namespace BacklashBot.Services
             return Bids.Where(x => x.Price < upperBound).Count();
         }
 
-        // Revised GetBottomYesVelocityPerMinute (remove 5.0 parameter)
+        /// <summary>
+        /// Calculates the velocity per minute for bottom-level "yes" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels below the threshold.
+        /// </summary>
+        /// <param name="yesBids">The list of "yes" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1563,6 +1594,14 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the velocity per minute for top-level "no" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels at or above the threshold.
+        /// </summary>
+        /// <param name="noBids">The list of "no" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1615,6 +1654,14 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the velocity per minute for top-level "yes" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels at or above the threshold.
+        /// </summary>
+        /// <param name="yesBids">The list of "yes" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1667,6 +1714,12 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the net order volume per minute for "yes" side bids.
+        /// This measures the dollar volume of non-trade-related orderbook changes (market making activity).
+        /// </summary>
+        /// <param name="yesBidChanges">The list of "yes" side orderbook changes to analyze</param>
+        /// <returns>A tuple containing the volume per minute and the count of orders</returns>
         public (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1695,6 +1748,12 @@ namespace BacklashBot.Services
             return (volume, orderCount);
         }
 
+        /// <summary>
+        /// Calculates the net order volume per minute for "no" side bids.
+        /// This measures the dollar volume of non-trade-related orderbook changes (market making activity).
+        /// </summary>
+        /// <param name="noBidChanges">The list of "no" side orderbook changes to analyze</param>
+        /// <returns>A tuple containing the volume per minute and the count of orders</returns>
         public (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1723,6 +1782,12 @@ namespace BacklashBot.Services
             return (volume, orderCount);
         }
 
+        /// <summary>
+        /// Calculates the trade rate and volume per minute for "yes" side maker trades.
+        /// This measures actual trading activity where the maker was on the "yes" side.
+        /// </summary>
+        /// <param name="yesTradeRelatedChanges">The list of trade-related "yes" side orderbook changes</param>
+        /// <returns>A tuple containing the trade rate per minute and volume per minute</returns>
         public (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1759,6 +1824,12 @@ namespace BacklashBot.Services
             return (Math.Round(rate, 2), volume);
         }
 
+        /// <summary>
+        /// Calculates the trade rate and volume per minute for "no" side maker trades.
+        /// This measures actual trading activity where the maker was on the "no" side.
+        /// </summary>
+        /// <param name="noTradeRelatedChanges">The list of trade-related "no" side orderbook changes</param>
+        /// <returns>A tuple containing the trade rate per minute and volume per minute</returns>
         public (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1795,6 +1866,12 @@ namespace BacklashBot.Services
             return (Math.Round(rate, 2), volume);
         }
 
+        /// <summary>
+        /// Calculates the average trade size in dollars for "yes" side maker trades.
+        /// This measures the typical dollar value of trades where the maker was on the "yes" side.
+        /// </summary>
+        /// <param name="tradeEvents">The list of trade-related orderbook changes to analyze</param>
+        /// <returns>The average trade size in dollars, rounded to 2 decimal places</returns>
         public double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1823,6 +1900,12 @@ namespace BacklashBot.Services
             return Math.Round(averageDollar, 2);
         }
 
+        /// <summary>
+        /// Calculates the average trade size in dollars for "no" side maker trades.
+        /// This measures the typical dollar value of trades where the maker was on the "no" side.
+        /// </summary>
+        /// <param name="tradeEvents">The list of trade-related orderbook changes to analyze</param>
+        /// <returns>The average trade size in dollars, rounded to 2 decimal places</returns>
         public double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1851,6 +1934,11 @@ namespace BacklashBot.Services
             return Math.Round(averageDollar, 2);
         }
 
+        /// <summary>
+        /// Gets the total count of trades where the maker was on the "yes" side.
+        /// This represents trades where the taker was on the "no" side.
+        /// </summary>
+        /// <returns>The number of trades where the maker was on the "yes" side</returns>
         public int GetTradeCount_MakerYes()
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1875,6 +1963,11 @@ namespace BacklashBot.Services
             return tradeCount;
         }
 
+        /// <summary>
+        /// Gets the total count of trades where the maker was on the "no" side.
+        /// This represents trades where the taker was on the "yes" side.
+        /// </summary>
+        /// <returns>The number of trades where the maker was on the "no" side</returns>
         public int GetTradeCount_MakerNo()
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -2007,6 +2100,10 @@ namespace BacklashBot.Services
         #endregion
 
         #region Dispose
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Stops and disposes of all timers and releases resources used by the tracker.
+        /// </summary>
         public void Dispose()
         {
             _recalculationTimer?.Stop();

@@ -17,6 +17,11 @@ namespace BacklashBot.Hubs
         private readonly ILogger<BacklashBotHub> _logger;
         private readonly IServiceFactory _serviceFactory;
 
+        /// <summary>
+        /// Initializes a new instance of the BacklashBotHub class.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for creating service instances.</param>
+        /// <param name="logger">Logger for recording hub operations.</param>
         public BacklashBotHub(
             IServiceFactory serviceFactory,
             ILogger<BacklashBotHub> logger)
@@ -25,6 +30,11 @@ namespace BacklashBot.Hubs
             _serviceFactory = serviceFactory;
         }
 
+        /// <summary>
+        /// Called when a client connects to the hub.
+        /// Adds the client to the connected clients collection and logs the connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnConnectedAsync()
         {
             if (_serviceFactory.GetBroadcastService() != null)
@@ -45,6 +55,12 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Called when a client disconnects from the hub.
+        /// Removes the client from the connected clients collection and logs the disconnection.
+        /// </summary>
+        /// <param name="exception">Exception that caused the disconnection, if any.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             lock (_connectedClients)
@@ -55,6 +71,10 @@ namespace BacklashBot.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
+        /// <summary>
+        /// Checks if there are any connected clients.
+        /// </summary>
+        /// <returns>True if there are connected clients, otherwise false.</returns>
         public static bool HasConnectedClients()
         {
             lock (_connectedClients)
@@ -63,6 +83,10 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Clears all connected clients from the collection.
+        /// Used for resetting the client state.
+        /// </summary>
         public static void ClearConnectedClients()
         {
             lock (_connectedClients)
@@ -175,6 +199,11 @@ namespace BacklashBot.Hubs
 
 
 
+        /// <summary>
+        /// Confirms to the Overseer that target tickers have been received and processed by a brain instance.
+        /// Used to acknowledge successful receipt of ticker assignments from the Overseer system.
+        /// </summary>
+        /// <param name="brainInstanceName">Name of the brain instance that received the target tickers.</param>
         public async Task ConfirmTargetTickersReceived(string brainInstanceName)
         {
             _logger.LogInformation("Confirming target tickers received for brain: {BrainInstanceName}", brainInstanceName);
@@ -279,6 +308,12 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Handles the response from the Overseer confirming receipt of target tickers confirmation.
+        /// Processes success/failure status and logs appropriate messages.
+        /// </summary>
+        /// <param name="response">Response data from the Overseer containing success status and brain instance information.</param>
+        /// <returns>A completed task.</returns>
         public Task HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse response)
         {
             _logger.LogInformation("Received TargetTickersConfirmationResponse from Overseer");

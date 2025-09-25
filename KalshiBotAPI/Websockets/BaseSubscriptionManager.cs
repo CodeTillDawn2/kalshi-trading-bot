@@ -19,9 +19,21 @@ namespace KalshiBotAPI.Websockets
     /// </summary>
     public class BaseSubscriptionManager : ISubscriptionManager
     {
+        /// <summary>
+        /// Logger for recording subscription activities and errors.
+        /// </summary>
         protected readonly ILogger<BaseSubscriptionManager> _logger;
+        /// <summary>
+        /// Manages WebSocket connection lifecycle and communication.
+        /// </summary>
         protected readonly IWebSocketConnectionManager _connectionManager;
+        /// <summary>
+        /// Provides system status and cancellation token management.
+        /// </summary>
         protected readonly IStatusTrackerService _statusTrackerService;
+        /// <summary>
+        /// Optional service for posting performance metrics.
+        /// </summary>
         protected readonly ISubscriptionManagerPerformanceMetrics? _performanceMetrics;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();

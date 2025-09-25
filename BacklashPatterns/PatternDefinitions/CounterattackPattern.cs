@@ -13,7 +13,7 @@ namespace BacklashPatterns.PatternDefinitions
     /// - Second candle: Opposite direction, similar size, closes near first open, not engulfing.
     /// Optimized for ML: Relative scaling based on lookback average range, loosened for broader detection across timeframes.
     /// </summary>
-    public class CounterattackPattern2 : PatternDefinition
+    public class CounterattackPattern : PatternDefinition
     {
         /// <summary>
         /// Number of candles required to form the pattern.
@@ -153,7 +153,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
         /// <param name="isBullish">Whether the pattern is bullish.</param>
-        public CounterattackPattern2(List<int> candles, bool isBullish) : base(candles)
+        public CounterattackPattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
         }

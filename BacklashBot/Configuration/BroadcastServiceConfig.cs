@@ -7,6 +7,9 @@ namespace BacklashBot.Configuration
     /// </summary>
     public class BroadcastServiceConfig
     {
+        /// <summary>
+        /// The configuration section name for BroadcastService settings.
+        /// </summary>
         public const string SectionName = "Communications:BroadcastService";
 
         /// <summary>

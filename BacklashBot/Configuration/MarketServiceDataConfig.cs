@@ -51,6 +51,9 @@ public class MarketServiceDataConfig
     [Required(ErrorMessage = "The 'EventLifecycleDelaySeconds' is missing in the configuration.")]
     public int EventLifecycleDelaySeconds { get; set; }
 
+    /// <summary>
+    /// Gets or sets the calculations configuration for market data processing.
+    /// </summary>
     [Required(ErrorMessage = "The 'CalculationConfig' is missing in the configuration.")]
     public CalculationsConfig Calculations { get; set; }
 }

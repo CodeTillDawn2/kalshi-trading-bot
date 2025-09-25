@@ -10,11 +10,24 @@ using TradingStrategies.Configuration;
 
 namespace TradingGUITests
 {
+    /// <summary>
+    /// Test fixture for validating configuration settings in the TradingGUI application.
+    /// </summary>
+    /// <remarks>
+    /// Tests ensure that all configuration classes are properly bound from appsettings.json,
+    /// no unused configuration sections exist, and secrets interpolation works correctly.
+    /// </remarks>
     [TestFixture]
     public class ConfigValidationTests
     {
         private IConfiguration _configuration;
 
+        /// <summary>
+        /// Sets up the test fixture by loading the configuration from appsettings.json.
+        /// </summary>
+        /// <remarks>
+        /// This method is called before each test method to initialize the configuration builder and load the appsettings.json file.
+        /// </remarks>
         [SetUp]
         public void SetUp()
         {
@@ -26,6 +39,14 @@ namespace TradingGUITests
             _configuration = builder.Build();
         }
 
+        /// <summary>
+        /// Validates that all configuration classes can be successfully bound from appsettings.json
+        /// using reflection to discover config types with SectionName fields.
+        /// </summary>
+        /// <remarks>
+        /// This test method uses reflection to find all config types with SectionName fields from referenced assemblies,
+        /// binds them from the configuration, and validates that the binding is successful and all required properties are present.
+        /// </remarks>
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
@@ -61,6 +82,14 @@ namespace TradingGUITests
             TestContext.WriteLine("Result: All configs validated successfully.");
         }
 
+        /// <summary>
+        /// Validates that there are no unused configuration sections in appsettings.json
+        /// by comparing all configuration keys against known SectionName values from config classes.
+        /// </summary>
+        /// <remarks>
+        /// This test method collects all SectionName values from config classes using reflection,
+        /// retrieves all configuration keys from appsettings.json, and asserts that no unused sections exist.
+        /// </remarks>
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
@@ -114,6 +143,14 @@ namespace TradingGUITests
             TestContext.WriteLine("Result: No unused sections found.");
         }
 
+        /// <summary>
+        /// Validates that secrets interpolation works correctly and that the interpolated key file exists.
+        /// </summary>
+        /// <remarks>
+        /// Tests the ConfigurationHelper.InterpolateConfigurationValue method and verifies
+        /// that secrets are properly loaded and interpolated from configuration placeholders.
+        /// Also checks that the interpolated key file path exists on the file system.
+        /// </remarks>
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {
@@ -192,6 +229,11 @@ namespace TradingGUITests
 
             TestContext.WriteLine("Result: Secrets interpolation and key file validation successful.");
         }
+        /// <summary>
+        /// Validates a configuration object using data annotations and checks for missing properties in the configuration section.
+        /// </summary>
+        /// <param name="config">The configuration object to validate.</param>
+        /// <param name="section">The configuration section to check for missing properties.</param>
         private void ValidateConfig(object config, IConfigurationSection section)
         {
             var validationResults = new List<ValidationResult>();
@@ -217,11 +259,22 @@ namespace TradingGUITests
             Assert.That(isValid && validationResults.Count == 0, Is.True, $"Validation failed for {config.GetType().Name}: {string.Join(", ", validationResults.Select(r => r.ErrorMessage))}");
         }
 
+        /// <summary>
+        /// Gets the SectionName field value from a configuration type.
+        /// </summary>
+        /// <param name="configType">The configuration type that contains the SectionName field.</param>
+        /// <returns>The section name string.</returns>
         private string GetSectionName(Type configType)
         {
             return (string)configType.GetField("SectionName")?.GetValue(null) ?? throw new InvalidOperationException($"SectionName not found for {configType.Name}");
         }
 
+        /// <summary>
+        /// Recursively retrieves all configuration keys from the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration to extract keys from.</param>
+        /// <param name="prefix">The prefix to prepend to the keys (used for recursion).</param>
+        /// <returns>A list of all configuration keys with their full paths.</returns>
         private List<string> GetAllConfigurationKeys(IConfiguration config, string prefix = "")
         {
             var keys = new List<string>();
@@ -234,6 +287,11 @@ namespace TradingGUITests
             return keys;
         }
 
+        /// <summary>
+        /// Masks a key ID string for secure logging by replacing most characters with asterisks.
+        /// </summary>
+        /// <param name="keyId">The key ID to mask.</param>
+        /// <returns>The masked key ID, showing only the last part or last few characters.</returns>
         private string MaskKeyId(string keyId)
         {
             if (string.IsNullOrEmpty(keyId))

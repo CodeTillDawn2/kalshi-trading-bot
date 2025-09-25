@@ -7,6 +7,9 @@ namespace BacklashBot.Configuration
     /// </summary>
     public class MarketDataInitializerConfig
     {
+        /// <summary>
+        /// The configuration section name for MarketDataInitializer settings.
+        /// </summary>
         public const string SectionName = "WatchedMarkets:MarketDataInitializer";
 
         /// <summary>

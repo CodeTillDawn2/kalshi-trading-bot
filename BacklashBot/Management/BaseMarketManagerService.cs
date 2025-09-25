@@ -21,21 +21,69 @@ namespace BacklashBot.Management
     /// </summary>
     public abstract class BaseMarketManagerService : IMarketManagerService
     {
+        /// <summary>
+        /// Factory for accessing various bot services and dependencies.
+        /// </summary>
         protected readonly IServiceFactory _serviceFactory;
+        /// <summary>
+        /// Service for managing dependency injection scopes.
+        /// </summary>
         protected readonly IScopeManagerService _scopeManagerService;
+        /// <summary>
+        /// Logger for recording market management operations and errors.
+        /// </summary>
         protected readonly ILogger<IMarketManagerService> _logger;
+        /// <summary>
+        /// Factory for creating service scopes for dependency injection.
+        /// </summary>
         protected readonly IServiceScopeFactory _scopeFactory;
+        /// <summary>
+        /// Service providing brain instance status information and lock management.
+        /// </summary>
         protected readonly IBrainStatusService _brainStatus;
+        /// <summary>
+        /// Monitor for tracking system performance metrics and resource usage.
+        /// </summary>
         protected readonly ICentralPerformanceMonitor _performanceMonitor;
+        /// <summary>
+        /// Service for calculating optimal market targets based on performance metrics.
+        /// </summary>
         protected readonly ITargetCalculationService _targetCalculationService;
+        /// <summary>
+        /// List of market tickers that have been flagged for reset operations.
+        /// </summary>
         protected List<string> MarketsToReset = new List<string>();
+        /// <summary>
+        /// List of market tickers to be added back to the watch list after reset operations complete.
+        /// </summary>
         protected List<string> MarketsToAddAfterReset = new List<string>();
+        /// <summary>
+        /// Flag indicating whether a recent market adjustment has been made.
+        /// </summary>
         protected bool _recentMarketAdjustment = false;
+        /// <summary>
+        /// Flag indicating whether this is the first watch list update operation.
+        /// </summary>
         protected bool _firstWatchUpdate = true;
+        /// <summary>
+        /// Configuration options for instance name parameters.
+        /// </summary>
         protected readonly InstanceNameConfig _instanceNameConfig;
+        /// <summary>
+        /// Configuration options for central brain parameters and limits.
+        /// </summary>
         protected readonly CentralBrainConfig _centralBrainConfig;
+        /// <summary>
+        /// Service for tracking operation status and managing cancellation tokens.
+        /// </summary>
         protected IStatusTrackerService _statusTrackerService;
+        /// <summary>
+        /// Flag indicating whether the watch list monitoring operation is currently active.
+        /// </summary>
         protected bool MonitoringWatchList = false;
+        /// <summary>
+        /// Lock object for thread-safe access to reset operation queues.
+        /// </summary>
         protected readonly object _resetLock = new();
 
         /// <summary>

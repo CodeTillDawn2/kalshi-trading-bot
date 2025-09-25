@@ -133,48 +133,39 @@ namespace KalshiBotAPI.Websockets
         private DateTime _lastDelayedMetricsTime = DateTime.UtcNow;
         private readonly object _delayedMetricsLock = new object();
 
-        /// <summary>Gets or sets the OrderBookReceived.</summary>
-        /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Occurs when an order book update is received.
         /// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+
         /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Occurs when a ticker update is received.
         /// </summary>
         public event EventHandler<TickerEventArgs>? TickerReceived;
+
         /// <summary>
+        /// Occurs when a trade event is received.
         /// </summary>
         public event EventHandler<TradeEventArgs>? TradeReceived;
+
+        /// <summary>
+        /// Occurs when a fill event is received.
+        /// </summary>
         public event EventHandler<FillEventArgs>? FillReceived;
+
+        /// <summary>
+        /// Occurs when a market lifecycle event is received.
+        /// </summary>
         public event EventHandler<MarketLifecycleEventArgs>? MarketLifecycleReceived;
+
+        /// <summary>
+        /// Occurs when an event lifecycle event is received.
+        /// </summary>
         public event EventHandler<EventLifecycleEventArgs>? EventLifecycleReceived;
+
+        /// <summary>
+        /// Occurs when any WebSocket message is received, providing the timestamp.
+        /// </summary>
         public event EventHandler<DateTime>? MessageReceived;
 
         /// <summary>

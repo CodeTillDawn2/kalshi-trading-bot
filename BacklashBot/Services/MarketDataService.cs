@@ -55,11 +55,32 @@ namespace BacklashBot.Services
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
         private HashSet<string> _lastWatchedMarkets = new HashSet<string>();
         private readonly IScopeManagerService _scopeManagerService;
+
+        /// <summary>
+        /// Event raised when market data is updated for a specific market ticker.
+        /// </summary>
         public event EventHandler<string> MarketDataUpdated;
+
+        /// <summary>
+        /// Event raised when position data is updated for a specific market ticker.
+        /// </summary>
         public event EventHandler<string> PositionDataUpdated;
+
+        /// <summary>
+        /// Event raised when the watch list of markets changes.
+        /// </summary>
         public event EventHandler WatchListChanged;
+
+        /// <summary>
+        /// Event raised when a new ticker is added for a specific market ticker.
+        /// </summary>
         public event EventHandler<string> TickerAdded;
+
+        /// <summary>
+        /// Event raised when the account balance is updated for a specific market ticker.
+        /// </summary>
         public event EventHandler<string> AccountBalanceUpdated;
+
         private readonly ConcurrentBag<TickerDTO> _preppedTickers = new ConcurrentBag<TickerDTO>();
         private void OnMarketInvalid(object sender, string marketTicker)
         {
@@ -68,8 +89,25 @@ namespace BacklashBot.Services
         private readonly ConcurrentDictionary<(DateTime, string), TickerDTO> _tickerDeduplication = new ConcurrentDictionary<(DateTime, string), TickerDTO>();
         private readonly AsyncRetryPolicy _retryPolicy;
         private readonly System.Timers.Timer _tickerUpdateTimer;
+
+        /// <summary>
+        /// Gets or sets the list of markets that need to be refreshed.
+        /// </summary>
         public List<string> MarketsToRefresh { get; set; } = new List<string>();
 
+        /// <summary>
+        /// Initializes a new instance of the MarketDataService class.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for creating service instances.</param>
+        /// <param name="logger">Logger for recording operations and errors.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="loggingConfig">Configuration options for logging.</param>
+        /// <param name="marketDataFactory">Factory function for creating MarketData instances.</param>
+        /// <param name="marketDataConfigOptions">Configuration options for market data operations.</param>
+        /// <param name="scopeManagerService">Service for managing scopes.</param>
+        /// <param name="statusTracker">Service for tracking bot status and cancellation tokens.</param>
+        /// <param name="readyStatus">Service for tracking bot readiness state.</param>
+        /// <param name="brainStatus">Service for tracking brain status.</param>
         public MarketDataService(
             IServiceFactory serviceFactory,
             ILogger<IMarketDataService> logger,
@@ -160,7 +198,11 @@ namespace BacklashBot.Services
             }
         }
 
-
+        /// <summary>
+        /// Gets the latest orderbook timestamp for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get the timestamp for.</param>
+        /// <returns>The latest orderbook timestamp, or null if not found.</returns>
         public DateTime? GetLatestOrderbookTimestamp(string marketTicker)
         {
             _logger.LogDebug("Retrieving latest orderbook timestamp for: {MarketTicker}", marketTicker);
@@ -174,6 +216,10 @@ namespace BacklashBot.Services
             return null;
         }
 
+        /// <summary>
+        /// Gets the current exchange status.
+        /// </summary>
+        /// <returns>True if the exchange is active, false otherwise.</returns>
         public bool GetExchangeStatus()
         {
             bool status = _serviceFactory.GetDataCache().ExchangeStatus;
@@ -181,6 +227,10 @@ namespace BacklashBot.Services
             return status;
         }
 
+        /// <summary>
+        /// Gets the current trading status.
+        /// </summary>
+        /// <returns>True if trading is active, false otherwise.</returns>
         public bool GetTradingStatus()
         {
             bool status = _serviceFactory.GetDataCache().TradingStatus;
@@ -188,7 +238,11 @@ namespace BacklashBot.Services
             return status;
         }
 
-
+        /// <summary>
+        /// Handles changes in exchange status by updating market data and WebSocket trading status.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="args">The status change event arguments.</param>
         public async void HandleExchangeStatusChanged(object sender, StatusChangedEventArgs args)
         {
             try
@@ -349,6 +403,10 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves and updates position data for all watched markets from the API.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task RetrieveAndUpdatePositionsAsync()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -366,7 +424,9 @@ namespace BacklashBot.Services
             }
         }
 
-
+        /// <summary>
+        /// Notifies clients that the market watch list has changed.
+        /// </summary>
         public void NotifyClientsOfMarketListChange()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -374,6 +434,12 @@ namespace BacklashBot.Services
             WatchListChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Adds a market to the watch list and initializes its data.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to add to the watch list.</param>
+        /// <param name="interestScore">Optional interest score for the market.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task AddMarketToWatchList(string marketTicker, double? interestScore = null)
         {
             _logger.LogInformation("Adding market watch to database: {MarketTicker}", marketTicker);
@@ -489,6 +555,11 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Subscribes to WebSocket channels for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to subscribe to.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SubscribeToMarketChannelsAsync(string marketTicker)
         {
             _logger.LogDebug("Subscribing to market: {MarketTicker}", marketTicker);
@@ -574,6 +645,11 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Removes a market from the watch list and unsubscribes from its WebSocket channels.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to remove from the watch list.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UnwatchMarket(string marketTicker)
         {
             _logger.LogInformation("Stats: Unwatching watch: {MarketTicker}", marketTicker);
@@ -767,6 +843,12 @@ namespace BacklashBot.Services
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Updates WebSocket subscriptions for markets based on the specified action.
+        /// </summary>
+        /// <param name="action">The action to perform (e.g., "add_markets", "delete_markets").</param>
+        /// <param name="marketTickers">The market tickers to update subscriptions for.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateMarketSubscriptionAsync(string action, string[] marketTickers)
         {
             _logger.LogDebug("Initiating subscription update: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
@@ -839,6 +921,9 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Stops the market data services and cleans up resources.
+        /// </summary>
         public void StopServicesAsync()
         {
             _logger.LogDebug("Stopping MarketDataService...");
@@ -1070,6 +1155,10 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Updates the list of watched markets from the database and synchronizes with WebSocket client.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateWatchedMarketsAsync()
         {
             _logger.LogDebug("Starting watched markets update");
@@ -1149,6 +1238,10 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Fetches the list of currently watched markets.
+        /// </summary>
+        /// <returns>A list of market tickers that are being watched.</returns>
         public async Task<List<string>> FetchWatchedMarketsAsync()
         {
             _logger.LogDebug("Fetching watched markets");
@@ -1208,6 +1301,11 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Gets the current order book data for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get order book data for.</param>
+        /// <returns>A list of order book data entries.</returns>
         public List<OrderbookData> GetCurrentOrderBook(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1217,6 +1315,11 @@ namespace BacklashBot.Services
             return orderBook;
         }
 
+        /// <summary>
+        /// Gets the market details for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get details for.</param>
+        /// <returns>The market data interface, or null if not found.</returns>
         public IMarketData GetMarketDetails(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1226,6 +1329,12 @@ namespace BacklashBot.Services
             return data;
         }
 
+        /// <summary>
+        /// Gets market details for multiple market tickers in a batch operation.
+        /// </summary>
+        /// <param name="marketTickers">The market tickers to get details for.</param>
+        /// <param name="cancellationToken">Cancellation token for the operation.</param>
+        /// <returns>A dictionary mapping market tickers to their market data.</returns>
         public async Task<Dictionary<string, IMarketData>> GetMarketDetailsBatchAsync(IEnumerable<string> marketTickers, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -1244,6 +1353,10 @@ namespace BacklashBot.Services
             return await Task.FromResult(result);
         }
 
+        /// <summary>
+        /// Gets the current account balance.
+        /// </summary>
+        /// <returns>The account balance as a double.</returns>
         public double GetAccountBalance()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1253,6 +1366,10 @@ namespace BacklashBot.Services
             return balance;
         }
 
+        /// <summary>
+        /// Gets the current portfolio value.
+        /// </summary>
+        /// <returns>The portfolio value as a double.</returns>
         public double GetPortfolioValue()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1262,6 +1379,10 @@ namespace BacklashBot.Services
             return value;
         }
 
+        /// <summary>
+        /// Gets the latest WebSocket timestamp.
+        /// </summary>
+        /// <returns>The latest WebSocket timestamp as a DateTime.</returns>
         public DateTime GetLatestWebSocketTimestamp()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1271,6 +1392,10 @@ namespace BacklashBot.Services
             return timestamp;
         }
 
+        /// <summary>
+        /// Updates the account balance from the API.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateAccountBalanceAsync()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1453,6 +1578,10 @@ namespace BacklashBot.Services
             return true;
         }
 
+        /// <summary>
+        /// Notifies listeners that market data has been updated for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker for which data was updated.</param>
         public void NotifyMarketDataUpdated(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1461,6 +1590,10 @@ namespace BacklashBot.Services
                 MarketDataUpdated?.Invoke(this, marketTicker);
         }
 
+        /// <summary>
+        /// Notifies listeners that position data has been updated for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker for which position data was updated.</param>
         public void NotifyPositionDataUpdated(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1469,6 +1602,10 @@ namespace BacklashBot.Services
                 PositionDataUpdated?.Invoke(this, marketTicker);
         }
 
+        /// <summary>
+        /// Notifies listeners that a new ticker has been added for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker for which a ticker was added.</param>
         public void NotifyTickerAdded(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1477,6 +1614,10 @@ namespace BacklashBot.Services
                 TickerAdded?.Invoke(this, marketTicker);
         }
 
+        /// <summary>
+        /// Notifies listeners that the account balance has been updated for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker for which account balance was updated.</param>
         public void NotifyAccountBalanceUpdated(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -1485,6 +1626,12 @@ namespace BacklashBot.Services
                 AccountBalanceUpdated?.Invoke(this, marketTicker);
         }
 
+        /// <summary>
+        /// Forward fills candlestick data by filling gaps with the last known values.
+        /// </summary>
+        /// <param name="candlesticks">The list of candlestick data to forward fill.</param>
+        /// <param name="marketTicker">The market ticker for the candlesticks.</param>
+        /// <returns>A list of forward-filled candlestick data.</returns>
         public List<CandlestickData> ForwardFillCandlesticks(List<CandlestickData> candlesticks, string marketTicker)
         {
             if (candlesticks.Count <= 1) return candlesticks;

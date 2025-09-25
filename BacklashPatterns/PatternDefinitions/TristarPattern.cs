@@ -3,6 +3,10 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents the Tristar pattern, a rare three-candle reversal pattern consisting of three Doji candles.
+    /// Indicates potential reversal from downtrend to uptrend (bullish) or uptrend to downtrend (bearish).
+    /// </summary>
     public class TristarPattern : PatternDefinition
     {
         /// <summary>
