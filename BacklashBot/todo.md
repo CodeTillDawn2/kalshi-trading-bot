@@ -1,68 +1,53 @@
-
-BacklashPatterns (~100 warnings)
-Files and Examples:
-
-
-PatternDefinitions/UpDownGapSideBySideWhiteLinesPattern.cs: Method IsPatternAsync at 84.
-
-Files and Examples:
-
-SmokehouseBot/KalshiAPI/IKalshiAPIService.cs: Methods (e.g., FetchMarketsAsync at 7, GetBalanceAsync at 21).
-SmokehouseBot/Management/ICentralBrain.cs: Properties/methods (e.g., IsServicesStopped at 7).
-SmokehouseBot/Management/ICentralErrorHandler.cs: Properties/methods (e.g., Warnings at 8).
-SmokehouseBot/Management/ICentralPerformanceMonitor.cs: Methods (e.g., RecordExecutionTime at 5).
-SmokehouseBot/Management/IInterestScoreService.cs: Methods (e.g., GetMarketInterestScores at 8).
-SmokehouseBot/Management/IMarketAnalysisHelper.cs: Method GenerateSnapshotGroups at 5.
-SmokehouseBot/Management/IMarketManagerService.cs: Methods (e.g., ClearMarketsToReset at 8).
-SmokehouseBot/Management/IOvernightActivitiesHelper.cs: Methods (e.g., RunOvernightTasks at 7).
-SmokehouseBot/Services/IBroadcastService.cs: Methods (e.g., StartServicesAsync at 5).
-SmokehouseBot/Services/ICandlestickService.cs: Methods (e.g., UpdateCandlesticksAsync at 7).
-SmokehouseBot/Services/IMarketDataInitializer.cs: Method SetupAsync at 6.
-SmokehouseBot/Services/IMarketDataService.cs: Events/properties/methods (e.g., MarketDataUpdated at 10).
-SmokehouseBot/Services/IMarketRefreshService.cs: Methods (e.g., ExecuteServicesAsync at 5).
-SmokehouseBot/Services/IOrderbookChangeTracker.cs: Methods (e.g., UpdateMarketStatus at 14).
-SmokehouseBot/Services/IOrderBookService.cs: Methods (e.g., ConfigureWebSocketEventHandlers at 8).
-SmokehouseBot/Services/IScopeManagerService.cs: Methods (e.g., InitializeScope at 7).
-SmokehouseBot/Services/IServiceFactory.cs: Methods (e.g., GetKalshiWebSocketClient at 11).
-SmokehouseBot/Services/ISqlDataService.cs: Methods (e.g., StoreOrderBookAsync at 7).
-SmokehouseBot/Services/ITradingSnapshotService.cs: Methods (e.g., SaveSnapshotAsync at 8).
-SmokehouseBot/Services/IWebSocketMonitorService.cs: Methods (e.g., StartServices at 5).
-SmokehouseBot/State/IBotReadyStatus.cs: Properties (e.g., InitializationCompleted at 5).
-SmokehouseBot/State/IDataCache.cs: Properties (e.g., Markets at 8).
-SmokehouseBot/State/IMarketData.cs: Properties/methods (e.g., LastSuccessfulSync at 12—very comprehensive).
-SmokehouseBot/State/IStatusTrackerService.cs: Methods (e.g., GetCancellationToken at 5).
-SmokehouseBot/KalshiAPI/IKalshiWebSocketClient.cs: Events/properties/methods (e.g., OrderBookReceived at 9).
-TradingStrategies/Classification/ISnapshotPeriodHelper.cs: Methods (e.g., SplitIntoValidGroups at 7).
-TradingStrategies/Helpers/ITradingCalculator.cs: Methods (e.g., CalculateRSI at 7).
-2. BacklashBotData (~200 warnings)
-Files and Examples:
-Models/Candlestick.cs: Properties/constructors (e.g., minute at 108, price_close at 112—many DTO properties).
-Models/Event.cs: Properties (e.g., sub_title at 54).
-Models/Market.cs: Properties (e.g., response_price_units at 155).
-Models/Series.cs: Properties (e.g., category at 54).
-Models/SnapshotGroup.cs: Properties (e.g., EndTime at 58).
-Data/BacklashBotContext.cs: Methods (e.g., AddOrUpdateEvent at 291—many data access methods).
-3. BacklashPatterns (~100 warnings)
-Files and Examples:
-PatternDefinitions/BeltHoldPattern.cs: Properties/methods (e.g., BaseName at 102).
-PatternDefinitions/BreakawayPattern.cs: Properties/methods (e.g., BaseName at 66).
-PatternDefinitions/ClosingMarubozuPattern.cs: Properties/methods (e.g., BaseName at 44).
-PatternDefinitions/DojiStarPattern.cs: Properties/methods (e.g., BaseName at 37).
-PatternDefinitions/DownsideGapThreeMethodsPattern.cs: Properties/methods (e.g., BaseName at 25).
-PatternDefinitions/HighWaveCandlePattern.cs: Properties/methods (e.g., BaseName at 50).
-PatternDefinitions/MarubozuPattern.cs: Properties/methods (e.g., Name at 23).
-PatternDefinitions/MorningDojiStarPattern.cs: Properties/methods (e.g., BaseName at 53).
-PatternDefinitions/ThrustingPattern.cs: Properties/methods (e.g., Name at 39).
-PatternDefinitions/TristarPattern.cs: Properties/methods (e.g., BaseName at 49).
-PatternDefinitions/Unique3RiverPattern.cs: Method IsPatternAsync at 72.
-PatternDefinitions/UpDownGapSideBySideWhiteLinesPattern.cs: Method IsPatternAsync at 84.
-4. KalshiBotAPI (~100 warnings)
-Files and Examples:
-Websockets/Interfaces/IMessageProcessor.cs: Interface/events/methods (e.g., OrderBookReceived at 8).
-Websockets/Interfaces/ISubscriptionManager.cs: Interface/methods (e.g., StartAsync at 8).
-Websockets/Interfaces/IWebSocketConnectionManager.cs: Interface/methods (e.g., ConnectAsync at 7).
-Websockets/KalshiWebSocketClient.cs: Methods (e.g., UpdateSubscriptionAsync at 336).
-Websockets/MessageProcessor.cs: Events (e.g., OrderBookReceived at 117).
+BacklashBotData/Models/Candlestick.cs
+BacklashBotData/Models/Event.cs
+BacklashBotData/Models/Market.cs
+BacklashBotData/Models/Series.cs
+BacklashBotData/Models/SnapshotGroup.cs
+BacklashInterfaces/Enums/StrategyEnums.cs
+BacklashInterfaces/KalshiBotData/Data/IBacklashBotContext.cs
+BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs
+BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiWebSocketClient.cs
+BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs
+BacklashInterfaces/SmokehouseBot/Management/ICentralErrorHandler.cs
+BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs
+BacklashInterfaces/SmokehouseBot/Management/IMarketAnalysisHelper.cs
+BacklashInterfaces/SmokehouseBot/Management/IMarketManagerService.cs
+BacklashInterfaces/SmokehouseBot/Management/IOvernightActivitiesHelper.cs
+BacklashInterfaces/SmokehouseBot/Services/IBroadcastService.cs
+BacklashInterfaces/SmokehouseBot/Services/ICandlestickService.cs
+BacklashInterfaces/SmokehouseBot/Services/IMarketDataInitializer.cs
+BacklashInterfaces/SmokehouseBot/Services/IMarketDataService.cs
+BacklashInterfaces/SmokehouseBot/Services/IMarketRefreshService.cs
+BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs
+BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs
+BacklashInterfaces/SmokehouseBot/Services/IServiceFactory.cs
+BacklashInterfaces/SmokehouseBot/Services/ISqlDataService.cs
+BacklashInterfaces/SmokehouseBot/Services/ITradingSnapshotService.cs
+BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs
+BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs
+BacklashInterfaces/SmokehouseBot/State/IDataCache.cs
+BacklashInterfaces/SmokehouseBot/State/IMarketData.cs
+BacklashInterfaces/SmokehouseBot/State/IStatusTrackerService.cs
+BacklashInterfaces/TradingStrategies/Classification/ISnapshotPeriodHelper.cs
+BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs
+BacklashPatterns/PatternDefinitions/BeltHoldPattern.cs
+BacklashPatterns/PatternDefinitions/BreakawayPattern.cs
+BacklashPatterns/PatternDefinitions/ClosingMarubozuPattern.cs
+BacklashPatterns/PatternDefinitions/DojiStarPattern.cs
+BacklashPatterns/PatternDefinitions/DownsideGapThreeMethodsPattern.cs
+BacklashPatterns/PatternDefinitions/HighWaveCandlePattern.cs
+BacklashPatterns/PatternDefinitions/MarubozuPattern.cs
+BacklashPatterns/PatternDefinitions/MorningDojiStarPattern.cs
+BacklashPatterns/PatternDefinitions/ThrustingPattern.cs
+BacklashPatterns/PatternDefinitions/TristarPattern.cs
+BacklashPatterns/PatternDefinitions/Unique3RiverPattern.cs
+BacklashPatterns/PatternDefinitions/UpDownGapSideBySideWhiteLinesPattern.cs
+OverseerTests/ConfigValidationTests.cs
+OverseerTests/IntegrationTests.cs
+OverseerTests/OverseerHubTests.cs
+OverseerTests/OverseerTests.cs
+OverseerTests/OverseerWebSocketMonitorServiceTests.cs
+TradingGUI/Configuration/SnapshotViewerConfig.cs
 
 # Important warnings to fix
 XML Comment Issues in BacklashDTOs/MarketSnapshot.cs:

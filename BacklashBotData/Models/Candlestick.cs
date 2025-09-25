@@ -11,137 +11,110 @@ namespace KalshiBotData.Models
         /// Gets or sets the ticker symbol of the market this candlestick belongs to.
         /// </summary>
         public string market_ticker { get; set; }
-
         /// <summary>
         /// Gets or sets the type of time interval for this candlestick (e.g., 1-minute, 5-minute).
         /// </summary>
         public int interval_type { get; set; }
-
         /// <summary>
         /// Gets or sets the Unix timestamp marking the end of the candlestick period.
         /// </summary>
         public long end_period_ts { get; set; }
-
         /// <summary>
         /// Gets or sets the UTC datetime marking the end of the candlestick period.
         /// </summary>
         public DateTime end_period_datetime_utc { get; set; }
-
         /// <summary>
         /// Gets or sets the year component of the end period datetime.
         /// </summary>
         public int year { get; set; }
-
         /// <summary>
         /// Gets or sets the month component of the end period datetime.
         /// </summary>
         public int month { get; set; }
-
         /// <summary>
         /// Gets or sets the day component of the end period datetime.
         /// </summary>
         public int day { get; set; }
-
         /// <summary>
         /// Gets or sets the hour component of the end period datetime.
         /// </summary>
         public int hour { get; set; }
-
         /// <summary>
         /// Gets or sets the minute component of the end period datetime.
         /// </summary>
         public int minute { get; set; }
-
         /// <summary>
         /// Gets or sets the open interest for the market at the end of the period.
         /// </summary>
         public int open_interest { get; set; }
-
         /// <summary>
         /// Gets or sets the closing price (yes price) at the end of the period.
         /// </summary>
         public int? price_close { get; set; }
-
         /// <summary>
         /// Gets or sets the highest price (yes price) during the period.
         /// </summary>
         public int? price_high { get; set; }
-
         /// <summary>
         /// Gets or sets the lowest price (yes price) during the period.
         /// </summary>
         public int? price_low { get; set; }
-
         /// <summary>
         /// Gets or sets the average (mean) price (yes price) during the period.
         /// </summary>
         public int? price_mean { get; set; }
-
         /// <summary>
         /// Gets or sets the opening price (yes price) at the start of the period.
         /// </summary>
         public int? price_open { get; set; }
-
         /// <summary>
         /// Gets or sets the previous period's closing price for comparison.
         /// </summary>
         public int? price_previous { get; set; }
-
         /// <summary>
         /// Gets or sets the trading volume during the period.
         /// </summary>
         public int volume { get; set; }
-
         /// <summary>
         /// Gets or sets the closing ask price (yes ask) at the end of the period.
         /// </summary>
         public int yes_ask_close { get; set; }
-
         /// <summary>
         /// Gets or sets the highest ask price (yes ask) during the period.
         /// </summary>
         public int yes_ask_high { get; set; }
-
         /// <summary>
         /// Gets or sets the lowest ask price (yes ask) during the period.
         /// </summary>
         public int yes_ask_low { get; set; }
-
         /// <summary>
         /// Gets or sets the opening ask price (yes ask) at the start of the period.
         /// </summary>
         public int yes_ask_open { get; set; }
-
         /// <summary>
         /// Gets or sets the closing bid price (yes bid) at the end of the period.
         /// </summary>
         public int yes_bid_close { get; set; }
-
         /// <summary>
         /// Gets or sets the highest bid price (yes bid) during the period.
         /// </summary>
         public int yes_bid_high { get; set; }
-
         /// <summary>
         /// Gets or sets the lowest bid price (yes bid) during the period.
         /// </summary>
         public int yes_bid_low { get; set; }
-
         /// <summary>
         /// Gets or sets the opening bid price (yes bid) at the start of the period.
         /// </summary>
         public int yes_bid_open { get; set; }
-
         /// <summary>
         /// Gets or sets the associated market entity for this candlestick.
         /// </summary>
         public Market Market { get; set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Candlestick"/> class (default constructor).
         /// </summary>
         public Candlestick() { }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Candlestick"/> class with all required data.
         /// </summary>

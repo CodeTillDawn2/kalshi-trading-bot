@@ -286,6 +286,16 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records the execution time for a given operation.
+        /// </summary>
+        /// <param name="operationName">The name of the operation being timed.</param>
+        /// <param name="executionTime">The time taken to execute the operation.</param>
+        public void RecordExecutionTime(string operationName, TimeSpan executionTime)
+        {
+            RecordExecutionTime(operationName, (long)executionTime.TotalMilliseconds, _centralPerformanceMonitorConfig?.EnablePerformanceMetrics ?? true);
+        }
+
+        /// <summary>
         /// Records the execution time for a specific API method or operation with enablement status.
         /// </summary>
         /// <param name="methodName">The name of the method or operation being timed.</param>
