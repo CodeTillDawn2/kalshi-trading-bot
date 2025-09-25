@@ -596,7 +596,7 @@ namespace BacklashBot.Services
 
             // Load from Parquet files
             var parquetStopwatch = Stopwatch.StartNew();
-            string basePath = Path.Combine(hardDataStorageLocation, "Candlesticks", marketTicker);
+            string basePath = Path.Combine(hardDataStorageLocation, _candlestickConfig.CandlestickFolderName, marketTicker);
             var filesToLoad = new List<string>();
             if (Directory.Exists(basePath))
             {
@@ -868,11 +868,11 @@ namespace BacklashBot.Services
                 string filePath;
                 if (interval == "day")
                 {
-                    // Save in year folder: HardDataStorageLocation\MarketTicker\Year\MM_Day.parquet
+                    // Save in year folder: HardDataStorageLocation\CandlestickFolderName\MarketTicker\Year\MM_Day.parquet
                     var parts = key.Split('-');
                     filePath = Path.Combine(
                         hardDataStorageLocation,
-                        "candlesticks",
+                        _candlestickConfig.CandlestickFolderName,
                         marketTicker,
                         parts[0], // Year
                         $"{parts[1]}{intervalSuffix}.parquet" // Month_Day.parquet
@@ -880,11 +880,11 @@ namespace BacklashBot.Services
                 }
                 else // hour or minute (both use weekly grouping)
                 {
-                    // Save in month folder: HardDataStorageLocation\MarketTicker\Year\Month\WeekN_Hour/Minute.parquet
+                    // Save in month folder: HardDataStorageLocation\CandlestickFolderName\MarketTicker\Year\Month\WeekN_Hour/Minute.parquet
                     var parts = key.Split('-');
                     filePath = Path.Combine(
                         hardDataStorageLocation,
-                        "candlesticks",
+                        _candlestickConfig.CandlestickFolderName,
                         marketTicker,
                         parts[0], // Year
                         parts[1], // Month
