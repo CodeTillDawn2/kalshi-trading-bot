@@ -50,17 +50,17 @@ namespace TradingGUITests
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
-            TestContext.WriteLine("Testing validation of all config classes from appsettings.json using reflection.");
+            TestContext.Out.WriteLine("Testing validation of all config classes from appsettings.json using reflection.");
             var configInstances = new Dictionary<string, object>();
 
             // Get all config types with SectionName from assemblies referenced by TradingGUI.csproj
             var assemblies = new[]
             {
-                typeof(BacklashCommon.Configuration.SecretsConfig).Assembly, // BacklashCommon
-                typeof(KalshiBotAPI.Configuration.KalshiConfig).Assembly, // KalshiBotAPI
-                typeof(TradingStrategies.Configuration.DataLoaderConfig).Assembly, // TradingStrategies
-                typeof(TradingGUI.Configuration.SnapshotViewerConfig).Assembly, // TradingGUI itself
-                typeof(BacklashBotData.Configuration.BacklashBotDataConfig).Assembly, // BacklashBotData
+                typeof(SecretsConfig).Assembly, // BacklashCommon
+                typeof(KalshiConfig).Assembly, // KalshiBotAPI
+                typeof(DataLoaderConfig).Assembly, // TradingStrategies
+                typeof(SnapshotViewerConfig).Assembly, // TradingGUI itself
+                typeof(BacklashBotDataConfig).Assembly, // BacklashBotData
             };
 
             var configTypes = assemblies
@@ -68,7 +68,7 @@ namespace TradingGUITests
                 .Where(t => t.GetField("SectionName", BindingFlags.Public | BindingFlags.Static) != null)
                 .ToList();
 
-            TestContext.WriteLine($"Step: Found {configTypes.Count} config types with SectionName.");
+            TestContext.Out.WriteLine($"Step: Found {configTypes.Count} config types with SectionName.");
             foreach (var configType in configTypes)
             {
                 var sectionName = GetSectionName(configType);
@@ -76,10 +76,10 @@ namespace TradingGUITests
                 var instance = Activator.CreateInstance(configType);
                 section.Bind(instance);
                 configInstances[sectionName] = instance;
-                TestContext.WriteLine($"Step: Validating config {configType.Name} from section {sectionName}.");
+                TestContext.Out.WriteLine($"Step: Validating config {configType.Name} from section {sectionName}.");
                 ValidateConfig(instance, section);
             }
-            TestContext.WriteLine("Result: All configs validated successfully.");
+            TestContext.Out.WriteLine("Result: All configs validated successfully.");
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace TradingGUITests
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
-            TestContext.WriteLine("Testing for unused configuration sections in appsettings.json using reflection.");
+            TestContext.Out.WriteLine("Testing for unused configuration sections in appsettings.json using reflection.");
             var usedSections = new HashSet<string>();
 
             // Automatically collect all SectionName values from assemblies referenced by TradingGUI.csproj
@@ -128,19 +128,19 @@ namespace TradingGUITests
                 !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
             ).ToList();
 
-            TestContext.WriteLine($"Step: Collected {usedSections.Count} used sections, found {allConfigurationKeys.Count} total keys.");
-            TestContext.WriteLine("Reflective: Unused configuration keys found:");
+            TestContext.Out.WriteLine($"Step: Collected {usedSections.Count} used sections, found {allConfigurationKeys.Count} total keys.");
+            TestContext.Out.WriteLine("Reflective: Unused configuration keys found:");
             foreach (var key in unusedKeys)
             {
-                TestContext.WriteLine($"  {key}");
+                TestContext.Out.WriteLine($"  {key}");
             }
 
             if (unusedKeys.Any())
             {
-                TestContext.WriteLine($"Error: Found {unusedKeys.Count} unused keys.");
+                TestContext.Out.WriteLine($"Error: Found {unusedKeys.Count} unused keys.");
             }
             Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
-            TestContext.WriteLine("Result: No unused sections found.");
+            TestContext.Out.WriteLine("Result: No unused sections found.");
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace TradingGUITests
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {
-            TestContext.WriteLine("Testing secrets interpolation and key file existence.");
+            TestContext.Out.WriteLine("Testing secrets interpolation and key file existence.");
             // Set up configuration with secrets loaded
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "TradingGUI"));
             var builder = new ConfigurationBuilder()
@@ -165,7 +165,7 @@ namespace TradingGUITests
 
             // Debug: Check what the secrets path is
             var secretsPath = baseConfig.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-            TestContext.WriteLine($"Step: Secrets path resolved to {secretsPath}.");
+            TestContext.Out.WriteLine($"Step: Secrets path resolved to {secretsPath}.");
 
             builder.AddSecretsConfiguration(basePath, baseConfig);
             var configuration = builder.Build();
@@ -173,14 +173,14 @@ namespace TradingGUITests
             // Debug: Check if secrets were loaded
             var botKeyId = configuration["Kalshi:BotKeyId"];
             var botKeyFile = configuration["Kalshi:BotKeyFile"];
-            TestContext.WriteLine($"Step: Secrets loaded - KeyId: {MaskKeyId(botKeyId)}, KeyFile: {botKeyFile}.");
+            TestContext.Out.WriteLine($"Step: Secrets loaded - KeyId: {MaskKeyId(botKeyId)}, KeyFile: {botKeyFile}.");
 
             // Test KalshiConfig binding (this will still have placeholders because binding doesn't interpolate)
             var kalshiConfig = new KalshiConfig();
             var kalshiSection = configuration.GetSection(KalshiConfig.SectionName);
             kalshiSection.Bind(kalshiConfig);
 
-            TestContext.WriteLine($"Step: Bound KalshiConfig - KeyId contains placeholders: {kalshiConfig.KeyId.Contains("{")}, KeyFile contains placeholders: {kalshiConfig.KeyFile.Contains("{")}.");
+            TestContext.Out.WriteLine($"Step: Bound KalshiConfig - KeyId contains placeholders: {kalshiConfig.KeyId.Contains("{")}, KeyFile contains placeholders: {kalshiConfig.KeyFile.Contains("{")}.");
 
             // The raw binding will still have placeholders - this is expected
             // We need to test the interpolation separately
@@ -192,12 +192,12 @@ namespace TradingGUITests
             // Test manual interpolation using ConfigurationHelper
             var rawKeyId = configuration["Kalshi:KeyId"];
             var rawKeyFile = configuration["Kalshi:KeyFile"];
-            TestContext.WriteLine($"Step: Retrieved raw values - KeyId: {rawKeyId}, KeyFile: {rawKeyFile}.");
+            TestContext.Out.WriteLine($"Step: Retrieved raw values - KeyId: {rawKeyId}, KeyFile: {rawKeyFile}.");
 
             var interpolatedKeyId = ConfigurationHelper.InterpolateConfigurationValue(rawKeyId, configuration);
             var interpolatedKeyFileName = ConfigurationHelper.InterpolateConfigurationValue(rawKeyFile, configuration);
 
-            TestContext.WriteLine($"Step: Interpolated values - KeyId: {MaskKeyId(interpolatedKeyId)}, KeyFile: {interpolatedKeyFileName}.");
+            TestContext.Out.WriteLine($"Step: Interpolated values - KeyId: {MaskKeyId(interpolatedKeyId)}, KeyFile: {interpolatedKeyFileName}.");
 
             // Verify interpolation worked
             Assert.That(interpolatedKeyId, Does.Not.Contain("{"),
@@ -223,11 +223,11 @@ namespace TradingGUITests
 
             // Verify the interpolated key file exists
             var keyFilePath = Path.Combine(secretsPath, interpolatedKeyFileName);
-            TestContext.WriteLine($"Step: Checking key file existence at {keyFilePath}.");
+            TestContext.Out.WriteLine($"Step: Checking key file existence at {keyFilePath}.");
             Assert.That(File.Exists(keyFilePath),
                 $"Interpolated key file should exist at: {keyFilePath}");
 
-            TestContext.WriteLine("Result: Secrets interpolation and key file validation successful.");
+            TestContext.Out.WriteLine("Result: Secrets interpolation and key file validation successful.");
         }
         /// <summary>
         /// Validates a configuration object using data annotations and checks for missing properties in the configuration section.

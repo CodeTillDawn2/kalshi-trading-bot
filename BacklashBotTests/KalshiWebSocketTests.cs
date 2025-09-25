@@ -314,7 +314,7 @@ namespace BacklashBotTests
         [Test]
         public void ChannelEnableDisable_AllChannelsInitiallyDisabled()
         {
-            TestContext.WriteLine("Testing that all WebSocket channels are disabled by default when the client is initialized.");
+            TestContext.Out.WriteLine("Testing that all WebSocket channels are disabled by default when the client is initialized.");
             // Arrange - All channels should be disabled by default
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
 
@@ -323,7 +323,7 @@ namespace BacklashBotTests
             {
                 Assert.That(_client.IsChannelEnabled(channel), Is.False, $"Channel {channel} should be disabled by default");
             }
-            TestContext.WriteLine("Result: All channels are disabled by default as expected.");
+            TestContext.Out.WriteLine("Result: All channels are disabled by default as expected.");
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace BacklashBotTests
         [Test]
         public void EnableChannel_SingleChannel_EnablementWorks()
         {
-            TestContext.WriteLine("Testing that a single WebSocket channel can be successfully enabled.");
+            TestContext.Out.WriteLine("Testing that a single WebSocket channel can be successfully enabled.");
             // Arrange
             string channel = "orderbook";
 
@@ -348,7 +348,7 @@ namespace BacklashBotTests
             // Assert
             Assert.That(_client.IsChannelEnabled(channel), Is.True, $"Channel {channel} should be enabled");
             Assert.That(_client.GetEnabledChannels().Contains(channel), Is.True, $"Enabled channels should contain {channel}");
-            TestContext.WriteLine("Result: Single channel enabled successfully.");
+            TestContext.Out.WriteLine("Result: Single channel enabled successfully.");
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace BacklashBotTests
         [Test]
         public void DisableChannel_SingleChannel_DisablementWorks()
         {
-            TestContext.WriteLine("Testing that a single WebSocket channel can be successfully disabled.");
+            TestContext.Out.WriteLine("Testing that a single WebSocket channel can be successfully disabled.");
             // Arrange
             string channel = "orderbook";
             _client.EnableChannel(channel);
@@ -374,7 +374,7 @@ namespace BacklashBotTests
             // Assert
             Assert.That(_client.IsChannelEnabled(channel), Is.False, $"Channel {channel} should be disabled");
             Assert.That(_client.GetEnabledChannels().Contains(channel), Is.False, $"Enabled channels should not contain {channel}");
-            TestContext.WriteLine("Result: Single channel disabled successfully.");
+            TestContext.Out.WriteLine("Result: Single channel disabled successfully.");
         }
 
         /// <summary>
@@ -389,7 +389,7 @@ namespace BacklashBotTests
         [Test]
         public void EnableAllChannels_AllChannelsEnabled()
         {
-            TestContext.WriteLine("Testing that all WebSocket channels can be enabled simultaneously.");
+            TestContext.Out.WriteLine("Testing that all WebSocket channels can be enabled simultaneously.");
             // Arrange
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
 
@@ -408,7 +408,7 @@ namespace BacklashBotTests
             {
                 Assert.That(enabledChannels.Contains(channel), Is.True, $"Enabled channels should contain {channel}");
             }
-            TestContext.WriteLine("Result: All channels enabled successfully.");
+            TestContext.Out.WriteLine("Result: All channels enabled successfully.");
         }
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace BacklashBotTests
         [Test]
         public void DisableAllChannels_AllChannelsDisabled()
         {
-            TestContext.WriteLine("Testing that all WebSocket channels can be disabled simultaneously.");
+            TestContext.Out.WriteLine("Testing that all WebSocket channels can be disabled simultaneously.");
             // Arrange
             _client.EnableAllChannels();
             var allChannels = new[] { "orderbook", "ticker", "trade", "fill", "lifecycle", "event_lifecycle" };
@@ -439,7 +439,7 @@ namespace BacklashBotTests
 
             var enabledChannels = _client.GetEnabledChannels();
             Assert.That(enabledChannels.Count, Is.EqualTo(0), "No channels should be enabled");
-            TestContext.WriteLine("Result: All channels disabled successfully.");
+            TestContext.Out.WriteLine("Result: All channels disabled successfully.");
         }
 
         #endregion
@@ -458,7 +458,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessOrderBookMessage_OrderBookSnapshot_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that orderbook snapshot messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that orderbook snapshot messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""orderbook_snapshot"",
@@ -475,7 +475,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("orderbook_snapshot"))), Times.Once);
-            TestContext.WriteLine("Result: Orderbook snapshot message processed successfully.");
+            TestContext.Out.WriteLine("Result: Orderbook snapshot message processed successfully.");
         }
 
         /// <summary>
@@ -490,7 +490,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessOrderBookMessage_OrderBookDelta_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that orderbook delta messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that orderbook delta messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""orderbook_delta"",
@@ -506,7 +506,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("orderbook_delta"))), Times.Once);
-            TestContext.WriteLine("Result: Orderbook delta message processed successfully.");
+            TestContext.Out.WriteLine("Result: Orderbook delta message processed successfully.");
         }
 
         /// <summary>
@@ -521,7 +521,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessTickerMessage_TickerData_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that ticker messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that ticker messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""ticker"",
@@ -542,7 +542,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("ticker"))), Times.Once);
-            TestContext.WriteLine("Result: Ticker message processed successfully.");
+            TestContext.Out.WriteLine("Result: Ticker message processed successfully.");
         }
 
         /// <summary>
@@ -557,7 +557,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessTradeMessage_TradeData_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that trade messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that trade messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""trade"",
@@ -575,7 +575,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("trade"))), Times.Once);
-            TestContext.WriteLine("Result: Trade message processed successfully.");
+            TestContext.Out.WriteLine("Result: Trade message processed successfully.");
         }
 
         /// <summary>
@@ -590,7 +590,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessFillMessage_FillData_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that fill messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that fill messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""fill"",
@@ -607,7 +607,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("fill"))), Times.Once);
-            TestContext.WriteLine("Result: Fill message processed successfully.");
+            TestContext.Out.WriteLine("Result: Fill message processed successfully.");
         }
 
         /// <summary>
@@ -622,7 +622,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessMarketLifecycleMessage_LifecycleData_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that market lifecycle messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that market lifecycle messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""market_lifecycle_v2"",
@@ -638,7 +638,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("market_lifecycle"))), Times.Once);
-            TestContext.WriteLine("Result: Market lifecycle message processed successfully.");
+            TestContext.Out.WriteLine("Result: Market lifecycle message processed successfully.");
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessEventLifecycleMessage_EventLifecycleData_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that event lifecycle messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that event lifecycle messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""event_lifecycle"",
@@ -669,7 +669,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("event_lifecycle"))), Times.Once);
-            TestContext.WriteLine("Result: Event lifecycle message processed successfully.");
+            TestContext.Out.WriteLine("Result: Event lifecycle message processed successfully.");
         }
 
         /// <summary>
@@ -684,7 +684,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessErrorMessage_ObjectError_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that error messages are correctly processed by the MessageProcessor without throwing exceptions.");
+            TestContext.Out.WriteLine("Testing that error messages are correctly processed by the MessageProcessor without throwing exceptions.");
             // Arrange
             var message = @"{
                 ""type"": ""error"",
@@ -696,7 +696,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("error"))), Times.Once);
-            TestContext.WriteLine("Result: Error message processed successfully without exceptions.");
+            TestContext.Out.WriteLine("Result: Error message processed successfully without exceptions.");
         }
 
         /// <summary>
@@ -711,7 +711,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessSubscribedMessage_SubscriptionConfirmation_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that subscription confirmation messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that subscription confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""subscribed"",
@@ -724,7 +724,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("subscribed"))), Times.Once);
-            TestContext.WriteLine("Result: Subscription confirmation message processed successfully.");
+            TestContext.Out.WriteLine("Result: Subscription confirmation message processed successfully.");
         }
 
         /// <summary>
@@ -739,7 +739,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessUnsubscribedMessage_UnsubscriptionConfirmation_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that unsubscription confirmation messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that unsubscription confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""unsubscribed"",
@@ -751,7 +751,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("unsubscribed"))), Times.Once);
-            TestContext.WriteLine("Result: Unsubscription confirmation message processed successfully.");
+            TestContext.Out.WriteLine("Result: Unsubscription confirmation message processed successfully.");
         }
 
         /// <summary>
@@ -766,7 +766,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ProcessOkMessage_UpdateConfirmation_MessageProcessorCalled()
         {
-            TestContext.WriteLine("Testing that OK confirmation messages are correctly processed by the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that OK confirmation messages are correctly processed by the MessageProcessor.");
             // Arrange
             var message = @"{
                 ""type"": ""ok"",
@@ -778,7 +778,7 @@ namespace BacklashBotTests
 
             // Assert - Verify that ProcessMessageAsync was called with the correct message
             _messageProcessorMock.Verify(mp => mp.ProcessMessageAsync(It.Is<string>(s => s.Contains("ok"))), Times.Once);
-            TestContext.WriteLine("Result: OK confirmation message processed successfully.");
+            TestContext.Out.WriteLine("Result: OK confirmation message processed successfully.");
         }
 
         #endregion
@@ -797,7 +797,7 @@ namespace BacklashBotTests
         [Test]
         public async Task SubscribeToChannel_OrderBookChannel_SubscriptionManagerCalled()
         {
-            TestContext.WriteLine("Testing that subscribing to a specific channel correctly delegates to the SubscriptionManager.");
+            TestContext.Out.WriteLine("Testing that subscribing to a specific channel correctly delegates to the SubscriptionManager.");
             // Arrange
             string channel = "orderbook";
             string[] marketTickers = { "TEST-123" };
@@ -810,7 +810,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.SubscribeToChannelAsync(channel, marketTickers),
                 Times.Once);
-            TestContext.WriteLine("Result: Subscription to channel delegated successfully.");
+            TestContext.Out.WriteLine("Result: Subscription to channel delegated successfully.");
         }
 
         /// <summary>
@@ -826,7 +826,7 @@ namespace BacklashBotTests
         [Test]
         public async Task SubscribeToWatchedMarkets_WatchedMarketsSet_SubscriptionManagerCalled()
         {
-            TestContext.WriteLine("Testing that subscribing to watched markets correctly delegates to the SubscriptionManager for all enabled channels.");
+            TestContext.Out.WriteLine("Testing that subscribing to watched markets correctly delegates to the SubscriptionManager for all enabled channels.");
             // Arrange
             var watchedMarkets = new HashSet<string> { "TEST-123", "TEST-456" };
             _client.WatchedMarkets = watchedMarkets;
@@ -848,7 +848,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.SubscribeToChannelAsync(It.IsAny<string>(), It.IsAny<string[]>()),
                 Times.AtLeastOnce);
-            TestContext.WriteLine("Result: Subscription to watched markets delegated successfully.");
+            TestContext.Out.WriteLine("Result: Subscription to watched markets delegated successfully.");
         }
 
         /// <summary>
@@ -863,7 +863,7 @@ namespace BacklashBotTests
         [Test]
         public async Task UnsubscribeFromChannel_ChannelSpecified_SubscriptionManagerCalled()
         {
-            TestContext.WriteLine("Testing that unsubscribing from a specific channel correctly delegates to the SubscriptionManager.");
+            TestContext.Out.WriteLine("Testing that unsubscribing from a specific channel correctly delegates to the SubscriptionManager.");
             // Arrange
             string channel = "orderbook";
 
@@ -874,7 +874,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.UnsubscribeFromChannelAsync(channel),
                 Times.Once);
-            TestContext.WriteLine("Result: Unsubscription from channel delegated successfully.");
+            TestContext.Out.WriteLine("Result: Unsubscription from channel delegated successfully.");
         }
 
         /// <summary>
@@ -889,7 +889,7 @@ namespace BacklashBotTests
         [Test]
         public async Task UnsubscribeFromAll_AllChannels_UnsubscribeFromAllAsyncCalled()
         {
-            TestContext.WriteLine("Testing that unsubscribing from all channels correctly delegates to the SubscriptionManager.");
+            TestContext.Out.WriteLine("Testing that unsubscribing from all channels correctly delegates to the SubscriptionManager.");
             // Act
             await _client.UnsubscribeFromAllAsync();
 
@@ -897,7 +897,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.UnsubscribeFromAllAsync(),
                 Times.Once);
-            TestContext.WriteLine("Result: Unsubscription from all channels delegated successfully.");
+            TestContext.Out.WriteLine("Result: Unsubscription from all channels delegated successfully.");
         }
 
         /// <summary>
@@ -912,7 +912,7 @@ namespace BacklashBotTests
         [Test]
         public void IsSubscribed_MarketAndChannel_SubscriptionManagerCalled()
         {
-            TestContext.WriteLine("Testing that checking subscription status correctly delegates to the SubscriptionManager.");
+            TestContext.Out.WriteLine("Testing that checking subscription status correctly delegates to the SubscriptionManager.");
             // Arrange
             string marketTicker = "TEST-123";
             string channel = "orderbook";
@@ -924,7 +924,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(
                 sm => sm.IsSubscribed(marketTicker, channel),
                 Times.Once);
-            TestContext.WriteLine("Result: Subscription status check delegated successfully.");
+            TestContext.Out.WriteLine("Result: Subscription status check delegated successfully.");
         }
 
         /// <summary>
@@ -939,7 +939,7 @@ namespace BacklashBotTests
         [Test]
         public void ResetEventCounts_Called_MessageProcessorResetEventCountsCalled()
         {
-            TestContext.WriteLine("Testing that resetting event counts correctly delegates to the MessageProcessor.");
+            TestContext.Out.WriteLine("Testing that resetting event counts correctly delegates to the MessageProcessor.");
             // Act
             _client.ResetEventCounts();
 
@@ -947,7 +947,7 @@ namespace BacklashBotTests
             _messageProcessorMock.Verify(
                 mp => mp.ResetEventCounts(),
                 Times.Once);
-            TestContext.WriteLine("Result: Event counts reset delegated successfully.");
+            TestContext.Out.WriteLine("Result: Event counts reset delegated successfully.");
         }
 
         #endregion
@@ -967,7 +967,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ConnectAsync_ConnectionManagerConnected_MessageProcessingStarted()
         {
-            TestContext.WriteLine("Testing that connecting to the WebSocket properly initializes all components.");
+            TestContext.Out.WriteLine("Testing that connecting to the WebSocket properly initializes all components.");
             // Arrange
             bool isConnected = false;
             _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask).Callback(() => isConnected = true);
@@ -980,7 +980,7 @@ namespace BacklashBotTests
             _connectionManagerMock.Verify(cm => cm.ConnectAsync(0), Times.Once);
             _messageProcessorMock.Verify(mp => mp.StartProcessingAsync(), Times.Once);
             _subscriptionManagerMock.Verify(sm => sm.StartAsync(), Times.Once);
-            TestContext.WriteLine("Result: WebSocket connection and component initialization completed successfully.");
+            TestContext.Out.WriteLine("Result: WebSocket connection and component initialization completed successfully.");
         }
 
         /// <summary>
@@ -996,7 +996,7 @@ namespace BacklashBotTests
         [Test]
         public async Task ShutdownAsync_AllComponentsStopped()
         {
-            TestContext.WriteLine("Testing that shutting down the WebSocket client properly stops all components.");
+            TestContext.Out.WriteLine("Testing that shutting down the WebSocket client properly stops all components.");
             // Arrange
             _subscriptionManagerMock.Setup(sm => sm.UnsubscribeFromAllAsync()).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.StopAsync()).Returns(Task.CompletedTask);
@@ -1009,7 +1009,7 @@ namespace BacklashBotTests
             _subscriptionManagerMock.Verify(sm => sm.UnsubscribeFromAllAsync(), Times.Once);
             _connectionManagerMock.Verify(cm => cm.StopAsync(), Times.Once);
             _messageProcessorMock.Verify(mp => mp.StopProcessingAsync(), Times.Once);
-            TestContext.WriteLine("Result: WebSocket client shutdown completed successfully.");
+            TestContext.Out.WriteLine("Result: WebSocket client shutdown completed successfully.");
         }
 
         #endregion

@@ -13,7 +13,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn></NoWarn>
-    <WarningsAsErrors>CS1591</WarningsAsErrors>
+    <WarningsAsErrors>CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
