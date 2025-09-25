@@ -57,8 +57,20 @@ namespace BacklashBot.Management
         private bool _servicesStopped = false;
         private bool _isStartingUp = false;
         private bool _isShuttingDown = false;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently stopped.
+        /// </summary>
         public bool IsServicesStopped => _servicesStopped;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently starting up.
+        /// </summary>
         public bool IsStartingUp => _isStartingUp;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently shutting down.
+        /// </summary>
         public bool IsShuttingDown => _isShuttingDown;
 
         private BTimer? _shutdownTimer;
@@ -75,6 +87,25 @@ namespace BacklashBot.Management
         private PerformanceMetrics _performanceMetrics = new PerformanceMetrics();
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CentralBrain"/> class with all required dependencies.
+        /// </summary>
+        /// <param name="logger">Logger instance for recording operations.</param>
+        /// <param name="serviceFactory">Factory for creating service instances.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="tradingSnapshotServiceConfig">Configuration for trading snapshot service.</param>
+        /// <param name="generalExecutionConfig">General execution configuration.</param>
+        /// <param name="instanceNameConfig">Instance name configuration.</param>
+        /// <param name="backlashErrorHandler">Error handler service.</param>
+        /// <param name="backlashPerformanceTracker">Performance tracking service.</param>
+        /// <param name="marketManager">Market management service.</param>
+        /// <param name="appLifetime">Application lifetime manager.</param>
+        /// <param name="scopeManagerService">Scope manager service.</param>
+        /// <param name="statusTrackerService">Status tracking service.</param>
+        /// <param name="readyStatus">Bot ready status service.</param>
+        /// <param name="brainStatusService">Brain status service.</param>
+        /// <param name="centralBrainConfig">Central brain configuration.</param>
+        /// <param name="timerFactory">Factory for creating timer instances.</param>
         public CentralBrain(
             ILogger<ICentralBrain> logger,
             IServiceFactory serviceFactory,
@@ -266,6 +297,10 @@ namespace BacklashBot.Management
             ConfigureScheduledTasks();
         }
 
+        /// <summary>
+        /// Starts the dashboard and initializes all trading services and components.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StartDashboard()
         {
             if (_isStartingUp)
@@ -571,6 +606,10 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Shuts down the dashboard and gracefully stops all trading services and components.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ShutdownDashboardAsync()
         {
             File.AppendAllText("logs/shutodown.log", $"{DateTime.Now.ToString()} - Shutting down\n");
@@ -694,6 +733,9 @@ namespace BacklashBot.Management
             _logger.LogInformation("BRAIN: Dependent services shut down successfully");
         }
 
+        /// <summary>
+        /// Disposes of the CentralBrain instance and releases all managed resources.
+        /// </summary>
         public void Dispose()
         {
             _snapshotTimer?.Dispose();

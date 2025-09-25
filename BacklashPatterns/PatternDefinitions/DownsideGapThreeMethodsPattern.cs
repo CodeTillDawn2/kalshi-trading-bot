@@ -4,6 +4,11 @@ using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
 
+    /// <summary>
+    /// Represents a Downside Gap Three Methods pattern, a bearish continuation pattern.
+    /// This pattern consists of three candles where the second gaps down from the first,
+    /// and the third partially fills that gap, indicating continued downward momentum in a downtrend.
+    /// </summary>
 public class DownsideGapThreeMethodsPattern : PatternDefinition
 {
     /// <summary>
@@ -24,8 +29,14 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
     /// </summary>
     public static double TrendThreshold { get; set; } = -0.3;
 
+    /// <summary>
+    /// Gets the base name identifier for this pattern type.
+    /// </summary>
     public const string BaseName = "DownsideGapThreeMethods";
 
+    /// <summary>
+    /// Gets the name of this pattern instance.
+    /// </summary>
     public override string Name => BaseName;
     /// <summary>
     /// Gets the description of the pattern.
@@ -35,14 +46,37 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
     /// Gets the direction of the pattern.
     /// </summary>
     public override PatternDirection Direction => PatternDirection.Bearish;
+    /// <summary>
+    /// Gets or sets the strength of this pattern instance, calculated based on various factors.
+    /// </summary>
     public override double Strength { get; protected set; }
 
+    /// <summary>
+    /// Gets or sets the certainty level of this pattern recognition.
+    /// </summary>
     public override double Certainty { get; protected set; }
+    /// <summary>
+    /// Gets or sets the uncertainty level of this pattern recognition.
+    /// </summary>
     public override double Uncertainty { get; protected set; }
+    /// <summary>
+    /// Initializes a new instance of the DownsideGapThreeMethodsPattern class.
+    /// </summary>
+    /// <param name="candles">The list of candle indices that form this pattern.</param>
     public DownsideGapThreeMethodsPattern(List<int> candles) : base(candles)
     {
     }
 
+    /// <summary>
+    /// Asynchronously determines if a Downside Gap Three Methods pattern exists at the specified index.
+    /// The pattern requires three candles where the second gaps down from the first in a downtrend,
+    /// and the third partially fills that gap while remaining bearish.
+    /// </summary>
+    /// <param name="index">The index of the third candle in the potential pattern.</param>
+    /// <param name="prices">The array of candle price data.</param>
+    /// <param name="trendLookback">The number of candles to look back for trend analysis.</param>
+    /// <param name="metricsCache">The cache of pre-calculated candle metrics.</param>
+    /// <returns>A DownsideGapThreeMethodsPattern instance if the pattern is detected, otherwise null.</returns>
     public static async Task<DownsideGapThreeMethodsPattern?> IsPatternAsync(
         int index,
         CandleMids[] prices,

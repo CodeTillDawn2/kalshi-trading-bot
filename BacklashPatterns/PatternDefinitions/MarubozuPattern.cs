@@ -4,6 +4,11 @@ using static BacklashPatterns.PatternUtils;
 namespace BacklashPatterns.PatternDefinitions
 {
 
+    /// <summary>
+    /// Represents a Marubozu candlestick pattern, indicating strong directional momentum.
+    /// A Marubozu is a single candle with no upper or lower wicks, showing either strong buying
+    /// pressure (bullish) or strong selling pressure (bearish) with no price rejection.
+    /// </summary>
     public class MarubozuPattern : PatternDefinition
 
     {
