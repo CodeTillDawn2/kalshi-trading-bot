@@ -298,8 +298,9 @@ namespace BacklashOverseer
         /// <param name="clientId">Unique identifier for the client.</param>
         /// <param name="clientName">Name of the client (typically the brain instance name).</param>
         /// <param name="clientType">Type of client connecting (e.g., brain, dashboard).</param>
+        /// <param name="authToken">Authentication token provided by the client.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handshake(string clientId, string clientName, string clientType)
+        public async Task Handshake(string clientId, string clientName, string clientType, string authToken)
         {
             var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
 

@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
+    <ProjectReference Include="..\BacklashBotLogging\BacklashBotLogging.csproj" />
     <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />

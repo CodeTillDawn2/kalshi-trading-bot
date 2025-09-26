@@ -80,7 +80,7 @@ namespace BacklashOverseer
             });
 
             // Add database logging services
-            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), true)); // isOverseer = true
+            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), ApplicationType.Overseer));
             services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             services.AddSingleton<ILoggerProvider>(provider =>

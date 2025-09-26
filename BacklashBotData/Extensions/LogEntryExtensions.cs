@@ -192,6 +192,72 @@ namespace KalshiBotData.Extensions
         }
 
         /// <summary>
+        /// Converts a LogEntryDTO to a BacktestingLogEntry model,
+        /// creating a specialized log entry variant for backtesting/GUI system operations.
+        /// </summary>
+        /// <param name="logEntryDTO">The LogEntryDTO to convert.</param>
+        /// <returns>A new BacktestingLogEntry with all properties mapped from the DTO.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when logEntryDTO is null.</exception>
+        public static BacktestingLogEntry ToBacktestingLogEntry(this LogEntryDTO logEntryDTO)
+        {
+            if (logEntryDTO == null)
+                throw new ArgumentNullException(nameof(logEntryDTO));
+
+            var stopwatch = Stopwatch.StartNew();
+
+            var result = new BacktestingLogEntry
+            {
+                Id = logEntryDTO.Id,
+                Timestamp = logEntryDTO.Timestamp,
+                Level = logEntryDTO.Level,
+                Message = logEntryDTO.Message,
+                Exception = logEntryDTO.Exception,
+                Environment = logEntryDTO.Environment,
+                BrainInstance = logEntryDTO.BrainInstance,
+                SessionIdentifier = logEntryDTO.SessionIdentifier,
+                Source = logEntryDTO.Source
+            };
+
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("ToBacktestingLogEntry", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts a BacktestingLogEntry model to its DTO representation,
+        /// mapping all backtesting log entry properties for data transfer.
+        /// </summary>
+        /// <param name="backtestingLogEntry">The BacktestingLogEntry model to convert.</param>
+        /// <returns>A new LogEntryDTO with all backtesting log entry properties mapped.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when backtestingLogEntry is null.</exception>
+        public static LogEntryDTO ToBacktestingLogEntryDTO(this BacktestingLogEntry backtestingLogEntry)
+        {
+            if (backtestingLogEntry == null)
+                throw new ArgumentNullException(nameof(backtestingLogEntry));
+
+            var stopwatch = Stopwatch.StartNew();
+
+            var result = new LogEntryDTO
+            {
+                Id = backtestingLogEntry.Id,
+                Timestamp = backtestingLogEntry.Timestamp,
+                Level = backtestingLogEntry.Level,
+                Message = backtestingLogEntry.Message,
+                Exception = backtestingLogEntry.Exception,
+                Environment = backtestingLogEntry.Environment,
+                BrainInstance = backtestingLogEntry.BrainInstance,
+                SessionIdentifier = backtestingLogEntry.SessionIdentifier,
+                Source = backtestingLogEntry.Source
+            };
+
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("ToBacktestingLogEntryDTO", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+
+            return result;
+        }
+
+        /// <summary>
         /// Converts a collection of LogEntry models to their corresponding DTO representations.
         /// </summary>
         /// <param name="logEntries">The collection of LogEntry models to convert.</param>

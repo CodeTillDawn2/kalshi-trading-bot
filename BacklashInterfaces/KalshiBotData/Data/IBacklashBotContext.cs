@@ -546,6 +546,12 @@ namespace BacklashBotData.Data.Interfaces
         Task AddOverseerLogEntry(LogEntryDTO dto);
 
         /// <summary>
+        /// Adds a backtesting log entry to the database.
+        /// </summary>
+        /// <param name="dto">The backtesting log entry DTO to add.</param>
+        Task AddBacktestingLogEntry(LogEntryDTO dto);
+
+        /// <summary>
         /// Gets log entries filtered by brain instance, level, dates, and maximum records.
         /// </summary>
         /// <param name="brainInstance">Optional brain instance to filter by.</param>

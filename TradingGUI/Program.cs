@@ -1,6 +1,7 @@
 using BacklashBotData.Data;
 using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
+using KalshiBotLogging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,12 +31,22 @@ namespace TradingGUI
             services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
 
-            // Add logging
-            services.AddLogging(logging =>
+            // Bind configurations to respective models
+            services.AddOptions<LoggingConfig>()
+                .Bind(configuration.GetSection(LoggingConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<InstanceNameConfig>()
+                .Bind(configuration.GetSection(InstanceNameConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            // Add logging - disable default logging, only use custom DatabaseLogger
+            services.AddLogging(builder =>
             {
-                logging.AddConfiguration(configuration.GetSection("Logging"));
-                logging.AddConsole();
-                logging.AddDebug();
+                builder.ClearProviders();
+                // Set minimum level to Trace to allow DatabaseLogger to handle its own filtering
+                builder.SetMinimumLevel(LogLevel.Trace);
             });
 
             // Add connection string access (matching BacklashBot pattern)
@@ -43,7 +54,30 @@ namespace TradingGUI
             if (!string.IsNullOrEmpty(connectionString))
             {
                 services.AddSingleton(connectionString);
+                services.AddSingleton(new BacklashCommon.Configuration.ConnectionStringProvider(connectionString));
             }
+
+            // Register DatabaseLoggingQueue as a singleton
+            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), ApplicationType.Backtesting));
+
+            // Register ILoggerFactory
+            services.AddSingleton<ILoggerFactory, LoggerFactory>();
+
+            // Re-enable custom logger provider
+            services.AddSingleton<ILoggerProvider>(provider =>
+            {
+                var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+                var instanceNameConfig = provider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
+                var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
+
+                return new DatabaseLoggerProvider(
+                    provider.GetRequiredService<DatabaseLoggingQueue>(),
+                    loggingConfig,
+                    instanceNameConfig.Name,
+                    minLevel,
+                    null, // sessionIdentifier
+                    loggingConfig.Environment);
+            });
 
             // Register BacklashBotData configuration
             services.AddOptions<BacklashBotDataConfig>()

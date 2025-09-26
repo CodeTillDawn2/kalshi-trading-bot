@@ -47,6 +47,7 @@ namespace BacklashBotData.Data
         private DbSet<Order> Orders { get; set; }
         private DbSet<LogEntry> LogEntries { get; set; }
         private DbSet<OverseerLogEntry> OverseerLogEntries { get; set; }
+        private DbSet<BacktestingLogEntry> BacktestingLogEntries { get; set; }
         private DbSet<Snapshot> Snapshots { get; set; }
         private DbSet<SnapshotSchema> SnapshotSchemas { get; set; }
         private DbSet<BrainInstance> BrainInstances { get; set; }
@@ -1569,6 +1570,12 @@ namespace BacklashBotData.Data
             await SaveChangesAsync();
         }
 
+        public async Task AddBacktestingLogEntry(LogEntryDTO dto)
+        {
+            BacktestingLogEntries.Add(dto.ToBacktestingLogEntry());
+            await SaveChangesAsync();
+        }
+
         public async Task<List<LogEntryDTO>> GetLogEntries(string? brainInstance = null, string? level = null,
             DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null)
         {
@@ -2334,6 +2341,39 @@ namespace BacklashBotData.Data
                 entity.Property(e => e.Source)
                       .IsRequired()
                       .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<BacktestingLogEntry>(entity =>
+            {
+                entity
+                    .HasKey(e => e.Id);
+
+                entity.Property(e => e.Timestamp)
+                      .IsRequired()
+                      .HasColumnType("datetime");
+
+                entity.Property(e => e.Level)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.SessionIdentifier)
+                      .IsRequired()
+                      .HasMaxLength(5);
+
+                entity.Property(e => e.Message)
+                      .IsRequired()
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Exception)
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Source)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.BrainInstance)
+                      .IsRequired()
+                      .HasMaxLength(50);
             });
 
             modelBuilder.Entity<StratData>()

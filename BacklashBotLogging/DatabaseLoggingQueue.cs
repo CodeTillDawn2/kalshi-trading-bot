@@ -6,6 +6,28 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
+/// <summary>
+/// Enum representing the type of application for logging purposes.
+/// Determines which database table to use for storing log entries.
+/// </summary>
+public enum ApplicationType
+{
+    /// <summary>
+    /// BacklashBot application - logs to t_LogEntries table.
+    /// </summary>
+    Bot,
+
+    /// <summary>
+    /// BacklashOverseer application - logs to t_OverseerLogs table.
+    /// </summary>
+    Overseer,
+
+    /// <summary>
+    /// TradingGUI application - logs to t_BacktestingLogs table.
+    /// </summary>
+    Backtesting
+}
+
 namespace KalshiBotLogging
 {
     /// <summary>
@@ -19,7 +41,7 @@ namespace KalshiBotLogging
     {
         private readonly ConcurrentQueue<LogEntryDTO> _logQueue = new ConcurrentQueue<LogEntryDTO>();
         private readonly IServiceProvider _serviceProvider;
-        private readonly bool _isOverseer;
+        private readonly ApplicationType _applicationType;
         private const int BatchSize = 50; // Configurable batch size for database operations
         private long _totalProcessedLogs;
         private long _totalProcessingTimeMs;
@@ -53,11 +75,11 @@ namespace KalshiBotLogging
         /// Initializes a new instance of the DatabaseLoggingQueue.
         /// </summary>
         /// <param name="serviceProvider">The service provider for dependency injection.</param>
-        /// <param name="isOverseer">Indicates whether this queue is for overseer-specific logging.</param>
-        public DatabaseLoggingQueue(IServiceProvider serviceProvider, bool isOverseer = false)
+        /// <param name="applicationType">The type of application for determining the log table.</param>
+        public DatabaseLoggingQueue(IServiceProvider serviceProvider, ApplicationType applicationType)
         {
             _serviceProvider = serviceProvider;
-            _isOverseer = isOverseer;
+            _applicationType = applicationType;
         }
 
         /// <summary>
@@ -141,16 +163,23 @@ namespace KalshiBotLogging
                         {
                             var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
-                            // Save batch to the appropriate database table based on context
+                            // Save batch to the appropriate database table based on application type
                             foreach (var logEntry in batch)
                             {
-                                if (_isOverseer)
+                                switch (_applicationType)
                                 {
-                                    await context.AddOverseerLogEntry(logEntry);
-                                }
-                                else
-                                {
-                                    await context.AddLogEntry(logEntry);
+                                    case ApplicationType.Bot:
+                                        await context.AddLogEntry(logEntry);
+                                        break;
+                                    case ApplicationType.Overseer:
+                                        await context.AddOverseerLogEntry(logEntry);
+                                        break;
+                                    case ApplicationType.Backtesting:
+                                        await context.AddBacktestingLogEntry(logEntry);
+                                        break;
+                                    default:
+                                        await context.AddLogEntry(logEntry); // fallback
+                                        break;
                                 }
                             }
 

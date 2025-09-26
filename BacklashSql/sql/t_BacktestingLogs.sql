@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[t_BacktestingLogs](
 	[Message] [nvarchar](max) NOT NULL,
 	[Exception] [nvarchar](max) NULL,
 	[Source] [nvarchar](255) NOT NULL,
-	[SimulatorInstance] [varchar](50) NOT NULL,
+	[BrainInstance] [varchar](50) NOT NULL,
 	[SessionIdentifier] [char](5) NOT NULL,
 	[Environment] [varchar](10) NOT NULL,
 PRIMARY KEY CLUSTERED 
