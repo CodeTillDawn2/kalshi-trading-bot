@@ -90,7 +90,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="scenario">The trading scenario containing strategies organized by market conditions.</param>
         /// <param name="snapshots">The sequence of market snapshots to simulate against, in chronological order.</param>
         /// <param name="isSingleStrategy">Whether to run in single-strategy mode (modifies paths in-place) or multi-strategy mode (creates new path branches).</param>
-        /// <returns>A list of completed simulation paths, each representing a possible outcome of the trading scenario.</returns>
+        /// <returns>A task that returns a list of completed simulation paths, each representing a possible outcome of the trading scenario.</returns>
         /// <remarks>
         /// This method orchestrates the entire simulation process:
         /// 1. Initializes simulation paths with starting conditions
@@ -106,7 +106,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Risk controls and position limits
         /// - Multiple concurrent strategy paths
         /// </remarks>
-        public List<SimulationPath> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
+        public async Task<List<SimulationPath>> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
         {
             if (scenario == null) throw new ArgumentNullException(nameof(scenario));
             if (snapshots == null) throw new ArgumentNullException(nameof(snapshots));
@@ -149,7 +149,7 @@ namespace TradingStrategies.Trading.Overseer
 
                     if (!path.StrategiesByMarketConditions.TryGetValue(currentMarketConditions, out var activeStrategies) || !activeStrategies.Any())
                     {
-                        var newPath = HandleScenarioWithNoActiveStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
+                        var newPath = await HandleScenarioWithNoActiveStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
                         newPaths.Add(newPath);
                         continue;
                     }
@@ -158,7 +158,7 @@ namespace TradingStrategies.Trading.Overseer
 
                     foreach (var kvp in actionGroups)
                     {
-                        var newPath = ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
+                        var newPath = await ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
                             currentMarketConditions, book, isSingleStrategy);
                         if (newPath != null)
                         {
@@ -368,7 +368,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Detects and includes any candlestick patterns
         /// - Preserves resting orders and position information
         /// </remarks>
-        private SimulationPath HandleScenarioWithNoActiveStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
+        private async Task<SimulationPath> HandleScenarioWithNoActiveStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
             SimulatedOrderbook actionBook;
@@ -399,7 +399,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
-            var patterns = DetectPatterns(effectiveSnapshot);
+            var patterns = DetectPatternsAsync(effectiveSnapshot).GetAwaiter().GetResult();
 
             var eventLog = new SimulationEventLog
             {
@@ -507,7 +507,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Logs the action event with comprehensive market metrics
         /// - Returns null if the action execution was skipped due to constraints
         /// </remarks>
-        private SimulationPath ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
+        private async Task<SimulationPath> ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
        MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
        MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
@@ -560,7 +560,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
-            var patterns = DetectPatterns(effectiveSnapshot);
+            var patterns = await DetectPatternsAsync(effectiveSnapshot);
 
             var eventLog = new SimulationEventLog
             {
@@ -991,16 +991,16 @@ namespace TradingStrategies.Trading.Overseer
         /// for analysis of pattern-based trading signals.
         /// Records comprehensive performance metrics to performance monitor if available.
         /// </remarks>
-        private List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
+        private async Task<List<BacklashPatterns.PatternDefinitions.PatternDefinition>> DetectPatternsAsync(MarketSnapshot snapshot)
         {
-            var result = _patternDetectionService.DetectPatterns(snapshot);
+            var result = await _patternDetectionService.DetectPatternsAsync(snapshot);
 
             // Record comprehensive performance metrics if monitor is available and metrics were collected
             if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
             {
                 var metricsDict = new Dictionary<string, object>
                 {
-                    ["MethodName"] = "PatternDetectionService.DetectPatterns",
+                    ["MethodName"] = "PatternDetectionService.DetectPatternsAsync",
                     ["TotalExecutionTimeMs"] = result.ExecutionTimeMs.Value,
                     ["TotalItemsProcessed"] = result.TotalCandlesProcessed ?? 0,
                     ["TotalItemsFound"] = result.TotalPatternsFound ?? 0,

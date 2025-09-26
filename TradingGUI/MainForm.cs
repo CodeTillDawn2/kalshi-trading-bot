@@ -26,7 +26,7 @@ namespace TradingGUI
         private BacklashBotContext _context;
         private IServiceProvider _serviceProvider;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
-        private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "trading_gui_config.json");
+        private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string? _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
@@ -1042,25 +1042,39 @@ namespace TradingGUI
                 if (File.Exists(_configFilePath))
                 {
                     var json = File.ReadAllText(_configFilePath);
-                    var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
+                    var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
 
-                    if (config != null)
+                    if (appSettings != null && appSettings.TryGetValue("TradingGUI", out var tradingGuiObj))
                     {
-                        // Set strategy selection
-                        if (!string.IsNullOrEmpty(config.LastSelectedStrategy) &&
-                            _strategyTypeComboBox.Items.Contains(config.LastSelectedStrategy))
+                        var tradingGuiJson = JsonSerializer.Serialize(tradingGuiObj);
+                        var config = JsonSerializer.Deserialize<TradingGUIConfig>(tradingGuiJson);
+
+                        if (config != null)
                         {
-                            _strategyTypeComboBox.SelectedItem = config.LastSelectedStrategy;
+                            // Set strategy selection
+                            if (!string.IsNullOrEmpty(config.LastSelectedStrategy) &&
+                                _strategyTypeComboBox.Items.Contains(config.LastSelectedStrategy))
+                            {
+                                _strategyTypeComboBox.SelectedItem = config.LastSelectedStrategy;
+                            }
+                            else
+                            {
+                                _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                            }
+
+                            // Set pattern image generation setting
+                            if (_enablePatternImagesCheckBox != null)
+                            {
+                                _enablePatternImagesCheckBox.Checked = config.EnablePatternImageGeneration;
+                            }
                         }
                         else
                         {
                             _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
-                        }
-
-                        // Set pattern image generation setting
-                        if (_enablePatternImagesCheckBox != null)
-                        {
-                            _enablePatternImagesCheckBox.Checked = config.EnablePatternImageGeneration;
+                            if (_enablePatternImagesCheckBox != null)
+                            {
+                                _enablePatternImagesCheckBox.Checked = true; // Default to enabled
+                            }
                         }
                     }
                     else
@@ -1095,8 +1109,16 @@ namespace TradingGUI
                     EnablePatternImageGeneration = _enablePatternImagesCheckBox?.Checked ?? true
                 };
 
-                var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(_configFilePath, json);
+                // Read the entire appsettings.json
+                var json = File.ReadAllText(_configFilePath);
+                var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+
+                // Update the TradingGUI section
+                appSettings["TradingGUI"] = config;
+
+                // Serialize back with indentation
+                var updatedJson = JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(_configFilePath, updatedJson);
             }
             catch (Exception ex)
             {
@@ -1197,11 +1219,21 @@ namespace TradingGUI
                             try
                             {
                                 var json = File.ReadAllText(_configFilePath);
-                                var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
-                                if (config != null && !string.IsNullOrEmpty(config.LastSelectedWeightSet) &&
-                                    _weightSetComboBox.Items.Contains(config.LastSelectedWeightSet))
+                                var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                                if (appSettings != null && appSettings.TryGetValue("TradingGUI", out var tradingGuiObj))
                                 {
-                                    _weightSetComboBox.SelectedItem = config.LastSelectedWeightSet;
+                                    var tradingGuiJson = JsonSerializer.Serialize(tradingGuiObj);
+                                    var config = JsonSerializer.Deserialize<TradingGUIConfig>(tradingGuiJson);
+                                    if (config != null && !string.IsNullOrEmpty(config.LastSelectedWeightSet) &&
+                                        _weightSetComboBox.Items.Contains(config.LastSelectedWeightSet))
+                                    {
+                                        _weightSetComboBox.SelectedItem = config.LastSelectedWeightSet;
+                                    }
+                                    else
+                                    {
+                                        _weightSetComboBox.SelectedIndex = 0;
+                                    }
                                 }
                                 else
                                 {

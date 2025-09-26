@@ -19,12 +19,6 @@ namespace TradingStrategies.Configuration
         [Required(ErrorMessage = "The 'CacheDirectory' is missing in the configuration.")]
         public string CacheDirectory { get; set; } = null!;
 
-        /// <summary>
-        /// Gets or sets the timeout in seconds for processing market data during simulation.
-        /// Default is 300 seconds (5 minutes).
-        /// </summary>
-        [Required(ErrorMessage = "The 'ProcessingTimeoutSeconds' is missing in the configuration.")]
-        public int ProcessingTimeoutSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the file naming pattern for market data JSON files.

@@ -39,11 +39,11 @@ namespace TradingSimulator
 
         /// <summary>
         /// Initializes a new instance of the StrategyResolver class.
-        /// Creates a new StrategySelectionHelper instance for accessing strategy configurations.
         /// </summary>
-        public StrategyResolver()
+        /// <param name="helper">The strategy selection helper for accessing strategy configurations.</param>
+        public StrategyResolver(StrategySelectionHelper helper)
         {
-            _helper = new StrategySelectionHelper();
+            _helper = helper;
         }
 
         /// <summary>

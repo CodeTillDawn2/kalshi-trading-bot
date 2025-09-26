@@ -204,13 +204,19 @@ namespace TradingSimulator.Simulator
                     throw new ArgumentException($"Market snapshot at index {i} has invalid or missing market ticker.", nameof(snapshots));
 
                 if (snapshot.Timestamp == default)
-                    throw new ArgumentException($"Market snapshot at index {i} has invalid timestamp.", nameof(snapshots));
+                    throw new ArgumentException($"Market snapshot at index {i} has invalid timestamp (default value).", nameof(snapshots));
 
-                if (snapshot.BestYesBid <= 0 || snapshot.BestYesAsk <= 0)
-                    throw new ArgumentException($"Market snapshot at index {i} has invalid bid/ask prices.", nameof(snapshots));
+                if (snapshot.BestYesBid <= 0)
+                    throw new ArgumentException($"Market snapshot at index {i} for market '{snapshot.MarketTicker}' at {snapshot.Timestamp} has invalid BestYesBid: {snapshot.BestYesBid} (must be > 0).", nameof(snapshots));
 
-                if (snapshot.TotalOrderbookDepth_Yes < 0 || snapshot.TotalOrderbookDepth_No < 0)
-                    throw new ArgumentException($"Market snapshot at index {i} has negative orderbook depth.", nameof(snapshots));
+                if (snapshot.BestYesAsk <= 0)
+                    throw new ArgumentException($"Market snapshot at index {i} for market '{snapshot.MarketTicker}' at {snapshot.Timestamp} has invalid BestYesAsk: {snapshot.BestYesAsk} (must be > 0).", nameof(snapshots));
+
+                if (snapshot.TotalOrderbookDepth_Yes < 0)
+                    throw new ArgumentException($"Market snapshot at index {i} for market '{snapshot.MarketTicker}' at {snapshot.Timestamp} has negative TotalOrderbookDepth_Yes: {snapshot.TotalOrderbookDepth_Yes}.", nameof(snapshots));
+
+                if (snapshot.TotalOrderbookDepth_No < 0)
+                    throw new ArgumentException($"Market snapshot at index {i} for market '{snapshot.MarketTicker}' at {snapshot.Timestamp} has negative TotalOrderbookDepth_No: {snapshot.TotalOrderbookDepth_No}.", nameof(snapshots));
             }
 
             // Check for chronological order

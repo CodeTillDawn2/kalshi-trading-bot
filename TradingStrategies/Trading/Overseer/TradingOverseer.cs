@@ -111,7 +111,7 @@ namespace TradingStrategies.Trading.Overseer
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
-            var activePaths = await Task.Run(() => _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy));
+            var activePaths = await _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy);
 
             var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 

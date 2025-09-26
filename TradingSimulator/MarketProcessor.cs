@@ -27,10 +27,6 @@ namespace TradingSimulator
         /// </summary>
         public string FileNameTemplate { get; set; } = "{MarketTicker}{Suffix}.json";
 
-        /// <summary>
-        /// Timeout in seconds for processing operations.
-        /// </summary>
-        public int ProcessingTimeoutSeconds { get; set; } = 300;
 
         /// <summary>
         /// Maximum number of markets to process concurrently in batch operations.
@@ -168,13 +164,16 @@ namespace TradingSimulator
             foreach (var snapshot in marketSnapshots)
             {
                 if (snapshot.Timestamp == default)
-                    throw new ArgumentException("Market snapshot has invalid timestamp.", nameof(marketSnapshots));
+                    throw new ArgumentException($"Market '{marketTicker}' snapshot has invalid timestamp (default value).", nameof(marketSnapshots));
 
-                if (snapshot.BestYesBid <= 0 || snapshot.BestYesAsk <= 0)
-                    throw new ArgumentException("Market snapshot has invalid bid/ask prices.", nameof(marketSnapshots));
+                if (snapshot.BestYesBid <= 0)
+                    throw new ArgumentException($"Market '{marketTicker}' snapshot at {snapshot.Timestamp} has invalid BestYesBid: {snapshot.BestYesBid} (must be > 0).", nameof(marketSnapshots));
+
+                if (snapshot.BestYesAsk <= 0)
+                    throw new ArgumentException($"Market '{marketTicker}' snapshot at {snapshot.Timestamp} has invalid BestYesAsk: {snapshot.BestYesAsk} (must be > 0).", nameof(marketSnapshots));
 
                 if (snapshot.BestYesBid >= snapshot.BestYesAsk)
-                    throw new ArgumentException("Market snapshot bid price must be less than ask price.", nameof(marketSnapshots));
+                    throw new ArgumentException($"Market '{marketTicker}' snapshot at {snapshot.Timestamp} has invalid bid/ask relationship: BestYesBid={snapshot.BestYesBid} >= BestYesAsk={snapshot.BestYesAsk}.", nameof(marketSnapshots));
             }
         }
 
@@ -275,25 +274,9 @@ namespace TradingSimulator
                     OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
                 }
 
-                // Run simulation with timeout
+                // Run simulation
                 var scenario = new Scenario(strategiesDict);
-                var simulationTask = Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
-                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(_config.ProcessingTimeoutSeconds));
-                var completedTask = await Task.WhenAny(simulationTask, timeoutTask);
-
-                var pathData = new List<(PathPerformance performance, List<SimulationEventLog> events)>();
-                if (completedTask == simulationTask)
-                {
-                    pathData = await simulationTask;
-                }
-                else
-                {
-                    OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_config.ProcessingTimeoutSeconds}s) for {marketTicker}. Skipping.");
-                    processingTime = DateTime.UtcNow - startTime;
-                    _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-                    _performanceMonitor.RecordExecutionTime("ProcessMarketTimeout", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
-                    return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
-                }
+                var pathData = await _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group);
 
                 if (pathData.Any())
                 {
