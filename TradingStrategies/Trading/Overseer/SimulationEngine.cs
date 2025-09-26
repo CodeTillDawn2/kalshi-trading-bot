@@ -288,7 +288,8 @@ namespace TradingStrategies.Trading.Overseer
                 if (order.expiration.HasValue && order.expiration < timestamp)
                 {
                     var targetBook = (order.action == "buy" && order.side == "yes") || (order.action == "sell" && order.side == "no") ? path.SimulatedBook.YesBids : path.SimulatedBook.NoBids;
-                    path.SimulatedBook.ReduceDepth(targetBook, order.price, order.count);
+                    int bookPrice = (order.action == "buy" && order.side == "yes") || (order.action == "sell" && order.side == "no") ? order.price : (order.action == "sell" && order.side == "yes" ? 100 - order.price : 100 - order.price);
+                    path.SimulatedBook.ReduceDepth(targetBook, bookPrice, order.count);
                     path.SimulatedRestingOrders.RemoveAt(i);
                 }
             }
@@ -686,7 +687,7 @@ namespace TradingStrategies.Trading.Overseer
                     int noBidPx = 100 - sellPriceYes;
                     if (sellPriceYes > 0 && sellPriceYes < 100 && noBidPx >= 1 && noBidPx <= 99)
                     {
-                        actionBook.AddToDepth(actionBook.NoBids, noBidPx, desiredQty, timestamp);
+                        actionBook.AddToDepth(actionBook.NoBids, noBidPx, desiredQty, timestamp, isOwn: true);
                         actionResting.Add(("sell", "yes", "limit", desiredQty, sellPriceYes, decision.Expiration));
                     }
                 }
@@ -695,7 +696,7 @@ namespace TradingStrategies.Trading.Overseer
                     int yesBidPx = decision.Price;
                     if (yesBidPx > 0 && yesBidPx < 100)
                     {
-                        actionBook.AddToDepth(actionBook.YesBids, yesBidPx, desiredQty, timestamp);
+                        actionBook.AddToDepth(actionBook.YesBids, yesBidPx, desiredQty, timestamp, isOwn: true);
                         actionResting.Add(("buy", "yes", "limit", desiredQty, yesBidPx, decision.Expiration));
                     }
                 }
@@ -718,11 +719,12 @@ namespace TradingStrategies.Trading.Overseer
 
                 double remainingCash = newCash;
 
-                for (int p = 99; p >= 1; p--)
+                foreach (var kvp in bookToReduce.Reverse()) // Highest prices first
                 {
+                    int p = kvp.Key;
                     if (remainingQty <= 0) break;
-                    if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
-                    int depth = bookToReduce[p].Sum(o => o.count);
+                    if (!kvp.Value.Any()) continue;
+                    int depth = kvp.Value.Sum(o => o.Count);
                     double levelPrice = LevelPriceFunc(p);
                     int maxFillByCash = isPaying ? (int)Math.Floor(remainingCash / levelPrice) : depth;
                     int maxFill = Math.Min(depth, maxFillByCash);
@@ -766,7 +768,7 @@ namespace TradingStrategies.Trading.Overseer
                 DateTime? exp = decision.Expiration;
                 if (limitPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, postQty, effectiveSnapshot.Timestamp, isOwn: true);
                     actionResting.Add(("buy", "yes", "limit", postQty, limitPrice, exp));
                 }
             }
@@ -779,7 +781,7 @@ namespace TradingStrategies.Trading.Overseer
                 DateTime? exp = decision.Expiration;
                 if (bidPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, postQty, effectiveSnapshot.Timestamp, isOwn: true);
                     actionResting.Add(("sell", "yes", "limit", postQty, sellPrice, exp));
                 }
             }

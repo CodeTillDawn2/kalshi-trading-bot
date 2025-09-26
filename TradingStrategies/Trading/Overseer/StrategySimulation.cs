@@ -168,7 +168,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Initialize book if first snapshot
-            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
+            if (SimulatedBook.YesBids.Count == 0 && SimulatedBook.NoBids.Count == 0)
             {
                 SimulatedBook.InitializeFromSnapshot(snapshot);
             }
@@ -265,11 +265,12 @@ namespace TradingStrategies.Trading.Overseer
             bool isPaying = longSide || (shortSide && action != ActionType.Exit);
             double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
-            for (int p = 100; p >= 0; p--)
+            foreach (var kvp in bookToReduce.Reverse()) // Highest prices first
             {
+                int p = kvp.Key;
                 if (remainingQuantity <= 0) break;
-                if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
-                int depth = bookToReduce[p].Sum(o => o.count);
+                if (!kvp.Value.Any()) continue;
+                int depth = kvp.Value.Sum(o => o.Count);
                 int fill = Math.Min(remainingQuantity, depth);
                 double levelPrice = LevelPriceFunc(p);
                 totalCost += fill * levelPrice;
@@ -356,7 +357,7 @@ namespace TradingStrategies.Trading.Overseer
                     bool isAskYes = o.action == "sell" && o.side == "yes";
                     bool isAskNo = o.action == "sell" && o.side == "no";
 
-                    List<(int count, DateTime timestamp)>[] book;
+                    SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book;
                     int bookPrice;
 
                     if (isBidYes) { book = SimulatedBook.YesBids; bookPrice = o.price; }
@@ -364,20 +365,7 @@ namespace TradingStrategies.Trading.Overseer
                     else if (isAskYes) { book = SimulatedBook.NoBids; bookPrice = 100 - o.price; }
                     else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
-                    int toCancel = o.count;
-                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    {
-                        var lst = book[bookPrice];
-                        for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
-                        {
-                            var e = lst[j];
-                            int take = Math.Min(toCancel, e.count);
-                            e.count -= take;
-                            toCancel -= take;
-                            if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
-                        }
-                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
-                    }
+                    SimulatedBook.ReduceDepth(book, bookPrice, o.count, fromFront: false);
                 }
                 SimulatedRestingOrders.Clear();
                 return;
@@ -393,17 +381,13 @@ namespace TradingStrategies.Trading.Overseer
 
             if (action == ActionType.PostYes)
             {
-                if (SimulatedBook.YesBids[limitPrice] == null)
-                    SimulatedBook.YesBids[limitPrice] = new List<(int count, DateTime timestamp)>();
-                SimulatedBook.YesBids[limitPrice].Add((qty, effectiveSnapshot.Timestamp));
+                SimulatedBook.AddToDepth(SimulatedBook.YesBids, limitPrice, qty, effectiveSnapshot.Timestamp, isOwn: true);
             }
             else // PostAsk (sell YES) => rests on NO bids at (100 - ask)
             {
                 int noBidPrice = 100 - limitPrice;
                 if (noBidPrice < 0 || noBidPrice > 100) return;
-                if (SimulatedBook.NoBids[noBidPrice] == null)
-                    SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
-                SimulatedBook.NoBids[noBidPrice].Add((qty, effectiveSnapshot.Timestamp));
+                SimulatedBook.AddToDepth(SimulatedBook.NoBids, noBidPrice, qty, effectiveSnapshot.Timestamp, isOwn: true);
             }
 
             SimulatedRestingOrders.Add((limitAction, limitSide, "limit", qty, limitPrice, exp));
@@ -470,78 +454,128 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         private void SimulateFillsFromDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime currentTime)
         {
-            for (int i = SimulatedRestingOrders.Count - 1; i >= 0; i--)
+            // Group resting orders by book and price
+            var ordersByBookPrice = new Dictionary<(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book, int price), List<int>>();
+
+            for (int i = 0; i < SimulatedRestingOrders.Count; i++)
             {
                 var o = SimulatedRestingOrders[i];
-
-                bool isBidYes = o.action == "buy"  && o.side == "yes";
-                bool isBidNo = o.action == "buy"  && o.side == "no";
+                bool isBidYes = o.action == "buy" && o.side == "yes";
+                bool isBidNo = o.action == "buy" && o.side == "no";
                 bool isAskYes = o.action == "sell" && o.side == "yes";
                 bool isAskNo = o.action == "sell" && o.side == "no";
 
-                List<(int count, DateTime timestamp)>[] book;
-                Dictionary<int, int> deltas;
+                SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book;
                 int bookPrice;
 
-                if (isBidYes) { book = SimulatedBook.YesBids; deltas = yesDeltas; bookPrice = o.price; }
-                else if (isBidNo) { book = SimulatedBook.NoBids; deltas = noDeltas; bookPrice = o.price; }
-                else if (isAskYes) { book = SimulatedBook.NoBids; deltas = noDeltas; bookPrice = 100 - o.price; }
-                else { book = SimulatedBook.YesBids; deltas = yesDeltas; bookPrice = 100 - o.price; }
+                if (isBidYes) { book = SimulatedBook.YesBids; bookPrice = o.price; }
+                else if (isBidNo) { book = SimulatedBook.NoBids; bookPrice = o.price; }
+                else if (isAskYes) { book = SimulatedBook.NoBids; bookPrice = 100 - o.price; }
+                else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
-                // Handle expiration: remove from the back (our own orders)
-                if (o.expiration.HasValue && o.expiration < currentTime)
-                {
-                    int toCancel = o.count;
-                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    {
-                        var lst = book[bookPrice];
-                        for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
-                        {
-                            var e = lst[j];
-                            int take = Math.Min(toCancel, e.count);
-                            e.count -= take;
-                            toCancel -= take;
-                            if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
-                        }
-                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
-                    }
-                    SimulatedRestingOrders.RemoveAt(i);
-                    continue;
-                }
+                var key = (book, bookPrice);
+                if (!ordersByBookPrice.ContainsKey(key)) ordersByBookPrice[key] = new List<int>();
+                ordersByBookPrice[key].Add(i);
+            }
 
-                if (deltas == null || !deltas.TryGetValue(bookPrice, out int deltaAtPrice) || deltaAtPrice >= 0)
-                    continue; // no reduction at our price -> no taker hit, or volume added
+            // Process each price level with negative delta
+            foreach (var kvp in ordersByBookPrice)
+            {
+                var (book, bookPrice) = kvp.Key;
+                var orderIndices = kvp.Value;
 
-                // Respect FIFO: your fill begins only after everything *ahead* of you has been consumed.
-                int totalDepth = 0;
-                if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    totalDepth = book[bookPrice].Sum(t => t.count);
+                Dictionary<int, int> deltas = (book == SimulatedBook.YesBids) ? yesDeltas : noDeltas;
+                if (!deltas.TryGetValue(bookPrice, out int deltaAtPrice) || deltaAtPrice >= 0) continue;
 
-                int depthAhead = Math.Max(0, totalDepth - o.count);
+                if (!book.TryGetValue(bookPrice, out var list)) continue;
+
                 int consumed = -deltaAtPrice;
 
-                int fillQuantity = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
-                if (fillQuantity <= 0) continue;
-
-                double px = o.price / 100.0;
-                if (isBidYes || isBidNo)
+                // Consume from front
+                int consumedSoFar = 0;
+                for (int j = 0; j < list.Count && consumedSoFar < consumed; j++)
                 {
-                    Cash     -= fillQuantity * px;
-                    Position += (o.side == "yes" ? fillQuantity : -fillQuantity);
-                }
-                else
-                {
-                    Cash     += fillQuantity * px;
-                    Position -= (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    var orderLevel = list[j];
+                    int take = Math.Min(consumed - consumedSoFar, orderLevel.Count);
+                    consumedSoFar += take;
+                    orderLevel.Count -= take;
                 }
 
-                o.count -= fillQuantity;
+                // Remove zero count orders
+                list.RemoveAll(ol => ol.Count <= 0);
 
-                // External taker consumed book from the *front* at this price
-                SimulatedBook.ReduceDepth(book, bookPrice, fillQuantity);
+                // Now, for our orders, calculate fills based on position in list
+                foreach (int orderIndex in orderIndices.OrderBy(i => i)) // Process in order added
+                {
+                    var o = SimulatedRestingOrders[orderIndex];
 
-                if (o.count <= 0) SimulatedRestingOrders.RemoveAt(i);
-                else SimulatedRestingOrders[i] = o;
+                    // Find this order's position in the list
+                    int orderPosition = -1;
+                    int depthAhead = 0;
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        if (list[j].IsOwnOrder)
+                        {
+                            orderPosition++;
+                            if (orderPosition == orderIndices.IndexOf(orderIndex)) // This is our order
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            depthAhead += list[j].Count;
+                        }
+                    }
+
+                    int fillQuantity = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
+                    if (fillQuantity <= 0) continue;
+
+                    double px = o.price / 100.0;
+                    bool isBid = o.action == "buy";
+                    if (isBid)
+                    {
+                        Cash -= fillQuantity * px;
+                        Position += (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    }
+                    else
+                    {
+                        Cash += fillQuantity * px;
+                        Position -= (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    }
+
+                    o.count -= fillQuantity;
+                    if (o.count <= 0)
+                    {
+                        SimulatedRestingOrders.RemoveAt(orderIndex);
+                        // Remove from list
+                        for (int j = list.Count - 1; j >= 0; j--)
+                        {
+                            if (list[j].IsOwnOrder)
+                            {
+                                list[j].Count -= fillQuantity;
+                                if (list[j].Count <= 0)
+                                {
+                                    list.RemoveAt(j);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SimulatedRestingOrders[orderIndex] = o;
+                        // Update in list
+                        for (int j = list.Count - 1; j >= 0; j--)
+                        {
+                            if (list[j].IsOwnOrder)
+                            {
+                                list[j].Count -= fillQuantity;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -655,7 +689,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Initialize book if first snapshot
-            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
+            if (SimulatedBook.YesBids.Count == 0 && SimulatedBook.NoBids.Count == 0)
             {
                 SimulatedBook.InitializeFromSnapshot(snapshot);
             }

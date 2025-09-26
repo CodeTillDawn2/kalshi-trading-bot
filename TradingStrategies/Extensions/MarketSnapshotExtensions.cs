@@ -161,7 +161,7 @@ namespace TradingStrategies.Extensions
         /// <summary>
         /// Calculates the cumulative depth of bid orders within a tolerance percentage of the best bid price.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <param name="bestBid">The best (highest) bid price to use as reference.</param>
         /// <param name="tolerancePct">Tolerance percentage (e.g., 5.0 for 5%) defining the price range.</param>
         /// <returns>Total contract count within the tolerance range below the best bid.</returns>
@@ -170,18 +170,18 @@ namespace TradingStrategies.Extensions
         /// calculated as bestBid * (1 - tolerancePct/100). It provides insight into the depth of
         /// the order book near the best bid, useful for assessing market liquidity and slippage potential.
         /// Only considers prices within the valid 1-99 range.
-        /// Handles null input arrays by returning 0.
+        /// Handles null input dictionaries by returning 0.
         /// </remarks>
-        private static int CalculateCumulativeDepth(List<(int count, DateTime timestamp)>[] bids, int bestBid, double tolerancePct)
+        private static int CalculateCumulativeDepth(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids, int bestBid, double tolerancePct)
         {
             if (bids == null) return 0;
             int cumulative = 0;
             double minPrice = bestBid * (1 - tolerancePct / 100.0);
             for (int p = bestBid; p >= minPrice && p >= 1; p--)
             {
-                if (bids[p] != null)
+                if (bids.TryGetValue(p, out var queue))
                 {
-                    cumulative += bids[p].Sum(o => o.count);
+                    cumulative += queue.Sum(o => o.Count);
                 }
             }
             return cumulative;
@@ -190,107 +190,81 @@ namespace TradingStrategies.Extensions
         /// <summary>
         /// Calculates the price range (max - min) of all active bid orders in the order book.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <returns>The difference between the highest and lowest bid prices with active orders.</returns>
         /// <remarks>
         /// This method scans all price levels to find the minimum and maximum prices that have
         /// at least one resting order. The range indicates the spread of bid prices in the order book,
         /// which can be useful for assessing market concentration and liquidity distribution.
         /// Returns 0 if no active bids exist.
-        /// Handles null input arrays by returning 0.
+        /// Handles null input dictionaries by returning 0.
         /// </remarks>
-        private static int CalculateBidRange(List<(int count, DateTime timestamp)>[] bids)
+        private static int CalculateBidRange(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids)
         {
-            if (bids == null) return 0;
-            int maxPrice = 0;
-            int minPrice = 100;
-            for (int p = 1; p <= 99; p++)
-            {
-                if (bids[p] != null && bids[p].Count > 0)
-                {
-                    if (p > maxPrice) maxPrice = p;
-                    if (p < minPrice) minPrice = p;
-                }
-            }
-            return maxPrice > 0 ? maxPrice - minPrice : 0;
+            if (bids == null || bids.Count == 0) return 0;
+            int maxPrice = bids.Keys.Max();
+            int minPrice = bids.Keys.Min();
+            return maxPrice - minPrice;
         }
 
         /// <summary>
         /// Calculates the total number of contracts across all bid orders in the order book.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <returns>Total contract count across all price levels.</returns>
         /// <remarks>
         /// This method sums the contract counts from all price levels that have active orders.
         /// It provides a measure of the total market participation at the bid side, useful for
         /// assessing overall market liquidity and order book size.
-        /// Handles null input arrays by returning 0.
+        /// Handles null input dictionaries by returning 0.
         /// </remarks>
-        private static int CalculateTotalContracts(List<(int count, DateTime timestamp)>[] bids)
+        private static int CalculateTotalContracts(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids)
         {
             if (bids == null) return 0;
-            int total = 0;
-            for (int p = 1; p <= 99; p++)
-            {
-                if (bids[p] != null)
-                {
-                    total += bids[p].Sum(o => o.count);
-                }
-            }
-            return total;
+            return bids.Values.Sum(queue => queue.Sum(o => o.Count));
         }
 
 
         /// <summary>
         /// Calculates the total dollar volume of all bid orders in the order book.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <returns>Total dollar volume as double (price in cents * contract count).</returns>
         /// <remarks>
         /// Volume is calculated as the sum of (price * contract_count) for all orders at each price level.
         /// This provides the total dollar value of all resting bid orders, useful for liquidity analysis.
         /// Prices are assumed to be in cents (1-99 range) as per Kalshi market conventions.
-        /// Handles null input arrays by returning 0.0.
+        /// Handles null input dictionaries by returning 0.0.
         /// </remarks>
-        private static double CalculateTotalVolume(List<(int count, DateTime timestamp)>[] bids)
+        private static double CalculateTotalVolume(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids)
         {
             if (bids == null) return 0.0;
-            double total = 0;
-            for (int p = 1; p <= 99; p++)
-            {
-                if (bids[p] != null)
-                {
-                    total += bids[p].Sum(o => p * o.count);
-                }
-            }
-            return total;
+            return bids.Sum(kvp => kvp.Key * kvp.Value.Sum(o => o.Count));
         }
 
         /// <summary>
         /// Calculates the total depth of the top N highest-priced bid levels in the order book.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <param name="n">Number of top price levels to include in the calculation.</param>
         /// <returns>Total contract count across the top N price levels.</returns>
         /// <remarks>
-        /// This method starts from the highest price (99) and works downward, summing contract counts
+        /// This method starts from the highest price and works downward, summing contract counts
         /// at each price level until it has processed N levels with active orders. It provides insight
         /// into the concentration of liquidity at the best bid prices, useful for assessing market depth
         /// and potential execution quality. If fewer than N levels have orders, it sums all available levels.
-        /// Handles null input arrays by returning 0.
+        /// Handles null input dictionaries by returning 0.
         /// </remarks>
-        private static int CalculateTopNDepth(List<(int count, DateTime timestamp)>[] bids, int n)
+        private static int CalculateTopNDepth(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids, int n)
         {
             if (bids == null) return 0;
             int depth = 0;
             int count = 0;
-            for (int p = 99; p >= 1 && count < n; p--)
+            foreach (var kvp in bids.Reverse())
             {
-                if (bids[p] != null && bids[p].Count > 0)
-                {
-                    depth += bids[p].Sum(o => o.count);
-                    count++;
-                }
+                if (count >= n) break;
+                depth += kvp.Value.Sum(o => o.Count);
+                count++;
             }
             return depth;
         }
@@ -298,28 +272,25 @@ namespace TradingStrategies.Extensions
         /// <summary>
         /// Calculates the center of mass (weighted average price) of all bid orders in the order book.
         /// </summary>
-        /// <param name="bids">Array of bid order lists indexed by price (1-99).</param>
+        /// <param name="bids">Dictionary of bid order queues indexed by price (1-99).</param>
         /// <returns>Weighted average price of all resting bid orders, or 0 if no orders exist.</returns>
         /// <remarks>
         /// The center of mass is calculated as the sum of (price * contract_count) divided by total contract count.
         /// This provides a measure of where the majority of the order book liquidity is concentrated,
         /// useful for understanding the distribution of bids and potential price levels of interest.
         /// A higher center of mass indicates bids are concentrated at higher prices, suggesting bullish sentiment.
-        /// Handles null input arrays by returning 0.0.
+        /// Handles null input dictionaries by returning 0.0.
         /// </remarks>
-        private static double CalculateCenterOfMass(List<(int count, DateTime timestamp)>[] bids)
+        private static double CalculateCenterOfMass(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> bids)
         {
             if (bids == null) return 0.0;
             double weightedSum = 0;
             int totalMass = 0;
-            for (int p = 1; p <= 99; p++)
+            foreach (var kvp in bids)
             {
-                if (bids[p] != null)
-                {
-                    int levelCount = bids[p].Sum(o => o.count);
-                    weightedSum += p * levelCount;
-                    totalMass += levelCount;
-                }
+                int levelCount = kvp.Value.Sum(o => o.Count);
+                weightedSum += kvp.Key * levelCount;
+                totalMass += levelCount;
             }
             return totalMass > 0 ? weightedSum / totalMass : 0;
         }
