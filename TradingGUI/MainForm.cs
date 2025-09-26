@@ -2,6 +2,7 @@
 using BacklashBotData.Data;
 using BacklashDTOs;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ScottPlot.Plottable;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -25,6 +26,7 @@ namespace TradingGUI
         private TradingSimulatorService _simulator;
         private BacklashBotContext _context;
         private IServiceProvider _serviceProvider;
+        private ILogger<MainForm> _logger;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
@@ -144,6 +146,7 @@ namespace TradingGUI
             _simulator = simulator;
             _context = context;
             _serviceProvider = serviceProvider;
+            _logger = _serviceProvider.GetRequiredService<ILogger<MainForm>>();
             _simulator.EnsureInitialized();
 
             // Set up event handlers for the simulator
@@ -478,8 +481,11 @@ namespace TradingGUI
         }
 
 
-        private void AppendLog(string msg)
+        private void AppendLog(string msg, LogLevel level = LogLevel.Information)
         {
+            // Log to the database logger
+            _logger.Log(level, msg);
+
             if (rtbLog.InvokeRequired)
             {
                 rtbLog.BeginInvoke(new Action(() =>
@@ -542,7 +548,7 @@ namespace TradingGUI
                 formsPlot1,
                 _cacheDir,
                 market,
-                AppendLog);
+                msg => AppendLog(msg));
 
             _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Black, 1);
             _hoverLine.IsVisible = false;

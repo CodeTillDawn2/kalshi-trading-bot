@@ -9,10 +9,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Management;
+using System.Timers;
 using TradingGUI.Configuration;
 using TradingSimulator;
 using TradingStrategies.Configuration;
 using TradingStrategies.Trading.Overseer;
+using BacklashBotData.Data.Interfaces;
 
 namespace TradingGUI
 {
@@ -59,25 +61,10 @@ namespace TradingGUI
 
             // Register DatabaseLoggingQueue as a singleton
             services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), ApplicationType.Backtesting));
+            services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             // Register ILoggerFactory
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
-
-            // Re-enable custom logger provider
-            services.AddSingleton<ILoggerProvider>(provider =>
-            {
-                var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
-                var instanceNameConfig = provider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
-                var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
-
-                return new DatabaseLoggerProvider(
-                    provider.GetRequiredService<DatabaseLoggingQueue>(),
-                    loggingConfig,
-                    instanceNameConfig.Name,
-                    minLevel,
-                    null, // sessionIdentifier
-                    loggingConfig.Environment);
-            });
 
             // Register BacklashBotData configuration
             services.AddOptions<BacklashBotDataConfig>()
@@ -96,6 +83,7 @@ namespace TradingGUI
                 var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
                 return new BacklashBotContext(connectionString, logger, dataConfig);
             });
+            services.AddTransient<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
 
             // Register TradingSimulatorService
             services.AddScoped<TradingSimulatorService>();
@@ -144,6 +132,30 @@ namespace TradingGUI
                     sp));
 
             var serviceProvider = services.BuildServiceProvider();
+
+            // Configure custom logger provider
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            var loggingConfig = serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+            var instanceNameConfig = serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
+            var minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
+            var loggerProvider = new DatabaseLoggerProvider(
+                serviceProvider.GetRequiredService<DatabaseLoggingQueue>(),
+                loggingConfig,
+                instanceNameConfig.Name,
+                minLevel,
+                null, // sessionIdentifier
+                loggingConfig.Environment);
+            loggerFactory.AddProvider(loggerProvider);
+
+            // Set up periodic processing of the database logging queue
+            var loggingQueue = serviceProvider.GetRequiredService<DatabaseLoggingQueue>();
+            var timer = new System.Timers.Timer(100); // Process every 100ms
+            timer.Elapsed += async (s, e) => await loggingQueue.ProcessQueueAsync();
+            timer.Start();
+
+            // Test logging
+            var logger = serviceProvider.GetRequiredService<ILogger<object>>();
+            logger.LogInformation("TradingGUI started");
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();

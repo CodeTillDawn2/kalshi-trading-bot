@@ -83,14 +83,12 @@ namespace KalshiBotLogging
         }
 
         /// <summary>
-        /// Enqueues a log entry for asynchronous database storage with batching support.
+        /// Enqueues a log entry for database storage with batching support.
         /// </summary>
         /// <param name="logEntry">The log entry to be stored in the database.</param>
-        /// <returns>A task representing the asynchronous enqueue operation.</returns>
-        public Task EnqueueDBLogsAsync(LogEntryDTO logEntry)
+        public void EnqueueDBLogs(LogEntryDTO logEntry)
         {
             _logQueue.Enqueue(logEntry);
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -130,6 +128,77 @@ namespace KalshiBotLogging
         }
 
         /// <summary>
+        /// Processes a batch of log entries from the queue and saves them to the database.
+        /// This method can be called manually for applications that don't use the hosted service.
+        /// </summary>
+        /// <returns>A task representing the processing operation.</returns>
+        public async Task ProcessQueueAsync()
+        {
+            var batch = new List<LogEntryDTO>();
+
+            // Collect batch of log entries
+            while (batch.Count < BatchSize && _logQueue.TryDequeue(out var logEntry))
+            {
+                batch.Add(logEntry);
+            }
+
+            if (batch.Count > 0)
+            {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                try
+                {
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+
+                        // Save batch to the appropriate database table based on application type
+                        foreach (var logEntry in batch)
+                        {
+                            switch (_applicationType)
+                            {
+                                case ApplicationType.Bot:
+                                    await context.AddLogEntry(logEntry);
+                                    break;
+                                case ApplicationType.Overseer:
+                                    await context.AddOverseerLogEntry(logEntry);
+                                    break;
+                                case ApplicationType.Backtesting:
+                                    await context.AddBacktestingLogEntry(logEntry);
+                                    break;
+                                default:
+                                    await context.AddLogEntry(logEntry); // fallback
+                                    break;
+                            }
+                        }
+
+                        // Update metrics
+                        Interlocked.Add(ref _totalProcessedLogs, batch.Count);
+                        Interlocked.Add(ref _totalProcessingTimeMs, stopwatch.ElapsedMilliseconds);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log database failure to console with structured format
+                    var errorMessage = $"DatabaseLoggingQueue: Failed to save batch of {batch.Count} log entries - {ex.Message}";
+                    if (ex.InnerException != null)
+                    {
+                        errorMessage += $" | Inner: {ex.InnerException.Message}";
+                    }
+                    Console.WriteLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [ERROR] {errorMessage}");
+
+                    // Log details of failed entries
+                    foreach (var logEntry in batch)
+                    {
+                        Console.WriteLine($"{logEntry.Timestamp:yyyy-MM-dd HH:mm:ss} [{logEntry.Level}] {logEntry.Source}: {logEntry.Message}");
+                    }
+                }
+
+                batch.Clear();
+            }
+        }
+
+        /// <summary>
         /// Executes the background processing loop for database logging with batching support.
         /// Continuously processes log entries from the queue in batches and saves them to the database for improved performance.
         /// Tracks processing metrics including queue depth and processing times.
@@ -140,74 +209,11 @@ namespace KalshiBotLogging
         {
             Console.WriteLine("DatabaseLoggingQueue starting at {0}", DateTime.UtcNow);
 
-            // Add a small delay before starting to process logs to avoid startup contention
-            await Task.Delay(2000, stoppingToken);
-
-            var batch = new List<LogEntryDTO>();
-
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Collect batch of log entries
-                while (batch.Count < BatchSize && _logQueue.TryDequeue(out var logEntry))
-                {
-                    batch.Add(logEntry);
-                }
+                await ProcessQueueAsync();
 
-                if (batch.Count > 0)
-                {
-                    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-                    try
-                    {
-                        using (var scope = _serviceProvider.CreateScope())
-                        {
-                            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-
-                            // Save batch to the appropriate database table based on application type
-                            foreach (var logEntry in batch)
-                            {
-                                switch (_applicationType)
-                                {
-                                    case ApplicationType.Bot:
-                                        await context.AddLogEntry(logEntry);
-                                        break;
-                                    case ApplicationType.Overseer:
-                                        await context.AddOverseerLogEntry(logEntry);
-                                        break;
-                                    case ApplicationType.Backtesting:
-                                        await context.AddBacktestingLogEntry(logEntry);
-                                        break;
-                                    default:
-                                        await context.AddLogEntry(logEntry); // fallback
-                                        break;
-                                }
-                            }
-
-                            // Update metrics
-                            Interlocked.Add(ref _totalProcessedLogs, batch.Count);
-                            Interlocked.Add(ref _totalProcessingTimeMs, stopwatch.ElapsedMilliseconds);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log database failure to console with structured format
-                        var errorMessage = $"DatabaseLoggingQueue: Failed to save batch of {batch.Count} log entries - {ex.Message}";
-                        if (ex.InnerException != null)
-                        {
-                            errorMessage += $" | Inner: {ex.InnerException.Message}";
-                        }
-                        Console.WriteLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [ERROR] {errorMessage}");
-
-                        // Log details of failed entries
-                        foreach (var logEntry in batch)
-                        {
-                            Console.WriteLine($"{logEntry.Timestamp:yyyy-MM-dd HH:mm:ss} [{logEntry.Level}] {logEntry.Source}: {logEntry.Message}");
-                        }
-                    }
-
-                    batch.Clear();
-                }
-                else
+                if (_logQueue.Count == 0)
                 {
                     await Task.Delay(100, stoppingToken); // Wait briefly if queue is empty
                 }
