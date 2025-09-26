@@ -435,6 +435,33 @@ namespace OverseerBotShared
     }
 
     /// <summary>
+    /// Request structure for handshake operations.
+    /// Contains client identification and authentication information.
+    /// </summary>
+    public class HandshakeRequest
+    {
+        /// <summary>
+        /// Gets or sets the unique identifier for the client.
+        /// </summary>
+        public string? ClientId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the client (typically the brain instance name).
+        /// </summary>
+        public string? ClientName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of client (e.g., brain, dashboard).
+        /// </summary>
+        public string? ClientType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authentication token provided by the client.
+        /// </summary>
+        public string? AuthToken { get; set; }
+    }
+
+    /// <summary>
     /// Response structure for handshake operations.
     /// Contains authentication token and success status for client registration.
     /// </summary>

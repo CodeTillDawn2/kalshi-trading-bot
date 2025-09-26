@@ -148,10 +148,9 @@ namespace OverseerBotShared
         #region IBacklashBotHub Implementation
 
         // Client-to-Server methods
-        public async Task<HandshakeResponse> Handshake(string clientId, string clientName, string clientType, string? authToken = null)
+        public async Task<HandshakeResponse> Handshake(HandshakeRequest request)
         {
-            var args = authToken != null ? new object[] { clientId, clientName, clientType, authToken } : new object[] { clientId, clientName, clientType };
-            return await InvokeAsync<HandshakeResponse>("Handshake", args);
+            return await InvokeAsync<HandshakeResponse>("Handshake", request);
         }
 
         public async Task<CheckInResponse> CheckIn(CheckInData checkInData)

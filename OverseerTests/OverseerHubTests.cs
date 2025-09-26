@@ -413,43 +413,7 @@ namespace OverseerTests
             Assert.That(hasClients, Is.False);
         }
 
-        /// <summary>
-        /// Tests that the Handshake method accepts the required authToken parameter.
-        /// This ensures compatibility with client implementations that send the token.
-        /// </summary>
-        [Test]
-        public async Task TestHandshake_WithAuthTokenParameter_AcceptsProvidedToken()
-        {
-            // Arrange
-            var hubCallerContextMock = new Mock<HubCallerContext>();
-            hubCallerContextMock.Setup(x => x.ConnectionId).Returns("test-connection-id");
-
-            var hub = new TestableOverseerHub(
-                _loggerMock.Object,
-                _scopeFactoryMock.Object,
-                _brainService,
-                Options.Create(_config),
-                _performanceMetrics
-            );
-            hub.SetContext(hubCallerContextMock.Object);
-
-            var clientsMock = new Mock<IHubCallerClients>();
-            var callerMock = new Mock<ISingleClientProxy>();
-            clientsMock.Setup(x => x.Caller).Returns(callerMock.Object);
-            hub.SetClients(clientsMock.Object);
-
-            // Act - Call with 4 parameters (authToken provided)
-            await hub.TestHandshakeWithAuthToken("test-client", "test-name", "test-type", "provided-token");
-
-            // Assert - Should not throw and should have logged the handshake request
-            _loggerMock.Verify(x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("Handshake request from client")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()
-            ), Times.Once);
-        }
+    
 
         /// <summary>
         /// Cleans up test fixtures after each test execution.
@@ -495,16 +459,6 @@ namespace OverseerTests
         public async Task TestOnDisconnectedAsync(Exception? exception)
         {
             await base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task TestHandshake(string clientId, string clientName, string clientType)
-        {
-            await base.Handshake(clientId, clientName, clientType, "test-auth-token");
-        }
-
-        public async Task TestHandshakeWithAuthToken(string clientId, string clientName, string clientType, string authToken)
-        {
-            await base.Handshake(clientId, clientName, clientType, authToken);
         }
 
         public async Task TestProcessCheckIn(OverseerBotShared.CheckInData checkInData)

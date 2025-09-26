@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BacklashBot.Shared\BacklashBot.Shared.csproj" />
+    <ProjectReference Include="..\OverseerBotShared\OverseerBotShared.csproj" />
+    <ProjectReference Include="..\BacklashOverseer\BacklashOverseer.csproj" />
   </ItemGroup>
 
 </Project>

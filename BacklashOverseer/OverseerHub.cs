@@ -46,6 +46,7 @@ namespace BacklashOverseer
             // Initialize timers
             _healthCheckTimer = new Timer(PerformHealthChecks, null, 0, 60000); // 60 seconds
             _rateLimitCleanupTimer = new Timer(CleanupRateLimits, null, 0, 300000); // 5 minutes
+            
         }
 
         /// <summary>
@@ -162,8 +163,8 @@ namespace BacklashOverseer
                 // Handle case in unit tests where HttpContext is not available
             }
 
-            _logger.LogInformation("Client connected: {ConnectionId} from IP: {IPAddress}. Total clients: {ClientCount}",
-                Context.ConnectionId, ipAddress, _connectedClients.Count);
+            _logger.LogInformation("OVERSEER- Client connected: ConnectionId={ConnectionId}, IP={IPAddress}",
+                Context.ConnectionId, ipAddress);
 
             await base.OnConnectedAsync();
         }
@@ -290,126 +291,7 @@ namespace BacklashOverseer
             return false;
         }
 
-        /// <summary>
-        /// Performs initial handshake with a client, validating and storing client information,
-        /// generating an authentication token, and logging the client to the database.
-        /// Includes rate limiting to prevent abuse.
-        /// </summary>
-        /// <param name="clientId">Unique identifier for the client.</param>
-        /// <param name="clientName">Name of the client (typically the brain instance name).</param>
-        /// <param name="clientType">Type of client connecting (e.g., brain, dashboard).</param>
-        /// <param name="authToken">Authentication token provided by the client.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handshake(string clientId, string clientName, string clientType, string authToken)
-        {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
-
-            var ipAddress = "unknown";
-            try
-            {
-                var httpContext = Context.GetHttpContext();
-                ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            }
-            catch (NullReferenceException)
-            {
-                // Handle case in unit tests where HttpContext is not available
-            }
-
-            // Rate limiting check
-            if (IsRateLimited(ipAddress, "handshake", _config.MaxHandshakeRequestsPerMinute))
-            {
-                _logger.LogWarning("Handshake rate limit exceeded for IP: {IPAddress}", ipAddress);
-                await Clients.Caller.SendAsync("HandshakeResponse", new
-                {
-                    Success = false,
-                    Message = "Rate limit exceeded. Please try again later."
-                });
-                return;
-            }
-
-            if (_config.EnablePerformanceMetrics)
-            {
-                _performanceMetrics.RecordSignalRHandshake();
-                _performanceMetrics.RecordSignalRMessage();
-            }
-
-            _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
-                clientId, clientName, clientType);
-
-            try
-            {
-
-                // Store client information
-                var clientInfo = new ClientInfo
-                {
-                    ClientId = clientId,
-                    ClientName = clientName,
-                    ClientType = clientType,
-                    IPAddress = ipAddress,
-                    ConnectionId = Context.ConnectionId,
-                    LastSeen = DateTime.UtcNow
-                };
-
-                _clientInfo[Context.ConnectionId] = clientInfo;
-
-                // Log to database if available and performance metrics are enabled
-                if (_config.EnablePerformanceMetrics)
-                {
-                    try
-                    {
-                        using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-
-                        var signalRClient = new BacklashDTOs.SignalRClient
-                        {
-                            ClientId = clientId,
-                            ClientName = clientName,
-                            IPAddress = ipAddress,
-                            ClientType = clientType,
-                            AuthToken = GenerateAuthToken(clientId, clientName),
-                            IsActive = true,
-                            ConnectionId = Context.ConnectionId,
-                            LastSeen = DateTime.UtcNow
-                        };
-
-                        await context.AddOrUpdateSignalRClient(signalRClient);
-                        _logger.LogInformation("Client registered in database: {ClientId} from {IPAddress}", clientId, ipAddress);
-                    }
-                    catch (Exception dbEx)
-                    {
-                        _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}. Exception: {Message}, Inner: {Inner}", clientId, dbEx.Message, dbEx.InnerException?.Message ?? "None");
-                    }
-                }
-
-                // Send handshake response
-                var response = new
-                {
-                    Success = true,
-                    AuthToken = GenerateAuthToken(clientId, clientName),
-                    Message = "Handshake successful"
-                };
-
-                await Clients.Caller.SendAsync("HandshakeResponse", response);
-                _logger.LogInformation("Handshake completed for client: {ClientId}", clientId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during handshake for client: {ClientId}", clientId);
-                await Clients.Caller.SendAsync("HandshakeResponse", new
-                {
-                    Success = false,
-                    Message = $"Handshake failed: {ex.Message}"
-                });
-            }
-            finally
-            {
-                if (stopwatch != null)
-                {
-                    stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRHandshakeLatency(stopwatch.Elapsed);
-                }
-            }
-        }
+        
 
         /// <summary>
         /// Processes a check-in request from a connected brain instance.
@@ -856,6 +738,147 @@ namespace BacklashOverseer
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing performance metrics update from brain {BrainInstanceName}", brainInstanceName);
+            }
+        }
+
+        /// <summary>
+        /// Processes initial handshake with a connecting client, validates credentials,
+        /// registers the client, and generates an authentication token for subsequent communications.
+        /// </summary>
+        /// <param name="request">The handshake request containing client identification information.</param>
+        /// <returns>A task representing the asynchronous operation that returns a handshake response.</returns>
+        public async Task<HandshakeResponse> Handshake(HandshakeRequest request)
+        {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            // Rate limiting check
+            var connectionId = Context.ConnectionId;
+            if (IsRateLimited(connectionId, "handshake", _config.MaxHandshakeRequestsPerMinute))
+            {
+                _logger.LogWarning("Handshake rate limit exceeded for connection: {ConnectionId}", connectionId);
+                return new HandshakeResponse
+                {
+                    Success = false,
+                    Message = "Rate limit exceeded. Please try again later."
+                };
+            }
+
+            if (_config.EnablePerformanceMetrics)
+            {
+                _performanceMetrics.RecordSignalRHandshake();
+                _performanceMetrics.RecordSignalRMessage();
+            }
+
+            _logger.LogInformation("Handshake received from connection: {ConnectionId}", connectionId);
+
+            try
+            {
+                // Validate HandshakeRequest
+                if (request == null)
+                {
+                    _logger.LogWarning("Handshake received with null request from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "Handshake request is null."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientId))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientId from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientId is required."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientName))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientName from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientName is required."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientType))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientType from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientType is required."
+                    };
+                }
+
+                // Get IP address
+                var ipAddress = "unknown";
+                try
+                {
+                    var httpContext = Context.GetHttpContext();
+                    if (httpContext != null)
+                    {
+                        ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                    }
+                }
+                catch (NullReferenceException)
+                {
+                    // Handle case in unit tests where HttpContext is not available
+                }
+
+                // Generate authentication token
+                var authToken = GenerateAuthToken(request.ClientId, request.ClientName);
+
+                // Store client information
+                var clientInfo = new ClientInfo
+                {
+                    ClientId = request.ClientId,
+                    ClientName = request.ClientName,
+                    ClientType = request.ClientType,
+                    IPAddress = ipAddress,
+                    ConnectionId = connectionId,
+                    LastSeen = DateTime.UtcNow
+                };
+
+                _clientInfo[connectionId] = clientInfo;
+
+                _logger.LogInformation("Handshake successful for client {ClientId} ({ClientName}) from IP {IPAddress}",
+                    request.ClientId, request.ClientName, ipAddress);
+
+                // Send handshake response to client
+                await Clients.Caller.SendAsync("HandshakeResponse", new HandshakeResponse
+                {
+                    Success = true,
+                    AuthToken = authToken,
+                    Message = "Handshake successful. Client registered."
+                });
+
+                return new HandshakeResponse
+                {
+                    Success = true,
+                    AuthToken = authToken,
+                    Message = "Handshake successful. Client registered."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing Handshake from connection: {ConnectionId}", connectionId);
+                return new HandshakeResponse
+                {
+                    Success = false,
+                    Message = $"Handshake processing failed: {ex.Message}"
+                };
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRHandshakeLatency(stopwatch.Elapsed);
+                }
             }
         }
 

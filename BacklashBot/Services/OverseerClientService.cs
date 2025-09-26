@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using OverseerBotShared;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace BacklashBot.Services
 {
@@ -32,6 +33,7 @@ namespace BacklashBot.Services
         private Timer? _checkInTimer;
         private Timer? _overseerDiscoveryTimer;
         private bool _isConnected = false;
+        private bool _handshakeCompleted = false;
 
         /// <summary>
         /// Gets a value indicating whether the service is currently connected to an Overseer.
@@ -204,6 +206,9 @@ namespace BacklashBot.Services
                 }
 
                 await CleanupConnectionAsync();
+
+                // Reset handshake completed flag
+                _handshakeCompleted = false;
 
                 _logger.LogInformation("OVERSEER- Overseer client stopped");
             }
@@ -417,9 +422,21 @@ namespace BacklashBot.Services
                 // Create new connection
                 _logger.LogDebug("OVERSEER- Creating new HubConnection");
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(overseerUrl)
+                    .WithUrl(overseerUrl, options =>
+                    {
+                        options.HttpMessageHandlerFactory = (handler) =>
+                        {
+                            if (handler is HttpClientHandler clientHandler)
+                            {
+                                clientHandler.UseProxy = false;
+                            }
+                            return handler;
+                        };
+                    })
+                    .AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; })
                     .WithAutomaticReconnect()
                     .Build();
+                _logger.LogDebug("OVERSEER- HubConnection created, about to call StartAsync");
                 _logger.LogDebug("OVERSEER- HubConnection created, initial state: {State}", _hubConnection.State);
 
                 // Set up event handlers
@@ -441,6 +458,7 @@ namespace BacklashBot.Services
 
                     _hubConnection = new HubConnectionBuilder()
                         .WithUrl(overseerUrl)
+                        .AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; })
                         .WithAutomaticReconnect()
                         .Build();
 
@@ -453,10 +471,18 @@ namespace BacklashBot.Services
                     _logger.LogDebug("OVERSEER- Fresh connection created");
                 }
 
-                _logger.LogDebug("OVERSEER- About to call StartAsync with configurable timeout");
+                _logger.LogDebug("OVERSEER- About to call StartAsync with configurable timeout ({Timeout}s)", _connectionTimeout.TotalSeconds);
                 using var cts = new CancellationTokenSource(_connectionTimeout);
-                await _hubConnection.StartAsync(cts.Token);
-                _logger.LogInformation("OVERSEER- StartAsync completed successfully, state: {State}", _hubConnection.State);
+                try
+                {
+                    await _hubConnection.StartAsync(cts.Token);
+                    _logger.LogInformation("OVERSEER- StartAsync completed successfully, state: {State}", _hubConnection.State);
+                }
+                catch (Exception startEx)
+                {
+                    _logger.LogWarning("OVERSEER- StartAsync failed with exception: {Message}", startEx.Message);
+                    throw;
+                }
 
                 lock (_connectionStateLock)
                 {
@@ -486,6 +512,10 @@ namespace BacklashBot.Services
             catch (TaskCanceledException)
             {
                 _logger.LogInformation("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
+                lock (_connectionStateLock)
+                {
+                    _isConnected = false;
+                }
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -498,6 +528,10 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogInformation("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
+                lock (_connectionStateLock)
+                {
+                    _isConnected = false;
+                }
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -684,6 +718,7 @@ namespace BacklashBot.Services
         {
             return _hubConnection != null &&
                    _isConnected &&
+                   _handshakeCompleted &&
                    _hubConnection.State == HubConnectionState.Connected;
         }
 
@@ -929,24 +964,48 @@ namespace BacklashBot.Services
             _logger.LogDebug("OVERSEER- Checking connection state for handshake: IsConnected={IsConnected}, State={State}",
                 _isConnected, _hubConnection.State);
 
-            if (!IsConnectionActive())
+            if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
             {
-                _logger.LogInformation("OVERSEER- Cannot send handshake: Connection not active (IsConnected={IsConnected}, State={State})",
-                    _isConnected, _hubConnection.State);
+                _logger.LogInformation("OVERSEER- Cannot send handshake: Connection not established (State={State})",
+                    _hubConnection?.State ?? HubConnectionState.Disconnected);
                 return;
             }
 
             try
             {
+                // Reset handshake completed flag
+                _handshakeCompleted = false;
+
                 // Ensure auth token is valid
                 await EnsureValidAuthTokenAsync();
 
+                // Delay to ensure connection is fully established
+                await Task.Delay(1000);
+
+                var handshakeRequest = new HandshakeRequest
+                {
+                    ClientId = _clientId,
+                    ClientName = _clientName,
+                    ClientType = _clientType,
+                    AuthToken = _authToken
+                };
+
                 _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}, AuthToken={HasToken}",
-                    _clientId, _clientName, _clientType, !string.IsNullOrEmpty(_authToken));
+                    handshakeRequest.ClientId, handshakeRequest.ClientName, handshakeRequest.ClientType, !string.IsNullOrEmpty(handshakeRequest.AuthToken));
 
                 var stopwatch = Stopwatch.StartNew();
-                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType, _authToken);
-                stopwatch.Stop();
+                HandshakeResponse response;
+                try
+                {
+                    response = await _hubConnection.InvokeAsync<HandshakeResponse>("Handshake", handshakeRequest);
+                    stopwatch.Stop();
+                    _logger.LogInformation("OVERSEER- Handshake InvokeAsync completed successfully");
+                }
+                catch (Exception invokeEx)
+                {
+                    _logger.LogWarning("OVERSEER- Handshake InvokeAsync failed: {Message}", invokeEx.Message);
+                    throw;
+                }
 
                 if (_enablePerformanceMetrics)
                 {
@@ -958,7 +1017,17 @@ namespace BacklashBot.Services
                     }
                 }
 
-                _logger.LogInformation("OVERSEER- Handshake sent successfully to overseer");
+                _logger.LogInformation("OVERSEER- Handshake response received: Success={Success}, Message={Message}", response.Success, response.Message);
+
+                if (response.Success)
+                {
+                    _handshakeCompleted = true;
+                    _logger.LogInformation("OVERSEER- Handshake completed successfully, client is now registered");
+                }
+                else
+                {
+                    _logger.LogWarning("OVERSEER- Handshake failed: {Message}", response.Message);
+                }
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
             {
@@ -979,6 +1048,12 @@ namespace BacklashBot.Services
             if (!IsConnectionActive() || _hubConnection == null)
             {
                 _logger.LogDebug("OVERSEER- Overseer not connected or connection not active, skipping CheckIn (will retry on next cycle)");
+                return;
+            }
+
+            if (!_handshakeCompleted)
+            {
+                _logger.LogDebug("OVERSEER- Handshake not completed yet, skipping CheckIn (will retry on next cycle)");
                 return;
             }
 
@@ -1093,6 +1168,16 @@ namespace BacklashBot.Services
                 }
             }
             _logger.LogInformation("OVERSEER- Handshake response received from overseer: Success={Success}, Message={Message}", response.Success, response.Message);
+
+            if (response.Success)
+            {
+                _handshakeCompleted = true;
+                _logger.LogInformation("OVERSEER- Handshake completed successfully, client is now registered");
+            }
+            else
+            {
+                _logger.LogWarning("OVERSEER- Handshake failed: {Message}", response.Message);
+            }
         }
 
         private void HandleCheckInResponse(CheckInResponse response)
@@ -1138,30 +1223,33 @@ namespace BacklashBot.Services
             return Task.CompletedTask;
         }
 
-        private Task HandleReconnected(string? connectionId)
+        private async Task HandleReconnected(string? connectionId)
         {
             lock (_connectionStateLock)
             {
                 _isConnected = true;
             }
 
+            // Reset handshake completed flag on reconnection
+            _handshakeCompleted = false;
+
             _logger.LogInformation("OVERSEER- Successfully reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection
-            _ = Task.Run(async () =>
+            try
             {
-                try
+                await PerformHandshakeAsync();
+                _logger.LogInformation("OVERSEER- Handshake completed after reconnection");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
+                // If handshake fails, mark as not connected
+                lock (_connectionStateLock)
                 {
-                    await PerformHandshakeAsync();
-                    _logger.LogInformation("OVERSEER- Handshake completed after reconnection");
+                    _isConnected = false;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning("OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
-                }
-            });
-
-            return Task.CompletedTask;
+            }
         }
     }
 }

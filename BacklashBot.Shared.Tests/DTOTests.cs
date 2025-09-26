@@ -1,4 +1,4 @@
-using BacklashBot.Shared;
+using OverseerBotShared;
 using System;
 using System.Collections.Generic;
 using Xunit;

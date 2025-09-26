@@ -32,6 +32,11 @@ namespace BacklashOverseer
     /// </summary>
     public class Overseer : IDisposable
     {
+        /// <summary>
+        /// Current version of the BacklashOverseer application.
+        /// </summary>
+        public const string Version = "1.0.0";
+
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
@@ -96,6 +101,9 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Start()
         {
+            // Log version information
+            _logger?.LogInformation("BacklashOverseer v{Version} starting up", Version);
+
             // Log system information to database for monitoring
             await LogSystemInfoAsync();
 

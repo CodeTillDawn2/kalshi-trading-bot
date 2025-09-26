@@ -7,7 +7,7 @@ namespace OverseerBotShared
     public interface IBacklashBotHub
     {
         // Client-to-Server methods (called by BacklashBot)
-        Task<HandshakeResponse> Handshake(string clientId, string clientName, string clientType, string? authToken = null);
+        Task<HandshakeResponse> Handshake(HandshakeRequest request);
         Task<CheckInResponse> CheckIn(CheckInData checkInData);
         Task<PerformanceMetricsResponse> SendPerformanceMetrics(PerformanceMetricsData performanceMetrics);
         Task ConfirmTargetTickersReceived(string brainInstanceName);
@@ -32,7 +32,7 @@ namespace OverseerBotShared
     public interface IOverseerHub
     {
         // Client-to-Server methods (called by Overseer clients like web UI)
-        Task<HandshakeResponse> Handshake(string clientId, string clientName, string clientType, string? authToken = null);
+        Task<HandshakeResponse> Handshake(HandshakeRequest request);
 
         // Server-to-Client methods (handled by Overseer)
         Task HandleCheckIn(CheckInData checkInData);
