@@ -133,6 +133,9 @@ namespace TradingGUI
 
             var serviceProvider = services.BuildServiceProvider();
 
+            // Generate session identifier
+            var sessionIdentifier = BacklashCommon.Helpers.SessionIdentifierGenerator.GenerateSessionIdentifier();
+
             // Configure custom logger provider
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             var loggingConfig = serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
@@ -143,7 +146,7 @@ namespace TradingGUI
                 loggingConfig,
                 instanceNameConfig.Name,
                 minLevel,
-                null, // sessionIdentifier
+                sessionIdentifier, // sessionIdentifier
                 loggingConfig.Environment);
             loggerFactory.AddProvider(loggerProvider);
 

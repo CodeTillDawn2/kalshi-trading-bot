@@ -133,8 +133,8 @@ namespace BacklashOverseer
             _logger = logger;
             _scopeFactory = scopeFactory;
             _brainService = brainService;
-            _config = config?.Value;
-            _performanceMetrics = performanceMetrics;
+            _config = config?.Value ?? throw new ArgumentNullException(nameof(config), "OverseerHubConfig is required");
+            _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
         }
 
         /// <summary>

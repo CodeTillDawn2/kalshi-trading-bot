@@ -79,6 +79,9 @@ namespace BacklashOverseer
                 builder.SetMinimumLevel(LogLevel.Trace);
             });
 
+            // Generate session identifier
+            var sessionIdentifier = BacklashCommon.Helpers.SessionIdentifierGenerator.GenerateSessionIdentifier();
+
             // Add database logging services
             services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), ApplicationType.Overseer));
             services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
@@ -93,7 +96,7 @@ namespace BacklashOverseer
                     loggingConfig,
                     instanceNameConfig.Name,
                     minLevel,
-                    null, // brainStatus
+                    sessionIdentifier, // sessionIdentifier
                     loggingConfig.Environment // defaultEnvironment
                 );
             });

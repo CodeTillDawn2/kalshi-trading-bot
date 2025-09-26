@@ -277,6 +277,125 @@ namespace TradingSimulator
 
 
         /// <summary>
+        /// Runs all specified strategy sets for a single market in GUI display.
+        /// This method validates inputs, resolves the strategy family, loads snapshots once,
+        /// then processes each weight set sequentially on the same data, and saves results.
+        /// </summary>
+        /// <param name="setKey">The key identifying the strategy family.</param>
+        /// <param name="weightNames">List of weight set names to process.</param>
+        /// <param name="market">The market name to process.</param>
+        /// <param name="writeToFile">Whether to save detailed market data to JSON files.</param>
+        public async Task RunAllSetsForSingleMarketAsync(
+            string setKey,
+            List<string> weightNames,
+            string market,
+            bool writeToFile)
+        {
+            // Validate inputs
+            if (string.IsNullOrWhiteSpace(setKey))
+            {
+                OnTestProgress?.Invoke("Warning: setKey is null or empty. Skipping execution.");
+                return;
+            }
+
+            if (weightNames == null || !weightNames.Any())
+            {
+                OnTestProgress?.Invoke("Warning: weightNames is null or empty. Skipping execution.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(market))
+            {
+                OnTestProgress?.Invoke("Warning: market is null or empty. Skipping execution.");
+                return;
+            }
+
+            // map provided setKey -> family
+            var family = MapFamilyFromSetKey(setKey);
+
+            // resolve strategies + param sets for that family
+            var (strategiesList, paramSets, label) = ResolveFamily(family);
+
+            // prep context once
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+
+            // Load data for this market only once
+            var marketSnapshots = await _dataLoader.LoadSnapshotsForMarketAsync(context, market);
+            if (!marketSnapshots.Any())
+            {
+                OnTestProgress?.Invoke($"Warning: No snapshots found for market {market}. Skipping.");
+                return;
+            }
+
+            var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
+
+            // Process each weight set
+            foreach (var weightName in weightNames)
+            {
+                // find the requested weight set by name (exact, case-insensitive)
+                var idx = paramSets.FindIndex(ps =>
+                    string.Equals(ps.Name, weightName, StringComparison.OrdinalIgnoreCase));
+                if (idx < 0)
+                {
+                    OnTestProgress?.Invoke($"Warning: Weight set '{weightName}' not found in {label}. Skipping.");
+                    continue;
+                }
+
+                // create DTO for this set
+                var (name, parameters) = paramSets[idx];
+                var dto = new WeightSetDTO
+                {
+                    StrategyName = name,
+                    Weights = JsonSerializer.Serialize(parameters),
+                    LastRun = DateTime.UtcNow,
+                    WeightSetMarkets = new List<WeightSetMarketDTO>()
+                };
+
+                var strategies = strategiesList[idx]; // the selected set
+                OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] processing market {market}");
+
+                var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc, patterns) =
+                    await _marketProcessor.ProcessMarketAsync(
+                        market, marketSnapshots, strategies,
+                        progressPrefix: $"[{label}/{dto.StrategyName}] ",
+                        writeToFile: writeToFile, group: groupForId,
+                        ignoreProcessedCache: true);
+
+                if (writeToFile)
+                {
+                    var fileName = FormatFileName(_simulatorOptions.Value.MarketDataFileNamePattern, new Dictionary<string, string>
+                    {
+                        { "market", market },
+                        { "label", label },
+                        { "strategy", dto.StrategyName },
+                        { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+                    });
+                    _marketProcessor.SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
+                        pos, avgCost, rest, disc, patterns, fileNameSuffix: fileName);
+                }
+
+                dto.WeightSetMarkets.Add(new WeightSetMarketDTO
+                {
+                    MarketTicker = market,
+                    PnL = (decimal)finalPnL,
+                    LastRun = DateTime.UtcNow
+                });
+
+                OnProfitLossUpdate?.Invoke(market, finalPnL);
+
+                // save this set
+                using var saveScope = _scopeFactory.CreateScope();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
+
+                OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} for market {market}");
+            }
+
+            marketSnapshots.Clear();
+        }
+
+        /// <summary>
         /// Runs a specific strategy set for GUI display, processing the selected parameter set against the specified markets.
         /// This method validates inputs (setKey, weightName, market names), resolves the strategy family from the set key,
         /// finds the matching weight set, and executes the simulation for all specified markets, optionally writing results

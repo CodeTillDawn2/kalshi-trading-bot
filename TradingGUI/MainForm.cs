@@ -598,32 +598,32 @@ namespace TradingGUI
 
                 AppendLog($"Found {allWeightSets.Count} weight sets to run: {string.Join(", ", allWeightSets)}");
 
-                // Set up progress tracking
-                int totalSteps = allWeightSets.Count;
+                // Set up progress tracking: total combinations of markets and weight sets
+                int totalSteps = sel.Count * allWeightSets.Count;
                 int currentStep = 0;
 
-                // Run each weight set for all selected markets
-                foreach (var weightSet in allWeightSets)
+                // Run all weight sets for each selected market in sequence
+                foreach (var market in sel)
                 {
-                    AppendLog($"Running {selectedStrategy} with parameter set: {weightSet}");
+                    AppendLog($"Processing market {market} with all weight sets");
 
-                    await _simulator.RunSelectedSetForGuiAsync(
+                    await _simulator.RunAllSetsForSingleMarketAsync(
                         setKey: selectedStrategy,
-                        weightName: weightSet,
-                        writeToFile: false, // Don't save files when running all weight sets
-                        marketsToRun: sel);
+                        weightNames: allWeightSets,
+                        market: market,
+                        writeToFile: false); // Don't save files when running all weight sets
 
-                    AppendLog($"Completed {weightSet} for all markets");
+                    AppendLog($"Completed all weight sets for market {market}");
 
-                    // Update progress
-                    currentStep++;
+                    // Update progress: increment by number of weight sets processed for this market
+                    currentStep += allWeightSets.Count;
                     if (_progressBar != null)
                     {
                         _progressBar.Value = (int)((double)currentStep / totalSteps * 100);
                     }
                 }
 
-                AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy}");
+                AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy} on {sel.Count} markets");
             }
             finally
             {

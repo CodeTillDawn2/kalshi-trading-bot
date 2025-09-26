@@ -26,29 +26,6 @@ using Microsoft.Extensions.Options;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
 
-// Local function to generate session identifier
-string GenerateSessionIdentifier(int length = 5)
-{
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    // Use more bytes for better entropy
-    var data = new byte[length + 8]; // Extra 8 bytes for timestamp
-    using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-    {
-        rng.GetBytes(data);
-    }
-    // Incorporate timestamp for additional entropy
-    var timestamp = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-    for (int i = 0; i < Math.Min(8, data.Length); i++)
-    {
-        data[i] ^= timestamp[i];
-    }
-    var result = new char[length];
-    for (int i = 0; i < length; i++)
-    {
-        result[i] = chars[data[i] % chars.Length];
-    }
-    return new string(result);
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -240,7 +217,7 @@ var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildCon
 builder.Services.AddSingleton(new BacklashCommon.Configuration.ConnectionStringProvider(connectionString));
 
 // Generate session identifier early to avoid circular dependency
-var sessionIdentifier = GenerateSessionIdentifier();
+var sessionIdentifier = BacklashCommon.Helpers.SessionIdentifierGenerator.GenerateSessionIdentifier();
 builder.Services.AddSingleton(sessionIdentifier);
 
 // Increase shutdown timeout
