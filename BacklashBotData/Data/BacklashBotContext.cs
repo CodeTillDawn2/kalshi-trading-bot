@@ -1474,56 +1474,64 @@ namespace BacklashBotData.Data
 
         public async Task AddOrUpdateWeightSet(WeightSetDTO dto)
         {
-            using var transaction = await Database.BeginTransactionAsync();
-            try
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var strategy = Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                WeightSet? weightSet = await WeightSets
-                    .Include(ws => ws.WeightSetMarkets)
-                    .FirstOrDefaultAsync(ws => ws.StrategyName == dto.StrategyName);
-
-                if (weightSet == null)
+                using var tx = await Database.BeginTransactionAsync();
+                try
                 {
-                    weightSet = dto.ToWeightSet();
-                    weightSet.WeightSetMarkets.Clear();
-                    await WeightSets.AddAsync(weightSet);
-                }
-                else
-                {
-                    weightSet.UpdateWeightSet(dto);
+                    WeightSet? weightSet = await WeightSets
+                        .Include(ws => ws.WeightSetMarkets)
+                        .FirstOrDefaultAsync(ws => ws.StrategyName == dto.StrategyName);
 
-                    var marketsToRemove = weightSet.WeightSetMarkets
-                        .Where(m => !dto.WeightSetMarkets.Any(dm => dm.WeightSetID == m.WeightSetID && dm.MarketTicker == m.MarketTicker))
-                        .ToList();
-                    foreach (var market in marketsToRemove)
+                    if (weightSet == null)
                     {
-                        weightSet.WeightSetMarkets.Remove(market);
-                    }
-                }
-
-                foreach (var marketDTO in dto.WeightSetMarkets)
-                {
-                    var existingMarket = weightSet.WeightSetMarkets
-                        .FirstOrDefault(m => m.MarketTicker == marketDTO.MarketTicker);
-
-                    if (existingMarket == null)
-                    {
-                        marketDTO.WeightSetID = weightSet.WeightSetID;
-                        weightSet.WeightSetMarkets.Add(marketDTO.ToWeightSetMarket());
+                        weightSet = dto.ToWeightSet();
+                        weightSet.WeightSetMarkets.Clear();
+                        await WeightSets.AddAsync(weightSet);
                     }
                     else
                     {
-                        existingMarket.UpdateWeightSetMarket(marketDTO);
-                    }
-                }
+                        weightSet.UpdateWeightSet(dto);
 
-                await SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                        var marketsToRemove = weightSet.WeightSetMarkets
+                            .Where(m => !dto.WeightSetMarkets.Any(dm => dm.WeightSetID == m.WeightSetID && dm.MarketTicker == m.MarketTicker))
+                            .ToList();
+                        foreach (var market in marketsToRemove)
+                        {
+                            weightSet.WeightSetMarkets.Remove(market);
+                        }
+                    }
+
+                    foreach (var marketDTO in dto.WeightSetMarkets)
+                    {
+                        var existingMarket = weightSet.WeightSetMarkets
+                            .FirstOrDefault(m => m.MarketTicker == marketDTO.MarketTicker);
+
+                        if (existingMarket == null)
+                        {
+                            marketDTO.WeightSetID = weightSet.WeightSetID;
+                            weightSet.WeightSetMarkets.Add(marketDTO.ToWeightSetMarket());
+                        }
+                        else
+                        {
+                            existingMarket.UpdateWeightSetMarket(marketDTO);
+                        }
+                    }
+
+                    await SaveChangesWithRetryAsync();
+                    await tx.CommitAsync();
+                    TrackPerformanceMetric("AddOrUpdateWeightSet", true, stopwatch.Elapsed);
+                }
+                catch (Exception ex)
+                {
+                    await tx.RollbackAsync();
+                    TrackPerformanceMetric("AddOrUpdateWeightSet", false, stopwatch.Elapsed);
+                    _logger?.LogError(ex, "Error adding or updating weight set {StrategyName}", dto.StrategyName);
+                    throw new Exception($"Failed to add or update weight set for strategy {dto.StrategyName}: {ex.Message}", ex);
+                }
+            });
         }
 
         public async Task AddOrUpdateWeightSets(List<WeightSetDTO> dtos)
