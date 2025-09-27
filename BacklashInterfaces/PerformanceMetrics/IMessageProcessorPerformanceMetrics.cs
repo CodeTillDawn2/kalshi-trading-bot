@@ -7,43 +7,7 @@ namespace BacklashInterfaces.PerformanceMetrics
     /// </summary>
     public interface IMessageProcessorPerformanceMetrics
     {
-        /// <summary>
-        /// Posts message processing performance metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="totalMessagesProcessed">Total number of messages processed since last reset.</param>
-        /// <param name="totalProcessingTimeMs">Total processing time in milliseconds since last reset.</param>
-        /// <param name="averageProcessingTimeMs">Average processing time per message in milliseconds.</param>
-        /// <param name="messagesPerSecond">Current messages per second rate.</param>
-        /// <param name="orderBookQueueDepth">Current depth of the order book update queue.</param>
-        /// <remarks>
-        /// This method is called by MessageProcessor to post comprehensive performance metrics
-        /// for monitoring message throughput, latency, and queue utilization.
-        /// </remarks>
-        void PostMessageProcessingMetrics(long totalMessagesProcessed, long totalProcessingTimeMs,
-            double averageProcessingTimeMs, double messagesPerSecond, int orderBookQueueDepth);
-
-        /// <summary>
-        /// Posts duplicate message detection metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="duplicateMessageCount">Total number of duplicate messages detected.</param>
-        /// <param name="duplicatesInWindow">Number of duplicates detected in the current time window.</param>
-        /// <param name="lastDuplicateWarningTime">Timestamp of the last duplicate message warning.</param>
-        /// <remarks>
-        /// This method is called by MessageProcessor to post metrics related to duplicate message
-        /// detection and warnings for monitoring message stream quality.
-        /// </remarks>
-        void PostDuplicateMessageMetrics(int duplicateMessageCount, int duplicatesInWindow, DateTime lastDuplicateWarningTime);
-
-        /// <summary>
-        /// Posts message type distribution metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="messageTypeCounts">Dictionary containing counts for each message type processed.</param>
-        /// <remarks>
-        /// This method is called by MessageProcessor to post the distribution of different
-        /// message types (OrderBook, Ticker, Trade, etc.) for monitoring message patterns.
-        /// </remarks>
-        void PostMessageTypeMetrics(IReadOnlyDictionary<string, long> messageTypeCounts);
-
+    
         /// <summary>
         /// Gets the current message processing performance metrics.
         /// </summary>

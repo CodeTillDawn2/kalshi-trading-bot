@@ -9,29 +9,7 @@ namespace BacklashInterfaces.PerformanceMetrics
     /// </summary>
     public interface IWebSocketPerformanceMetrics
     {
-        /// <summary>
-        /// Records WebSocket message processing performance with enablement status.
-        /// </summary>
-        /// <param name="messageType">The type of WebSocket message (e.g., "WebSocketMessage").</param>
-        /// <param name="processingTimeTicks">The processing time in stopwatch ticks.</param>
-        /// <param name="messageCount">The number of messages processed.</param>
-        /// <param name="bufferSizeBytes">The size of the message buffer in bytes.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
-        void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled);
-
-        /// <summary>
-        /// Records WebSocket connection performance.
-        /// </summary>
-        /// <param name="operation">The operation name (e.g., "Connect").</param>
-        /// <param name="duration">The duration of the operation.</param>
-        void RecordWebSocketOperation(string operation, TimeSpan duration);
-
-        /// <summary>
-        /// Records semaphore wait counts for WebSocket operations.
-        /// </summary>
-        /// <param name="operation">The operation name.</param>
-        /// <param name="waitCount">The number of semaphore waits.</param>
-        void RecordSemaphoreWait(string operation, int waitCount);
+     
 
         /// <summary>
         /// Gets the average processing times for WebSocket messages.

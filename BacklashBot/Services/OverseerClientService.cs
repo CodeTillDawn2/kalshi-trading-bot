@@ -1062,7 +1062,7 @@ namespace BacklashBot.Services
             {
                 // Post metrics to central performance monitor
                 var metrics = GetMetrics();
-                _centralPerformanceMonitor.RecordOverseerClientServiceMetrics(metrics, _enablePerformanceMetrics);
+                RecordOverseerClientServiceMetrics(metrics, _enablePerformanceMetrics);
 
                 // Log metrics every 10 check-ins
                 if (_connectionSuccessCount > 0 && _connectionSuccessCount % 10 == 0)
@@ -1246,6 +1246,81 @@ namespace BacklashBot.Services
                 lock (_connectionStateLock)
                 {
                     _isConnected = false;
+                }
+            }
+        }
+
+        private void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics, bool enablePerformanceMetrics)
+        {
+            string className = nameof(OverseerClientService);
+            string category = "Connection";
+
+            // Define all possible metrics with their properties
+            var allMetrics = new Dictionary<string, (string Name, string Description, string Unit, string VisualType, double? MinThreshold, double? WarningThreshold, double? CriticalThreshold)>
+            {
+                ["ConnectionAttempts"] = ("Connection Attempts", "Total number of connection attempts made", "count", "Counter", null, null, null),
+                ["ConnectionSuccesses"] = ("Connection Successes", "Number of successful connections", "count", "Counter", null, null, null),
+                ["ConnectionSuccessRate"] = ("Connection Success Rate", "Rate of successful connections", "%", "ProgressBar", 0, 50, 80),
+                ["CircuitBreakerFailures"] = ("Circuit Breaker Failures", "Number of circuit breaker failures", "count", "Counter", null, null, null),
+                ["DiscoveryOperations"] = ("Discovery Operations", "Number of overseer discovery operations", "count", "Counter", null, null, null),
+                ["AverageDiscoveryTimeMs"] = ("Average Discovery Time", "Average time spent on discovery operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalDiscoveryTimeMs"] = ("Total Discovery Time", "Total time spent on discovery operations", "ms", "NumericDisplay", null, null, null),
+                ["IsCircuitBreakerOpen"] = ("Circuit Breaker Status", "Whether the circuit breaker is currently open", "state", "TrafficLight", 0, 0.5, 1),
+                ["AverageHandshakeTimeMs"] = ("Average Handshake Time", "Average time for handshake operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalHandshakeTimeMs"] = ("Total Handshake Time", "Total time spent on handshake operations", "ms", "NumericDisplay", null, null, null),
+                ["HandshakeCount"] = ("Handshake Count", "Number of handshake operations", "count", "Counter", null, null, null),
+                ["AverageCheckInTimeMs"] = ("Average Check-In Time", "Average time for check-in operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalCheckInTimeMs"] = ("Total Check-In Time", "Total time spent on check-in operations", "ms", "NumericDisplay", null, null, null),
+                ["CheckInCount"] = ("Check-In Count", "Number of check-in operations", "count", "Counter", null, null, null),
+                ["AverageConnectionAttemptTimeMs"] = ("Average Connection Attempt Time", "Average time for connection attempts", "ms", "NumericDisplay", null, null, null),
+                ["TotalConnectionAttemptTimeMs"] = ("Total Connection Attempt Time", "Total time spent on connection attempts", "ms", "NumericDisplay", null, null, null),
+                ["ConnectionAttemptTimeCount"] = ("Connection Attempt Time Count", "Number of connection attempt time measurements", "count", "Counter", null, null, null),
+                ["MessagesSent"] = ("Messages Sent", "Number of messages sent", "count", "Counter", null, null, null),
+                ["MessagesReceived"] = ("Messages Received", "Number of messages received", "count", "Counter", null, null, null),
+                ["MessagesPerSecond"] = ("Messages Per Second", "Messages processed per second", "msg/s", "NumericDisplay", null, null, null),
+                ["TimeoutFailureCount"] = ("Timeout Failures", "Number of timeout failures", "count", "Counter", null, null, null),
+                ["AuthFailureCount"] = ("Auth Failures", "Number of authentication failures", "count", "Counter", null, null, null),
+                ["NetworkFailureCount"] = ("Network Failures", "Number of network failures", "count", "Counter", null, null, null),
+                ["OtherFailureCount"] = ("Other Failures", "Number of other failures", "count", "Counter", null, null, null)
+            };
+
+            if (enablePerformanceMetrics)
+            {
+                // Send all metrics in the dictionary as enabled
+                foreach (var kvp in metrics)
+                {
+                    if (allMetrics.TryGetValue(kvp.Key, out var metricInfo))
+                    {
+                        double value = kvp.Key == "ConnectionSuccessRate" ? Convert.ToDouble(kvp.Value) * 100 : Convert.ToDouble(kvp.Value);
+                        if (kvp.Key == "IsCircuitBreakerOpen")
+                        {
+                            value = Convert.ToBoolean(kvp.Value) ? 1.0 : 0.0;
+                        }
+
+                        switch (metricInfo.VisualType)
+                        {
+                            case "Counter":
+                                _centralPerformanceMonitor.RecordCounterMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                break;
+                            case "ProgressBar":
+                                _centralPerformanceMonitor.RecordProgressBarMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                break;
+                            case "NumericDisplay":
+                                _centralPerformanceMonitor.RecordNumericDisplayMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                break;
+                            case "TrafficLight":
+                                _centralPerformanceMonitor.RecordTrafficLightMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Send all possible metrics as disabled
+                foreach (var kvp in allMetrics)
+                {
+                    _centralPerformanceMonitor.RecordDisabledMetricMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
                 }
             }
         }

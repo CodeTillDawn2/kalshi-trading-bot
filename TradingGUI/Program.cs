@@ -13,6 +13,8 @@ using System.Timers;
 using TradingGUI.Configuration;
 using TradingSimulator;
 using TradingStrategies.Configuration;
+using BacklashCommon.Configuration;
+using TradingSimulator.Configuration;
 using TradingStrategies.Trading.Overseer;
 using BacklashBotData.Data.Interfaces;
 
@@ -115,6 +117,14 @@ namespace TradingGUI
                 .ValidateOnStart();
             services.AddOptions<SnapshotViewerConfig>()
                 .Bind(configuration.GetSection(SnapshotViewerConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<MarketProcessorConfig>()
+                .Bind(configuration.GetSection(MarketProcessorConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<DataStorageConfig>()
+                .Bind(configuration.GetSection(DataStorageConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 

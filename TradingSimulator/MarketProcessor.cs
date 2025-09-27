@@ -7,68 +7,11 @@ using System.Text.Json;
 using TradingSimulator.Simulator;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Overseer;
+using TradingSimulator.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingSimulator
 {
-    /// <summary>
-    /// Configuration class for MarketProcessor settings.
-    /// </summary>
-    public class MarketProcessorConfig
-    {
-        /// <summary>
-        /// Directory path where processed market data is cached.
-        /// </summary>
-        [Required]
-        public string CacheDirectory { get; set; } = "Cache";
-
-        /// <summary>
-        /// File naming convention for cache files.
-        /// </summary>
-        public string FileNameTemplate { get; set; } = "{MarketTicker}{Suffix}.json";
-
-
-        /// <summary>
-        /// Maximum number of markets to process concurrently in batch operations.
-        /// </summary>
-        public int MaxConcurrentMarkets { get; set; } = 5;
-
-        /// <summary>
-        /// Size of batches for processing multiple markets to reduce memory pressure.
-        /// </summary>
-        public int BatchSize { get; set; } = 10;
-
-        /// <summary>
-        /// Configuration for discrepancy detection.
-        /// </summary>
-        public DiscrepancyDetectionConfig DiscrepancyDetection { get; set; } = new();
-
-        /// <summary>
-        /// Whether to enable performance metrics tracking (includes memory tracking).
-        /// </summary>
-        public bool EnablePerformanceMetrics { get; set; } = true;
-    }
-
-    /// <summary>
-    /// Configuration for discrepancy detection parameters.
-    /// </summary>
-    public class DiscrepancyDetectionConfig
-    {
-        /// <summary>
-        /// Whether to enable velocity discrepancy detection.
-        /// </summary>
-        public bool Enabled { get; set; } = false;
-
-        /// <summary>
-        /// Threshold for detecting velocity discrepancies.
-        /// </summary>
-        public double VelocityThreshold { get; set; } = 0.1;
-
-        /// <summary>
-        /// Minimum number of snapshots required for discrepancy detection.
-        /// </summary>
-        public int MinSnapshotsForDetection { get; set; } = 10;
-    }
 
     /// <summary>
     /// Processes individual markets in the trading simulator by running trading strategies,
@@ -141,6 +84,43 @@ namespace TradingSimulator
             _simulatorReporting = simulatorReporting;
             _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _performanceMetrics = new PerformanceMetrics(_config.EnablePerformanceMetrics);
+        }
+
+        /// <summary>
+        /// Records execution time metric using the performance monitor.
+        /// </summary>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="milliseconds">Execution time in milliseconds.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled.</param>
+        private void RecordExecutionTimeMetric(string id, long milliseconds, bool metricsEnabled)
+        {
+            if (metricsEnabled)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(
+                    "MarketProcessor",
+                    id,
+                    "Execution Time",
+                    $"Time taken for {id}",
+                    milliseconds,
+                    "ms",
+                    "Performance",
+                    null, null, null,
+                    true
+                );
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetricMetric(
+                    "MarketProcessor",
+                    id,
+                    "Execution Time",
+                    $"Time taken for {id}",
+                    milliseconds,
+                    "ms",
+                    "Performance",
+                    false
+                );
+            }
         }
 
         /// <summary>
@@ -286,7 +266,7 @@ namespace TradingSimulator
                     var result = await ProcessEventLogsAsync(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
                     processingTime = DateTime.UtcNow - startTime;
                     _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-                    _performanceMonitor.RecordExecutionTime("ProcessMarket", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
+                    RecordExecutionTimeMetric("ProcessMarket", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
                     return result;
                 }
             }
@@ -297,7 +277,7 @@ namespace TradingSimulator
 
             processingTime = DateTime.UtcNow - startTime;
             _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-            _performanceMonitor.RecordExecutionTime("ProcessMarketError", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
+            RecordExecutionTimeMetric("ProcessMarketError", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
             return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
         }
 
@@ -443,7 +423,7 @@ namespace TradingSimulator
                 await Task.WhenAll(batchTasks);
                 var batchProcessingTime = DateTime.UtcNow - batchStartTime;
                 _performanceMetrics.RecordBatchProcessing(batch.Count, batchProcessingTime);
-                _performanceMonitor.RecordExecutionTime("ProcessBatch", (long)batchProcessingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
+                RecordExecutionTimeMetric("ProcessBatch", (long)batchProcessingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
                 OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _config.BatchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
             }
 

@@ -43,7 +43,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : BasePerformanceMonitor
+    public class CentralPerformanceMonitor : BasePerformanceMonitor, ICentralPerformanceMonitor
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         /// <summary>

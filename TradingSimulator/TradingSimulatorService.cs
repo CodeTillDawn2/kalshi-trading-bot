@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TradingSimulator.Configuration;
 using TradingSimulator.Simulator;
 using TradingSimulator.Strategies;
 using TradingStrategies.Classification.Interfaces;
@@ -79,6 +80,8 @@ namespace TradingSimulator
         private SnapshotGroupHelper _marketAnalysisHelper;
         private IOptions<DataStorageConfig> _dataStorageConfig;
         private IOptions<TradingSimulatorServiceConfig> _simulatorOptions;
+        private IOptions<MarketProcessorConfig> _marketProcessorOptions;
+        private IOptions<DataStorageConfig> _dataStorageOptions;
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
@@ -100,6 +103,17 @@ namespace TradingSimulator
 
         private SqlDataService _sqlDataService;
         private PerformanceMonitor _performanceMonitor;
+
+        /// <summary>
+        /// Initializes a new instance of the TradingSimulatorService class.
+        /// </summary>
+        /// <param name="marketProcessorOptions">Configuration options for the market processor.</param>
+        /// <param name="dataStorageOptions">Configuration options for data storage.</param>
+        public TradingSimulatorService(IOptions<MarketProcessorConfig> marketProcessorOptions, IOptions<DataStorageConfig> dataStorageOptions)
+        {
+            _marketProcessorOptions = marketProcessorOptions;
+            _dataStorageOptions = dataStorageOptions;
+        }
 
         /// <summary>
         /// Formats a file name using the configured pattern and provided parameters.
@@ -211,15 +225,13 @@ namespace TradingSimulator
             _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
 
             _processedMarkets = new HashSet<string>();
-            _cacheDirectory = _simulatorOptions.Value.CacheDirectory;
+            _cacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService, serviceProvider.GetRequiredService<IOptions<DataLoaderConfig>>());
-            var marketProcessorConfig = new MarketProcessorConfig
-            {
-                CacheDirectory = _cacheDirectory
-            };
+            var marketProcessorConfig = _marketProcessorOptions.Value;
+            marketProcessorConfig.CacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;
             _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, marketProcessorConfig, _simulatorReporting, _performanceMonitor);
             _marketProcessor.OnTestProgress += msg => OnTestProgress?.Invoke(msg);
             _strategyResolver = serviceProvider.GetRequiredService<StrategyResolver>();

@@ -17,5 +17,11 @@ namespace BacklashCommon.Configuration
         /// </summary>
         [Required(ErrorMessage = "The 'HardDataStorageLocation' is missing in the configuration.")]
         public string HardDataStorageLocation { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the cache directory for trading simulation.
+        /// </summary>
+        [Required(ErrorMessage = "The 'SimulationCacheDirectory' is missing in the configuration.")]
+        public string SimulationCacheDirectory { get; set; } = null!;
     }
 }

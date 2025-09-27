@@ -34,7 +34,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Optional service for posting performance metrics.
         /// </summary>
-        protected readonly ISubscriptionManagerPerformanceMetrics? _performanceMetrics;
+        protected readonly IPerformanceMonitor? _performanceMetrics;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
@@ -111,7 +111,7 @@ namespace KalshiBotAPI.Websockets
             IWebSocketConnectionManager connectionManager,
             IStatusTrackerService statusTrackerService,
             IOptions<SubscriptionManagerConfig> config,
-            ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
+            IPerformanceMonitor? performanceMetrics = null)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -1467,7 +1467,7 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostOperationMetrics(metrics);
+                PostOperationMetrics(metrics);
             }
 
             return metrics;
@@ -1496,10 +1496,82 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostLockContentionMetrics(metrics);
+                PostLockContentionMetrics(metrics);
             }
 
             return metrics;
+        }
+
+        /// <summary>
+        /// Posts operation performance metrics to the performance monitor.
+        /// </summary>
+        /// <param name="metrics">The operation metrics to post.</param>
+        private void PostOperationMetrics(ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string operation = kvp.Key;
+                var (avgTicks, totalOps, successOps) = kvp.Value;
+                string id = $"SubscriptionManager_Operation_{operation}";
+                string name = $"{operation} Operations";
+                string description = $"Performance metrics for {operation} operations";
+                string category = "SubscriptionManager";
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetricMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                }
+                else
+                {
+                    // Record total operations
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Total", $"{name} Total", $"Total {operation} operations", totalOps, "count", category);
+
+                    // Record successful operations
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Success", $"{name} Success", $"Successful {operation} operations", successOps, "count", category);
+
+                    // Record average time in ms
+                    double avgMs = avgTicks / (double)TimeSpan.TicksPerMillisecond;
+                    _performanceMetrics.RecordSpeedDialMetric("BaseSubscriptionManager", $"{id}_AvgTime", $"{name} Avg Time", $"Average time for {operation} operations", avgMs, "ms", category, 0, 1000, 5000);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Posts lock contention metrics to the performance monitor.
+        /// </summary>
+        /// <param name="metrics">The lock metrics to post.</param>
+        private void PostLockContentionMetrics(ConcurrentDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string lockName = kvp.Key;
+                var (acqCount, avgWaitTicks, contCount) = kvp.Value;
+                string id = $"SubscriptionManager_Lock_{lockName}";
+                string name = $"{lockName} Lock";
+                string description = $"Lock contention metrics for {lockName}";
+                string category = "SubscriptionManager";
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetricMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                }
+                else
+                {
+                    // Record acquisition count
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Acquisitions", $"{name} Acquisitions", $"Total acquisitions for {lockName}", acqCount, "count", category);
+
+                    // Record contention count
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Contentions", $"{name} Contentions", $"Total contentions for {lockName}", contCount, "count", category);
+
+                    // Record average wait time in ms
+                    double avgWaitMs = avgWaitTicks / (double)TimeSpan.TicksPerMillisecond;
+                    _performanceMetrics.RecordSpeedDialMetric("BaseSubscriptionManager", $"{id}_AvgWait", $"{name} Avg Wait", $"Average wait time for {lockName}", avgWaitMs, "ms", category, 0, 100, 500);
+                }
+            }
         }
 
         /// <summary>
