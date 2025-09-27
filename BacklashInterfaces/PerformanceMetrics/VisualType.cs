@@ -1,4 +1,4 @@
-namespace BacklashCommon.Performance
+namespace BacklashInterfaces.PerformanceMetrics
 {
     /// <summary>
     /// Defines the visual representation type for performance metrics in GUI components.

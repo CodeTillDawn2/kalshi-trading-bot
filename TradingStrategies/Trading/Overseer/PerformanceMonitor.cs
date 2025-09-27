@@ -1,4 +1,5 @@
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashInterfaces.PerformanceMetrics;
 using System.Collections.Concurrent;
 
 namespace TradingStrategies.Trading.Overseer
@@ -11,7 +12,7 @@ namespace TradingStrategies.Trading.Overseer
     /// from StrategySimulation, with typed access via StrategySimulationPerformanceMetrics.
     /// All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.
     /// </summary>
-    public class PerformanceMonitor : IPerformanceMonitor
+    public class PerformanceMonitor : BasePerformanceMonitor
     {
         private readonly ConcurrentDictionary<string, List<PerformanceRecord>> _performanceRecords;
         private readonly ConcurrentDictionary<string, Dictionary<string, object>> _simulationMetrics;
@@ -148,24 +149,6 @@ namespace TradingStrategies.Trading.Overseer
             _simulationMetrics[simulationName] = enhancedMetrics;
         }
 
-        /// <summary>
-        /// Records the execution time for a specific method or operation (for backward compatibility).
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation.</param>
-        /// <param name="milliseconds">The execution time in milliseconds.</param>
-        /// <remarks>
-        /// This method is provided for backward compatibility with the IPerformanceMonitor interface.
-        /// For comprehensive metrics, use RecordPerformanceMetrics.
-        /// Metrics collection is gated by EnablePerformanceMetrics flag.
-        /// </remarks>
-        public void RecordExecutionTime(string methodName, long milliseconds)
-        {
-            if (!EnablePerformanceMetrics)
-            {
-                return;
-            }
-            RecordPerformanceMetrics(methodName, milliseconds, 0, 0, null);
-        }
 
         /// <summary>
         /// Records the execution time for a specific method or operation with enablement status.
@@ -595,21 +578,21 @@ namespace TradingStrategies.Trading.Overseer
             /// <summary>
             /// Converts StrategySimulationPerformanceMetrics to a collection of simple PerformanceMetrics
             /// </summary>
-            public static IEnumerable<BacklashCommon.Performance.PerformanceMetric> ToPerformanceMetrics(
+            public static IEnumerable<BacklashInterfaces.PerformanceMetrics.PerformanceMetric> ToPerformanceMetrics(
                 this StrategySimulationPerformanceMetrics simulationMetrics,
                 string simulationName)
             {
-                var metrics = new List<BacklashCommon.Performance.PerformanceMetric>();
+                var metrics = new List<BacklashInterfaces.PerformanceMetrics.PerformanceMetric>();
 
                 // Execution Time - Speed Dial
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_ExecutionTime",
                     Name = "Execution Time",
                     Description = "Total time spent executing the simulation",
                     Value = simulationMetrics.TotalExecutionTime.TotalMilliseconds,
                     Unit = "ms",
-                    VisualType = BacklashCommon.Performance.VisualType.SpeedDial,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.SpeedDial,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -618,14 +601,14 @@ namespace TradingStrategies.Trading.Overseer
                 });
 
                 // Average Execution Time - Speed Dial
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_AvgExecutionTime",
                     Name = "Avg Execution Time",
                     Description = "Average execution time per operation",
                     Value = simulationMetrics.AverageExecutionTimeMs,
                     Unit = "ms",
-                    VisualType = BacklashCommon.Performance.VisualType.SpeedDial,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.SpeedDial,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -634,14 +617,14 @@ namespace TradingStrategies.Trading.Overseer
                 });
 
                 // Peak Memory Usage - Progress Bar
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_PeakMemory",
                     Name = "Peak Memory",
                     Description = "Maximum memory usage during simulation",
                     Value = simulationMetrics.PeakMemoryUsage / (1024.0 * 1024.0), // Convert to MB
                     Unit = "MB",
-                    VisualType = BacklashCommon.Performance.VisualType.ProgressBar,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.ProgressBar,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -653,14 +636,14 @@ namespace TradingStrategies.Trading.Overseer
                 if (simulationMetrics.MemoryThresholdMB > 0)
                 {
                     var memoryRatio = (simulationMetrics.PeakMemoryUsage / (1024.0 * 1024.0)) / simulationMetrics.MemoryThresholdMB * 100;
-                    metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                    metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                     {
                         Id = $"{simulationName}_MemoryThreshold",
                         Name = "Memory Usage %",
                         Description = "Memory usage as percentage of threshold",
                         Value = memoryRatio,
                         Unit = "%",
-                        VisualType = BacklashCommon.Performance.VisualType.TrafficLight,
+                        VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.TrafficLight,
                         Category = "Strategy Simulation",
                         Timestamp = DateTime.UtcNow,
                         MinThreshold = 0,
@@ -670,40 +653,40 @@ namespace TradingStrategies.Trading.Overseer
                 }
 
                 // Total Trades Executed - Counter
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_TotalTrades",
                     Name = "Total Trades",
                     Description = "Number of trades executed during simulation",
                     Value = simulationMetrics.TotalTradesExecuted,
                     Unit = "trades",
-                    VisualType = BacklashCommon.Performance.VisualType.Counter,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.Counter,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow
                 });
 
                 // Current Position - Numeric Display
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_CurrentPosition",
                     Name = "Current Position",
                     Description = "Current trading position",
                     Value = simulationMetrics.CurrentPosition,
                     Unit = "units",
-                    VisualType = BacklashCommon.Performance.VisualType.NumericDisplay,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.NumericDisplay,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow
                 });
 
                 // Current Cash - Numeric Display
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{simulationName}_CurrentCash",
                     Name = "Current Cash",
                     Description = "Current cash balance",
                     Value = simulationMetrics.CurrentCash,
                     Unit = "USD",
-                    VisualType = BacklashCommon.Performance.VisualType.NumericDisplay,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.NumericDisplay,
                     Category = "Strategy Simulation",
                     Timestamp = DateTime.UtcNow
                 });
@@ -714,27 +697,27 @@ namespace TradingStrategies.Trading.Overseer
             /// <summary>
             /// Converts PatternUtilsPerformanceMetrics to a collection of simple PerformanceMetrics
             /// </summary>
-            public static IEnumerable<BacklashCommon.Performance.PerformanceMetric> ToPerformanceMetrics(
+            public static IEnumerable<BacklashInterfaces.PerformanceMetrics.PerformanceMetric> ToPerformanceMetrics(
                 this global::TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics patternMetrics,
                 string patternName)
             {
-                var metrics = new List<BacklashCommon.Performance.PerformanceMetric>();
+                var metrics = new List<BacklashInterfaces.PerformanceMetrics.PerformanceMetric>();
 
                 // Total Calculations - Counter
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{patternName}_TotalCalculations",
                     Name = "Total Calculations",
                     Description = "Number of pattern calculations performed",
                     Value = patternMetrics.TotalCalculations,
                     Unit = "calculations",
-                    VisualType = BacklashCommon.Performance.VisualType.Counter,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.Counter,
                     Category = "Pattern Utils",
                     Timestamp = DateTime.UtcNow
                 });
 
                 // Cache Hit Rate - Pie Chart
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{patternName}_CacheHitRate",
                     Name = "Cache Hit Rate",
@@ -742,7 +725,7 @@ namespace TradingStrategies.Trading.Overseer
                     Value = patternMetrics.CacheHitRate,
                     SecondaryValue = 100 - patternMetrics.CacheHitRate, // Miss rate
                     Unit = "%",
-                    VisualType = BacklashCommon.Performance.VisualType.PieChart,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.PieChart,
                     Category = "Pattern Utils",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -751,14 +734,14 @@ namespace TradingStrategies.Trading.Overseer
                 });
 
                 // Average Calculation Time - Speed Dial
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{patternName}_AvgCalcTime",
                     Name = "Avg Calc Time",
                     Description = "Average time per calculation",
                     Value = patternMetrics.AverageCalculationTimeMs,
                     Unit = "ms",
-                    VisualType = BacklashCommon.Performance.VisualType.SpeedDial,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.SpeedDial,
                     Category = "Pattern Utils",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -769,14 +752,14 @@ namespace TradingStrategies.Trading.Overseer
                 // Throughput - Speed Dial
                 if (patternMetrics.Throughput.HasValue)
                 {
-                    metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                    metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                     {
                         Id = $"{patternName}_Throughput",
                         Name = "Throughput",
                         Description = "Calculations per second",
                         Value = patternMetrics.Throughput.Value,
                         Unit = "calc/sec",
-                        VisualType = BacklashCommon.Performance.VisualType.SpeedDial,
+                        VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.SpeedDial,
                         Category = "Pattern Utils",
                         Timestamp = DateTime.UtcNow,
                         MinThreshold = 0,
@@ -788,14 +771,14 @@ namespace TradingStrategies.Trading.Overseer
                 // Memory Usage - Progress Bar
                 if (patternMetrics.MemoryUsage.HasValue)
                 {
-                    metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                    metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                     {
                         Id = $"{patternName}_MemoryUsage",
                         Name = "Memory Usage",
                         Description = "Current memory usage",
                         Value = patternMetrics.MemoryUsage.Value / (1024.0 * 1024.0), // Convert to MB
                         Unit = "MB",
-                        VisualType = BacklashCommon.Performance.VisualType.ProgressBar,
+                        VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.ProgressBar,
                         Category = "Pattern Utils",
                         Timestamp = DateTime.UtcNow,
                         MinThreshold = 0,
@@ -810,34 +793,34 @@ namespace TradingStrategies.Trading.Overseer
             /// <summary>
             /// Converts PerformanceStats to a collection of simple PerformanceMetrics
             /// </summary>
-            public static IEnumerable<BacklashCommon.Performance.PerformanceMetric> ToPerformanceMetrics(
+            public static IEnumerable<BacklashInterfaces.PerformanceMetrics.PerformanceMetric> ToPerformanceMetrics(
                 this global::TradingStrategies.Trading.Overseer.PerformanceStats stats,
                 string methodName)
             {
-                var metrics = new List<BacklashCommon.Performance.PerformanceMetric>();
+                var metrics = new List<BacklashInterfaces.PerformanceMetrics.PerformanceMetric>();
 
                 // Record Count - Badge
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{methodName}_RecordCount",
                     Name = "Record Count",
                     Description = "Number of performance records collected",
                     Value = stats.RecordCount,
                     Unit = "records",
-                    VisualType = BacklashCommon.Performance.VisualType.Badge,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.Badge,
                     Category = "Performance Stats",
                     Timestamp = DateTime.UtcNow
                 });
 
                 // Average Execution Time - Speed Dial
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{methodName}_AvgExecutionTime",
                     Name = "Avg Execution Time",
                     Description = "Average execution time across all records",
                     Value = stats.AverageExecutionTimeMs,
                     Unit = "ms",
-                    VisualType = BacklashCommon.Performance.VisualType.SpeedDial,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.SpeedDial,
                     Category = "Performance Stats",
                     Timestamp = DateTime.UtcNow,
                     MinThreshold = 0,
@@ -846,14 +829,14 @@ namespace TradingStrategies.Trading.Overseer
                 });
 
                 // Items Processed - Counter
-                metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                 {
                     Id = $"{methodName}_TotalItemsProcessed",
                     Name = "Items Processed",
                     Description = "Total number of items processed",
                     Value = stats.TotalItemsProcessed,
                     Unit = "items",
-                    VisualType = BacklashCommon.Performance.VisualType.Counter,
+                    VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.Counter,
                     Category = "Performance Stats",
                     Timestamp = DateTime.UtcNow
                 });
@@ -862,14 +845,14 @@ namespace TradingStrategies.Trading.Overseer
                 if (stats.TotalItemsFound > 0 && stats.TotalItemsProcessed > 0)
                 {
                     var successRate = (double)stats.TotalItemsFound / stats.TotalItemsProcessed * 100;
-                    metrics.Add(new BacklashCommon.Performance.GeneralPerformanceMetric
+                    metrics.Add(new BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric
                     {
                         Id = $"{methodName}_SuccessRate",
                         Name = "Success Rate",
                         Description = "Percentage of items successfully found",
                         Value = successRate,
                         Unit = "%",
-                        VisualType = BacklashCommon.Performance.VisualType.ProgressBar,
+                        VisualType = BacklashInterfaces.PerformanceMetrics.VisualType.ProgressBar,
                         Category = "Performance Stats",
                         Timestamp = DateTime.UtcNow,
                         MinThreshold = 0,

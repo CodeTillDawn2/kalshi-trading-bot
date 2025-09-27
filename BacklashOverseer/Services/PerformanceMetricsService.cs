@@ -1,4 +1,5 @@
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
@@ -9,7 +10,7 @@ namespace BacklashOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics, IPerformanceMonitor
+    public class PerformanceMetricsService : BasePerformanceMonitor, IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -121,6 +122,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         /// <param name="logger">The logger instance for recording metrics operations.</param>
         public PerformanceMetricsService(ILogger<PerformanceMetricsService> logger)
+            : base(logger)
         {
             _logger = logger;
             _lastMetricsReset = DateTime.UtcNow;
@@ -741,39 +743,6 @@ namespace BacklashOverseer.Services
 
         #endregion
 
-        #region IWebSocketPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Records WebSocket message processing performance with enablement status.
-        /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
-        {
-            if (!metricsEnabled) return;
-
-            _webSocketProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
-            _webSocketProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
-            _webSocketBufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
-            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}, MetricsEnabled={MetricsEnabled}",
-                messageType, processingTimeTicks, messageCount, bufferSizeBytes, metricsEnabled);
-        }
-
-        /// <summary>
-        /// Records WebSocket connection performance.
-        /// </summary>
-        public void RecordWebSocketOperation(string operation, TimeSpan duration)
-        {
-            _webSocketOperationTimes[operation] = duration;
-            _logger.LogDebug("WebSocket operation recorded: {Operation}={Duration}ms", operation, duration.TotalMilliseconds);
-        }
-
-        /// <summary>
-        /// Records semaphore wait counts for WebSocket operations.
-        /// </summary>
-        public void RecordSemaphoreWait(string operation, int waitCount)
-        {
-            _webSocketSemaphoreWaitCount.AddOrUpdate(operation, 0, (k, v) => v + waitCount);
-            _logger.LogDebug("Semaphore wait recorded: {Operation}={WaitCount}", operation, waitCount);
-        }
 
         /// <summary>
         /// Gets the average processing times for WebSocket messages.
@@ -831,8 +800,6 @@ namespace BacklashOverseer.Services
             _webSocketSemaphoreWaitCount.Clear();
             _logger.LogInformation("WebSocket performance metrics reset");
         }
-
-        #endregion
 
         #region ISqlDataServicePerformanceMetrics Implementation
 
@@ -933,26 +900,6 @@ namespace BacklashOverseer.Services
         #region ISubscriptionManagerPerformanceMetrics Implementation
 
         /// <summary>
-        /// Posts operation performance metrics from SubscriptionManager.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing operation names and their performance statistics.</param>
-        public void PostOperationMetrics(IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> metrics)
-        {
-            _subscriptionManagerOperationMetrics = metrics;
-            _logger.LogDebug("SubscriptionManager operation metrics posted: {Count} operations", metrics?.Count ?? 0);
-        }
-
-        /// <summary>
-        /// Posts lock contention metrics from SubscriptionManager.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing lock names and their contention statistics.</param>
-        public void PostLockContentionMetrics(IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> metrics)
-        {
-            _subscriptionManagerLockMetrics = metrics;
-            _logger.LogDebug("SubscriptionManager lock contention metrics posted: {Count} locks", metrics?.Count ?? 0);
-        }
-
-        /// <summary>
         /// Gets the current operation performance metrics.
         /// </summary>
         /// <returns>Dictionary containing operation names and their performance statistics.</returns>
@@ -983,60 +930,6 @@ namespace BacklashOverseer.Services
         #endregion
 
         #region IMessageProcessorPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Posts message processing performance metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="totalMessagesProcessed">Total number of messages processed since last reset.</param>
-        /// <param name="totalProcessingTimeMs">Total processing time in milliseconds since last reset.</param>
-        /// <param name="averageProcessingTimeMs">Average processing time per message in milliseconds.</param>
-        /// <param name="messagesPerSecond">Current messages per second rate.</param>
-        /// <param name="orderBookQueueDepth">Current depth of the order book update queue.</param>
-        public void PostMessageProcessingMetrics(long totalMessagesProcessed, long totalProcessingTimeMs,
-            double averageProcessingTimeMs, double messagesPerSecond, int orderBookQueueDepth)
-        {
-            lock (_snapshotLock) // reusing snapshot lock for MessageProcessor metrics
-            {
-                _messageProcessorTotalMessagesProcessed = totalMessagesProcessed;
-                _messageProcessorTotalProcessingTimeMs = totalProcessingTimeMs;
-                _messageProcessorAverageProcessingTimeMs = averageProcessingTimeMs;
-                _messageProcessorMessagesPerSecond = messagesPerSecond;
-                _messageProcessorOrderBookQueueDepth = orderBookQueueDepth;
-                _logger.LogDebug("MessageProcessor metrics posted: {TotalMessages} messages, {AvgTime:F2}ms avg, {MsgsPerSec:F2} msg/sec, QueueDepth={QueueDepth}",
-                    totalMessagesProcessed, averageProcessingTimeMs, messagesPerSecond, orderBookQueueDepth);
-            }
-        }
-
-        /// <summary>
-        /// Posts duplicate message detection metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="duplicateMessageCount">Total number of duplicate messages detected.</param>
-        /// <param name="duplicatesInWindow">Number of duplicates detected in the current time window.</param>
-        /// <param name="lastDuplicateWarningTime">Timestamp of the last duplicate message warning.</param>
-        public void PostDuplicateMessageMetrics(int duplicateMessageCount, int duplicatesInWindow, DateTime lastDuplicateWarningTime)
-        {
-            lock (_snapshotLock)
-            {
-                _messageProcessorDuplicateMessageCount = duplicateMessageCount;
-                _messageProcessorDuplicatesInWindow = duplicatesInWindow;
-                _messageProcessorLastDuplicateWarningTime = lastDuplicateWarningTime;
-                _logger.LogDebug("MessageProcessor duplicate metrics posted: {DuplicateCount} total, {DuplicatesInWindow} in window",
-                    duplicateMessageCount, duplicatesInWindow);
-            }
-        }
-
-        /// <summary>
-        /// Posts message type distribution metrics from MessageProcessor.
-        /// </summary>
-        /// <param name="messageTypeCounts">Dictionary containing counts for each message type processed.</param>
-        public void PostMessageTypeMetrics(IReadOnlyDictionary<string, long> messageTypeCounts)
-        {
-            lock (_snapshotLock)
-            {
-                _messageProcessorMessageTypeCounts = messageTypeCounts;
-                _logger.LogDebug("MessageProcessor message type metrics posted: {Count} types", messageTypeCounts?.Count ?? 0);
-            }
-        }
 
         /// <summary>
         /// Gets the current message processing performance metrics.
@@ -1098,153 +991,6 @@ namespace BacklashOverseer.Services
 
         #endregion
 
-        #region IPerformanceMonitor Implementation
-
-        /// <summary>
-        /// Records the execution time for a specific method or operation.
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation.</param>
-        /// <param name="milliseconds">The execution time in milliseconds.</param>
-        public void RecordExecutionTime(string methodName, long milliseconds)
-        {
-            // Store in API metrics for consistency
-            lock (_apiLock)
-            {
-                _totalApiFetchTime += milliseconds;
-                _apiFetchCount++;
-                _lastApiFetchTime = DateTime.UtcNow;
-            }
-
-            _logger.LogDebug("Execution time recorded: {MethodName}={Milliseconds}ms", methodName, milliseconds);
-        }
-
-        /// <summary>
-        /// Records the execution time for a specific method or operation with enablement status.
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation.</param>
-        /// <param name="milliseconds">The execution time in milliseconds.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
-        public void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)
-        {
-            // Store in API metrics for consistency
-            lock (_apiLock)
-            {
-                _totalApiFetchTime += milliseconds;
-                _apiFetchCount++;
-                _lastApiFetchTime = DateTime.UtcNow;
-            }
-
-            _logger.LogDebug("Execution time recorded: {MethodName}={Milliseconds}ms, MetricsEnabled={MetricsEnabled}", methodName, milliseconds, metricsEnabled);
-        }
-
-        /// <summary>
-        /// Records simulation performance metrics from StrategySimulation.
-        /// </summary>
-        /// <param name="simulationName">The name of the simulation.</param>
-        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
-        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
-        {
-            _logger.LogInformation("Simulation metrics recorded for {SimulationName}: {MetricsCount} metrics", simulationName, metrics.Count);
-
-            // Log key metrics for monitoring
-            foreach (var kvp in metrics)
-            {
-                _logger.LogDebug("Simulation metric: {Key}={Value}", kvp.Key, kvp.Value);
-            }
-        }
-
-        /// <summary>
-        /// Records simulation performance metrics from StrategySimulation with enablement status.
-        /// </summary>
-        /// <param name="simulationName">The name of the simulation.</param>
-        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
-        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled)
-        {
-            _logger.LogInformation("Simulation metrics recorded for {SimulationName}: {MetricsCount} metrics, MetricsEnabled={MetricsEnabled}",
-                simulationName, metrics.Count, metricsEnabled);
-
-            // Log key metrics for monitoring
-            foreach (var kvp in metrics)
-            {
-                _logger.LogDebug("Simulation metric: {Key}={Value}", kvp.Key, kvp.Value);
-            }
-        }
-
-        /// <summary>
-        /// Records comprehensive performance metrics.
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation.</param>
-        /// <param name="totalExecutionTimeMs">Total time spent on execution.</param>
-        /// <param name="totalItemsProcessed">Number of items processed.</param>
-        /// <param name="totalItemsFound">Number of items found.</param>
-        /// <param name="itemCheckTimes">Dictionary of item names to their processing times.</param>
-        public void RecordPerformanceMetrics(
-            string methodName,
-            long totalExecutionTimeMs,
-            int totalItemsProcessed,
-            int totalItemsFound,
-            Dictionary<string, long>? itemCheckTimes = null)
-        {
-            _logger.LogInformation("Performance metrics recorded for {MethodName}: TotalTime={TotalTime}ms, ItemsProcessed={Processed}, ItemsFound={Found}",
-                methodName, totalExecutionTimeMs, totalItemsProcessed, totalItemsFound);
-
-            // Record as API fetch for consistency
-            RecordExecutionTime(methodName, totalExecutionTimeMs, true);
-
-            // Log individual item times if provided
-            if (itemCheckTimes != null && itemCheckTimes.Count > 0)
-            {
-                foreach (var kvp in itemCheckTimes)
-                {
-                    _logger.LogDebug("Item processing time: {ItemName}={Time}ms", kvp.Key, kvp.Value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets all configurable performance metrics for GUI consumption.
-        /// </summary>
-        /// <returns>Dictionary containing all configurable metrics.</returns>
-        public IReadOnlyDictionary<string, object> GetConfigurableMetrics()
-        {
-            return _configurableMetrics;
-        }
-
-        /// <summary>
-        /// Records delayed API call metrics for rate limiting analysis.
-        /// </summary>
-        /// <param name="componentName">The name of the component recording the metrics.</param>
-        /// <param name="totalDelayedCalls">Total number of delayed API calls in the period.</param>
-        /// <param name="averageWaitTimeMs">Average wait time in milliseconds.</param>
-        /// <param name="maxWaitTimeMs">Maximum wait time in milliseconds.</param>
-        /// <param name="currentQueueDepth">Current number of items in the delay queue.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled.</param>
-        public void RecordDelayedApiCallMetrics(string componentName, long totalDelayedCalls, double averageWaitTimeMs, long maxWaitTimeMs, int currentQueueDepth, bool metricsEnabled)
-        {
-            _logger.LogInformation("Delayed API call metrics recorded for {ComponentName}: TotalCalls={TotalCalls}, AvgWait={AvgWait:F2}ms, MaxWait={MaxWait}ms, QueueDepth={QueueDepth}, MetricsEnabled={MetricsEnabled}",
-                componentName, totalDelayedCalls, averageWaitTimeMs, maxWaitTimeMs, currentQueueDepth, metricsEnabled);
-
-            // Store in configurable metrics for monitoring
-            lock (_snapshotLock)
-            {
-                _configurableMetrics[$"{componentName}_TotalDelayedCalls"] = totalDelayedCalls;
-                _configurableMetrics[$"{componentName}_AverageWaitTimeMs"] = averageWaitTimeMs;
-                _configurableMetrics[$"{componentName}_MaxWaitTimeMs"] = maxWaitTimeMs;
-                _configurableMetrics[$"{componentName}_CurrentQueueDepth"] = currentQueueDepth;
-            }
-        }
-
-        /// <summary>
-        /// Sends an empty result when performance metrics are disabled.
-        /// </summary>
-        private void SendEmptyResult()
-        {
-            // Initialize with false when metrics are disabled
-            _configurableMetrics["EnablePerformanceMetrics"] = false;
-        }
-
-        #endregion
 
     }
 }

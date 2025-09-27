@@ -1,4 +1,4 @@
-namespace BacklashCommon.Performance
+namespace BacklashInterfaces.PerformanceMetrics
 {
     /// <summary>
     /// Base class for all performance metrics with uniform structure for GUI visualization.

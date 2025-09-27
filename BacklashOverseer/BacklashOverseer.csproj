@@ -66,5 +66,9 @@
     <ProjectReference Include="..\OverseerBotShared\OverseerBotShared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Performance\" />
+  </ItemGroup>
+
 </Project>
 

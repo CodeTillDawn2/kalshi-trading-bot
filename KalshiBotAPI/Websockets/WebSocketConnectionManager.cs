@@ -938,7 +938,7 @@ namespace KalshiBotAPI.Websockets
         {
             if (_performanceMonitor != null && _enableMetrics)
             {
-                _performanceMonitor.RecordExecutionTime($"WebSocketConnectionManager.{operation}", milliseconds, _enableMetrics);
+                _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", operation, $"WebSocket {operation} Time", $"Time taken for {operation}", (double)milliseconds, "ms", "WebSocket", 0, 10000, 1000, _enableMetrics);
             }
         }
 
@@ -953,21 +953,17 @@ namespace KalshiBotAPI.Websockets
         {
             if (_performanceMonitor == null || !_enableMetrics) return;
 
-            // Post connection success rate as execution time (using a fixed operation name)
-            var successRateMs = (long)(ConnectionSuccessRate * 1000); // Convert to milliseconds for consistency
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ConnectionSuccessRate", successRateMs, _enableMetrics);
+            // Post connection success rate as progress bar
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "ConnectionSuccessRate", "WebSocket Connection Success Rate", "Percentage of successful connections", ConnectionSuccessRate * 100, "%", "WebSocket", 0, 100, 95, _enableMetrics);
 
-            // Post throughput as execution time
-            var throughputMs = (long)(MessageThroughput * 1000); // Convert messages/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.MessageThroughput", throughputMs, _enableMetrics);
+            // Post throughput as speed dial
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "MessageThroughput", "WebSocket Message Throughput", "Messages received per second", MessageThroughput, "msg/sec", "WebSocket", 0, 1000, 100, _enableMetrics);
 
-            // Post error rate
-            var errorRateMs = (long)(ErrorRate * 1000);
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ErrorRate", errorRateMs, _enableMetrics);
+            // Post error rate as traffic light
+            _performanceMonitor.RecordTrafficLightMetric("WebSocketConnectionManager", "ErrorRate", "WebSocket Error Rate", "Percentage of messages with errors", ErrorRate * 100, "%", "WebSocket", 0, 5, 1, _enableMetrics);
 
-            // Post bandwidth
-            var bandwidthMs = (long)(BandwidthBps * 1000); // Convert bytes/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.Bandwidth", bandwidthMs, _enableMetrics);
+            // Post bandwidth as speed dial
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "Bandwidth", "WebSocket Bandwidth", "Data received per second", BandwidthBps, "bytes/sec", "WebSocket", 0, 1000000, 100000, _enableMetrics);
 
             _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }

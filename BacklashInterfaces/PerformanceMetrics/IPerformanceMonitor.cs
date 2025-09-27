@@ -1,74 +1,135 @@
+using BacklashInterfaces.PerformanceMetrics;
+
 namespace BacklashInterfaces.PerformanceMetrics
 {
     /// <summary>
     /// Interface for recording performance metrics across the KalshiBot system.
-    /// Provides standardized methods for tracking execution times and simulation metrics
-    /// with mandatory enablement status to control when metrics are actually recorded.
+    /// Provides methods for each VisualType to ensure uniform handling of different metric types.
     /// </summary>
     /// <remarks>
-    /// All methods require an explicit metricsEnabled parameter to ensure granular control
-    /// over metric collection. This prevents unnecessary metric collection when monitoring
-    /// is disabled and provides clear visibility into which components are recording metrics.
+    /// All methods require the className to identify the source of the metric.
+    /// Metrics are recorded through specific methods for each visual type to ensure proper categorization.
     /// </remarks>
     public interface IPerformanceMonitor
     {
-        /// <summary>
-        /// Records the execution time for a specific method or operation with enablement status.
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation being timed.</param>
-        /// <param name="milliseconds">The execution time in milliseconds.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
-        /// <remarks>
-        /// This method allows the calling class to pass its enablement status, enabling
-        /// more granular control over metric collection. Metrics are only recorded when
-        /// both the caller has metrics enabled AND the monitor implementation allows it.
-        /// </remarks>
-        void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled);
 
         /// <summary>
-        /// Records simulation performance metrics from StrategySimulation with enablement status.
+        /// Records a SpeedDial metric with the specified parameters.
         /// </summary>
-        /// <param name="simulationName">The name of the simulation (e.g., "BollingerBreakout", "StrategySimulation").</param>
-        /// <param name="metrics">The detailed metrics dictionary containing performance data such as execution times, memory usage, trade counts.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
-        /// <remarks>
-        /// This method allows the calling class to pass its enablement status, enabling
-        /// more granular control over metric collection. The metrics dictionary typically
-        /// includes keys like "TotalExecutionTimeMs", "TotalItemsProcessed", "Timestamp", etc.
-        /// </remarks>
-        void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled);
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="minThreshold">Optional minimum threshold for visual indicators.</param>
+        /// <param name="warningThreshold">Optional warning threshold for visual indicators.</param>
+        /// <param name="criticalThreshold">Optional critical threshold for visual indicators.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordSpeedDialMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true);
 
         /// <summary>
-        /// Records comprehensive performance metrics.
+        /// Records a ProgressBar metric with the specified parameters.
         /// </summary>
-        /// <param name="methodName">The name of the method or operation.</param>
-        /// <param name="totalExecutionTimeMs">Total time spent on execution.</param>
-        /// <param name="totalItemsProcessed">Number of items processed.</param>
-        /// <param name="totalItemsFound">Number of items found.</param>
-        /// <param name="itemCheckTimes">Dictionary of item names to their processing times.</param>
-        void RecordPerformanceMetrics(
-            string methodName,
-            long totalExecutionTimeMs,
-            int totalItemsProcessed,
-            int totalItemsFound,
-            Dictionary<string, long>? itemCheckTimes = null);
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="minThreshold">Optional minimum threshold for visual indicators.</param>
+        /// <param name="warningThreshold">Optional warning threshold for visual indicators.</param>
+        /// <param name="criticalThreshold">Optional critical threshold for visual indicators.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordProgressBarMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true);
 
         /// <summary>
-        /// Records metrics for delayed API calls due to rate limiting.
+        /// Records a Counter metric with the specified parameters.
         /// </summary>
-        /// <param name="componentName">The name of the component (e.g., "MessageProcessor").</param>
-        /// <param name="totalDelayedCalls">Total number of API calls that were delayed.</param>
-        /// <param name="averageWaitTimeMs">Average wait time in milliseconds for delayed calls.</param>
-        /// <param name="maxWaitTimeMs">Maximum wait time in milliseconds for any delayed call.</param>
-        /// <param name="currentQueueDepth">Current number of items in the delay queue.</param>
-        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
-        void RecordDelayedApiCallMetrics(
-            string componentName,
-            long totalDelayedCalls,
-            double averageWaitTimeMs,
-            long maxWaitTimeMs,
-            int currentQueueDepth,
-            bool metricsEnabled);
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordCounterMetric(string className, string id, string name, string description, double value, string unit, string category, bool metricsEnabled = true);
+
+        /// <summary>
+        /// Records a TrafficLight metric with the specified parameters.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="minThreshold">Optional minimum threshold for visual indicators.</param>
+        /// <param name="warningThreshold">Optional warning threshold for visual indicators.</param>
+        /// <param name="criticalThreshold">Optional critical threshold for visual indicators.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordTrafficLightMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true);
+
+        /// <summary>
+        /// Records a PieChart metric with the specified parameters.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="secondaryValue">Optional secondary value for comparison.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="minThreshold">Optional minimum threshold for visual indicators.</param>
+        /// <param name="warningThreshold">Optional warning threshold for visual indicators.</param>
+        /// <param name="criticalThreshold">Optional critical threshold for visual indicators.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordPieChartMetric(string className, string id, string name, string description, double value, double? secondaryValue, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true);
+
+        /// <summary>
+        /// Records a NumericDisplay metric with the specified parameters.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordNumericDisplayMetric(string className, string id, string name, string description, double value, string unit, string category, bool metricsEnabled = true);
+
+        /// <summary>
+        /// Records a Badge metric with the specified parameters.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="id">Unique identifier for the metric.</param>
+        /// <param name="name">Display name for the metric.</param>
+        /// <param name="description">Description of what the metric measures.</param>
+        /// <param name="value">The primary numeric value.</param>
+        /// <param name="unit">Unit of measurement (e.g., "ms", "%", "count").</param>
+        /// <param name="category">Category for grouping metrics.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        void RecordBadgeMetric(string className, string id, string name, string description, double value, string unit, string category, bool metricsEnabled = true);
+
+        /// <summary>
+        /// Records a LineChart metric.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="metric">The performance metric data.</param>
+        void RecordLineChartMetric(string className, PerformanceMetric metric);
+
+        /// <summary>
+        /// Records a DataGrid metric.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metric.</param>
+        /// <param name="metric">The performance metric data.</param>
+        void RecordDataGridMetric(string className, PerformanceMetric metric);
 
     }
 }

@@ -1,4 +1,4 @@
-namespace BacklashCommon.Performance
+namespace BacklashInterfaces.PerformanceMetrics
 {
     /// <summary>
     /// General performance metric for basic measurements like execution time, counts, and ratios.
