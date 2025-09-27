@@ -9,6 +9,7 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace BacklashBot.Management
 {
@@ -74,6 +75,10 @@ namespace BacklashBot.Management
         /// </summary>
         protected readonly CentralBrainConfig _centralBrainConfig;
         /// <summary>
+        /// Configuration options for market manager service parameters.
+        /// </summary>
+        protected readonly MarketManagerServiceConfig _marketManagerServiceConfig;
+        /// <summary>
         /// Service for tracking operation status and managing cancellation tokens.
         /// </summary>
         protected IStatusTrackerService _statusTrackerService;
@@ -97,6 +102,7 @@ namespace BacklashBot.Management
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="instanceNameConfig">Configuration options for instance name parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
+        /// <param name="marketManagerServiceConfig">Configuration options for market manager service parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
@@ -107,6 +113,7 @@ namespace BacklashBot.Management
             ICentralPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
+            IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
@@ -119,6 +126,7 @@ namespace BacklashBot.Management
             _scopeFactory = scopeFactory;
             _instanceNameConfig = instanceNameConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
+            _marketManagerServiceConfig = marketManagerServiceConfig.Value;
             _performanceMonitor = performanceMonitor;
             _brainStatus = brainStatus;
             _targetCalculationService = targetCalculationService;

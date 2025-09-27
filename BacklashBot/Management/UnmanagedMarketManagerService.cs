@@ -8,6 +8,7 @@ using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace BacklashBot.Management
 {
@@ -31,6 +32,7 @@ namespace BacklashBot.Management
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="instanceNameConfig">Configuration options for execution parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
+        /// <param name="marketManagerServiceConfig">Configuration options for market manager service parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
@@ -41,11 +43,12 @@ namespace BacklashBot.Management
             ICentralPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
+            IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
         }
 
@@ -62,6 +65,8 @@ namespace BacklashBot.Management
         /// <returns>A task representing the asynchronous monitoring operation</returns>
         public override async Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             // Validate brain configuration parameters
             if (brain == null)
             {
@@ -153,6 +158,11 @@ namespace BacklashBot.Management
                     int removed = await RemoveLowestInterestMarkets(context, apiService, brain, toRemove, token);
                     _logger.LogInformation("BRAIN: Usage too high: {Percentage:F2}%. Removed {Count} markets to target {ActualTarget} markets",
                         metrics.CurrentUsage, removed, actualTarget);
+
+                    if (_marketManagerServiceConfig.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordCounterMetric("UnmanagedMarketManagerService", "MarketsRemovedDueToHighUsage", "Markets Removed Due to High Usage", "Number of markets removed because usage exceeded target in unmanaged mode", removed, "count", "MarketManagement");
+                    }
                 }
                 else if (actualTarget > actualMarketCount)
                 {
@@ -167,6 +177,11 @@ namespace BacklashBot.Management
                         foreach (var ticker in addedMarkets)
                             _logger.LogInformation("BRAIN: Added {Market} to watch list during Monitor Watch List", ticker);
                     }
+
+                    if (_marketManagerServiceConfig.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordCounterMetric("UnmanagedMarketManagerService", "MarketsAddedDueToLowUsage", "Markets Added Due to Low Usage", "Number of markets added because usage fell below target in unmanaged mode", addedMarkets.Count, "count", "MarketManagement");
+                    }
                 }
                 else
                 {
@@ -176,6 +191,11 @@ namespace BacklashBot.Management
                     {
                         List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, removed, dto?.MinimumInterest ?? 0);
                         _logger.LogInformation("BRAIN: In unmanaged mode, replaced {Removed} uninteresting markets with {Added} high interest markets.", removed, addedMarkets.Count);
+
+                        if (_marketManagerServiceConfig.EnablePerformanceMetrics)
+                        {
+                            _performanceMonitor.RecordCounterMetric("UnmanagedMarketManagerService", "UninterestingMarketsReplaced", "Uninteresting Markets Replaced", "Number of uninteresting markets replaced with high interest ones in unmanaged mode", removed, "count", "MarketManagement");
+                        }
                     }
                 }
                 _firstWatchUpdate = false;
@@ -188,6 +208,13 @@ namespace BacklashBot.Management
             {
                 _logger.LogError(ex, "Failed to monitor watch list");
             }
+
+            stopwatch.Stop();
+            if (_marketManagerServiceConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordSpeedDialMetric("UnmanagedMarketManagerService", "MonitorWatchListDuration", "Monitor Watch List Duration", "Time taken to monitor watch list in unmanaged mode", stopwatch.ElapsedMilliseconds, "ms", "MarketManagement");
+            }
+
             MonitoringWatchList = false;
         }
 

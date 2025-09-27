@@ -196,6 +196,10 @@ builder.Services.AddOptions<CentralErrorHandlerConfig>()
     .Bind(builder.Configuration.GetSection(CentralErrorHandlerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<MarketManagerServiceConfig>()
+    .Bind(builder.Configuration.GetSection(MarketManagerServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<OrderBookServiceConfig>()
     .Bind(builder.Configuration.GetSection(OrderBookServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -314,6 +318,7 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
+    sp.GetRequiredService<IOptions<MarketManagerServiceConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IBrainStatusService>(),
