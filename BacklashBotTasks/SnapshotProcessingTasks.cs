@@ -45,6 +45,7 @@ namespace BacklashBotTasks
         private SnapshotPeriodHelper _snapshotPeriodHelper;
         private IOptions<DataStorageConfig> _dataStorageConfig;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
+        private Mock<IPerformanceMonitor> _performanceMonitorMock;
         private SnapshotGroupHelper _snapshotGroupHelper;
         private IBacklashBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
@@ -158,6 +159,7 @@ namespace BacklashBotTasks
             var tradingLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
             _spikeLoggerMock = new Mock<ILogger<SpikePredictionModel>>();
+            _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             // Add mocks for missing dependencies
             var scopeManagerMock = new Mock<IScopeManagerService>();
@@ -226,12 +228,12 @@ namespace BacklashBotTasks
 
             // Create database context with proper parameters
             var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
-            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig));
+            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, _performanceMonitorMock.Object));
 
             // Create SqlDataService with proper parameters
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
             var performanceMetricsReceivers = new List<ISqlDataServicePerformanceMetrics>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMetricsReceivers);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitorMock.Object, performanceMetricsReceivers);
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -243,7 +245,7 @@ namespace BacklashBotTasks
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, null);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _scopeFactory, centralPerformanceMonitor);
 
-            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
+            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, _performanceMonitorMock.Object);
             _missingOrderbookCount = 0;
             _overlappingPriceCount = 0;
             _rateDiscrepancyCount = 0; // Initialize new counter
@@ -303,7 +305,7 @@ namespace BacklashBotTasks
                         var connectionString = ConfigurationHelper.BuildConnectionString(config);
                         var dataConfig = _dataConfig;
                         var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
-                        using var dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
+                        using var dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, _performanceMonitorMock.Object);
 
                         // Get market info for category
                         string? marketCategory = null;

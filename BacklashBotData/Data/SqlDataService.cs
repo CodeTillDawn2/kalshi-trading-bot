@@ -39,6 +39,11 @@ namespace KalshiBotData.Data
         private readonly ILogger<ISqlDataService> _logger;
 
         /// <summary>
+        /// Performance monitor for recording metrics.
+        /// </summary>
+        private readonly IPerformanceMonitor _performanceMonitor;
+
+        /// <summary>
         /// Collection of performance metrics receivers that will receive metrics automatically.
         /// </summary>
         private readonly IEnumerable<ISqlDataServicePerformanceMetrics> _performanceMetricsReceivers;
@@ -140,9 +145,10 @@ namespace KalshiBotData.Data
         /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
         /// <param name="dataConfig">Configuration options for data service operations.</param>
+        /// <param name="performanceMonitor">Performance monitor for recording metrics.</param>
         /// <param name="performanceMetricsReceivers">Collection of services that will receive performance metrics automatically.</param>
         public SqlDataService(string connectionString, ILogger<ISqlDataService> logger, BacklashBotDataConfig dataConfig,
-                              IEnumerable<ISqlDataServicePerformanceMetrics> performanceMetricsReceivers)
+                              IPerformanceMonitor performanceMonitor, IEnumerable<ISqlDataServicePerformanceMetrics> performanceMetricsReceivers)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
@@ -159,6 +165,7 @@ namespace KalshiBotData.Data
             }
 
             _logger = logger;
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _startTime = DateTime.UtcNow;
             _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
@@ -998,6 +1005,34 @@ namespace KalshiBotData.Data
                     });
                     stopwatch.Stop();
                     _logger.LogInformation("Processed batch of {Count} {OperationName} operations in {ElapsedMs}ms", operations.Count, operationName, stopwatch.ElapsedMilliseconds);
+
+                    // Transmit performance metrics to the injected monitor
+                    if (_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric(
+                            className: "SqlDataService",
+                            id: $"{operationName}_BatchProcessingTime",
+                            name: $"{operationName} Batch Processing Time",
+                            description: $"Time to process a batch of {operations.Count} {operationName} operations",
+                            value: stopwatch.ElapsedMilliseconds,
+                            unit: "ms",
+                            category: "Database",
+                            metricsEnabled: true
+                        );
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric(
+                            className: "SqlDataService",
+                            id: $"{operationName}_Batch",
+                            name: $"{operationName} Batch",
+                            description: $"Disabled metric for {operationName} batch processing",
+                            value: stopwatch.ElapsedMilliseconds,
+                            unit: "ms",
+                            category: "Database",
+                            metricsEnabled: false
+                        );
+                    }
 
                     // Log metrics periodically
                     if ((DateTime.UtcNow - lastMetricsLog).TotalMinutes >= 1)

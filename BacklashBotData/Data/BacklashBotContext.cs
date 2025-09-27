@@ -67,11 +67,13 @@ namespace BacklashBotData.Data
 
         private readonly string _connectionString;
         private readonly ILogger<BacklashBotContext>? _logger;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         // Configuration options
         private readonly int _maxRetryCount;
         private readonly TimeSpan _retryDelay;
         private readonly int _batchSize;
+        private readonly bool _enablePerformanceMetrics;
         private readonly Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> _performanceMetrics;
 
         /// <summary>
@@ -80,14 +82,17 @@ namespace BacklashBotData.Data
         /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Optional logger for context operations. If null, logging is disabled.</param>
         /// <param name="dataConfig">Configuration options for database operations.</param>
-        /// <exception cref="ArgumentNullException">Thrown when connectionString or dataConfig is null.</exception>
-        public BacklashBotContext(string connectionString, ILogger<BacklashBotContext>? logger, BacklashBotDataConfig dataConfig)
+        /// <param name="performanceMonitor">Performance monitor for tracking metrics.</param>
+        /// <exception cref="ArgumentNullException">Thrown when connectionString, dataConfig, or performanceMonitor is null.</exception>
+        public BacklashBotContext(string connectionString, ILogger<BacklashBotContext>? logger, BacklashBotDataConfig dataConfig, IPerformanceMonitor performanceMonitor)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _logger = logger;
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _maxRetryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
             _batchSize = dataConfig.BatchSize;
+            _enablePerformanceMetrics = dataConfig.EnablePerformanceMetrics;
             _performanceMetrics = new Dictionary<string, (int, int, TimeSpan)>();
         }
 
@@ -1784,6 +1789,34 @@ namespace BacklashBotData.Data
                 {
                     _performanceMetrics[operationName] = (current.SuccessCount, current.FailureCount + 1, current.TotalTime + duration);
                 }
+            }
+
+            // Transmit performance metrics to the injected monitor
+            if (_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "BacklashBotContext",
+                    id: operationName,
+                    name: operationName,
+                    description: $"Performance metric for {operationName}",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Database",
+                    metricsEnabled: true
+                );
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(
+                    className: "BacklashBotContext",
+                    id: operationName,
+                    name: operationName,
+                    description: $"Disabled performance metric for {operationName}",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Database",
+                    metricsEnabled: false
+                );
             }
         }
 

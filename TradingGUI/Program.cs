@@ -84,7 +84,8 @@ namespace TradingGUI
             {
                 var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
                 var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-                return new BacklashBotContext(connectionString, logger, dataConfig);
+                var performanceMonitor = provider.GetRequiredService<IPerformanceMonitor>();
+                return new BacklashBotContext(connectionString, logger, dataConfig, performanceMonitor);
             });
             services.AddTransient<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
 

@@ -192,7 +192,8 @@ namespace BacklashBotTests
 
             // Initialize real context to query for dynamic test data
             var logger = new Mock<ILogger<BacklashBotContext>>().Object;
-            _realContext = new BacklashBotContext(_connectionString, logger, _dataConfig);
+            var performanceMonitorMock = new Mock<IPerformanceMonitor>().Object;
+            _realContext = new BacklashBotContext(_connectionString, logger, _dataConfig, performanceMonitorMock);
 
             // Query for an active market
             var activeMarket = await _realContext.GetMarketsFiltered(

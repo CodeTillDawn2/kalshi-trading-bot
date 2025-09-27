@@ -147,12 +147,13 @@ namespace BacklashBotTasks
 
             // Create database context with proper parameters
             var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
-            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig));
+            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, provider.GetRequiredService<IPerformanceMonitor>()));
 
             // Create SqlDataService with proper parameters
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
+            var performanceMonitorMock = new Mock<IPerformanceMonitor>();
             var performanceMetricsReceivers = new List<ISqlDataServicePerformanceMetrics>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMetricsReceivers);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMonitorMock.Object, performanceMetricsReceivers);
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -164,7 +165,7 @@ namespace BacklashBotTasks
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, null);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _scopeFactory, centralPerformanceMonitor);
 
-            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
+            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, performanceMonitorMock.Object);
 
             _outDir = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
             Directory.CreateDirectory(_outDir);

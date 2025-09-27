@@ -9,6 +9,7 @@ using BacklashCommon.Helpers;
 using BacklashCommon.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotData.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -222,7 +223,8 @@ namespace TradingSimulator
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
+            IEnumerable<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics> performanceMetricsReceivers = serviceProvider.GetServices<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics>();
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitor, performanceMetricsReceivers);
 
             _processedMarkets = new HashSet<string>();
             _cacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;

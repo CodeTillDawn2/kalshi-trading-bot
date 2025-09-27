@@ -422,7 +422,8 @@ builder.Services.AddScoped<IBacklashBotContext>(provider =>
     var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
     var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
     var connStr = provider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
-    return new BacklashBotContext(connStr, logger, dataConfig);
+    var performanceMonitor = provider.GetRequiredService<IPerformanceMonitor>();
+    return new BacklashBotContext(connStr, logger, dataConfig, performanceMonitor);
 });
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
     sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
@@ -439,9 +440,10 @@ builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
     var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
+    var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
     var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
     var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
-    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
+    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor, performanceMetrics);
 });
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();

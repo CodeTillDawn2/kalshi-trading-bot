@@ -149,16 +149,18 @@ namespace BacklashOverseer
             {
                 var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
                 var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-                var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
+                var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
+                IEnumerable<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics> performanceMetricsReceivers = serviceProvider.GetServices<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics>();
                 var connectionString = serviceProvider.GetRequiredService<string>();
-                return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
+                return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor, performanceMetricsReceivers);
             });
             services.AddScoped<BacklashBotContext>(provider =>
             {
                 var connectionString = provider.GetRequiredService<string>();
                 var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
                 var dataConfig = Configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
-                return new BacklashBotContext(connectionString, logger, dataConfig);
+                var performanceMonitor = provider.GetRequiredService<IPerformanceMonitor>();
+                return new BacklashBotContext(connectionString, logger, dataConfig, performanceMonitor);
             });
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
