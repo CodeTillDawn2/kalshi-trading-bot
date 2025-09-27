@@ -25,7 +25,7 @@ namespace BacklashBot.Services
     public class TradingCalculator : ITradingCalculator
     {
         private readonly ILogger<ITradingCalculator> _logger;
-        private readonly CalculationsConfig _config;
+        private readonly BacklashBot.Configuration.CalculationsConfig _config;
         private readonly IPerformanceMonitor _performanceMonitor;
         private readonly bool _enablePerformanceMetrics;
 
@@ -37,7 +37,7 @@ namespace BacklashBot.Services
         /// <param name="config">The CalculationConfig instance containing parameters for technical indicator calculations.</param>
         /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
         /// <exception cref="ArgumentNullException">Thrown when logger, config, or performanceMonitor is null.</exception>
-        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.State.CalculationsConfig> config, IPerformanceMonitor performanceMonitor)
+        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.Configuration.CalculationsConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config?.Value ?? throw new ArgumentNullException(nameof(config));

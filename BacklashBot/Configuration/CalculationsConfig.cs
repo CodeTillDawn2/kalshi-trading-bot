@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BacklashBot.State
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for calculation parameters used in MarketData.

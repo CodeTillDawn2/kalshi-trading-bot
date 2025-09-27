@@ -1,5 +1,4 @@
 using BacklashBot.Configuration;
-using BacklashBot.State;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 

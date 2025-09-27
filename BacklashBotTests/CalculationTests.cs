@@ -3,7 +3,6 @@ using BacklashBot.Helpers;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
-using BacklashBot.State;
 using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Services;

@@ -196,6 +196,14 @@ builder.Services.AddOptions<CentralErrorHandlerConfig>()
     .Bind(builder.Configuration.GetSection(CentralErrorHandlerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<KalshiBotReadyStatusConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiBotReadyStatusConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiBotStatusTrackerConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiBotStatusTrackerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<MarketManagerServiceConfig>()
     .Bind(builder.Configuration.GetSection(MarketManagerServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -204,8 +212,8 @@ builder.Services.AddOptions<OrderBookServiceConfig>()
     .Bind(builder.Configuration.GetSection(OrderBookServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<BacklashBot.State.CalculationsConfig>()
-    .Bind(builder.Configuration.GetSection(BacklashBot.State.CalculationsConfig.SectionName))
+builder.Services.AddOptions<BacklashBot.Configuration.CalculationsConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBot.Configuration.CalculationsConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<BacklashBotDataConfig>()
@@ -326,8 +334,14 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<IBrainStatusService>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<ITargetCalculationService>()));
-builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
-builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
+builder.Services.AddSingleton<IStatusTrackerService>(sp => new KalshiBotStatusTracker(
+    sp.GetRequiredService<ILogger<KalshiBotStatusTracker>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
+    sp.GetRequiredService<IOptions<KalshiBotStatusTrackerConfig>>()));
+builder.Services.AddSingleton<IBotReadyStatus>(sp => new KalshiBotReadyStatus(
+    sp.GetRequiredService<ILogger<KalshiBotReadyStatus>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
+    sp.GetRequiredService<IOptions<KalshiBotReadyStatusConfig>>()));
 builder.Services.AddSingleton<IBrainStatusService>(sp => new BrainStatusService(
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
@@ -397,7 +411,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IPerformanceMonitor>()
             ),
             sp.GetRequiredService<IOptions<MarketServiceDataConfig>>(),
-            sp.GetRequiredService<IOptions<BacklashBot.State.CalculationsConfig>>()
+            sp.GetRequiredService<IOptions<BacklashBot.Configuration.CalculationsConfig>>()
         );
     };
 });
