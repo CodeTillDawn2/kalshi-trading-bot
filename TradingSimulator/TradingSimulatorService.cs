@@ -223,8 +223,7 @@ namespace TradingSimulator
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            IEnumerable<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics> performanceMetricsReceivers = serviceProvider.GetServices<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitor, performanceMetricsReceivers);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitor);
 
             _processedMarkets = new HashSet<string>();
             _cacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;

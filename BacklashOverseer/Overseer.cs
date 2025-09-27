@@ -1,6 +1,7 @@
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
 using KalshiBotAPI.WebSockets.Interfaces;
@@ -42,7 +43,7 @@ namespace BacklashOverseer
         private readonly ILogger<Overseer> _logger;
         private readonly IHubContext<OverseerHub> _hubContext;
         private readonly OverseerConfig _config;
-        private readonly PerformanceMetricsService _performanceMetrics;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private Timer? _systemInfoLogTimer;
@@ -70,7 +71,7 @@ namespace BacklashOverseer
         /// <param name="logger">Logger for recording system events and diagnostics.</param>
         /// <param name="hubContext">SignalR hub context for real-time client communication.</param>
         /// <param name="config">Configuration options for the overseer system.</param>
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config, PerformanceMetricsService performanceMetrics)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
@@ -84,7 +85,7 @@ namespace BacklashOverseer
                 BrainBatchSize = 50,
                 EnableOverseerPerformanceMetrics = true
             };
-            _performanceMetrics = performanceMetrics;
+            _performanceMonitor = performanceMonitor;
 
             // Initialize configuration-based intervals
             _apiFetchInterval = TimeSpan.FromMinutes(_config.ApiFetchIntervalMinutes);
@@ -111,7 +112,15 @@ namespace BacklashOverseer
             await LogBrainPersistenceStateAsync();
 
             // Send initial metrics update regardless of performance metrics flag
-            _performanceMetrics.RecordWebSocketEvent(); // Record one event to indicate initialization
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket",
+                metricsEnabled: _enableOverseerPerformanceMetrics);
 
             // Subscribe to WebSocket events for real-time market data processing
             _webSocketClient.FillReceived += HandleFillEvent;
@@ -158,10 +167,15 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket",
+                metricsEnabled: _enableOverseerPerformanceMetrics);
             _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
@@ -179,10 +193,15 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket",
+                metricsEnabled: _enableOverseerPerformanceMetrics);
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
         }
 
@@ -200,10 +219,15 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket",
+                metricsEnabled: _enableOverseerPerformanceMetrics);
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
             // Process check-in data from brain instances
@@ -361,10 +385,15 @@ namespace BacklashOverseer
                     exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
 
                 stopwatch.Stop();
-                if (_enableOverseerPerformanceMetrics)
-                {
-                    _performanceMetrics.RecordApiFetch(stopwatch.Elapsed);
-                }
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "Overseer",
+                    id: "ApiFetchDuration",
+                    name: "API Fetch Duration",
+                    description: "Time taken to fetch API data",
+                    value: stopwatch.Elapsed.TotalMilliseconds,
+                    unit: "ms",
+                    category: "API",
+                    metricsEnabled: _enableOverseerPerformanceMetrics);
 
                 _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp} in {Duration}ms", DateTime.UtcNow, stopwatch.ElapsedMilliseconds);
             }

@@ -10,7 +10,7 @@ namespace BacklashOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService : BasePerformanceMonitor, IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
+    public class PerformanceMetricsService : BasePerformanceMonitor, IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -143,112 +143,12 @@ namespace BacklashOverseer.Services
             };
         }
 
-        #region WebSocket Metrics
+     
 
-        /// <summary>
-        /// Records a WebSocket event occurrence.
-        /// </summary>
-        public void RecordWebSocketEvent()
-        {
-            lock (_webSocketLock)
-            {
-                _webSocketEventCount++;
-                _lastWebSocketEventTime = DateTime.UtcNow;
-            }
-        }
-
-
-        #endregion
-
-        #region API Metrics
-
-        /// <summary>
-        /// Records an API fetch operation with its duration.
-        /// </summary>
-        /// <param name="duration">The duration of the API fetch operation.</param>
-        public void RecordApiFetch(TimeSpan duration)
-        {
-            lock (_apiLock)
-            {
-                _totalApiFetchTime += (long)duration.TotalMilliseconds;
-                _apiFetchCount++;
-                _lastApiFetchTime = DateTime.UtcNow;
-            }
-        }
-
-
-        #endregion
-
+   
         #region SignalR Metrics
 
-        /// <summary>
-        /// Records a SignalR message processing event.
-        /// </summary>
-        public void RecordSignalRMessage()
-        {
-            lock (_signalRLock)
-            {
-                _totalMessagesProcessed++;
-            }
-        }
 
-        /// <summary>
-        /// Records a SignalR handshake request.
-        /// </summary>
-        public void RecordSignalRHandshake()
-        {
-            lock (_signalRLock)
-            {
-                _totalHandshakeRequests++;
-            }
-        }
-
-        /// <summary>
-        /// Records a SignalR check-in request.
-        /// </summary>
-        public void RecordSignalRCheckIn()
-        {
-            lock (_signalRLock)
-            {
-                _totalCheckInRequests++;
-            }
-        }
-
-        /// <summary>
-        /// Records the latency of a SignalR handshake operation.
-        /// </summary>
-        /// <param name="latency">The latency duration.</param>
-        public void RecordSignalRHandshakeLatency(TimeSpan latency)
-        {
-            lock (_signalRLock)
-            {
-                _handshakeLatencies.Add((long)latency.TotalMilliseconds);
-            }
-        }
-
-        /// <summary>
-        /// Records the latency of a SignalR check-in operation.
-        /// </summary>
-        /// <param name="latency">The latency duration.</param>
-        public void RecordSignalRCheckInLatency(TimeSpan latency)
-        {
-            lock (_signalRLock)
-            {
-                _checkInLatencies.Add((long)latency.TotalMilliseconds);
-            }
-        }
-
-        /// <summary>
-        /// Records the latency of a general SignalR message processing operation.
-        /// </summary>
-        /// <param name="latency">The latency duration.</param>
-        public void RecordSignalRMessageLatency(TimeSpan latency)
-        {
-            lock (_signalRLock)
-            {
-                _messageLatencies.Add((long)latency.TotalMilliseconds);
-            }
-        }
 
         /// <summary>
         /// Gets the current SignalR metrics.
@@ -286,22 +186,7 @@ namespace BacklashOverseer.Services
 
         #region Overnight Task Metrics
 
-        /// <summary>
-        /// Records an overnight task execution.
-        /// </summary>
-        /// <param name="taskName">The name of the task.</param>
-        /// <param name="duration">The duration of the task execution.</param>
-        /// <param name="success">Whether the task was successful.</param>
-        public void RecordOvernightTask(string taskName, TimeSpan duration, bool success)
-        {
-            lock (_overnightLock)
-            {
-                _totalOvernightTasks++;
-                if (success) _successfulOvernightTasks++;
-                _totalOvernightDuration += duration;
-                _overnightTaskTimings[taskName] = duration;
-            }
-        }
+     
 
 
         /// <summary>
@@ -319,23 +204,7 @@ namespace BacklashOverseer.Services
 
         #endregion
 
-        #region Snapshot Aggregation Metrics
-
-        /// <summary>
-        /// Records a snapshot aggregation operation with its duration.
-        /// </summary>
-        /// <param name="duration">The duration of the snapshot aggregation operation.</param>
-        public void RecordSnapshotAggregation(TimeSpan duration)
-        {
-            lock (_snapshotLock)
-            {
-                _totalSnapshotAggregationTime += (long)duration.TotalMilliseconds;
-                _snapshotAggregationCount++;
-                _snapshotAggregationTimes.Add((long)duration.TotalMilliseconds);
-                _logger.LogDebug("Snapshot aggregation recorded: Duration={Duration}ms, TotalCount={Count}, TotalTime={TotalTime}ms",
-                    duration.TotalMilliseconds, _snapshotAggregationCount, _totalSnapshotAggregationTime);
-            }
-        }
+     
 
         /// <summary>
         /// Gets the current snapshot aggregation metrics.
@@ -381,221 +250,9 @@ namespace BacklashOverseer.Services
             }
         }
 
-        #endregion
 
-        #region System Health Metrics
 
-        /// <summary>
-        /// Records a market refresh failure.
-        /// </summary>
-        public void RecordMarketRefreshFailure()
-        {
-            lock (_healthLock)
-            {
-                _marketRefreshFailureCount++;
-                _lastMarketRefreshFailure = DateTime.UtcNow;
-            }
-        }
 
-        /// <summary>
-        /// Resets the market refresh failure count.
-        /// </summary>
-        public void ResetMarketRefreshFailures()
-        {
-            lock (_healthLock)
-            {
-                _marketRefreshFailureCount = 0;
-                _lastMarketRefreshFailure = null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current system health metrics.
-        /// </summary>
-        public (int MarketRefreshFailureCount, DateTime? LastMarketRefreshFailure) GetHealthMetrics()
-        {
-            lock (_healthLock)
-            {
-                return (_marketRefreshFailureCount, _lastMarketRefreshFailure);
-            }
-        }
-
-        #endregion
-
-        #region Cache Metrics
-
-        /// <summary>
-        /// Records a cache hit event.
-        /// </summary>
-        public void RecordCacheHit()
-        {
-            lock (_cacheLock)
-            {
-                _cacheHits++;
-            }
-        }
-
-        /// <summary>
-        /// Records a cache miss event.
-        /// </summary>
-        public void RecordCacheMiss()
-        {
-            lock (_cacheLock)
-            {
-                _cacheMisses++;
-            }
-        }
-
-        /// <summary>
-        /// Posts cache performance metrics from a component.
-        /// </summary>
-        /// <param name="cacheHits">Number of cache hits to add.</param>
-        /// <param name="cacheMisses">Number of cache misses to add.</param>
-        public void PostCacheMetrics(long cacheHits, long cacheMisses)
-        {
-            lock (_cacheLock)
-            {
-                _cacheHits += cacheHits;
-                _cacheMisses += cacheMisses;
-                _logger.LogDebug("Cache metrics posted: Hits={Hits}, Misses={Misses}", cacheHits, cacheMisses);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current cache metrics.
-        /// </summary>
-        public (long CacheHits, long CacheMisses, double HitRate) GetCacheMetrics()
-        {
-            lock (_cacheLock)
-            {
-                long total = _cacheHits + _cacheMisses;
-                double hitRate = total > 0 ? (_cacheHits / (double)total) * 100 : 0;
-                return (_cacheHits, _cacheMisses, hitRate);
-            }
-        }
-
-        /// <summary>
-        /// Resets the cache metrics.
-        /// </summary>
-        public void ResetCacheMetrics()
-        {
-            lock (_cacheLock)
-            {
-                _cacheHits = 0;
-                _cacheMisses = 0;
-            }
-        }
-
-        #endregion
-
-        #region Database Metrics
-
-        /// <summary>
-        /// Records database performance metrics.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing database operation metrics.</param>
-        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
-        {
-            lock (_snapshotLock) // reusing snapshot lock for database metrics
-            {
-                _databaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>(metrics);
-                _logger.LogDebug("Database metrics recorded: {Count} operations", metrics.Count);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current database performance metrics.
-        /// </summary>
-        public Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetDatabaseMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                return new Dictionary<string, (int, int, TimeSpan, double)>(_databaseMetrics);
-            }
-        }
-
-        #endregion
-
-        #region BrainPersistence Metrics
-
-        /// <summary>
-        /// Records BrainPersistence service performance metrics.
-        /// </summary>
-        public void RecordBrainPersistenceMetrics(
-            IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> operationStats,
-            IReadOnlyDictionary<string, int> trimmingCounts,
-            (long TotalWaitTimeMs, int ContentionCount) lockMetrics,
-            Dictionary<string, long> memoryUsage,
-            (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) threadPoolInfo)
-        {
-            lock (_snapshotLock)
-            {
-                _brainPersistenceOperationStats = new Dictionary<string, (long, long, long, long)>(operationStats);
-                _brainPersistenceTrimmingCounts = new Dictionary<string, int>(trimmingCounts);
-                _brainPersistenceLockMetrics = lockMetrics;
-                _brainPersistenceMemoryUsage = new Dictionary<string, long>(memoryUsage);
-                _brainPersistenceThreadPoolInfo = threadPoolInfo;
-                _logger.LogDebug("BrainPersistence metrics recorded: {OperationCount} operations, {TrimmingCount} trimmings",
-                    operationStats.Count, trimmingCounts.Count);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current BrainPersistence operation statistics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> GetBrainPersistenceOperationStats()
-        {
-            lock (_snapshotLock)
-            {
-                return new Dictionary<string, (long, long, long, long)>(_brainPersistenceOperationStats);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current BrainPersistence trimming counts.
-        /// </summary>
-        public IReadOnlyDictionary<string, int> GetBrainPersistenceTrimmingCounts()
-        {
-            lock (_snapshotLock)
-            {
-                return new Dictionary<string, int>(_brainPersistenceTrimmingCounts);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current BrainPersistence lock metrics.
-        /// </summary>
-        public (long TotalWaitTimeMs, int ContentionCount) GetBrainPersistenceLockMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                return _brainPersistenceLockMetrics;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current BrainPersistence memory usage.
-        /// </summary>
-        public IReadOnlyDictionary<string, long> GetBrainPersistenceMemoryUsage()
-        {
-            lock (_snapshotLock)
-            {
-                return new Dictionary<string, long>(_brainPersistenceMemoryUsage);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current BrainPersistence thread pool information.
-        /// </summary>
-        public (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) GetBrainPersistenceThreadPoolInfo()
-        {
-            lock (_snapshotLock)
-            {
-                return _brainPersistenceThreadPoolInfo;
-            }
-        }
-
-        #endregion
 
         #region Metrics Status
 
@@ -680,53 +337,6 @@ namespace BacklashOverseer.Services
             return status;
         }
 
-        /// <summary>
-        /// Records overnight activities performance metrics from the common OvernightActivitiesHelper.
-        /// </summary>
-        /// <param name="metrics">The performance metrics from overnight activities.</param>
-        /// <remarks>
-        /// This method receives comprehensive performance data from the OvernightActivitiesHelper
-        /// and integrates it with the overseer performance monitoring system.
-        /// </remarks>
-        public void RecordOvernightActivitiesMetrics(INightActivitiesPerformanceMetrics metrics)
-        {
-            var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
-
-            // Record as an overnight task
-            RecordOvernightTask("OvernightActivities", TimeSpan.FromMilliseconds(totalTime), errors == 0);
-
-            // Record API calls
-            for (int i = 0; i < apiCalls; i++)
-            {
-                RecordApiFetch(TimeSpan.Zero); // We don't have individual API call times, so record as 0
-            }
-
-            // Log comprehensive overnight performance summary
-            _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
-                totalTime, marketsProcessed, apiCalls, errors, peakMemory);
-
-            // Log individual task performances
-            foreach (var task in taskDurations)
-            {
-                _logger.LogInformation("OVERNIGHT TASK: {TaskName}={Duration}ms", task.Key, task.Value);
-            }
-
-            // Check for overnight performance alerts
-            if (totalTime > 300000) // 5 minutes
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities took {TotalTime}ms (>5 minutes)", totalTime);
-            }
-
-            if (errors > 10)
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities had {ErrorCount} errors", errors);
-            }
-
-            if (peakMemory > 1000) // 1GB
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities used {PeakMemory}MB peak memory (>1GB)", peakMemory);
-            }
-        }
 
         /// <summary>
         /// Logs the current metrics status for debugging purposes.
@@ -800,102 +410,6 @@ namespace BacklashOverseer.Services
             _webSocketSemaphoreWaitCount.Clear();
             _logger.LogInformation("WebSocket performance metrics reset");
         }
-
-        #region ISqlDataServicePerformanceMetrics Implementation
-
-        /// <summary>
-        /// Receives throughput metrics from SqlDataService.
-        /// </summary>
-        /// <param name="operationsPerSecond">Current operations per second rate.</param>
-        /// <param name="totalProcessed">Total operations processed successfully.</param>
-        /// <param name="totalFailed">Total operations that failed.</param>
-        public void ReceiveThroughputMetrics(double operationsPerSecond, long totalProcessed, long totalFailed)
-        {
-            _logger.LogDebug("SqlDataService Throughput: {OpsPerSec:F2} ops/sec, Processed: {Processed}, Failed: {Failed}",
-                operationsPerSecond, totalProcessed, totalFailed);
-
-            // Store metrics in status for monitoring
-            lock (_snapshotLock)
-            {
-                // Could extend to store historical data or expose via API
-            }
-        }
-
-        /// <summary>
-        /// Receives latency metrics from SqlDataService.
-        /// </summary>
-        /// <param name="averageLatencyMs">Average latency in milliseconds for processed operations.</param>
-        /// <param name="sampleCount">Number of latency samples collected.</param>
-        public void ReceiveLatencyMetrics(double averageLatencyMs, long sampleCount)
-        {
-            _logger.LogDebug("SqlDataService Latency: {AvgLatency:F2}ms over {SampleCount} samples", averageLatencyMs, sampleCount);
-
-            // Check for performance alerts
-            if (averageLatencyMs > 1000) // 1 second
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService average latency {AvgLatency:F2}ms exceeds 1 second", averageLatencyMs);
-            }
-        }
-
-        /// <summary>
-        /// Receives resource utilization metrics from SqlDataService.
-        /// </summary>
-        /// <param name="cpuUsagePercent">Current CPU usage percentage.</param>
-        /// <param name="memoryUsageMB">Current memory usage in MB.</param>
-        public void ReceiveResourceMetrics(double cpuUsagePercent, double memoryUsageMB)
-        {
-            _logger.LogDebug("SqlDataService Resources: CPU {CpuUsage:F2}%, Memory {MemoryUsage:F2}MB", cpuUsagePercent, memoryUsageMB);
-
-            // Check for resource alerts
-            if (cpuUsagePercent > 80)
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService CPU usage {CpuUsage:F2}% exceeds 80%", cpuUsagePercent);
-            }
-
-            if (memoryUsageMB > 1000) // 1GB
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService memory usage {MemoryUsage:F2}MB exceeds 1GB", memoryUsageMB);
-            }
-        }
-
-        /// <summary>
-        /// Receives queue depth metrics from SqlDataService.
-        /// </summary>
-        /// <param name="orderBookQueueDepth">Current depth of order book queue.</param>
-        /// <param name="tradeQueueDepth">Current depth of trade queue.</param>
-        /// <param name="fillQueueDepth">Current depth of fill queue.</param>
-        /// <param name="eventLifecycleQueueDepth">Current depth of event lifecycle queue.</param>
-        /// <param name="marketLifecycleQueueDepth">Current depth of market lifecycle queue.</param>
-        /// <param name="totalQueuedOperations">Total operations across all queues.</param>
-        public void ReceiveQueueMetrics(int orderBookQueueDepth, int tradeQueueDepth, int fillQueueDepth,
-                                       int eventLifecycleQueueDepth, int marketLifecycleQueueDepth, int totalQueuedOperations)
-        {
-            _logger.LogDebug("SqlDataService Queues: OrderBook={OrderBook}, Trade={Trade}, Fill={Fill}, Event={Event}, Market={Market}, Total={Total}",
-                orderBookQueueDepth, tradeQueueDepth, fillQueueDepth, eventLifecycleQueueDepth, marketLifecycleQueueDepth, totalQueuedOperations);
-
-            // Check for queue alerts
-            if (totalQueuedOperations > 5000)
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService total queued operations {Total} exceeds 5000", totalQueuedOperations);
-            }
-        }
-
-        /// <summary>
-        /// Receives success rate metrics from SqlDataService.
-        /// </summary>
-        /// <param name="successRatePercent">Success rate as a percentage (0-100).</param>
-        public void ReceiveSuccessRateMetrics(double successRatePercent)
-        {
-            _logger.LogDebug("SqlDataService Success Rate: {SuccessRate:F2}%", successRatePercent);
-
-            // Check for success rate alerts
-            if (successRatePercent < 95.0)
-            {
-                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService success rate {SuccessRate:F2}% is below 95%", successRatePercent);
-            }
-        }
-
-        #endregion
 
         #region ISubscriptionManagerPerformanceMetrics Implementation
 

@@ -1,4 +1,5 @@
 using BacklashBotData.Data.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ namespace BacklashOverseer.Services
         private readonly BrainPersistenceServiceConfig _config;
         private readonly ILogger<BrainPersistenceService>? _logger;
         private readonly IBacklashBotContext? _context;
-        private readonly PerformanceMetricsService? _performanceMetricsService;
+        private readonly IPerformanceMonitor? _performanceMonitor;
         private readonly Stopwatch _serviceStopwatch = new();
         private long _totalOperations;
         private readonly Dictionary<string, List<long>> _operationTimings = new();
@@ -43,17 +44,17 @@ namespace BacklashOverseer.Services
         /// <param name="config">Configuration options including history limits and metric settings.</param>
         /// <param name="context">Database context for persistence operations.</param>
         /// <param name="logger">Optional logger for service operations and performance metrics.</param>
-        /// <param name="performanceMetricsService">Optional performance metrics service for transmitting metrics.</param>
+        /// <param name="performanceMonitor">Optional performance monitor for transmitting metrics.</param>
         public BrainPersistenceService(
             IOptions<BrainPersistenceServiceConfig> config,
             IBacklashBotContext? context = null,
             ILogger<BrainPersistenceService>? logger = null,
-            PerformanceMetricsService? performanceMetricsService = null)
+            IPerformanceMonitor? performanceMonitor = null)
         {
             _config = config.Value;
             _context = context;
             _logger = logger;
-            _performanceMetricsService = performanceMetricsService;
+            _performanceMonitor = performanceMonitor;
             _serviceStopwatch.Start();
 
             if (_context != null)
@@ -628,20 +629,41 @@ namespace BacklashOverseer.Services
         /// </summary>
         private void TransmitMetrics()
         {
-            if (_performanceMetricsService == null || !_config.EnablePerformanceMetrics)
+            if (_performanceMonitor == null || !_config.EnablePerformanceMetrics)
                 return;
 
-            var operationStats = GetOperationStats();
-            var trimmingCounts = TrimmingCounts;
-            var lockMetrics = LockMetrics;
-            var memoryUsage = new Dictionary<string, long>();
-            foreach (var brainName in _brains.Keys)
-            {
-                memoryUsage[brainName] = GetMemoryUsageForBrain(brainName);
-            }
-            var threadPoolInfo = GetThreadPoolInfo();
+            // Record brain count
+            _performanceMonitor.RecordCounterMetric(
+                className: "BrainPersistenceService",
+                id: "BrainCount",
+                name: "Brain Count",
+                description: "Number of brain instances managed",
+                value: _brains.Count,
+                unit: "count",
+                category: "Persistence",
+                metricsEnabled: true);
 
-            _performanceMetricsService.RecordBrainPersistenceMetrics(operationStats, trimmingCounts, lockMetrics, memoryUsage, threadPoolInfo);
+            // Record total operations
+            _performanceMonitor.RecordCounterMetric(
+                className: "BrainPersistenceService",
+                id: "TotalOperations",
+                name: "Total Operations",
+                description: "Total number of operations performed",
+                value: _totalOperations,
+                unit: "count",
+                category: "Persistence",
+                metricsEnabled: true);
+
+            // Record total history entries
+            _performanceMonitor.RecordCounterMetric(
+                className: "BrainPersistenceService",
+                id: "TotalHistoryEntries",
+                name: "Total History Entries",
+                description: "Total number of metric history entries",
+                value: TotalHistoryEntries,
+                unit: "count",
+                category: "Persistence",
+                metricsEnabled: true);
         }
 
         /// <summary>

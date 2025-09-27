@@ -3,6 +3,7 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using BacklashOverseer.Services;
@@ -30,11 +31,11 @@ namespace BacklashOverseer.Controllers
         private readonly IBacklashBotContext _context;
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
-        private readonly SnapshotAggregationService _snapshotService;
+        private readonly SnapshotService _snapshotService;
         private readonly BrainPersistenceService _brainService;
         private readonly ILogger<MarketWatchController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly PerformanceMetricsService _performanceMetricsService;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly MarketWatchControllerConfig _config;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
@@ -65,9 +66,9 @@ namespace BacklashOverseer.Controllers
         /// <param name="snapshotService">Service for managing market snapshots.</param>
         /// <param name="logger">Logger for recording operational information and errors.</param>
         /// <param name="configuration">Configuration for cache durations and performance metrics settings.</param>
-        /// <param name="performanceMetricsService">Service for tracking performance metrics and cache statistics.</param>
+        /// <param name="performanceMonitor">Monitor for tracking performance metrics and cache statistics.</param>
         /// <param name="config">Configuration options for MarketWatchController behavior, including cache durations and performance metrics settings.</param>
-        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, BrainPersistenceService brainService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService, IOptions<MarketWatchControllerConfig> config)
+        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, BrainPersistenceService brainService, ILogger<MarketWatchController> logger, IConfiguration configuration, IPerformanceMonitor performanceMonitor, IOptions<MarketWatchControllerConfig> config)
         {
             _context = context;
             _cache = cache;
@@ -76,7 +77,7 @@ namespace BacklashOverseer.Controllers
             _brainService = brainService;
             _logger = logger;
             _configuration = configuration;
-            _performanceMetricsService = performanceMetricsService;
+            _performanceMonitor = performanceMonitor;
             _config = config.Value;
 
             MarketsCacheDuration = TimeSpan.FromMinutes(_config.MarketsCacheDurationMinutes);
@@ -593,7 +594,24 @@ namespace BacklashOverseer.Controllers
         {
             if (_enableMarketWatchControllerPerformanceMetrics && (_localCacheHits > 0 || _localCacheMisses > 0))
             {
-                _performanceMetricsService.PostCacheMetrics(_localCacheHits, _localCacheMisses);
+                _performanceMonitor.RecordCounterMetric(
+                    className: "MarketWatchController",
+                    id: "CacheHits",
+                    name: "Cache Hits",
+                    description: "Number of cache hits",
+                    value: _localCacheHits,
+                    unit: "count",
+                    category: "Cache",
+                    metricsEnabled: true);
+                _performanceMonitor.RecordCounterMetric(
+                    className: "MarketWatchController",
+                    id: "CacheMisses",
+                    name: "Cache Misses",
+                    description: "Number of cache misses",
+                    value: _localCacheMisses,
+                    unit: "count",
+                    category: "Cache",
+                    metricsEnabled: true);
                 _localCacheHits = 0;
                 _localCacheMisses = 0;
             }

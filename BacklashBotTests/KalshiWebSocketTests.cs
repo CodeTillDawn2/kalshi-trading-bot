@@ -128,8 +128,7 @@ namespace BacklashBotTests
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
             var dataConfig = _configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
             var performanceMonitorMock = new Mock<IPerformanceMonitor>();
-            IEnumerable<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics> performanceMetricsReceivers = new List<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics>();
-            _sqlService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMonitorMock.Object, performanceMetricsReceivers);
+            _sqlService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMonitorMock.Object);
 
             // Create mock objects for the new refactored dependencies
             _connectionManagerMock = new Mock<IWebSocketConnectionManager>();

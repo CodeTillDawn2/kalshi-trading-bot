@@ -1,6 +1,7 @@
 
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,35 +15,30 @@ namespace BacklashOverseer.Services
     /// This service aggregates snapshot groups by market ticker, calculates recorded hours,
     /// market hours, and recorded hours percentages, and returns structured data for analysis.
     /// </summary>
-    public class SnapshotAggregationService
+    public class SnapshotService
     {
         private readonly IBacklashBotContext _context;
-        private readonly PerformanceMetricsService _performanceMetrics;
-        private readonly ILogger<SnapshotAggregationService> _logger;
-        private readonly SnapshotAggregationServiceConfig _config;
+        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly ILogger<SnapshotService> _logger;
+        private readonly SnapshotServiceConfig _config;
+
 
         /// <summary>
-        /// Gets or sets whether performance metrics collection is enabled for SnapshotAggregationService operations.
-        /// When disabled, timing operations are skipped to improve performance.
-        /// </summary>
-        public bool EnableSnapshotAggregationMetrics => _config.EnablePerformanceMetrics;
-
-        /// <summary>
-        /// Initializes a new instance of the SnapshotAggregationService class.
+        /// Initializes a new instance of the SnapshotService class.
         /// </summary>
         /// <param name="context">The database context interface for accessing snapshot and market data.</param>
-        /// <param name="config">The configuration options for SnapshotAggregationService behavior.</param>
-        /// <param name="performanceMetrics">The performance metrics service for recording metrics.</param>
+        /// <param name="config">The configuration options for SnapshotService behavior.</param>
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
         /// <param name="logger">The logger instance for recording operations.</param>
-        public SnapshotAggregationService(
+        public SnapshotService(
             IBacklashBotContext context,
-            IOptions<SnapshotAggregationServiceConfig> config,
-            PerformanceMetricsService performanceMetrics,
-            ILogger<SnapshotAggregationService> logger)
+            IOptions<SnapshotServiceConfig> config,
+            IPerformanceMonitor performanceMonitor,
+            ILogger<SnapshotService> logger)
         {
             _context = context;
             _config = config.Value;
-            _performanceMetrics = performanceMetrics;
+            _performanceMonitor = performanceMonitor;
             _logger = logger;
         }
 
@@ -73,7 +69,7 @@ namespace BacklashOverseer.Services
                 throw new ArgumentNullException(nameof(snapshotGroups));
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = EnableSnapshotAggregationMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = Stopwatch.StartNew();
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -113,12 +109,31 @@ namespace BacklashOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            if (stopwatch != null)
+            stopwatch.Stop();
+            var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+            if (_config.EnablePerformanceMetrics)
             {
-                stopwatch.Stop();
-                // Store performance metrics in centralized service
-                var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
-                _performanceMetrics.RecordSnapshotAggregation(duration);
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "SnapshotService",
+                    id: "SnapshotAggregationDuration",
+                    name: "Snapshot Aggregation Duration",
+                    description: "Time taken to aggregate snapshot groups",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Performance",
+                    metricsEnabled: true);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(
+                    className: "SnapshotService",
+                    id: "SnapshotAggregationDuration",
+                    name: "Snapshot Aggregation Duration",
+                    description: "Time taken to aggregate snapshot groups",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Performance",
+                    metricsEnabled: false);
             }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
@@ -143,7 +158,7 @@ namespace BacklashOverseer.Services
             var marketLookup = relatedMarkets.Where(m => m.market_ticker != null).ToDictionary(m => m.market_ticker!, m => m);
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = EnableSnapshotAggregationMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = Stopwatch.StartNew();
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -197,12 +212,31 @@ namespace BacklashOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            if (stopwatch != null)
+            stopwatch.Stop();
+            var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+            if (_config.EnablePerformanceMetrics)
             {
-                stopwatch.Stop();
-                // Store performance metrics in centralized service
-                var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
-                _performanceMetrics.RecordSnapshotAggregation(duration);
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "SnapshotService",
+                    id: "SnapshotAggregationDuration",
+                    name: "Snapshot Aggregation Duration",
+                    description: "Time taken to aggregate snapshot groups",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Performance",
+                    metricsEnabled: true);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(
+                    className: "SnapshotService",
+                    id: "SnapshotAggregationDuration",
+                    name: "Snapshot Aggregation Duration",
+                    description: "Time taken to aggregate snapshot groups",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Performance",
+                    metricsEnabled: false);
             }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
@@ -219,7 +253,7 @@ namespace BacklashOverseer.Services
         /// </remarks>
         public long[] GetAggregationTimes()
         {
-            return EnableSnapshotAggregationMetrics ? _performanceMetrics.GetSnapshotAggregationTimes() : Array.Empty<long>();
+            return Array.Empty<long>();
         }
 
         /// <summary>
@@ -232,11 +266,7 @@ namespace BacklashOverseer.Services
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()
         {
-            if (!EnableSnapshotAggregationMetrics)
-                return (0, 0, 0, 0);
-
-            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
-            return (metrics.Count, metrics.AverageMs, metrics.MinMs, metrics.MaxMs);
+            return (0, 0, 0, 0);
         }
 
         /// <summary>
@@ -248,11 +278,7 @@ namespace BacklashOverseer.Services
         /// </remarks>
         public long GetTotalAggregationTime()
         {
-            if (!EnableSnapshotAggregationMetrics)
-                return 0;
-
-            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
-            return metrics.TotalMs;
+            return 0;
         }
 
         /// <summary>
@@ -264,11 +290,7 @@ namespace BacklashOverseer.Services
         /// </remarks>
         public int GetAggregationCount()
         {
-            if (!EnableSnapshotAggregationMetrics)
-                return 0;
-
-            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
-            return metrics.Count;
+            return 0;
         }
 
         /// <summary>
@@ -280,10 +302,7 @@ namespace BacklashOverseer.Services
         /// </remarks>
         public void ClearAggregationMetrics()
         {
-            if (EnableSnapshotAggregationMetrics)
-            {
-                _performanceMetrics.ClearSnapshotAggregationMetrics();
-            }
+            // No-op since metrics are now handled centrally
         }
     }
 }

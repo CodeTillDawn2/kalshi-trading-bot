@@ -1,3 +1,4 @@
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
@@ -26,8 +27,7 @@ namespace OverseerTests
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
         private BrainPersistenceService _brainService;
         private Mock<ILogger<BrainPersistenceService>> _brainServiceLoggerMock;
-        private PerformanceMetricsService _performanceMetrics;
-        private Mock<ILogger<PerformanceMetricsService>> _performanceMetricsLoggerMock;
+        private Mock<IPerformanceMonitor> _performanceMonitorMock;
         private OverseerHubConfig _config;
         private OverseerHub _hub;
 
@@ -64,8 +64,7 @@ namespace OverseerTests
             _brainServiceLoggerMock = new Mock<ILogger<BrainPersistenceService>>();
             _brainService = new BrainPersistenceService(brainConfigOptions, null, _brainServiceLoggerMock.Object, null);
 
-            _performanceMetricsLoggerMock = new Mock<ILogger<PerformanceMetricsService>>();
-            _performanceMetrics = new PerformanceMetricsService(_performanceMetricsLoggerMock.Object);
+            _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             var configOptions = Options.Create(_config);
 
@@ -74,7 +73,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 configOptions,
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
         }
 
@@ -92,7 +91,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 configOptions,
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
 
             // Assert
@@ -121,7 +120,7 @@ namespace OverseerTests
                     _scopeFactoryMock.Object,
                     _brainService,
                     configOptions,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
@@ -132,7 +131,7 @@ namespace OverseerTests
                     null,
                     _brainService,
                     configOptions,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
@@ -154,7 +153,7 @@ namespace OverseerTests
                     _scopeFactoryMock.Object,
                     _brainService,
                     null,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
@@ -187,7 +186,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -226,7 +225,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -289,7 +288,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -392,7 +391,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -427,8 +426,8 @@ namespace OverseerTests
             IServiceScopeFactory scopeFactory,
             BrainPersistenceService brainService,
             IOptions<OverseerHubConfig> config,
-            PerformanceMetricsService performanceMetrics)
-            : base(logger, scopeFactory, brainService, config, performanceMetrics)
+            IPerformanceMonitor performanceMonitor)
+            : base(logger, scopeFactory, brainService, config, performanceMonitor)
         {
         }
 

@@ -150,9 +150,8 @@ namespace BacklashOverseer
                 var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
                 var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
                 var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
-                IEnumerable<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics> performanceMetricsReceivers = serviceProvider.GetServices<BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics>();
                 var connectionString = serviceProvider.GetRequiredService<string>();
-                return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor, performanceMetricsReceivers);
+                return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
             });
             services.AddScoped<BacklashBotContext>(provider =>
             {
@@ -197,9 +196,9 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Configure SnapshotAggregationService settings
-            services.AddOptions<Config.SnapshotAggregationServiceConfig>()
-                .Bind(Configuration.GetSection(Config.SnapshotAggregationServiceConfig.SectionName))
+            // Configure SnapshotService settings
+            services.AddOptions<Config.SnapshotServiceConfig>()
+                .Bind(Configuration.GetSection(Config.SnapshotServiceConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -316,12 +315,12 @@ namespace BacklashOverseer
             services.AddMemoryCache();
 
             // Register SnapshotService with dependencies
-            services.AddScoped<SnapshotAggregationService>(sp =>
-                new SnapshotAggregationService(
+            services.AddScoped<SnapshotService>(sp =>
+                new SnapshotService(
                     sp.GetRequiredService<IBacklashBotContext>(),
-                    sp.GetRequiredService<IOptions<Config.SnapshotAggregationServiceConfig>>(),
-                    sp.GetRequiredService<PerformanceMetricsService>(),
-                    sp.GetRequiredService<ILogger<SnapshotAggregationService>>()
+                    sp.GetRequiredService<IOptions<Config.SnapshotServiceConfig>>(),
+                    sp.GetRequiredService<IPerformanceMonitor>(),
+                    sp.GetRequiredService<ILogger<SnapshotService>>()
                 ));
 
             // Register PerformanceMetricsService
@@ -354,7 +353,7 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
                 sp.GetRequiredService<IBacklashBotContext>(),
                 sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
-                sp.GetRequiredService<PerformanceMetricsService>()
+                sp.GetRequiredService<IPerformanceMonitor>()
             ));
 
 

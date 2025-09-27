@@ -232,8 +232,7 @@ namespace BacklashBotTasks
 
             // Create SqlDataService with proper parameters
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            var performanceMetricsReceivers = new List<ISqlDataServicePerformanceMetrics>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitorMock.Object, performanceMetricsReceivers);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitorMock.Object);
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();

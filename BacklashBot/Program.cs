@@ -258,8 +258,6 @@ builder.Services.AddSingleton<IPerformanceMonitor>(provider =>
     provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
     (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<ISqlDataServicePerformanceMetrics>(provider =>
-    (ISqlDataServicePerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
     (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<ISubscriptionManagerPerformanceMetrics>(provider =>
@@ -441,9 +439,8 @@ builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
     var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
     var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
     var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
-    var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
     var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
-    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor, performanceMetrics);
+    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
 });
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
