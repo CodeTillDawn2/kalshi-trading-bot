@@ -1,4 +1,5 @@
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
@@ -26,7 +27,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
         private readonly StrategySelectionHelper _strategySelectionHelper;
-        private readonly PerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace TradingStrategies.Trading.Overseer
             MarketTypeService marketTypeService,
             StrategySelectionHelper strategySelectionHelper,
             PatternDetectionService patternDetectionService,
-            PerformanceMonitor? performanceMonitor = null)
+            IPerformanceMonitor performanceMonitor)
         {
             _marketTypeService = marketTypeService;
             _strategySelectionHelper = strategySelectionHelper;
@@ -82,7 +83,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Gets the pattern performance monitor for accessing performance metrics.
         /// </summary>
-        public PerformanceMonitor? PerformanceMonitor => _performanceMonitor;
+        public IPerformanceMonitor PerformanceMonitor => _performanceMonitor;
 
         /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
@@ -181,20 +182,22 @@ namespace TradingStrategies.Trading.Overseer
                 LastIOReadTime = TimeSpan.Zero; // Placeholder for future I/O tracking
                 LastIOWriteTime = TimeSpan.Zero; // Placeholder for future I/O tracking
 
-                // Record metrics to PerformanceMonitor if available and enabled
-                if (_performanceMonitor != null && _performanceMonitor.EnablePerformanceMetrics)
+                // Record metrics to PerformanceMonitor
+                if (_enablePerformanceMetrics)
                 {
-                    var metrics = new Dictionary<string, object>
-                    {
-                        ["TotalExecutionTime"] = LastExecutionTime,
-                        ["MemoryUsed"] = LastMemoryUsed,
-                        ["ThroughputSnapshotsPerSecond"] = LastThroughputSnapshotsPerSecond,
-                        ["SnapshotsProcessed"] = snapshots.Count,
-                        ["IOReadTime"] = LastIOReadTime,
-                        ["IOWriteTime"] = LastIOWriteTime,
-                        ["EnablePerformanceMetrics"] = _enablePerformanceMetrics
-                    };
-                    _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", LastExecutionTime.TotalMilliseconds, "ms", "Simulation", 0, 1000, 5000, true);
+                    _performanceMonitor.RecordProgressBarMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", LastMemoryUsed, "bytes", "Simulation", 0, 1000000, 10000000, true);
+                    _performanceMonitor.RecordNumericDisplayMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", LastThroughputSnapshotsPerSecond, "/s", "Simulation", true);
+                    _performanceMonitor.RecordCounterMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", snapshots.Count, "count", "Simulation", true);
+                    _performanceMonitor.RecordTrafficLightMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", _enablePerformanceMetrics ? 1 : 0, "", "Simulation", 0, 0.5, 1, true);
+                }
+                else
+                {
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", 0, "ms", "Simulation", false);
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", 0, "bytes", "Simulation", false);
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", 0, "/s", "Simulation", false);
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", 0, "count", "Simulation", false);
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", 0, "", "Simulation", false);
                 }
             }
 
@@ -202,7 +205,7 @@ namespace TradingStrategies.Trading.Overseer
             _marketTypeService.PostMetrics();
 
             // Post StrategySelectionHelper metrics automatically
-            _strategySelectionHelper.PostMetrics(_performanceMonitor);
+            _strategySelectionHelper.PostMetrics();
 
             return activePaths;
         }
@@ -995,23 +998,35 @@ namespace TradingStrategies.Trading.Overseer
         {
             var result = await _patternDetectionService.DetectPatternsAsync(snapshot);
 
-            // Record comprehensive performance metrics if monitor is available and metrics were collected
-            if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
+            // Record comprehensive performance metrics if monitor is available
+            if (_performanceMonitor != null)
             {
-                var metricsDict = new Dictionary<string, object>
+                if (_enablePerformanceMetrics)
                 {
-                    ["MethodName"] = "PatternDetectionService.DetectPatternsAsync",
-                    ["TotalExecutionTimeMs"] = result.ExecutionTimeMs.Value,
-                    ["TotalItemsProcessed"] = result.TotalCandlesProcessed ?? 0,
-                    ["TotalItemsFound"] = result.TotalPatternsFound ?? 0,
-                    ["ItemCheckTimes"] = result.PatternCheckTimes,
-                    ["Timestamp"] = DateTime.UtcNow
-                };
-
-                _performanceMonitor.RecordSimulationMetrics("PatternDetectionService", metricsDict, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", result.ExecutionTimeMs.Value, "ms", "PatternDetection", 0, 1000, 5000, true);
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", result.TotalCandlesProcessed ?? 0, "count", "PatternDetection", true);
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", result.TotalPatternsFound ?? 0, "count", "PatternDetection", true);
+                    foreach (var kvp in result.PatternCheckTimes)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", (double)kvp.Value, "ms", "PatternDetection", 0, 1000, 5000, true);
+                    }
+                    
+                }
+                else
+                {
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", 0, "ms", "PatternDetection", false);
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", 0, "count", "PatternDetection", false);
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", 0, "count", "PatternDetection", false);
+                    foreach (var kvp in result.PatternCheckTimes)
+                    {
+                        _performanceMonitor.RecordDisabledMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", 0, "ms", "PatternDetection", false);
+                    }
+                }
             }
 
             return result.Patterns;
         }
+
+
     }
 }

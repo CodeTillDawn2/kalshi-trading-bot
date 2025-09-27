@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using OverseerBotShared;
 using System.Diagnostics;
 using System.Net.Http;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashBot.Services
 {
@@ -1320,7 +1321,7 @@ namespace BacklashBot.Services
                 // Send all possible metrics as disabled
                 foreach (var kvp in allMetrics)
                 {
-                    _centralPerformanceMonitor.RecordDisabledMetricMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
+                    _centralPerformanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
                 }
             }
         }

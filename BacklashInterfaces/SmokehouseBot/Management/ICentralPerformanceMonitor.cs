@@ -1,3 +1,5 @@
+using BacklashInterfaces.PerformanceMetrics;
+
 namespace BacklashBot.Management.Interfaces
 {
     /// <summary>
@@ -5,7 +7,7 @@ namespace BacklashBot.Management.Interfaces
     /// system performance metrics across various components including queues, WebSocket connections,
     /// database operations, and market analysis activities.
     /// </summary>
-    public interface ICentralPerformanceMonitor : BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor
+    public interface ICentralPerformanceMonitor : IPerformanceMonitor
     {
 
         // Additional methods specific to central performance monitoring:

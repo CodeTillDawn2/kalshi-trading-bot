@@ -853,6 +853,37 @@ namespace BacklashBot.Management
             return new ConcurrentDictionary<string, int>();
         }
 
+        /// <summary>
+        /// Records a WebSocket operation with timing information.
+        /// </summary>
+        /// <param name="operation">The operation name.</param>
+        /// <param name="duration">The duration of the operation.</param>
+        /// <param name="success">Whether the operation was successful.</param>
+        public void RecordWebSocketOperation(string operation, TimeSpan duration, bool success)
+        {
+            // Implementation can be added here if needed
+        }
+
+        /// <summary>
+        /// Records semaphore wait time for WebSocket operations.
+        /// </summary>
+        /// <param name="operation">The operation name.</param>
+        /// <param name="waitTime">The time spent waiting for the semaphore.</param>
+        public void RecordSemaphoreWait(string operation, TimeSpan waitTime)
+        {
+            // Implementation can be added here if needed
+        }
+
+        /// <summary>
+        /// Records WebSocket message processing time.
+        /// </summary>
+        /// <param name="messageType">The type of message processed.</param>
+        /// <param name="processingTime">The time spent processing the message.</param>
+        public void RecordWebSocketMessageProcessing(string messageType, TimeSpan processingTime)
+        {
+            // Implementation can be added here if needed
+        }
+
         #endregion
 
         #region Subscription Manager Performance Metrics Getters

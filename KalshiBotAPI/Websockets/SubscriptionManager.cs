@@ -99,7 +99,7 @@ namespace KalshiBotAPI.Websockets
             IDataCache dataCache,
             IStatusTrackerService statusTrackerService,
             IOptions<SubscriptionManagerConfig> config,
-            ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
+            IPerformanceMonitor performanceMetrics)
             : base(logger, connectionManager, statusTrackerService, config, performanceMetrics)
         {
             _logger = logger;
@@ -1401,6 +1401,140 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Sends operation performance metrics using the performance monitor interface.
+        /// </summary>
+        /// <param name="metrics">The operation metrics to send.</param>
+        private void SendOperationMetrics(ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string operation = kvp.Key;
+                var (avgTicks, totalOps, successOps) = kvp.Value;
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetric(
+                        "SubscriptionManager",
+                        $"OperationMetrics_{operation}",
+                        $"Operation Metrics - {operation}",
+                        $"Performance metrics for {operation} operations",
+                        0,
+                        "",
+                        "Performance",
+                        false
+                    );
+                    continue;
+                }
+
+                // Record total operations
+                _performanceMetrics.RecordCounterMetric(
+                    "SubscriptionManager",
+                    $"OperationMetrics_{operation}_Total",
+                    $"{operation} Total Operations",
+                    $"Total number of {operation} operations",
+                    totalOps,
+                    "count",
+                    "Performance"
+                );
+
+                // Record successful operations
+                _performanceMetrics.RecordCounterMetric(
+                    "SubscriptionManager",
+                    $"OperationMetrics_{operation}_Success",
+                    $"{operation} Successful Operations",
+                    $"Number of successful {operation} operations",
+                    successOps,
+                    "count",
+                    "Performance"
+                );
+
+                // Record average time in ms
+                double avgMs = avgTicks / (double)TimeSpan.TicksPerMillisecond;
+                _performanceMetrics.RecordSpeedDialMetric(
+                    "SubscriptionManager",
+                    $"OperationMetrics_{operation}_AvgTime",
+                    $"{operation} Average Time",
+                    $"Average time for {operation} operations",
+                    avgMs,
+                    "ms",
+                    "Performance",
+                    0,
+                    1000,
+                    5000
+                );
+            }
+        }
+
+        /// <summary>
+        /// Sends lock contention metrics using the performance monitor interface.
+        /// </summary>
+        /// <param name="metrics">The lock metrics to send.</param>
+        private void SendLockMetrics(ConcurrentDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string lockName = kvp.Key;
+                var (acqCount, avgWaitTicks, contCount) = kvp.Value;
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetric(
+                        "SubscriptionManager",
+                        $"LockMetrics_{lockName}",
+                        $"Lock Metrics - {lockName}",
+                        $"Lock contention metrics for {lockName}",
+                        0,
+                        "",
+                        "Performance",
+                        false
+                    );
+                    continue;
+                }
+
+                // Record acquisition count
+                _performanceMetrics.RecordCounterMetric(
+                    "SubscriptionManager",
+                    $"LockMetrics_{lockName}_Acquisitions",
+                    $"{lockName} Acquisitions",
+                    $"Total acquisitions for {lockName}",
+                    acqCount,
+                    "count",
+                    "Performance"
+                );
+
+                // Record contention count
+                _performanceMetrics.RecordCounterMetric(
+                    "SubscriptionManager",
+                    $"LockMetrics_{lockName}_Contentions",
+                    $"{lockName} Contentions",
+                    $"Total contentions for {lockName}",
+                    contCount,
+                    "count",
+                    "Performance"
+                );
+
+                // Record average wait time in ms
+                double avgWaitMs = avgWaitTicks / (double)TimeSpan.TicksPerMillisecond;
+                _performanceMetrics.RecordSpeedDialMetric(
+                    "SubscriptionManager",
+                    $"LockMetrics_{lockName}_AvgWait",
+                    $"{lockName} Average Wait",
+                    $"Average wait time for {lockName}",
+                    avgWaitMs,
+                    "ms",
+                    "Performance",
+                    0,
+                    100,
+                    500
+                );
+            }
+        }
+
+        /// <summary>
         /// Gets performance metrics for subscription operations.
         /// </summary>
         /// <returns>A dictionary containing operation metrics, or empty if metrics are disabled.</returns>
@@ -1423,7 +1557,7 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostOperationMetrics(metrics);
+                SendOperationMetrics(metrics);
             }
 
             return metrics;
@@ -1452,7 +1586,7 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostLockContentionMetrics(metrics);
+                SendLockMetrics(metrics);
             }
 
             return metrics;

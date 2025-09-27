@@ -692,15 +692,15 @@ namespace BacklashBot.Services
             if (!enablePerformanceMetrics)
             {
                 // Send disabled metrics
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "SuccessfulBroadcasts", "Successful Broadcasts", "Number of successful broadcasts", successfulBroadcasts, "count", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "FailedBroadcasts", "Failed Broadcasts", "Number of failed broadcasts", failedBroadcasts, "count", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalBroadcastTime", "Total Broadcast Time", "Cumulative time spent on broadcasts", totalBroadcastTime, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "AverageBroadcastTime", "Average Broadcast Time", "Average time per broadcast", avgTime, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "SuccessRate", "Broadcast Success Rate", "Percentage of successful broadcasts", successRate, "%", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalDataSize", "Total Data Size", "Total size of broadcast payloads", totalDataSize, "bytes", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "BroadcastsPerMinute", "Broadcasts Per Minute", "Average broadcasts per minute", broadcastsPerMinute, "bpm", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalMemoryUsed", "Total Memory Used", "Total memory used during broadcasts", totalMemoryUsed, "bytes", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "AverageIntervalDeviation", "Average Interval Deviation", "Average deviation from broadcast intervals", avgDeviation, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "SuccessfulBroadcasts", "Successful Broadcasts", "Number of successful broadcasts", successfulBroadcasts, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "FailedBroadcasts", "Failed Broadcasts", "Number of failed broadcasts", failedBroadcasts, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalBroadcastTime", "Total Broadcast Time", "Cumulative time spent on broadcasts", totalBroadcastTime, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageBroadcastTime", "Average Broadcast Time", "Average time per broadcast", avgTime, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "SuccessRate", "Broadcast Success Rate", "Percentage of successful broadcasts", successRate, "%", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalDataSize", "Total Data Size", "Total size of broadcast payloads", totalDataSize, "bytes", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "BroadcastsPerMinute", "Broadcasts Per Minute", "Average broadcasts per minute", broadcastsPerMinute, "bpm", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalMemoryUsed", "Total Memory Used", "Total memory used during broadcasts", totalMemoryUsed, "bytes", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageIntervalDeviation", "Average Interval Deviation", "Average deviation from broadcast intervals", avgDeviation, "ms", category, false);
             }
             else
             {

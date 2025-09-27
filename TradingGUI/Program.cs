@@ -17,6 +17,7 @@ using BacklashCommon.Configuration;
 using TradingSimulator.Configuration;
 using TradingStrategies.Trading.Overseer;
 using BacklashBotData.Data.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingGUI
 {
@@ -33,7 +34,7 @@ namespace TradingGUI
             // Set up DI container
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
-            services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
+            services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
 
             // Bind configurations to respective models
             services.AddOptions<LoggingConfig>()

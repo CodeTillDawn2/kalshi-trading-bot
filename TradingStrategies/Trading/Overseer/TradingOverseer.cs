@@ -136,7 +136,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Post EquityCalculator metrics automatically
-            _equityCalculator.PostMetrics(_performanceMonitor);
+            _equityCalculator.PostMetrics();
 
             return pathData;
         }

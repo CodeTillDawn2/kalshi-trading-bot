@@ -488,12 +488,13 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
     sp.GetRequiredService<IPerformanceMonitor>()
 ));
-builder.Services.AddScoped<ISubscriptionManager>(sp => new KalshiBotAPI.Websockets.SubscriptionManager(
+builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<ILogger<KalshiBotAPI.Websockets.SubscriptionManager>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
+    sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>()
 ));
 builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
     var client = new KalshiWebSocketClient(
@@ -506,7 +507,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
         sp.GetRequiredService<IWebSocketConnectionManager>(),
         sp.GetRequiredService<ISubscriptionManager>(),
         sp.GetRequiredService<IMessageProcessor>(),
-        sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+        sp.GetRequiredService<IPerformanceMonitor>(),
         sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
     );
     // Enable all channels for BacklashBot

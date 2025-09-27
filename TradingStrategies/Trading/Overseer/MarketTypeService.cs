@@ -295,10 +295,10 @@ namespace TradingStrategies.Trading.Overseer
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetricMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", 0, "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", 0, "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", 0, "ms", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", 0, "ms", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", 0, "count", "Performance", metricsEnabled);
             }
         }
     }

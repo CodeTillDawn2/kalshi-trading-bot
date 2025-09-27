@@ -39,5 +39,7 @@ namespace BacklashInterfaces.PerformanceMetrics
         /// Resets all WebSocket performance metrics.
         /// </summary>
         void ResetWebSocketMetrics();
+
+      
     }
 }

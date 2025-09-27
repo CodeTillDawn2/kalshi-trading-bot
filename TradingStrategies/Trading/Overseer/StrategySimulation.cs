@@ -98,7 +98,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly List<TimeSpan> _decisionTimes = new List<TimeSpan>();
         private readonly List<TimeSpan> _applyTimes = new List<TimeSpan>();
         private readonly SimulationConfig _config;
-        private readonly IPerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private int _totalTradesExecuted = 0;
         private int _tradeCountThisSnapshot = 0;
 
@@ -111,7 +111,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="initialCash">The initial cash balance for the simulation (default is 100.0).</param>
         /// <param name="performanceMonitor">Optional performance monitor to automatically record metrics.</param>
         /// <exception cref="ArgumentNullException">Thrown when strategy or config is null.</exception>
-        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, double initialCash = 100.0, IPerformanceMonitor? performanceMonitor = null)
+        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, IPerformanceMonitor performanceMonitor, double initialCash = 100.0)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -804,7 +804,7 @@ namespace TradingStrategies.Trading.Overseer
             };
 
             // Automatically record to performance monitor if provided
-            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics, _config.EnablePerformanceMetrics);
+            RecordSimulationMetrics(Strategy.Name, metrics, _config.EnablePerformanceMetrics);
 
             return metrics;
         }
@@ -823,6 +823,123 @@ namespace TradingStrategies.Trading.Overseer
             _applyTimes.Clear();
             _stopwatch.Reset();
             _totalTradesExecuted = 0;
+        }
+
+        private void RecordSimulationMetrics(string className, Dictionary<string, object> metrics, bool enabled)
+        {
+            string category = "Simulation";
+            if (!enabled)
+            {
+                foreach (var kvp in metrics)
+                {
+                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category, false);
+                }
+                return;
+            }
+            foreach (var kvp in metrics)
+            {
+                string id = kvp.Key;
+                string name = kvp.Key;
+                string description = GetDescriptionForMetric(id);
+                double value = GetValueAsDouble(kvp.Value);
+                string unit = GetUnitForMetric(id);
+                switch (id)
+                {
+                    case "TotalExecutionTime":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "AverageExecutionTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "PeakMemoryUsage":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "TotalSnapshotsProcessed":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "PerformanceThresholdMs":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "SlowOperationsCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "RestingOrdersCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "CurrentPosition":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "CurrentCash":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "TotalTradesExecuted":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "AverageDecisionTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "AverageApplyTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "SlowDecisionsCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    default:
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                }
+            }
+        }
+
+        private string GetDescriptionForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "Total time spent processing all snapshots";
+                case "AverageExecutionTimeMs": return "Average time to process one snapshot";
+                case "PeakMemoryUsage": return "Maximum memory usage during simulation";
+                case "TotalSnapshotsProcessed": return "Number of snapshots processed";
+                case "PerformanceThresholdMs": return "Threshold for slow operations";
+                case "SlowOperationsCount": return "Number of operations exceeding performance threshold";
+                case "RestingOrdersCount": return "Current number of resting orders";
+                case "CurrentPosition": return "Current position size";
+                case "CurrentCash": return "Current cash balance";
+                case "TotalTradesExecuted": return "Total number of trades executed";
+                case "AverageDecisionTimeMs": return "Average time for strategy decisions";
+                case "AverageApplyTimeMs": return "Average time to apply trading actions";
+                case "SlowDecisionsCount": return "Number of slow strategy decisions";
+                default: return $"Metric: {id}";
+            }
+        }
+
+        private string GetUnitForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "ms";
+                case "AverageExecutionTimeMs": return "ms";
+                case "PeakMemoryUsage": return "bytes";
+                case "TotalSnapshotsProcessed": return "count";
+                case "PerformanceThresholdMs": return "ms";
+                case "SlowOperationsCount": return "count";
+                case "RestingOrdersCount": return "count";
+                case "CurrentPosition": return "contracts";
+                case "CurrentCash": return "USD";
+                case "TotalTradesExecuted": return "count";
+                case "AverageDecisionTimeMs": return "ms";
+                case "AverageApplyTimeMs": return "ms";
+                case "SlowDecisionsCount": return "count";
+                default: return "";
+            }
+        }
+
+        private double GetValueAsDouble(object value)
+        {
+            if (value is TimeSpan ts) return ts.TotalMilliseconds;
+            if (value is double d) return d;
+            if (value is int i) return (double)i;
+            if (value is long l) return (double)l;
+            return 0.0;
         }
     }
 }

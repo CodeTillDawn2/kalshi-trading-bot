@@ -53,18 +53,6 @@ public class MessageProcessorConfig
     [Required(ErrorMessage = "The 'PerformanceMetricsLogIntervalMs' is missing in the configuration.")]
     public int PerformanceMetricsLogIntervalMs { get; set; }
 
-    /// <summary>
-    /// Gets or sets the threshold for duplicate message warnings.
-    /// If duplicate messages exceed this count within a time window, warnings are logged.
-    /// </summary>
-    [Required(ErrorMessage = "The 'DuplicateMessageWarningThreshold' is missing in the configuration.")]
-    public int DuplicateMessageWarningThreshold { get; set; }
-
-    /// <summary>
-    /// Gets or sets the time window in milliseconds for duplicate message counting.
-    /// </summary>
-    [Required(ErrorMessage = "The 'DuplicateMessageTimeWindowMs' is missing in the configuration.")]
-    public int DuplicateMessageTimeWindowMs { get; set; }
 
     /// <summary>
     /// Gets or sets whether to use sophisticated locking mechanisms for high-concurrency scenarios.

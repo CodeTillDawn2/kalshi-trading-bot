@@ -574,16 +574,16 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 // Update performance metrics
+                var processingTime = _processingStopwatch.ElapsedMilliseconds - processingStartTime;
                 if (_enablePerformanceMonitoring)
                 {
-                    var processingTime = _processingStopwatch.ElapsedMilliseconds - processingStartTime;
                     lock (_metricsLock)
                     {
                         _totalMessagesProcessed++;
                         _totalProcessingTimeMs += processingTime;
                     }
-                    LogPerformanceMetrics();
                 }
+                LogPerformanceMetrics();
             }
             catch (JsonException ex)
             {
@@ -1388,9 +1388,6 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         private void LogPerformanceMetrics()
         {
-            if (!_enablePerformanceMonitoring)
-                return;
-
             lock (_metricsLock)
             {
                 var now = DateTime.UtcNow;
@@ -1401,19 +1398,41 @@ namespace KalshiBotAPI.Websockets
                     var messagesPerSecond = _totalMessagesProcessed / timeSinceLastLog.TotalSeconds;
                     var avgProcessingTime = _totalMessagesProcessed > 0 ? _totalProcessingTimeMs / _totalMessagesProcessed : 0;
 
-                    _logger.LogInformation("Performance Metrics - Messages/sec: {MessagesPerSecond:F2}, Avg Processing Time: {AvgProcessingTime}ms, Queue Depth: {QueueDepth}, Total Processed: {TotalProcessed}",
-                        messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
+                    if (_enablePerformanceMonitoring)
+                    {
+                        _logger.LogInformation("Performance Metrics - Messages/sec: {MessagesPerSecond:F2}, Avg Processing Time: {AvgProcessingTime}ms, Queue Depth: {QueueDepth}, Total Processed: {TotalProcessed}",
+                            messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
+                    }
 
                     // Post metrics to central monitoring services
-                    PostMessageProcessingMetrics(
-                        _totalMessagesProcessed,
-                        _totalProcessingTimeMs,
-                        avgProcessingTime,
-                        messagesPerSecond,
-                        _orderBookUpdateQueue.Count);
+                    if (!_enablePerformanceMonitoring)
+                    {
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalMessagesProcessed", "Total Messages Processed", "Total number of messages processed", _totalMessagesProcessed, "count", "MessageProcessing", false);
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "AverageProcessingTime", "Average Processing Time", "Average time to process a message", avgProcessingTime, "ms", "MessageProcessing", false);
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "MessagesPerSecond", "Messages Per Second", "Rate of message processing", messagesPerSecond, "msg/s", "MessageProcessing", false);
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "OrderBookQueueDepth", "Order Book Queue Depth", "Current depth of order book update queue", _orderBookUpdateQueue.Count, "count", "MessageProcessing", false);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalMessagesProcessed", "Total Messages Processed", "Total number of messages processed", _totalMessagesProcessed, "count", "MessageProcessing", true);
+                        _performanceMonitor.RecordSpeedDialMetric("MessageProcessor", "AverageProcessingTime", "Average Processing Time", "Average time to process a message", avgProcessingTime, "ms", "MessageProcessing", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("MessageProcessor", "MessagesPerSecond", "Messages Per Second", "Rate of message processing", messagesPerSecond, "msg/s", "MessageProcessing", null, null, null, true);
+                        _performanceMonitor.RecordCounterMetric("MessageProcessor", "OrderBookQueueDepth", "Order Book Queue Depth", "Current depth of order book update queue", _orderBookUpdateQueue.Count, "count", "MessageProcessing", true);
+                    }
 
                     // Post message type distribution metrics
-                    PostMessageTypeMetrics(GetMessageTypeCounts());
+                    var messageTypeCounts = GetMessageTypeCounts();
+                    foreach (var kvp in messageTypeCounts)
+                    {
+                        if (!_enablePerformanceMonitoring)
+                        {
+                            _performanceMonitor.RecordDisabledMetric("MessageProcessor", $"MessageType_{kvp.Key}", $"Message Type {kvp.Key}", $"Count of {kvp.Key} messages", kvp.Value, "count", "MessageTypes", false);
+                        }
+                        else
+                        {
+                            _performanceMonitor.RecordCounterMetric("MessageProcessor", $"MessageType_{kvp.Key}", $"Message Type {kvp.Key}", $"Count of {kvp.Key} messages", kvp.Value, "count", "MessageTypes", true);
+                        }
+                    }
 
                     // Reset counters for next interval
                     _totalMessagesProcessed = 0;
@@ -1592,10 +1611,10 @@ namespace KalshiBotAPI.Websockets
             if (!enablePerformanceMonitoring)
             {
                 // Send disabled metrics
-                _performanceMonitor.RecordDisabledMetricMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category, false);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category, false);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category, false);
-                _performanceMonitor.RecordDisabledMetricMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category, false);
             }
             else
             {
@@ -1613,28 +1632,31 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         private void CheckDuplicateMessageWarnings()
         {
-            if (!_enablePerformanceMonitoring)
-                return;
-
             var now = DateTime.UtcNow;
             var timeSinceLastWarning = now - _lastDuplicateWarningTime;
 
-            if (timeSinceLastWarning.TotalMilliseconds >= _config.DuplicateMessageTimeWindowMs)
+            if (timeSinceLastWarning.TotalSeconds >= 10 && _duplicateMessageCount > 0)
             {
-                if (_duplicateMessagesInWindow >= _config.DuplicateMessageWarningThreshold)
+                if (_enablePerformanceMonitoring)
                 {
-                    _logger.LogWarning("DUP-High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
-                        _duplicateMessagesInWindow, _config.DuplicateMessageTimeWindowMs);
-
-                    // Post duplicate metrics to central monitoring
-                    PostDuplicateMessageMetrics(
-                        _duplicateMessageCount,
-                        _duplicateMessagesInWindow,
-                        _lastDuplicateWarningTime);
+                    _logger.LogWarning("DUP-Duplicate messages detected: {DuplicateCount} total duplicates. Any duplicate is unacceptable and should not occur.",
+                        _duplicateMessageCount);
                 }
 
-                // Reset for next window
-                _duplicateMessagesInWindow = 0;
+                // Post duplicate metrics to central monitoring
+                if (!_enablePerformanceMonitoring)
+                {
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalDuplicateMessages", "Total Duplicate Messages", "Total number of duplicate messages detected", _duplicateMessageCount, "count", "DuplicateMessages", false);
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "DuplicateMessagesInWindow", "Duplicate Messages In Window", "Number of duplicate messages in current time window", _duplicateMessagesInWindow, "count", "DuplicateMessages", false);
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "LastDuplicateWarningTime", "Last Duplicate Warning Time", "Timestamp of last duplicate message warning", _lastDuplicateWarningTime.Ticks, "ticks", "DuplicateMessages", false);
+                }
+                else
+                {
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalDuplicateMessages", "Total Duplicate Messages", "Total number of duplicate messages detected", _duplicateMessageCount, "count", "DuplicateMessages", true);
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "DuplicateMessagesInWindow", "Duplicate Messages In Window", "Number of duplicate messages in current time window", _duplicateMessagesInWindow, "count", "DuplicateMessages", true);
+                    _performanceMonitor.RecordNumericDisplayMetric("MessageProcessor", "LastDuplicateWarningTime", "Last Duplicate Warning Time", "Timestamp of last duplicate message warning", _lastDuplicateWarningTime.Ticks, "ticks", "DuplicateMessages", true);
+                }
+
                 _lastDuplicateWarningTime = now;
             }
         }

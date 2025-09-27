@@ -34,7 +34,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Optional service for posting performance metrics.
         /// </summary>
-        protected readonly IPerformanceMonitor? _performanceMetrics;
+        protected readonly IPerformanceMonitor _performanceMetrics;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
@@ -111,7 +111,7 @@ namespace KalshiBotAPI.Websockets
             IWebSocketConnectionManager connectionManager,
             IStatusTrackerService statusTrackerService,
             IOptions<SubscriptionManagerConfig> config,
-            IPerformanceMonitor? performanceMetrics = null)
+            IPerformanceMonitor performanceMetrics)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -1521,7 +1521,7 @@ namespace KalshiBotAPI.Websockets
 
                 if (!_enableMetrics)
                 {
-                    _performanceMetrics.RecordDisabledMetricMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                    _performanceMetrics.RecordDisabledMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
                 }
                 else
                 {
@@ -1557,7 +1557,7 @@ namespace KalshiBotAPI.Websockets
 
                 if (!_enableMetrics)
                 {
-                    _performanceMetrics.RecordDisabledMetricMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                    _performanceMetrics.RecordDisabledMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
                 }
                 else
                 {

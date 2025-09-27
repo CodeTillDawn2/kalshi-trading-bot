@@ -13,9 +13,9 @@ using TradingStrategies.Extensions;
 public record PatternDetectionResult(
     List<BacklashPatterns.PatternDefinitions.PatternDefinition> Patterns,
     long? ExecutionTimeMs,
-    int? TotalCandlesProcessed = null,
-    int? TotalPatternsFound = null,
-    Dictionary<string, long>? PatternCheckTimes = null
+    int? TotalCandlesProcessed,
+    int? TotalPatternsFound,
+    Dictionary<string, long>? PatternCheckTimes
 );
 
 namespace TradingStrategies.Trading.Overseer
@@ -57,7 +57,7 @@ namespace TradingStrategies.Trading.Overseer
     public class PatternDetectionService
     {
         private readonly PatternDetectionServiceConfig _config;
-        private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         // Cache for pattern detection results to avoid repeated computation
         private readonly ConcurrentDictionary<string, PatternDetectionResult> _patternCache = new();
@@ -68,7 +68,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
-        public PatternDetectionService(IOptions<PatternDetectionServiceConfig> config, IPerformanceMonitor? performanceMonitor = null)
+        public PatternDetectionService(IOptions<PatternDetectionServiceConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _performanceMonitor = performanceMonitor;
@@ -160,7 +160,7 @@ namespace TradingStrategies.Trading.Overseer
             // Validate input data availability
             if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
             {
-                return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null);
+                return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null, null, null, null);
             }
 
             // Check cache first
@@ -252,7 +252,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Return empty list as fallback for any processing failures
-            return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null);
+            return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null, null, null, null);
         }
     }
 }

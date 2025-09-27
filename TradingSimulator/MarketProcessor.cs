@@ -9,6 +9,7 @@ using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Overseer;
 using TradingSimulator.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingSimulator
 {
@@ -48,7 +49,7 @@ namespace TradingSimulator
         /// <summary>
         /// Performance monitor for centralized metrics collection.
         /// </summary>
-        private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Performance metrics for tracking processing rates and queue depths.
@@ -75,7 +76,7 @@ namespace TradingSimulator
             HashSet<string> processedMarkets,
             MarketProcessorConfig config,
             SimulatorReporting simulatorReporting,
-            BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
+            IPerformanceMonitor performanceMonitor)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;
@@ -110,7 +111,7 @@ namespace TradingSimulator
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetricMetric(
+                _performanceMonitor.RecordDisabledMetric(
                     "MarketProcessor",
                     id,
                     "Execution Time",

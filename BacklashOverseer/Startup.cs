@@ -120,7 +120,8 @@ namespace BacklashOverseer
                 sp.GetRequiredService<ILogger<BaseSubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
+                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
+                sp.GetRequiredService<IPerformanceMonitor>()
             ));
             services.AddScoped<IKalshiWebSocketClient>(sp => {
                 var client = new KalshiWebSocketClient(
@@ -133,7 +134,7 @@ namespace BacklashOverseer
                     sp.GetRequiredService<IWebSocketConnectionManager>(),
                     sp.GetRequiredService<ISubscriptionManager>(),
                     sp.GetRequiredService<IMessageProcessor>(),
-                    sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+                    sp.GetRequiredService<IPerformanceMonitor>(),
                     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics

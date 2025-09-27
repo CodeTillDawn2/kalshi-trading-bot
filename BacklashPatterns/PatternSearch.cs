@@ -136,7 +136,7 @@ namespace BacklashPatterns
         /// <param name="prices">Array of candle data containing price and volume information.</param>
         /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
         /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
-        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
+        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback, IPerformanceMonitor performanceMonitor)
         {
             var config = new PatternDetectionConfig();
             var metrics = new PatternDetectionMetrics();
@@ -161,7 +161,7 @@ namespace BacklashPatterns
         /// </remarks>
         public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatternsAsync(CandleMids[] prices,
                 int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
-                IPerformanceMonitor? performanceMonitor = null)
+                IPerformanceMonitor performanceMonitor)
         {
             if (prices == null || prices.Length < 2)
                 return new Dictionary<int, List<PatternDefinition>>();
@@ -1039,7 +1039,7 @@ namespace BacklashPatterns
         /// <param name="generateImages">Whether to generate and save pattern visualization images.</param>
         /// <param name="imageLookback">Number of candles to include in pattern images for context.</param>
         /// <returns>Dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
-        public static Dictionary<int, List<PatternVisualization>> DetectPatternsWithVisualization(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+        public static Dictionary<int, List<PatternVisualization>> DetectPatternsWithVisualization(CandleMids[] prices, int trendLookback, IPerformanceMonitor performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
         {
             var config = new PatternDetectionConfig();
             var metrics = new PatternDetectionMetrics();
@@ -1059,7 +1059,7 @@ namespace BacklashPatterns
         /// <returns>Task containing dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
         public static async Task<Dictionary<int, List<PatternVisualization>>> DetectPatternsWithVisualizationAsync(CandleMids[] prices,
                 int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
-                IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+                IPerformanceMonitor performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
         {
             // First detect patterns normally
             var patterns = await DetectPatternsAsync(prices, trendLookback, config, metrics, performanceMonitor);

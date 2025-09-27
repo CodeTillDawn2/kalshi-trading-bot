@@ -229,10 +229,10 @@ namespace BacklashCommon.Helpers
             if (!metricsEnabled)
             {
                 // Send disabled metrics
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, false);
             }
             else
             {

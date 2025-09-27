@@ -174,7 +174,7 @@ namespace BacklashBot.Services
             if (!enableMetrics)
             {
                 // Send disabled metric
-                _monitor.RecordDisabledMetricMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+                _monitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
             }
             else
             {

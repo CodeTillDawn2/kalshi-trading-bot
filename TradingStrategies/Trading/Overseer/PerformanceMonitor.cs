@@ -30,5 +30,149 @@ namespace TradingStrategies.Trading.Overseer
 
         }
 
+        public void RecordSimulationMetrics(string className, Dictionary<string, object> metrics, bool enabled)
+        {
+            string category = "Simulation";
+            if (!enabled)
+            {
+                foreach (var kvp in metrics)
+                {
+                    RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category, false);
+                }
+                return;
+            }
+            foreach (var kvp in metrics)
+            {
+                string id = kvp.Key;
+                string name = kvp.Key;
+                string description = GetDescriptionForMetric(id);
+                double value = GetValueAsDouble(kvp.Value);
+                string unit = GetUnitForMetric(id);
+                switch (id)
+                {
+                    case "TotalExecutionTime":
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "AverageExecutionTimeMs":
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "PeakMemoryUsage":
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "TotalSnapshotsProcessed":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "PerformanceThresholdMs":
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "SlowOperationsCount":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "RestingOrdersCount":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "CurrentPosition":
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "CurrentCash":
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "TotalTradesExecuted":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "AverageDecisionTimeMs":
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "AverageApplyTimeMs":
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "SlowDecisionsCount":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "MethodName":
+                        RecordNumericDisplayMetric(className, id, name, description, 0, unit, category, true); // or something
+                        break;
+                    case "TotalExecutionTimeMs":
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        break;
+                    case "TotalItemsProcessed":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "TotalItemsFound":
+                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                    case "ItemCheckTimes":
+                        // Skip or handle differently
+                        break;
+                    case "Timestamp":
+                        // Skip
+                        break;
+                    default:
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        break;
+                }
+            }
+        }
+
+        private string GetDescriptionForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "Total time spent processing all snapshots";
+                case "AverageExecutionTimeMs": return "Average time to process one snapshot";
+                case "PeakMemoryUsage": return "Maximum memory usage during simulation";
+                case "TotalSnapshotsProcessed": return "Number of snapshots processed";
+                case "PerformanceThresholdMs": return "Threshold for slow operations";
+                case "SlowOperationsCount": return "Number of operations exceeding performance threshold";
+                case "RestingOrdersCount": return "Current number of resting orders";
+                case "CurrentPosition": return "Current position size";
+                case "CurrentCash": return "Current cash balance";
+                case "TotalTradesExecuted": return "Total number of trades executed";
+                case "AverageDecisionTimeMs": return "Average time for strategy decisions";
+                case "AverageApplyTimeMs": return "Average time to apply trading actions";
+                case "SlowDecisionsCount": return "Number of slow strategy decisions";
+                case "MethodName": return "Name of the method being monitored";
+                case "TotalExecutionTimeMs": return "Total execution time in milliseconds";
+                case "TotalItemsProcessed": return "Total number of items processed";
+                case "TotalItemsFound": return "Total number of items found";
+                default: return $"Metric: {id}";
+            }
+        }
+
+        private string GetUnitForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "ms";
+                case "AverageExecutionTimeMs": return "ms";
+                case "PeakMemoryUsage": return "bytes";
+                case "TotalSnapshotsProcessed": return "count";
+                case "PerformanceThresholdMs": return "ms";
+                case "SlowOperationsCount": return "count";
+                case "RestingOrdersCount": return "count";
+                case "CurrentPosition": return "contracts";
+                case "CurrentCash": return "USD";
+                case "TotalTradesExecuted": return "count";
+                case "AverageDecisionTimeMs": return "ms";
+                case "AverageApplyTimeMs": return "ms";
+                case "SlowDecisionsCount": return "count";
+                case "MethodName": return "";
+                case "TotalExecutionTimeMs": return "ms";
+                case "TotalItemsProcessed": return "count";
+                case "TotalItemsFound": return "count";
+                default: return "";
+            }
+        }
+
+        private double GetValueAsDouble(object value)
+        {
+            if (value is TimeSpan ts) return ts.TotalMilliseconds;
+            if (value is double d) return d;
+            if (value is int i) return (double)i;
+            if (value is long l) return (double)l;
+            if (value is Dictionary<string, long> dict) return dict.Values.Sum(); // for ItemCheckTimes
+            return 0.0;
+        }
+
     }
 }
