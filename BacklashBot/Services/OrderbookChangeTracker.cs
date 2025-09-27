@@ -895,25 +895,51 @@ namespace BacklashBot.Services
             }
 
             // Post metrics to central performance monitor
-            if (_enablePerformanceMetrics)
+            if (_eventProcessingCount > 0)
             {
-                if (_eventProcessingCount > 0)
-                {
-                    long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
-                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
-                }
-
-                if (_timerCallbackCount > 1)
-                {
-                    long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
-                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
-                }
-                if (_timerCallbackCount > 0)
-                {
-                    long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
-                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
-                }
+                long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
             }
+
+            if (_timerCallbackCount > 1)
+            {
+                long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
+            }
+            if (_timerCallbackCount > 0)
+            {
+                long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
+            }
+
+            // Record additional performance metrics
+            var uptime = DateTime.UtcNow - _lastMetricsReset;
+            var matchSuccessRate = _totalMatchingOperations > 0 ? (double)_successfulMatches / _totalMatchingOperations : 0.0;
+            var avgProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalProcessingTimeMs / _totalMatchingOperations : 0.0;
+            var avgQueueProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalQueueProcessingTimeMs / _totalMatchingOperations : 0.0;
+            var avgEventProcessingTimeMs = _eventProcessingCount > 0 ? (double)_totalEventProcessingTimeMs / _eventProcessingCount : 0.0;
+            var avgTimerDriftMs = _timerCallbackCount > 1 ? (double)_totalTimerDriftMs / (_timerCallbackCount - 1) : 0.0;
+            var avgTimerExecutionTimeMs = _timerCallbackCount > 0 ? (double)_totalTimerExecutionTimeMs / _timerCallbackCount : 0.0;
+            var operationsPerSecond = uptime.TotalSeconds > 0 ? _totalMatchingOperations / uptime.TotalSeconds : 0.0;
+
+            RecordMetric($"TotalMatchingOperations_{_marketTicker}", "Total Matching Operations", "Total number of matching operations performed", _totalMatchingOperations, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"SuccessfulMatches_{_marketTicker}", "Successful Matches", "Number of successful matches", _successfulMatches, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"MatchSuccessRate_{_marketTicker}", "Match Success Rate", "Percentage of successful matches", Math.Round(matchSuccessRate * 100, 2), "%", "OrderbookTracking", isProgressBar: true);
+            RecordMetric($"AverageProcessingTimeMs_{_marketTicker}", "Average Processing Time", "Average time per matching operation", Math.Round(avgProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"AverageQueueProcessingTimeMs_{_marketTicker}", "Average Queue Processing Time", "Average time for queue processing", Math.Round(avgQueueProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"MaxQueueDepth_{_marketTicker}", "Max Queue Depth", "Maximum depth of the orderbook changes queue", _maxQueueDepth, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"CurrentQueueDepth_{_marketTicker}", "Current Queue Depth", "Current depth of the orderbook changes queue", _orderbookChanges.Count, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"CurrentTradeQueueDepth_{_marketTicker}", "Current Trade Queue Depth", "Current depth of the trade events queue", _tradeEvents.Count, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"UptimeSeconds_{_marketTicker}", "Uptime", "Time since last metrics reset", Math.Round(uptime.TotalSeconds, 2), "seconds", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"OperationsPerSecond_{_marketTicker}", "Operations Per Second", "Rate of matching operations", Math.Round(operationsPerSecond, 2), "ops/sec", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalEventProcessingTimeMs_{_marketTicker}", "Total Event Processing Time", "Total time spent processing events", _totalEventProcessingTimeMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"EventProcessingCount_{_marketTicker}", "Event Processing Count", "Number of events processed", _eventProcessingCount, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"AverageEventProcessingTimeMs_{_marketTicker}", "Average Event Processing Time", "Average time per event processing", Math.Round(avgEventProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalTimerDriftMs_{_marketTicker}", "Total Timer Drift", "Total timer drift accumulated", _totalTimerDriftMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TimerCallbackCount_{_marketTicker}", "Timer Callback Count", "Number of timer callbacks", _timerCallbackCount, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"AverageTimerDriftMs_{_marketTicker}", "Average Timer Drift", "Average timer drift per callback", Math.Round(avgTimerDriftMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalTimerExecutionTimeMs_{_marketTicker}", "Total Timer Execution Time", "Total time spent in timer executions", _totalTimerExecutionTimeMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"AverageTimerExecutionTimeMs_{_marketTicker}", "Average Timer Execution Time", "Average time per timer execution", Math.Round(avgTimerExecutionTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
         }
 
         /// <summary>
@@ -2120,6 +2146,25 @@ namespace BacklashBot.Services
             {
                 // Record actual metric
                 _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+            }
+        }
+
+        private void RecordMetric(string id, string name, string description, double value, string unit, string category, bool isSpeedDial = false, bool isCounter = false, bool isNumeric = false, bool isProgressBar = false)
+        {
+            if (_enablePerformanceMetrics)
+            {
+                if (isSpeedDial)
+                    _performanceMonitor.RecordSpeedDialMetric("OrderbookChangeTracker", id, name, description, value, unit, category, null, null, null, true);
+                else if (isCounter)
+                    _performanceMonitor.RecordCounterMetric("OrderbookChangeTracker", id, name, description, value, unit, category, true);
+                else if (isNumeric)
+                    _performanceMonitor.RecordNumericDisplayMetric("OrderbookChangeTracker", id, name, description, value, unit, category, true);
+                else if (isProgressBar)
+                    _performanceMonitor.RecordProgressBarMetric("OrderbookChangeTracker", id, name, description, value, unit, category, 0, 100, null, true);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("OrderbookChangeTracker", id, name, description, value, unit, category, false);
             }
         }
 

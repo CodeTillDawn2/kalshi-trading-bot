@@ -6,6 +6,7 @@ using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using System.Collections.Concurrent;
 using System.Text.Json;
 
@@ -24,6 +25,7 @@ namespace BacklashBot.Services
         private IStatusTrackerService _statusTrackerService;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IServiceFactory _serviceFactory;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private BlockingCollection<(JsonElement Data, string OfferType, long Seq, Guid EventId)> _eventQueue = new();
         private BlockingCollection<string> _tickerQueue = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketUpdateSemaphores = new();
@@ -40,6 +42,7 @@ namespace BacklashBot.Services
         private readonly ConcurrentDictionary<string, List<long>> _marketLockWaitDurations = new();
         private const int MaxWaitTimeSamples = 100;
         private readonly HashSet<string> _subscribedMarkets = new();
+        private readonly System.Timers.Timer _metricsTimer;
 
         /// <summary>
         /// Configuration options for the order book service timeouts and limits.
@@ -82,6 +85,7 @@ namespace BacklashBot.Services
         /// <param name="serviceFactory">Factory for accessing other services.</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="statusTrackerService">Service for tracking cancellation tokens and status.</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording metrics.</param>
         /// <param name="config">Configuration options for the order book service.</param>
         public OrderBookService(
             ILogger<IOrderBookService> logger,
@@ -89,6 +93,7 @@ namespace BacklashBot.Services
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
+            IPerformanceMonitor performanceMonitor,
             OrderBookServiceConfig config)
         {
             _logger = logger;
@@ -96,11 +101,16 @@ namespace BacklashBot.Services
             _statusTrackerService = statusTrackerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _config = config;
 
             _logger.LogDebug("OrderBookService constructor initializing processors...");
             StartProcessors();
-            _logger.LogDebug("OrderBookService initialized with processors, EventProcessor Status: {EventStatus}, TickerProcessor Status: {TickerStatus}, NotificationProcessor Status: {NotificationStatus}",
+            _metricsTimer = new System.Timers.Timer(10000); // 10 seconds
+            _metricsTimer.Elapsed += (sender, e) => RecordPerformanceMetrics();
+            _metricsTimer.AutoReset = true;
+            _metricsTimer.Start();
+            _logger.LogDebug("OrderBookService initialized with processors and metrics timer, EventProcessor Status: {EventStatus}, TickerProcessor Status: {TickerStatus}, NotificationProcessor Status: {NotificationStatus}",
                 _eventProcessor.Status, _tickerProcessor.Status, _notificationProcessor.Status);
         }
 
@@ -308,6 +318,9 @@ namespace BacklashBot.Services
 
             _serviceFactory.GetKalshiWebSocketClient().OrderBookReceived -= HandleOrderBookReceived;
             _serviceFactory.GetKalshiWebSocketClient().TradeReceived -= HandleTradeReceived;
+
+            _metricsTimer.Stop();
+            _metricsTimer.Dispose();
 
             try
             {
@@ -1131,6 +1144,52 @@ namespace BacklashBot.Services
             MarketInvalid?.Invoke(this, marketTicker);
         }
 
+        private void RecordPerformanceMetrics()
+        {
+            // Record queue counts
+            var (eventCount, tickerCount, notificationCount) = GetQueueCounts();
+            RecordMetric("EventQueueCount", "Event Queue Count", "Current number of items in event queue", eventCount, "count", "OrderBookQueues", isNumeric: true);
+            RecordMetric("TickerQueueCount", "Ticker Queue Count", "Current number of items in ticker queue", tickerCount, "count", "OrderBookQueues", isNumeric: true);
+            RecordMetric("NotificationQueueCount", "Notification Queue Count", "Current number of items in notification queue", notificationCount, "count", "OrderBookQueues", isNumeric: true);
+
+            // Record processing metrics
+            var (eventAvg, eventCountOps) = GetEventQueueProcessingMetrics();
+            RecordMetric("EventQueue_AverageProcessingTime", "Event Queue Average Processing Time", "Average time to process event queue items", eventAvg, "ms", "OrderBookProcessing", isSpeedDial: true);
+            RecordMetric("EventQueue_ProcessingOperations", "Event Queue Processing Operations", "Number of event queue processing operations", eventCountOps, "count", "OrderBookProcessing", isCounter: true);
+
+            var (tickerAvg, tickerCountOps) = GetTickerQueueProcessingMetrics();
+            RecordMetric("TickerQueue_AverageProcessingTime", "Ticker Queue Average Processing Time", "Average time to process ticker queue items", tickerAvg, "ms", "OrderBookProcessing", isSpeedDial: true);
+            RecordMetric("TickerQueue_ProcessingOperations", "Ticker Queue Processing Operations", "Number of ticker queue processing operations", tickerCountOps, "count", "OrderBookProcessing", isCounter: true);
+
+            var (notificationAvg, notificationCountOps) = GetNotificationQueueProcessingMetrics();
+            RecordMetric("NotificationQueue_AverageProcessingTime", "Notification Queue Average Processing Time", "Average time to process notification queue items", notificationAvg, "ms", "OrderBookProcessing", isSpeedDial: true);
+            RecordMetric("NotificationQueue_ProcessingOperations", "Notification Queue Processing Operations", "Number of notification queue processing operations", notificationCountOps, "count", "OrderBookProcessing", isCounter: true);
+
+            // For market lock wait, since it's per market, record for each market
+            foreach (var market in _marketLockWaitDurations.Keys.ToList())
+            {
+                var (avgWait, count) = GetMarketLockWaitMetrics(market);
+                RecordMetric($"MarketLockWaitTime_{market}", "Market Lock Wait Time", $"Average wait time for market {market} lock", avgWait, "ms", "OrderBookLocks", isSpeedDial: true);
+                RecordMetric($"MarketLockWaitCount_{market}", "Market Lock Wait Count", $"Number of lock wait operations for market {market}", count, "count", "OrderBookLocks", isCounter: true);
+            }
+        }
+
+        private void RecordMetric(string id, string name, string description, double value, string unit, string category, bool isSpeedDial = false, bool isCounter = false, bool isNumeric = false)
+        {
+            if (_config.EnablePerformanceMetrics)
+            {
+                if (isSpeedDial)
+                    _performanceMonitor.RecordSpeedDialMetric("OrderBookService", id, name, description, value, unit, category, null, null, null, true);
+                else if (isCounter)
+                    _performanceMonitor.RecordCounterMetric("OrderBookService", id, name, description, value, unit, category, true);
+                else if (isNumeric)
+                    _performanceMonitor.RecordNumericDisplayMetric("OrderBookService", id, name, description, value, unit, category, true);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("OrderBookService", id, name, description, value, unit, category, false);
+            }
+        }
 
     }
 }
