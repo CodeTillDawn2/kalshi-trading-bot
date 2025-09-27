@@ -3,6 +3,7 @@ using BacklashBot.State.Interfaces;
 using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashOverseer.Services;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

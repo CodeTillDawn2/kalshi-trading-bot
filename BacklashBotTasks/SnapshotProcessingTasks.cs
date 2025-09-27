@@ -211,7 +211,7 @@ namespace BacklashBotTasks
             var snapshotPeriodHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>();
             var snapshotGroupHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>();
 
-            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions);
+            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions, _performanceMonitorMock.Object);
 
             // Register the mocks and options required by KalshiAPIService
             services.AddScoped(p => apiLoggerMock.Object);
@@ -242,7 +242,7 @@ namespace BacklashBotTasks
             _snapshotPeriodHelper = new SnapshotPeriodHelper(snapshotPeriodHelperOptions.Value);
 
             _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _dataStorageConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
-            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, null);
+            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, _performanceMonitorMock.Object);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _scopeFactory, centralPerformanceMonitor);
 
             _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, _performanceMonitorMock.Object);

@@ -547,7 +547,7 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
         provider.GetRequiredService<ISnapshotGroupHelper>(),
         provider.GetRequiredService<IOptions<DataStorageConfig>>(),
         provider.GetRequiredService<ISqlDataService>(),
-        provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
+        provider.GetRequiredService<IPerformanceMonitor>()));
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
     new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value));
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();

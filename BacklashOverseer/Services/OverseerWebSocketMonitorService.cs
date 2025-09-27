@@ -5,7 +5,7 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BacklashCommon.Services
+namespace BacklashOverseer.Services
 {
     /// <summary>
     /// Lightweight service for monitoring WebSocket connections and exchange status.

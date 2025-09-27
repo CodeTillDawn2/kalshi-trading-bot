@@ -166,8 +166,8 @@ namespace BacklashOverseer
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
 
-            services.AddScoped<IWebSocketMonitorService>(sp => new BacklashCommon.Services.OverseerWebSocketMonitorService(
-                sp.GetRequiredService<ILogger<BacklashCommon.Services.OverseerWebSocketMonitorService>>(),
+            services.AddScoped<IWebSocketMonitorService>(sp => new OverseerWebSocketMonitorService(
+                sp.GetRequiredService<ILogger<OverseerWebSocketMonitorService>>(),
                 sp.GetRequiredService<IKalshiWebSocketClient>(),
                 sp.GetRequiredService<IServiceScopeFactory>()
             ));
@@ -347,7 +347,7 @@ namespace BacklashOverseer
                     provider.GetRequiredService<ISnapshotGroupHelper>(),
                     provider.GetRequiredService<IOptions<DataStorageConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
-                    provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
+                    provider.GetRequiredService<IPerformanceMonitor>()));
 
             // Register BrainPersistenceService
             services.AddScoped<BrainPersistenceService>(sp => new BrainPersistenceService(
