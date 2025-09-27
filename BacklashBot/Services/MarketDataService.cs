@@ -19,6 +19,7 @@ using Polly;
 using Polly.Retry;
 using System.Collections.Concurrent;
 using System.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using System.Diagnostics;
 
 namespace BacklashBot.Services
@@ -53,6 +54,7 @@ namespace BacklashBot.Services
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketSyncLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
+        private readonly IPerformanceMonitor _performanceMonitor;
         private HashSet<string> _lastWatchedMarkets = new HashSet<string>();
         private readonly IScopeManagerService _scopeManagerService;
 
@@ -118,7 +120,8 @@ namespace BacklashBot.Services
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
             IBotReadyStatus readyStatus,
-            IBrainStatusService brainStatus)
+            IBrainStatusService brainStatus,
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _scopeManagerService = scopeManagerService;
@@ -135,6 +138,7 @@ namespace BacklashBot.Services
             _tickerUpdateTimer.AutoReset = true;
             _tickerUpdateTimer.Start();
             _retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, retryCount, context) => _logger.LogWarning(exception, "Retry {RetryCount} for market data fetch after {TimeSpan}", retryCount, timeSpan));
+            _performanceMonitor = performanceMonitor;
 
             _serviceFactory.GetDataCache().ExchangeStatusChanged += HandleExchangeStatusChanged;
             _brainStatus = brainStatus;
@@ -1034,18 +1038,30 @@ namespace BacklashBot.Services
                 }
                 finally
                 {
-                    // Log performance metrics if enabled
+                    // Record performance metrics
+                    var endCpuTime = process.TotalProcessorTime;
+                    var cpuTimeUsed = endCpuTime - startCpuTime;
+                    var elapsed = stopwatch.Elapsed;
+                    var cpuUsagePercent = (cpuTimeUsed.TotalMilliseconds / elapsed.TotalMilliseconds) * 100 / Environment.ProcessorCount;
+                    var memoryUsageMB = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
+                    var cacheSize = _serviceFactory.GetDataCache().Markets.Count;
+                    var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.Count;
+
                     if (_marketDataConfig.EnablePerformanceMetrics)
                     {
-                        var endCpuTime = process.TotalProcessorTime;
-                        var cpuTimeUsed = endCpuTime - startCpuTime;
-                        var elapsed = stopwatch.Elapsed;
-                        var cpuUsagePercent = (cpuTimeUsed.TotalMilliseconds / elapsed.TotalMilliseconds) * 100 / Environment.ProcessorCount;
-                        var memoryUsageMB = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
-                        var cacheSize = _serviceFactory.GetDataCache().Markets.Count;
-                        var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.Count;
-                        _logger.LogInformation("Performance-Sync for {MarketTicker}: Elapsed={Elapsed}ms, CPU Usage={CpuUsage:F2}%, Memory={Memory:F2}MB, Markets Cache={CacheSize}, Watched Markets={WatchedMarkets}",
-                            marketTicker, elapsed.TotalMilliseconds, cpuUsagePercent, memoryUsageMB, cacheSize, watchedMarkets);
+                        _performanceMonitor.RecordSpeedDialMetric("MarketDataService", "SyncElapsedTime", "Sync Elapsed Time", "Time taken for market data sync", elapsed.TotalMilliseconds, "ms", "Performance", null, 5000, 10000);
+                        _performanceMonitor.RecordSpeedDialMetric("MarketDataService", "SyncCpuUsage", "Sync CPU Usage", "CPU usage during sync", cpuUsagePercent, "%", "Performance", 0, 50, 80);
+                        _performanceMonitor.RecordNumericDisplayMetric("MarketDataService", "SyncMemoryUsage", "Sync Memory Usage", "Memory usage after sync", memoryUsageMB, "MB", "Performance");
+                        _performanceMonitor.RecordCounterMetric("MarketDataService", "MarketsCacheSize", "Markets Cache Size", "Number of markets in cache", cacheSize, "count", "Cache");
+                        _performanceMonitor.RecordCounterMetric("MarketDataService", "WatchedMarketsCount", "Watched Markets Count", "Number of watched markets", watchedMarkets, "count", "Markets");
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("MarketDataService", "SyncElapsedTime", "Sync Elapsed Time", "Time taken for market data sync", elapsed.TotalMilliseconds, "ms", "Performance");
+                        _performanceMonitor.RecordDisabledMetric("MarketDataService", "SyncCpuUsage", "Sync CPU Usage", "CPU usage during sync", cpuUsagePercent, "%", "Performance");
+                        _performanceMonitor.RecordDisabledMetric("MarketDataService", "SyncMemoryUsage", "Sync Memory Usage", "Memory usage after sync", memoryUsageMB, "MB", "Performance");
+                        _performanceMonitor.RecordDisabledMetric("MarketDataService", "MarketsCacheSize", "Markets Cache Size", "Number of markets in cache", cacheSize, "count", "Cache");
+                        _performanceMonitor.RecordDisabledMetric("MarketDataService", "WatchedMarketsCount", "Watched Markets Count", "Number of watched markets", watchedMarkets, "count", "Markets");
                     }
                 }
             }
