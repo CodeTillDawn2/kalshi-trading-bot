@@ -26,12 +26,6 @@ public class MarketServiceDataConfig
     public int TickerBatchSize { get; set; }
 
     /// <summary>
-    /// Gets or sets the API retry timeout in milliseconds. Default is 30000.
-    /// </summary>
-    [Required(ErrorMessage = "The 'ApiRetryTimeoutMs' is missing in the configuration.")]
-    public int ApiRetryTimeoutMs { get; set; }
-
-    /// <summary>
     /// Gets or sets a value indicating whether performance metrics logging is enabled for MarketDataService. Default is false.
     /// </summary>
     [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
@@ -51,11 +45,6 @@ public class MarketServiceDataConfig
     [Required(ErrorMessage = "The 'EventLifecycleDelaySeconds' is missing in the configuration.")]
     public int EventLifecycleDelaySeconds { get; set; }
 
-    /// <summary>
-    /// Gets or sets the calculations configuration for market data processing.
-    /// </summary>
-    [Required(ErrorMessage = "The 'CalculationConfig' is missing in the configuration.")]
-    public CalculationsConfig Calculations { get; set; }
 }
 
 
