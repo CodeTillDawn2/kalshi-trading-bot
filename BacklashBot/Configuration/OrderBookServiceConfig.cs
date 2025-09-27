@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BacklashBot.Services
+namespace BacklashBot.Configuration
 {
     /// <summary>
     /// Configuration class for the OrderBookService, containing settings for semaphore timeouts, queue limits, and performance metrics.

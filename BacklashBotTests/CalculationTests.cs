@@ -1,10 +1,14 @@
 using BacklashBot.Configuration;
 using BacklashBot.Helpers;
+using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.State;
+using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Services;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
 using KalshiBotTests;
@@ -58,6 +62,11 @@ namespace BacklashBotTests
         private Mock<ILogger<TradingCalculator>> _tradingCalculatorLoggerMock;
 
         /// <summary>
+        /// Real performance monitor for TradingCalculator.
+        /// </summary>
+        private IPerformanceMonitor _performanceMonitor;
+
+        /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).
         /// </summary>
         private IOptions<CalculationsConfig> _calculationOptions;
@@ -79,6 +88,26 @@ namespace BacklashBotTests
         private IServiceScopeFactory _scopeFactory;
 
         /// <summary>
+        /// Logger for CentralPerformanceMonitor.
+        /// </summary>
+        private Mock<ILogger<ICentralPerformanceMonitor>> _centralPerformanceMonitorLoggerMock;
+
+        /// <summary>
+        /// Status tracker service for CentralPerformanceMonitor.
+        /// </summary>
+        private Mock<IStatusTrackerService> _statusTrackerServiceMock;
+
+        /// <summary>
+        /// Queue monitoring config for CentralPerformanceMonitor.
+        /// </summary>
+        private IOptions<QueueMonitoringConfig> _queueMonitoringOptions;
+
+        /// <summary>
+        /// Central performance monitor config for CentralPerformanceMonitor.
+        /// </summary>
+        private IOptions<CentralPerformanceMonitorConfig> _centralPerformanceMonitorOptions;
+
+        /// <summary>
         /// Initializes test fixtures before each test execution.
         /// Sets up mock services, creates temporary directories, and configures
         /// the TradingCalculator instance with test-specific parameters.
@@ -92,9 +121,26 @@ namespace BacklashBotTests
             _scopeFactory = new Mock<IServiceScopeFactory>().Object;
             _tradingSnapshotServiceLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             _tradingCalculatorLoggerMock = new Mock<ILogger<TradingCalculator>>();
+            _centralPerformanceMonitorLoggerMock = new Mock<ILogger<ICentralPerformanceMonitor>>();
+            _statusTrackerServiceMock = new Mock<IStatusTrackerService>();
             _generalExecutionOptions = TestHelper.GetGeneralExecutionConfig();
             _calculationOptions = TestHelper.GetCalculationConfig();
-            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions);
+
+            // Create configs for CentralPerformanceMonitor
+            _queueMonitoringOptions = Options.Create(new QueueMonitoringConfig { EnablePerformanceMetrics = false });
+            _centralPerformanceMonitorOptions = Options.Create(new CentralPerformanceMonitorConfig { EnablePerformanceMetrics = true });
+
+            // Create real CentralPerformanceMonitor
+            _performanceMonitor = new CentralPerformanceMonitor(
+                _centralPerformanceMonitorLoggerMock.Object,
+                _generalExecutionOptions,
+                "TestInstance",
+                _queueMonitoringOptions,
+                _centralPerformanceMonitorOptions,
+                _scopeFactory,
+                _statusTrackerServiceMock.Object);
+
+            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions, _performanceMonitor);
             _marginFactor = 0.001; // 0.1% margin factor
 
             var snapshotServiceConfig = TestHelper.GetTradingSnapshotServiceConfig();

@@ -440,6 +440,7 @@ builder.Services.AddScoped<IOrderBookService>(provider =>
         provider.GetRequiredService<IServiceFactory>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
+        provider.GetRequiredService<IPerformanceMonitor>(),
         provider.GetRequiredService<IOptions<OrderBookServiceConfig>>().Value
     ));
 builder.Services.AddScoped<IMarketDataInitializer, MarketDataInitializer>();
