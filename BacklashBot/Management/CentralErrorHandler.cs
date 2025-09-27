@@ -3,9 +3,11 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotLogging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text.RegularExpressions;
 
@@ -44,6 +46,7 @@ namespace BacklashBot.Management
         private readonly IServiceFactory _serviceFactory;
         private readonly DatabaseLoggingQueue _loggingQueue;
         private readonly CentralErrorHandlerConfig _errorHandlerConfig;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ConcurrentQueue<(DateTime Timestamp, ErrorHandlerTaskInfo Error)> _nonCatastrophicErrors = new();
         private readonly TimeSpan _errorWindow; // Configurable window
         private readonly int _errorThreshold; // Configurable threshold
@@ -108,12 +111,14 @@ namespace BacklashBot.Management
         /// <param name="serviceFactory">Factory for creating and accessing various system services.</param>
         /// <param name="loggingQueue">Queue containing logged errors and warnings to be processed.</param>
         /// <param name="errorHandlerConfig">Configuration settings for error handling.</param>
+        /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
         /// <param name="logger">Logger instance for recording error handler operations.</param>
         public CentralErrorHandler(
             IMarketManagerService marketManagerService,
             IServiceFactory serviceFactory,
             DatabaseLoggingQueue loggingQueue,
             IOptions<CentralErrorHandlerConfig> errorHandlerConfig,
+            IPerformanceMonitor performanceMonitor,
             ILogger<ICentralErrorHandler> logger)
         {
             _logger = logger;
@@ -121,6 +126,7 @@ namespace BacklashBot.Management
             _serviceFactory = serviceFactory;
             _loggingQueue = loggingQueue;
             _errorHandlerConfig = errorHandlerConfig.Value;
+            _performanceMonitor = performanceMonitor;
             _errorWindow = TimeSpan.FromMinutes(_errorHandlerConfig.ErrorWindowMinutes);
             _errorThreshold = _errorHandlerConfig.ErrorThreshold;
             LastSuccessfulSnapshot = DateTime.MinValue;
@@ -151,6 +157,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public async Task<bool> HandleErrors()
         {
+            var stopwatch = Stopwatch.StartNew();
             bool isCatastrophic = false;
 
             while (_loggingQueue.Errors.TryDequeue(out var errorTask))
@@ -195,6 +202,16 @@ namespace BacklashBot.Management
                         WarningCount++;
                     }
                 }
+            }
+
+            // Record warnings processed metric
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "WarningsProcessed", "Warnings Processed", "Total warnings processed in this cycle", WarningCount, "count", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "WarningsProcessed", "Warnings Processed", "Total warnings processed in this cycle", WarningCount, "count", "ErrorHandling");
             }
 
             if (!Errors.IsEmpty)
@@ -385,8 +402,33 @@ namespace BacklashBot.Management
                 }
             }
 
+            // Record errors processed metrics
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "ErrorsProcessed", "Errors Processed", "Total errors processed in this cycle", ErrorCount, "count", "ErrorHandling");
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "NonCatastrophicErrors", "Non-Catastrophic Errors", "Current count of non-catastrophic errors in window", NonCatastrophicErrorCount, "count", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "ErrorsProcessed", "Errors Processed", "Total errors processed in this cycle", ErrorCount, "count", "ErrorHandling");
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "NonCatastrophicErrors", "Non-Catastrophic Errors", "Current count of non-catastrophic errors in window", NonCatastrophicErrorCount, "count", "ErrorHandling");
+            }
+
             Errors.Clear();
             Warnings.Clear();
+
+            stopwatch.Stop();
+
+            // Record processing time metric
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(nameof(CentralErrorHandler), "HandleErrorsProcessingTime", "Handle Errors Processing Time", "Time taken to process errors and warnings", stopwatch.ElapsedMilliseconds, "ms", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "HandleErrorsProcessingTime", "Handle Errors Processing Time", "Time taken to process errors and warnings", stopwatch.ElapsedMilliseconds, "ms", "ErrorHandling");
+            }
+
             return isCatastrophic;
         }
 
@@ -458,20 +500,6 @@ namespace BacklashBot.Management
             LastErrorDate = timestamp;
         }
 
-        private string ExtractValueFromLogMessage(string logMessage, string variableName)
-        {
-            string pattern = $@"{variableName}\s*:\s*""([^""]+)""";
-            var match = Regex.Match(logMessage, pattern);
-            if (match.Success && match.Groups.Count > 1) return match.Groups[1].Value;
-            _logger.LogTrace("ExtractValueFromLogMessage called for '{VariableName}' in message '{LogMessage}', returning empty. Consider using custom exceptions.", variableName, logMessage);
-            return string.Empty;
-        }
-
-        private bool MatchesLogMessageTemplate(string logMessage, string template)
-        {
-            string pattern = Regex.Escape(template).Replace(@"\{\w+\}", ".*?");
-            return Regex.IsMatch(logMessage, $"^{pattern}$");
-        }
 
         /// <summary>
         /// Performs a series of internet connectivity checks with exponential backoff retry logic.

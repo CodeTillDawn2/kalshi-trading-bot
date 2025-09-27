@@ -110,7 +110,7 @@ namespace BacklashBot.Management
         /// <param name="brain">The brain instance configuration containing watch list settings</param>
         /// <param name="metrics">Current performance metrics for decision making</param>
         /// <returns>A task representing the asynchronous monitoring operation</returns>
-        public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
+        public override async Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics)
         {
             if (brain.ManagedWatchList)
             {

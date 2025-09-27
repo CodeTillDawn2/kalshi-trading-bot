@@ -34,7 +34,7 @@ namespace BacklashBot.Management
         /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
         /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
         /// <returns>The calculated target number of markets to watch</returns>
-        public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
+        public int CalculateTarget(BrainPerformanceMetricsDTO metrics, BrainInstanceDTO brain)
         {
             const int MaxValidValue = int.MaxValue;
             const int MinValidValue = 0; // Assuming non-negative targets

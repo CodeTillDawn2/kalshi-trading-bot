@@ -82,7 +82,7 @@ namespace BacklashBot.Management
 
         private BrainInstanceDTO? _thisBrain = null;
 
-        private PerformanceMetrics _performanceMetrics = new PerformanceMetrics();
+        private BrainPerformanceMetricsDTO _performanceMetrics = new BrainPerformanceMetricsDTO();
 
 
         /// <summary>

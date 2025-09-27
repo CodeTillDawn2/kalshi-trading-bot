@@ -3,13 +3,13 @@ namespace BacklashDTOs
     /// <summary>
     /// Represents performance metrics.
     /// </summary>
-    public class PerformanceMetrics
+    public class BrainPerformanceMetricsDTO
     {
 
         /// <summary>
         /// Initializes a new instance of the PerformanceMetrics class.
         /// </summary>
-        public PerformanceMetrics()
+        public BrainPerformanceMetricsDTO()
         {
             EventQueueAvg = 0;
             TickerQueueAvg = 0;

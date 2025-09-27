@@ -32,6 +32,6 @@ namespace BacklashBot.Management.Interfaces
         /// <param name="brain">The brain instance DTO containing configuration and state.</param>
         /// <param name="performanceMetrics">The performance metrics to update during monitoring.</param>
         /// <returns>A task representing the asynchronous monitoring operation.</returns>
-        Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics performanceMetrics);
+        Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO performanceMetrics);
     }
 }

@@ -17,6 +17,6 @@ namespace BacklashBot.Management.Interfaces
         /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
         /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
         /// <returns>The calculated target number of markets to watch</returns>
-        int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain);
+        int CalculateTarget(BrainPerformanceMetricsDTO metrics, BrainInstanceDTO brain);
     }
 }

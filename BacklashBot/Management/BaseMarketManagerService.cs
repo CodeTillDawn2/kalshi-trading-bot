@@ -184,7 +184,7 @@ namespace BacklashBot.Management
         /// <param name="brain">The brain instance configuration containing watch list settings</param>
         /// <param name="metrics">Current performance metrics for decision making</param>
         /// <returns>A task representing the asynchronous monitoring operation</returns>
-        public abstract Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics);
+        public abstract Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics);
 
         /// <summary>
         /// Calculates the optimal target number of markets to watch based on current performance metrics.
@@ -193,7 +193,7 @@ namespace BacklashBot.Management
         /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
         /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
         /// <returns>The calculated target number of markets to watch</returns>
-        public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
+        public int CalculateTarget(BrainPerformanceMetricsDTO metrics, BrainInstanceDTO brain)
         {
             return _targetCalculationService.CalculateTarget(metrics, brain);
         }
