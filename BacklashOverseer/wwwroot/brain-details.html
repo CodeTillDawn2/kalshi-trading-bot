@@ -79,54 +79,6 @@
             color: rgb(225, 221, 206);
         }
 
-        .toggle-btn {
-            background: rgb(28, 51, 39);
-            color: rgb(225, 221, 206);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .toggle-btn:hover {
-            background: rgb(38, 71, 59);
-        }
-
-        .toggle-btn.active {
-            background: rgb(40, 167, 69);
-        }
-
-        .control-title, .control-description {
-            transition: opacity 0.3s ease;
-        }
-
-        /* Per-element label visibility control */
-        .control-title.hide-label, .control-description.hide-label {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Data attribute approach for more granular control */
-        [data-show-labels="false"] .control-title,
-        [data-show-labels="false"] .control-description {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Individual control overrides */
-        .speed-dial-control.hide-labels .control-title,
-        .speed-dial-control.hide-labels .control-description,
-        .progress-control.hide-labels .control-title,
-        .progress-control.hide-labels .control-description,
-        .counter-control.hide-labels .control-title,
-        .counter-control.hide-labels .control-description {
-            opacity: 0;
-            pointer-events: none;
-        }
-
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -144,19 +96,6 @@
             align-items: center;
             min-height: 220px;
             position: relative;
-        }
-
-        .control-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgb(225, 221, 206);
-            font-weight: bold;
-            text-align: center;
-            z-index: 10;
-            pointer-events: none;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .control-title {
@@ -242,14 +181,6 @@
             box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
         }
 
-        .progress-value {
-            color: rgb(225, 221, 206);
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 12px;
-            text-shadow: 0 0 5px rgba(225, 221, 206, 0.3);
-        }
-
         /* Counter Styles */
         .counter {
             font-size: 64px;
@@ -284,43 +215,6 @@
         .traffic-light-bulb.red { background: #dc3545; color: #dc3545; }
         .traffic-light-bulb.yellow { background: #ffc107; color: #ffc107; }
         .traffic-light-bulb.green { background: #28a745; color: #28a745; }
-
-        /* Pie Chart Styles */
-        .pie-chart-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-        }
-
-        .pie-chart {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                #28a745 0% 40%,
-                #20c997 40% 70%,
-                #17a2b8 70% 100%
-            );
-            border: 3px solid rgba(28, 51, 39, 0.6);
-        }
-
-        .pie-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(16, 16, 13, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgb(225, 221, 206);
-            font-size: 16px;
-            font-weight: bold;
-            border: 2px solid rgba(28, 51, 39, 0.5);
-        }
 
         /* Numeric Display Styles */
         .numeric-display {
@@ -359,40 +253,13 @@
             border: 2px solid rgba(28, 51, 39, 0.4);
         }
 
-        .line-chart-line {
+        .trend-bar {
             position: absolute;
             bottom: 15px;
-            left: 15px;
-            right: 15px;
-            height: 24px;
-            background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
-        }
-
-        /* Data Grid Styles */
-        .data-grid {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(28, 51, 39, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid rgba(28, 51, 39, 0.5);
-        }
-
-        .data-grid th,
-        .data-grid td {
-            padding: 12px 16px;
-            text-align: left;
-            color: rgb(225, 221, 206);
-            font-size: 14px;
-            border-bottom: 2px solid rgba(28, 51, 39, 0.4);
-        }
-
-        .data-grid th {
-            background: rgba(28, 51, 39, 0.9);
-            font-weight: 700;
-            font-size: 16px;
+            width: 8px;
+            background: linear-gradient(to top, #28a745, #20c997);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
         }
     </style>
 </head>
@@ -419,307 +286,10 @@
     </div>
 
     <script>
-        // Get brain name from URL parameters
-        function getBrainName() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('brain') || 'Unknown Brain';
-        }
-
-        // Initialize page
-        function initPage() {
-            const brainName = getBrainName();
-            document.getElementById('brainName').textContent = brainName;
-            document.title = `Brain Details: ${brainName} - Backlash Bot Dashboard`;
-
-            // Start dynamic updates
-            startDynamicUpdates();
-        }
-
-        // Go back to dashboard
-        function goBack() {
-            window.location.href = 'marketwatch.html';
-        }
-
-
-        // Dynamic update functions
-        function updateSpeedDial() {
-            const percentage = Math.floor(Math.random() * 100);
-            const overlay = document.querySelector('.control-card:nth-child(1) .control-overlay');
-            const indicator = document.querySelector('.speed-dial-indicator');
-
-            if (overlay) {
-                overlay.textContent = percentage + '%';
-            }
-
-            // Position indicator based on percentage (rotate around the circle)
-            if (indicator) {
-                const angle = (percentage / 100) * 360 - 90; // -90 to start at top
-                indicator.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-            }
-
-            // Update color based on percentage with smooth transitions
-            const dialCircle = document.querySelector('.speed-dial-circle');
-            if (dialCircle) {
-                let gradient;
-                if (percentage < 50) {
-                    // Green to yellow transition
-                    gradient = `conic-gradient(#28a745 0% ${percentage}%, #ffc107 ${percentage}% 75%, #dc3545 75% 100%)`;
-                } else if (percentage < 75) {
-                    // Yellow to red transition
-                    gradient = `conic-gradient(#28a745 0% 50%, #ffc107 50% ${percentage}%, #dc3545 ${percentage}% 100%)`;
-                } else {
-                    // Mostly red
-                    gradient = `conic-gradient(#28a745 0% 50%, #ffc107 50% 75%, #dc3545 75% ${percentage}%)`;
-                }
-                dialCircle.style.background = gradient;
-            }
-        }
-
-        function updateProgressBar() {
-            const percentage = Math.floor(Math.random() * 100);
-            const progressFill = document.querySelector('.progress-bar-fill');
-            const overlay = document.querySelector('.control-card:nth-child(2) .control-overlay');
-
-            if (progressFill) {
-                // Smooth transition
-                progressFill.style.transition = 'width 1s ease-in-out';
-                progressFill.style.width = percentage + '%';
-            }
-            if (overlay) {
-                overlay.textContent = percentage + '%';
-            }
-        }
-
-        function updateCounter() {
-            const count = Math.floor(Math.random() * 2000) + 100;
-            const overlay = document.querySelector('.control-card:nth-child(3) .control-overlay');
-            if (overlay) {
-                // Animate the counter
-                animateCounter(overlay, parseInt(overlay.textContent.replace(',', '')), count);
-            }
-        }
-
-        function animateCounter(element, from, to) {
-            const duration = 1000; // 1 second
-            const start = Date.now();
-            const step = () => {
-                const now = Date.now();
-                const progress = Math.min((now - start) / duration, 1);
-                const current = Math.floor(from + (to - from) * progress);
-                element.textContent = current.toLocaleString();
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                }
-            };
-            requestAnimationFrame(step);
-        }
-
-        function updateTrafficLight() {
-            const bulbs = document.querySelectorAll('.traffic-light-bulb');
-            const overlay = document.querySelector('.control-card:nth-child(4) .control-overlay');
-
-            bulbs.forEach(bulb => bulb.classList.remove('active'));
-
-            const randomIndex = Math.floor(Math.random() * bulbs.length);
-            bulbs[randomIndex].classList.add('active');
-
-            // Update overlay text based on active bulb
-            if (overlay) {
-                const statusText = randomIndex === 0 ? 'BAD' : randomIndex === 1 ? 'WARNING' : 'GOOD';
-                overlay.textContent = statusText;
-            }
-        }
-
-        function updatePieChart() {
-            const percentage1 = Math.floor(Math.random() * 40) + 20; // 20-60%
-            const percentage2 = Math.floor(Math.random() * 30) + 20; // 20-50%
-            const percentage3 = 100 - percentage1 - percentage2; // Remainder
-
-            const pieChart = document.querySelector('.pie-chart');
-            const overlay = document.querySelector('.control-card:nth-child(5) .control-overlay');
-
-            if (pieChart) {
-                const gradient = `conic-gradient(
-                    #28a745 0% ${percentage1}%,
-                    #20c997 ${percentage1}% ${percentage1 + percentage2}%,
-                    #17a2b8 ${percentage1 + percentage2}% 100%
-                )`;
-                pieChart.style.background = gradient;
-            }
-
-            if (overlay) {
-                overlay.textContent = `CPU\n${percentage1}%`;
-            }
-        }
-
-        function updateNumericDisplay() {
-            const value = (Math.random() * 100 + 10).toFixed(1);
-            const overlay = document.querySelector('.control-card:nth-child(6) .control-overlay');
-            const responseFill = document.querySelector('.control-card:nth-child(6) .response-fill');
-
-            if (overlay) {
-                overlay.textContent = value + ' ms';
-            }
-
-            // Update response bar based on value (lower is better)
-            if (responseFill) {
-                const percentage = Math.max(0, Math.min(100, (100 - value))); // Invert so lower values = higher fill
-                responseFill.style.width = percentage + '%';
-
-                // Change color based on performance
-                if (value < 30) {
-                    responseFill.style.background = 'linear-gradient(90deg, #28a745, #20c997)'; // Good
-                } else if (value < 60) {
-                    responseFill.style.background = 'linear-gradient(90deg, #ffc107, #fd7e14)'; // Warning
-                } else {
-                    responseFill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)'; // Bad
-                }
-            }
-        }
-
-        function updateBadge() {
-            const count = Math.floor(Math.random() * 15); // 0-14 errors
-            const badge = document.querySelector('.control-card:nth-child(7) .badge span');
-            const badgeElement = document.querySelector('.control-card:nth-child(7) .badge');
-
-            if (badge) {
-                badge.textContent = count;
-            }
-
-            // Update badge color based on error count threshold
-            if (badgeElement) {
-                if (count > 5) {
-                    // Red for high error count (>5)
-                    badgeElement.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
-                } else {
-                    // Green for low error count (0-5)
-                    badgeElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
-                }
-            }
-        }
-
-        function updateLineChart() {
-            const bars = document.querySelectorAll('.trend-bar');
-
-            bars.forEach((bar, index) => {
-                // Shift all bars left and add new value at the end
-                if (index < bars.length - 1) {
-                    const nextBar = bars[index + 1];
-                    const nextHeight = parseFloat(nextBar.style.height) || 50;
-                    bar.style.height = nextHeight + '%';
-
-                    // Update color based on the height value
-                    updateBarColor(bar, nextHeight);
-                } else {
-                    // Add new random value for the last bar
-                    const newValue = Math.floor(Math.random() * 80) + 20; // 20-100%
-                    bar.style.height = newValue + '%';
-
-                    // Update color based on the new value
-                    updateBarColor(bar, newValue);
-                }
-            });
-        }
-
-        function updateBarColor(bar, value) {
-            if (value < 50) {
-                bar.style.background = 'linear-gradient(to top, #28a745, #20c997)'; // Green for low usage
-            } else if (value < 75) {
-                bar.style.background = 'linear-gradient(to top, #ffc107, #fd7e14)'; // Yellow for medium usage
-            } else {
-                bar.style.background = 'linear-gradient(to top, #dc3545, #c82333)'; // Red for high usage
-            }
-        }
-
-        function updateDataGrid() {
-            const rows = document.querySelectorAll('.data-grid tbody tr');
-
-            rows.forEach((row, index) => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    if (index === 0) { // CPU
-                        const cpuValue = Math.floor(Math.random() * 100) + '%';
-                        cells[1].textContent = cpuValue;
-                        // Update status color
-                        if (parseInt(cpuValue) < 70) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseInt(cpuValue) < 90) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    } else if (index === 1) { // Memory
-                        const gb = (Math.random() * 4 + 1).toFixed(1);
-                        const memValue = gb + ' GB';
-                        cells[1].textContent = memValue;
-                        // Update status color
-                        if (parseFloat(gb) < 2.5) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseFloat(gb) < 3.5) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    } else if (index === 2) { // Disk
-                        const diskValue = Math.floor(Math.random() * 100) + '%';
-                        cells[1].textContent = diskValue;
-                        // Update status color
-                        if (parseInt(diskValue) < 70) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseInt(diskValue) < 90) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    }
-                }
-            });
-        }
-
-        // Start dynamic updates
-        function startDynamicUpdates() {
-            // Update all controls immediately
-            updateAllControls();
-
-            // Set up intervals for different update frequencies
-            setInterval(updateSpeedDial, 2000); // Every 2 seconds
-            setInterval(updateProgressBar, 3000); // Every 3 seconds
-            setInterval(updateCounter, 4000); // Every 4 seconds
-            setInterval(updateTrafficLight, 5000); // Every 5 seconds
-            setInterval(updatePieChart, 3500); // Every 3.5 seconds
-            setInterval(updateNumericDisplay, 2500); // Every 2.5 seconds
-            setInterval(updateBadge, 6000); // Every 6 seconds
-            setInterval(updateLineChart, 4500); // Every 4.5 seconds
-            setInterval(updateDataGrid, 5500); // Every 5.5 seconds
-        }
-
-        // Update all controls at once
-        function updateAllControls() {
-            updateSpeedDial();
-            updateProgressBar();
-            updateCounter();
-            updateTrafficLight();
-            updatePieChart();
-            updateNumericDisplay();
-            updateBadge();
-            updateLineChart();
-            updateDataGrid();
-        }
-
         // Global variables
         let connection = null;
         let currentBrainData = null;
         let currentCategory = 'All';
-        let availableCategories = new Set(['All']);
         let currentMetrics = [];
 
         // Initialize SignalR connection
@@ -744,6 +314,8 @@
         function handlePerformanceMetricsUpdate(data) {
             if (data.BrainInstanceName === getBrainName()) {
                 updateBrainData(data);
+                createMetricsFromData();
+                updateCategoryDropdown();
                 renderControls();
             }
         }
@@ -752,6 +324,8 @@
         function handleBrainStatusUpdate(data) {
             if (data.BrainInstanceName === getBrainName()) {
                 updateBrainData(data);
+                createMetricsFromData();
+                updateCategoryDropdown();
                 renderControls();
             }
         }
@@ -762,8 +336,6 @@
                 currentBrainData = {};
             }
             Object.assign(currentBrainData, newData);
-            createMetricsFromData();
-            updateCategoryDropdown();
         }
 
         // Create GeneralPerformanceMetric objects from brain data
@@ -1026,28 +598,6 @@
             }
         }
 
-        // Fetch initial brain data
-        async function fetchBrainData() {
-            try {
-                const response = await fetch('/MarketWatch/brains');
-                const brains = await response.json();
-                const brainName = getBrainName();
-                const brain = brains.find(b => b.brainInstanceName === brainName);
-                if (brain) {
-                    currentBrainData = brain;
-                    renderControls();
-                }
-            } catch (error) {
-                console.error('Failed to fetch brain data:', error);
-            }
-        }
-
-        // Category change handler
-        function onCategoryChange() {
-            currentCategory = document.getElementById('metricCategory').value;
-            renderControls();
-        }
-
         // Render controls for current category
         function renderControls() {
             const grid = document.getElementById('controlsGrid');
@@ -1089,21 +639,6 @@
             }
 
             return card;
-        }
-
-        // Get description for metric
-        function getDescription(def) {
-            if (def.dataKey && currentBrainData[def.dataKey] !== undefined) {
-                return `Current value: ${currentBrainData[def.dataKey]} ${def.unit}`;
-            }
-            if (def.historyKey && currentBrainData[def.historyKey]) {
-                const history = currentBrainData[def.historyKey];
-                if (history && history.length > 0) {
-                    const latest = history[history.length - 1];
-                    return `Latest: ${latest.value} ${def.unit} at ${new Date(latest.timestamp).toLocaleTimeString()}`;
-                }
-            }
-            return 'No data available';
         }
 
         // Create visual element based on type
@@ -1306,6 +841,48 @@
                 return value > 0 ? 'green' : 'red';
             }
             return 'yellow'; // Default
+        }
+
+        // Get brain name from URL parameters
+        function getBrainName() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('brain') || 'Unknown Brain';
+        }
+
+        // Initialize page
+        function initPage() {
+            const brainName = getBrainName();
+            document.getElementById('brainName').textContent = brainName;
+            document.title = `Brain Details: ${brainName} - Backlash Bot Dashboard`;
+        }
+
+        // Go back to dashboard
+        function goBack() {
+            window.location.href = 'marketwatch.html';
+        }
+
+        // Category change handler
+        function onCategoryChange() {
+            currentCategory = document.getElementById('metricCategory').value;
+            renderControls();
+        }
+
+        // Fetch initial brain data
+        async function fetchBrainData() {
+            try {
+                const response = await fetch('/MarketWatch/brains');
+                const brains = await response.json();
+                const brainName = getBrainName();
+                const brain = brains.find(b => b.brainInstanceName === brainName);
+                if (brain) {
+                    currentBrainData = brain;
+                    createMetricsFromData();
+                    updateCategoryDropdown();
+                    renderControls();
+                }
+            } catch (error) {
+                console.error('Failed to fetch brain data:', error);
+            }
         }
 
         // Initialize when page loads
