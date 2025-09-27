@@ -8,6 +8,7 @@ using BacklashDTOs.Converters;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,7 +36,7 @@ namespace BacklashCommon.Services
     {
         private readonly ILogger<ITradingSnapshotService> _logger;
         private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceConfig;
-        private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
 
         /// <summary>
@@ -67,17 +68,17 @@ namespace BacklashCommon.Services
         /// <param name="logger">Logger for recording snapshot operations, warnings, and errors.</param>
         /// <param name="tradingSnapshotServiceConfig">Configuration options for trading snapshot service behavior including tolerance settings.</param>
         /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording execution times.</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording execution times.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor? centralPerformanceMonitor = null)
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig;
             _serviceScopeFactory = scopeFactory;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
             _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingSnapshotServiceConfig.Value.DecisionFrequencySeconds);
             _snapshotTimingTolerance = TimeSpan.FromSeconds(tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds);
 
@@ -275,9 +276,9 @@ namespace BacklashCommon.Services
                 Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
 
-                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "SaveSnapshotAsync", "Save Snapshot Execution Time", "Time taken to save a snapshot", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 1000, 5000, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "SaveSnapshotAsync", "Save Snapshot Execution Time", "Time taken to save a snapshot", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 1000, 5000, _enablePerformanceMetrics);
                 }
 
                 if (_enablePerformanceMetrics)
@@ -407,9 +408,9 @@ namespace BacklashCommon.Services
                 Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
 
-                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "LoadManySnapshots", "Load Many Snapshots Execution Time", "Time taken to load multiple snapshots", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 10000, 50000, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "LoadManySnapshots", "Load Many Snapshots Execution Time", "Time taken to load multiple snapshots", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 10000, 50000, _enablePerformanceMetrics);
                 }
 
                 if (_enablePerformanceMetrics)

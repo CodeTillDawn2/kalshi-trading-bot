@@ -7,7 +7,7 @@ namespace BacklashBot.Management.Interfaces
     /// system performance metrics across various components including queues, WebSocket connections,
     /// database operations, and market analysis activities.
     /// </summary>
-    public interface ICentralPerformanceMonitor : IPerformanceMonitor
+    public interface ICentralPerformanceMonitor
     {
 
         // Additional methods specific to central performance monitoring:

@@ -4,6 +4,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -38,7 +39,7 @@ namespace BacklashBot.Services
         private readonly IScopeManagerService _scopeManagerService;
 
         private IStatusTrackerService _statusTrackerService;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         private readonly bool _enablePerformanceMetrics;
 
@@ -157,7 +158,7 @@ namespace BacklashBot.Services
         /// <param name="trackerConfig">Orderbook change tracker configuration containing time windows and thresholds</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording metrics</param>
         /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, trackerConfig, or statusTrackerService is null</exception>
         public OrderbookChangeTracker(
             string marketTicker,
@@ -166,7 +167,7 @@ namespace BacklashBot.Services
             IOptions<OrderbookChangeTrackerConfig> trackerConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
+            IPerformanceMonitor performanceMonitor)
         {
             _marketTicker = marketTicker ?? throw new ArgumentNullException(nameof(marketTicker));
             _scopeManagerService = scopeManagerService;
@@ -174,7 +175,7 @@ namespace BacklashBot.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _trackerConfig = trackerConfig ?? throw new ArgumentNullException(nameof(trackerConfig));
             _statusTrackerService = statusTrackerService;
-            _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
 
             _enablePerformanceMetrics = _trackerConfig.Value.EnablePerformanceMetrics;
 
@@ -2113,12 +2114,12 @@ namespace BacklashBot.Services
             if (!enableMetrics)
             {
                 // Send disabled metric
-                _centralPerformanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
             }
             else
             {
                 // Record actual metric
-                _centralPerformanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
 

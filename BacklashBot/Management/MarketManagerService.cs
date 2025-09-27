@@ -5,6 +5,7 @@ using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
@@ -36,22 +37,24 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="centralPerformanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         public MarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService)
         {
-            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
-            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
+            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService);
+            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService);
         }
 
         /// <summary>

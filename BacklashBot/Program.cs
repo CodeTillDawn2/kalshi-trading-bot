@@ -236,7 +236,7 @@ builder.Services.Configure<HostOptions>(options =>
 
 // ## Service Registrations
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
-builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
+builder.Services.AddSingleton<CentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
     sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>().Value.Name,
@@ -244,8 +244,10 @@ builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerfo
     sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>()));
+builder.Services.AddSingleton<ICentralPerformanceMonitor>(provider =>
+    provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IPerformanceMonitor>(provider =>
-    provider.GetRequiredService<ICentralPerformanceMonitor>());
+    provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
     (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<ISqlDataServicePerformanceMetrics>(provider =>
@@ -315,13 +317,14 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<ILogger<IMarketManagerService>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>(),
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IOptions<MarketManagerServiceConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IBrainStatusService>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<ITargetCalculationService>()));
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
 builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
@@ -365,7 +368,7 @@ builder.Services.AddTransient(provider =>
         provider.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
-        provider.GetRequiredService<ICentralPerformanceMonitor>()
+        provider.GetRequiredService<IPerformanceMonitor>()
     );
 });
 
@@ -391,7 +394,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<ICentralPerformanceMonitor>()
+                sp.GetRequiredService<IPerformanceMonitor>()
             ),
             sp.GetRequiredService<IOptions<MarketServiceDataConfig>>()
         );
@@ -444,18 +447,17 @@ builder.Services.AddScoped<ICandlestickService>(sp => new CandlestickService(
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<CandlestickServiceConfig>>(),
-    sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>(),
     sp.GetRequiredService<IOptions<DataStorageConfig>>(),
     sp.GetRequiredService<IServiceFactory>(),
-    sp.GetRequiredService<IScopeManagerService>()));
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
     sp.GetRequiredService<IHubContext<BacklashBotHub>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<ILogger<IBroadcastService>>(),
     sp.GetRequiredService<IConfiguration>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>(),
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<BacklashBot.Configuration.BroadcastServiceConfig>>()));
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorService(
@@ -466,18 +468,19 @@ builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorS
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>()));
+    sp.GetRequiredService<IPerformanceMonitor>()));
 builder.Services.AddSingleton<IOverseerClientService>(sp => new OverseerClientService(
     sp.GetRequiredService<ILogger<OverseerClientService>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IOptions<OverseerClientServiceConfig>>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConnectionManager(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
     sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>()
+    sp.GetRequiredService<IPerformanceMonitor>()
 ));
 builder.Services.AddScoped<IDataCache, DataCache>();
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(

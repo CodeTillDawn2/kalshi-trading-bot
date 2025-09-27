@@ -4,6 +4,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,9 +23,8 @@ namespace BacklashCommon.Helpers
         private readonly SnapshotGroupHelperConfig _snapshotGroupHelperConfig;
         private readonly ISnapshotPeriodHelper _snapshotPeriodHelper;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ITradingSnapshotService _snapshotService;
         private readonly ILogger<SnapshotGroupHelper> _logger;
-        private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly bool _metricsEnabled;
         private int _totalMarketsProcessed = 0;
         private long _totalProcessingTimeMs = 0;
@@ -34,29 +34,25 @@ namespace BacklashCommon.Helpers
         /// Initializes a new instance of the <see cref="SnapshotGroupHelper"/> class.
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
-        /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
-        /// <param name="snapshotService">Service for managing trading snapshots.</param>
         /// <param name="dataStorageConfig">Configuration options for general execution settings.</param>
         /// <param name="marketAnalysisHelperConfig">Configuration options for market analysis helper settings.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
         public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper,
-            ITradingSnapshotService snapshotService, IOptions<DataStorageConfig> dataStorageConfig,
-            IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor centralPerformanceMonitor, ILogger<SnapshotGroupHelper> logger)
+             IOptions<DataStorageConfig> dataStorageConfig,
+            IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, IPerformanceMonitor performanceMonitor, ILogger<SnapshotGroupHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
-            ArgumentNullException.ThrowIfNull(snapshotService);
             ArgumentNullException.ThrowIfNull(dataStorageConfig);
             ArgumentNullException.ThrowIfNull(marketAnalysisHelperConfig);
             ArgumentNullException.ThrowIfNull(logger);
 
-            _snapshotService = snapshotService;
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
             _dataStorageConfig = dataStorageConfig.Value ?? throw new ArgumentNullException(nameof(dataStorageConfig.Value));
             _snapshotGroupHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
 
             _logger = logger;
             _metricsEnabled = _snapshotGroupHelperConfig.EnablePerformanceMetrics;
@@ -202,7 +198,7 @@ namespace BacklashCommon.Helpers
                     totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
 
                 // Post metrics to central performance monitor if available
-                if (_centralPerformanceMonitor != null)
+                if (_performanceMonitor != null)
                 {
                     RecordMarketAnalysisHelperMetricsPrivate(totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, _errorCount, _metricsEnabled);
                 }
@@ -229,18 +225,18 @@ namespace BacklashCommon.Helpers
             if (!metricsEnabled)
             {
                 // Send disabled metrics
-                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, false);
-                _centralPerformanceMonitor.RecordDisabledMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, false);
             }
             else
             {
                 // Record actual metrics
-                _centralPerformanceMonitor.RecordCounterMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, true);
-                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, null, null, null, true);
-                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, null, null, null, true);
-                _centralPerformanceMonitor.RecordCounterMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, true);
+                _performanceMonitor.RecordCounterMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordCounterMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, true);
             }
         }
 

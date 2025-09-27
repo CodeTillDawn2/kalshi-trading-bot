@@ -1,5 +1,6 @@
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,7 @@ namespace KalshiBotAPI.Websockets
         private readonly KalshiConfig _kalshiConfig;
         private readonly WebSocketConnectionManagerConfig _websocketConfig;
         private readonly RSA _privateKey;
-        private readonly ICentralPerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private ClientWebSocket? _webSocket = null!;
         private readonly object _webSocketLock = new object();
         private bool _isConnected = false;
@@ -113,7 +114,7 @@ namespace KalshiBotAPI.Websockets
                 if (_enableMetrics != value)
                 {
                     _enableMetrics = value;
-                    _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(_enableMetrics);
+                    (_performanceMonitor as ICentralPerformanceMonitor)?.UpdateWebSocketMetricsRecordingStatus(_enableMetrics);
                     if (_enableMetrics && _performanceMonitor == null)
                     {
                         _logger.LogWarning("Performance metrics enabled but no ICentralPerformanceMonitor was provided. Metrics will be collected locally but not posted to central monitoring.");
@@ -140,7 +141,7 @@ namespace KalshiBotAPI.Websockets
             IOptions<KalshiConfig> kalshiConfig,
             IOptions<WebSocketConnectionManagerConfig> websocketConfig,
             ILogger<WebSocketConnectionManager> logger,
-            ICentralPerformanceMonitor? performanceMonitor = null)
+            IPerformanceMonitor performanceMonitor)
         {
             _kalshiConfig = kalshiConfig.Value;
             _websocketConfig = websocketConfig.Value;

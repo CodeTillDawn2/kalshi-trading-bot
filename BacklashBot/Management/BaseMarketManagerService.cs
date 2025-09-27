@@ -8,6 +8,7 @@ using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
@@ -45,7 +46,11 @@ namespace BacklashBot.Management
         /// <summary>
         /// Monitor for tracking system performance metrics and resource usage.
         /// </summary>
-        protected readonly ICentralPerformanceMonitor _performanceMonitor;
+        protected readonly IPerformanceMonitor _performanceMonitor;
+        /// <summary>
+        /// Monitor for getting system performance metrics and resource usage.
+        /// </summary>
+        protected readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
         /// <summary>
         /// Service for calculating optimal market targets based on performance metrics.
         /// </summary>
@@ -106,21 +111,24 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="centralPerformanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         protected BaseMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
             ITargetCalculationService targetCalculationService)
         {
             _serviceFactory = serviceFactory;
             _scopeManagerService = scopeManagerService;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
             _statusTrackerService = statusTrackerService;
             _logger = logger;
             _scopeFactory = scopeFactory;

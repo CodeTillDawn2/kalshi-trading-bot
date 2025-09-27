@@ -179,12 +179,6 @@ namespace BacklashBot.Services
         public IOrderBookService? GetOrderBookService() => GetService<IOrderBookService>();
 
         /// <summary>
-        /// Retrieves the central performance monitor for tracking system performance metrics.
-        /// </summary>
-        /// <returns>The performance monitor instance, or null if the service scope is not initialized.</returns>
-        public ICentralPerformanceMonitor? GetPerformanceMonitor() => GetService<ICentralPerformanceMonitor>();
-
-        /// <summary>
         /// Retrieves the data cache service for caching frequently accessed data.
         /// </summary>
         /// <returns>The data cache service instance, or null if the service scope is not initialized.</returns>

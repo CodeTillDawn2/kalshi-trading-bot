@@ -55,12 +55,6 @@ namespace BacklashBot.Services.Interfaces
         IOrderBookService? GetOrderBookService();
 
         /// <summary>
-        /// Gets the central performance monitor service instance.
-        /// </summary>
-        /// <returns>The performance monitor service, or null if not available.</returns>
-        ICentralPerformanceMonitor? GetPerformanceMonitor();
-
-        /// <summary>
         /// Gets the data cache service instance.
         /// </summary>
         /// <returns>The data cache service, or null if not available.</returns>

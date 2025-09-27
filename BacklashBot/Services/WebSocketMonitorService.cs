@@ -4,6 +4,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ namespace BacklashBot.Services
 
         // Configuration and dependencies
         private readonly bool _enableMetrics;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         // Performance metrics
         private int _exchangeStatusCheckCount = 0;
@@ -87,7 +88,7 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="readyStatus">Status tracker for bot initialization completion.</param>
         /// <param name="statusTrackerService">Service for managing cancellation tokens and operation status.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitoring service for posting metrics.</param>
+        /// <param name="performanceMonitor">Central performance monitoring service for posting metrics.</param>
         public WebSocketMonitorService(
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
@@ -96,15 +97,15 @@ namespace BacklashBot.Services
             IScopeManagerService scopeManagerService,
             IBotReadyStatus readyStatus,
             IStatusTrackerService statusTrackerService,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
-            : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, centralPerformanceMonitor, readyStatus)
+            IPerformanceMonitor performanceMonitor)
+            : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, performanceMonitor, readyStatus)
         {
             _scopeFactory = scopeFactory;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
             _config = config.Value;
 
             // Load configuration values from injected options
@@ -705,12 +706,12 @@ namespace BacklashBot.Services
             if (!enableMetrics)
             {
                 // Send disabled metric
-                _centralPerformanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
             }
             else
             {
                 // Record actual metric
-                _centralPerformanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
     }

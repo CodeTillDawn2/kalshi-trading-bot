@@ -8,6 +8,7 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using Parquet;
 using Parquet.Data;
@@ -27,13 +28,12 @@ namespace BacklashBot.Services
     {
         private readonly ILogger<ICandlestickService> _logger;
         private readonly CandlestickServiceConfig _candlestickConfig;
-        private readonly CentralBrainConfig _centralBrainConfig;
         private readonly DataStorageConfig _storageConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IServiceFactory _serviceFactory;
-        private readonly IScopeManagerService _scopeManagerService;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Initializes a new instance of the CandlestickService with required dependencies.
@@ -42,91 +42,30 @@ namespace BacklashBot.Services
         /// <param name="scopeFactory">Factory for creating service scopes for database operations</param>
         /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
         /// <param name="candlestickConfig">Configuration options for candlestick service parameters</param>
-        /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="loggingConfig">Configuration options for logging behavior</param>
+        /// <param name="storageConfig">Configuration options for storage behavior</param>
         /// <param name="serviceFactory">Factory for accessing other system services</param>
-        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="performanceMonitor">Performance monitor for recording metrics</param>
         public CandlestickService(
             ILogger<ICandlestickService> logger,
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTracker,
             IOptions<CandlestickServiceConfig> candlestickConfig,
-            IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<LoggingConfig> loggingConfig,
             IOptions<DataStorageConfig> storageConfig,
             IServiceFactory serviceFactory,
-            IScopeManagerService scopeManagerService)
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
-            _scopeManagerService = scopeManagerService;
             _statusTracker = statusTracker;
             _scopeFactory = scopeFactory;
             _storageConfig = storageConfig.Value;
             _candlestickConfig = candlestickConfig.Value;
-            _centralBrainConfig = centralBrainConfig.Value;
             _loggingConfig = loggingConfig.Value;
             _serviceFactory = serviceFactory;
+            _performanceMonitor = performanceMonitor;
         }
 
-        /// <summary>
-        /// Cleans up old Parquet files for a specific market based on retention policy.
-        /// </summary>
-        /// <param name="marketDir">Market directory path</param>
-        /// <param name="retentionCutoff">Date cutoff for retention</param>
-        /// <returns>Number of files cleaned up</returns>
-        private async Task<int> CleanupOldParquetFilesAsync(string marketDir, DateTime retentionCutoff)
-        {
-            int filesCleaned = 0;
-            try
-            {
-                foreach (var yearDir in Directory.GetDirectories(marketDir))
-                {
-                    var year = int.Parse(Path.GetFileName(yearDir));
-                    if (year < retentionCutoff.Year)
-                    {
-                        // Delete entire year directory if it's before retention cutoff
-                        Directory.Delete(yearDir, true);
-                        _logger.LogDebug("Deleted old year directory: {YearDir}", yearDir);
-                        continue;
-                    }
-                    else if (year == retentionCutoff.Year)
-                    {
-                        // Clean up files within the retention year
-                        foreach (var monthDir in Directory.GetDirectories(yearDir))
-                        {
-                            var month = int.Parse(Path.GetFileName(monthDir));
-                            if (month < retentionCutoff.Month)
-                            {
-                                Directory.Delete(monthDir, true);
-                                _logger.LogDebug("Deleted old month directory: {MonthDir}", monthDir);
-                            }
-                            else if (month == retentionCutoff.Month)
-                            {
-                                // Clean up individual files in the retention month
-                                foreach (var file in Directory.GetFiles(monthDir, "*.parquet"))
-                                {
-                                    var fileName = Path.GetFileNameWithoutExtension(file);
-                                    var parts = fileName.Split('_');
-                                    if (parts.Length >= 2 && int.TryParse(parts[0], out var day))
-                                    {
-                                        if (day < retentionCutoff.Day)
-                                        {
-                                            await Task.Run(() => File.Delete(file));
-                                            filesCleaned++;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error cleaning up Parquet files in {MarketDir}. Exception: {Message}, Inner: {Inner}", marketDir, ex.Message, ex.InnerException?.Message ?? "None");
-            }
-            return filesCleaned;
-        }
 
         /// <summary>
         /// Logs performance metrics for operations if enabled in configuration.
@@ -136,14 +75,8 @@ namespace BacklashBot.Services
         /// <param name="additionalData">Optional additional data to log</param>
         private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
         {
-            if (!_candlestickConfig.EnablePerformanceMetrics) return;
-
-            // Record execution time in CentralPerformanceMonitor
-            var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
-            if (performanceMonitor != null)
-            {
-                RecordExecutionTimePrivate(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
-            }
+            RecordExecutionTimePrivate(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
+            
         }
 
         /// <summary>
@@ -1109,12 +1042,12 @@ namespace BacklashBot.Services
             if (!enableMetrics)
             {
                 // Send disabled metric
-                _serviceFactory.GetPerformanceMonitor()?.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+                _performanceMonitor?.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
             }
             else
             {
                 // Record actual metric
-                _serviceFactory.GetPerformanceMonitor()?.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+                _performanceMonitor?.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
     }

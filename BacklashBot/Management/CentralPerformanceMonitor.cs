@@ -43,7 +43,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : BasePerformanceMonitor, ICentralPerformanceMonitor
+    public class CentralPerformanceMonitor : BasePerformanceMonitor, ICentralPerformanceMonitor, IPerformanceMonitor
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         /// <summary>
@@ -271,23 +271,7 @@ namespace BacklashBot.Management
         /// </summary>
         public bool WebSocketConnectionManagerMetricsRecording { get; private set; } = false;
 
-        /// <summary>
-        /// Updates the WebSocket metrics recording status and logs the change.
-        /// </summary>
-        /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
-        /// <remarks>
-        /// This method should be called by WebSocketConnectionManager when metrics collection starts or stops.
-        /// It provides visibility into the WebSocket performance monitoring state.
-        /// </remarks>
-        public void UpdateWebSocketMetricsRecordingStatus(bool isRecording)
-        {
-            if (WebSocketConnectionManagerMetricsRecording != isRecording)
-            {
-                WebSocketConnectionManagerMetricsRecording = isRecording;
-                _logger.LogInformation("WebSocket metrics recording status changed: {Status}",
-                    isRecording ? "ENABLED" : "DISABLED");
-            }
-        }
+
 
         /// <summary>
         /// Initializes a new instance of the CentralPerformanceMonitor class.

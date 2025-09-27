@@ -30,6 +30,7 @@ namespace BacklashBot.Services
 
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
         private HubConnection? _hubConnection;
         private Timer? _checkInTimer;
@@ -94,18 +95,21 @@ namespace BacklashBot.Services
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
         /// <param name="overseerConfig">Configuration options for the overseer.</param>
         /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
+        /// <param name="performanceMonitor">Performance monitor for recording metrics.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
             IOptions<OverseerClientServiceConfig> overseerConfig,
             IOptions<InstanceNameConfig> instanceNameConfig,
+            IPerformanceMonitor performanceMonitor,
             ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
             _clientId = Guid.NewGuid().ToString();
+            _centralPerformanceMonitor = centralPerformanceMonitor;
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
             _clientName = instanceNameConfig.Value.Name;
@@ -1301,16 +1305,16 @@ namespace BacklashBot.Services
                         switch (metricInfo.VisualType)
                         {
                             case "Counter":
-                                _centralPerformanceMonitor.RecordCounterMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                _performanceMonitor.RecordCounterMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
                                 break;
                             case "ProgressBar":
-                                _centralPerformanceMonitor.RecordProgressBarMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                _performanceMonitor.RecordProgressBarMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
                                 break;
                             case "NumericDisplay":
-                                _centralPerformanceMonitor.RecordNumericDisplayMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                _performanceMonitor.RecordNumericDisplayMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
                                 break;
                             case "TrafficLight":
-                                _centralPerformanceMonitor.RecordTrafficLightMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                _performanceMonitor.RecordTrafficLightMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
                                 break;
                         }
                     }
@@ -1321,7 +1325,7 @@ namespace BacklashBot.Services
                 // Send all possible metrics as disabled
                 foreach (var kvp in allMetrics)
                 {
-                    _centralPerformanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
+                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
                 }
             }
         }

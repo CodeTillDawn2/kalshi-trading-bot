@@ -7,6 +7,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
@@ -36,19 +37,21 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="centralPerformanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         public UnmanagedMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService)
         {
         }
 
@@ -105,7 +108,7 @@ namespace BacklashBot.Management
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
 
-                if (_performanceMonitor.LastPerformanceSampleDate == null)
+                if (_centralPerformanceMonitor.LastPerformanceSampleDate == null)
                 {
                     _logger.LogInformation("Stats: No performance metric available for MarketRefreshService.");
                     MonitoringWatchList = false;
@@ -138,7 +141,7 @@ namespace BacklashBot.Management
                     || MarketsToAddAfterReset.Count() > 0)
                 {
                     _logger.LogDebug("Stats: Waiting for markets to settle. Percentage={Percentage:F2}%, CurrentCount={CurrentCount}, ActualCount={ActualCount}, RefreshUsage={RefreshUsage}, QueueUsage={QueueUsage}, MarketsToAddAfterReset={MarketsToAdd}, RecentAdjustment={RecentAdjustment}",
-                        metrics.CurrentUsage, metrics.CurrentCount, actualMarketCount, Math.Round(metrics.CurrentUsage, 2), _performanceMonitor.GetQueueHighCountPercentage(), MarketsToAddAfterReset.Count(), _recentMarketAdjustment);
+                        metrics.CurrentUsage, metrics.CurrentCount, actualMarketCount, Math.Round(metrics.CurrentUsage, 2), _centralPerformanceMonitor.GetQueueHighCountPercentage(), MarketsToAddAfterReset.Count(), _recentMarketAdjustment);
                     MonitoringWatchList = false;
                     return;
                 }
