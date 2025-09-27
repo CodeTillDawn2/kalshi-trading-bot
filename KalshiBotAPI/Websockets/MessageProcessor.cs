@@ -1405,7 +1405,7 @@ namespace KalshiBotAPI.Websockets
                         messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
 
                     // Post metrics to central monitoring services
-                    _performanceMetrics.PostMessageProcessingMetrics(
+                    PostMessageProcessingMetrics(
                         _totalMessagesProcessed,
                         _totalProcessingTimeMs,
                         avgProcessingTime,
@@ -1413,7 +1413,7 @@ namespace KalshiBotAPI.Websockets
                         _orderBookUpdateQueue.Count);
 
                     // Post message type distribution metrics
-                    _performanceMetrics.PostMessageTypeMetrics(GetMessageTypeCounts());
+                    PostMessageTypeMetrics(GetMessageTypeCounts());
 
                     // Reset counters for next interval
                     _totalMessagesProcessed = 0;
@@ -1627,7 +1627,7 @@ namespace KalshiBotAPI.Websockets
                         _duplicateMessagesInWindow, _config.DuplicateMessageTimeWindowMs);
 
                     // Post duplicate metrics to central monitoring
-                    _performanceMetrics.PostDuplicateMessageMetrics(
+                    PostDuplicateMessageMetrics(
                         _duplicateMessageCount,
                         _duplicateMessagesInWindow,
                         _lastDuplicateWarningTime);

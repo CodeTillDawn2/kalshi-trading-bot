@@ -199,7 +199,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Post MarketTypeService metrics automatically
-            _marketTypeService.PostMetrics(_performanceMonitor);
+            _marketTypeService.PostMetrics();
 
             // Post StrategySelectionHelper metrics automatically
             _strategySelectionHelper.PostMetrics(_performanceMonitor);

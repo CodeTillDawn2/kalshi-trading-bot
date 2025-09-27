@@ -1,5 +1,6 @@
 using BacklashCommon.Helpers;
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -61,6 +62,11 @@ namespace TradingStrategies.Trading.Overseer
         private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
+        /// Performance monitor for recording metrics.
+        /// </summary>
+        private readonly IPerformanceMonitor _performanceMonitor;
+
+        /// <summary>
         /// Performance metrics: cache hits.
         /// </summary>
         private long _cacheHits;
@@ -84,18 +90,20 @@ namespace TradingStrategies.Trading.Overseer
         /// Initializes a new instance of the MarketTypeService class.
         /// </summary>
         /// <param name="config">The market type service configuration containing settings for cache expiration and performance metrics.</param>
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
         /// <remarks>
         /// Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
         /// The cache expiration can be configured via MarketTypeServiceConfig:CacheExpirationMinutes in appsettings.json.
         /// Performance metrics collection can be enabled/disabled via MarketTypeServiceConfig:EnablePerformanceMetrics.
         /// This constructor sets up the service for immediate use in market type classification.
         /// </remarks>
-        public MarketTypeService(IOptions<MarketTypeServiceConfig> config)
+        public MarketTypeService(IOptions<MarketTypeServiceConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _marketTypeHelper = new MarketTypeHelper();
             _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
             _cacheExpiration = TimeSpan.FromMinutes(config.Value.CacheExpirationMinutes);
             _enablePerformanceMetrics = config.Value.EnablePerformanceMetrics;
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -256,21 +264,41 @@ namespace TradingStrategies.Trading.Overseer
         public int GetClassificationCount() => _classificationCount;
 
         /// <summary>
-        /// Posts the current performance metrics to the specified performance monitor.
+        /// Posts the current performance metrics to the injected performance monitor.
         /// </summary>
-        /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
-        public void PostMetrics(PerformanceMonitor performanceMonitor)
+        public void PostMetrics()
         {
-            if (performanceMonitor != null)
+            var metrics = new Dictionary<string, object>
             {
-                var metrics = new Dictionary<string, object>
-                {
-                    ["CacheHits"] = _cacheHits,
-                    ["CacheMisses"] = _cacheMisses,
-                    ["AverageClassificationTimeMs"] = GetAverageClassificationTime().TotalMilliseconds,
-                    ["ClassificationCount"] = _classificationCount
-                };
-                performanceMonitor.RecordSimulationMetrics("MarketTypeService", metrics, _enablePerformanceMetrics);
+                ["CacheHits"] = _cacheHits,
+                ["CacheMisses"] = _cacheMisses,
+                ["AverageClassificationTimeMs"] = GetAverageClassificationTime().TotalMilliseconds,
+                ["ClassificationCount"] = _classificationCount
+            };
+            RecordSimulationMetrics("MarketTypeService", metrics, _enablePerformanceMetrics);
+        }
+
+        /// <summary>
+        /// Records simulation metrics using the injected performance monitor interface.
+        /// </summary>
+        /// <param name="className">The name of the class recording the metrics.</param>
+        /// <param name="metrics">Dictionary of metric names and values.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled.</param>
+        private void RecordSimulationMetrics(string className, Dictionary<string, object> metrics, bool metricsEnabled)
+        {
+            if (metricsEnabled)
+            {
+                _performanceMonitor.RecordCounterMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", (double)metrics["CacheHits"], "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordCounterMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", (double)metrics["CacheMisses"], "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", (double)metrics["AverageClassificationTimeMs"], "ms", "Performance", null, null, null, metricsEnabled);
+                _performanceMonitor.RecordCounterMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", (double)metrics["ClassificationCount"], "count", "Performance", metricsEnabled);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetricMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", 0, "ms", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", 0, "count", "Performance", metricsEnabled);
             }
         }
     }
