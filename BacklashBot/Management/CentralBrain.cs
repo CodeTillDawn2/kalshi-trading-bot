@@ -45,8 +45,6 @@ namespace BacklashBot.Management
         private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly InstanceNameConfig _instanceNameConfig;
-        private readonly GeneralExecutionConfig _generalConfig;
-        private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
         private BTimer? _snapshotTimer;
@@ -94,13 +92,11 @@ namespace BacklashBot.Management
         /// <param name="serviceFactory">Factory for creating service instances.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="tradingSnapshotServiceConfig">Configuration for trading snapshot service.</param>
-        /// <param name="generalExecutionConfig">General execution configuration.</param>
         /// <param name="instanceNameConfig">Instance name configuration.</param>
         /// <param name="backlashErrorHandler">Error handler service.</param>
         /// <param name="backlashPerformanceTracker">Performance tracking service.</param>
         /// <param name="marketManager">Market management service.</param>
         /// <param name="appLifetime">Application lifetime manager.</param>
-        /// <param name="scopeManagerService">Scope manager service.</param>
         /// <param name="statusTrackerService">Status tracking service.</param>
         /// <param name="readyStatus">Bot ready status service.</param>
         /// <param name="brainStatusService">Brain status service.</param>
@@ -111,13 +107,11 @@ namespace BacklashBot.Management
             IServiceFactory serviceFactory,
             IServiceScopeFactory scopeFactory,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
-            IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<InstanceNameConfig> instanceNameConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
             IMarketManagerService marketManager,
             IHostApplicationLifetime appLifetime,
-            IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBotReadyStatus readyStatus,
             IBrainStatusService brainStatusService,
@@ -126,7 +120,6 @@ namespace BacklashBot.Management
         {
             Console.WriteLine("CentralBrain constructor started");
             _logger = logger;
-            _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
             _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig.Value;

@@ -264,10 +264,8 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
     var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
     Console.WriteLine("Resolving IOptions<TradingSnapshotServiceConfig>");
     var tradingSnapshotServiceConfig = sp.GetRequiredService<IOptions<TradingSnapshotServiceConfig>>();
-    Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 1");
-    var generalExecutionConfig1 = sp.GetRequiredService<IOptions<GeneralExecutionConfig>>();
-    Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 2");
-    var generalExecutionConfig2 = sp.GetRequiredService<IOptions<InstanceNameConfig>>();
+    Console.WriteLine("Resolving IOptions<instanceNameConfig>");
+    var instanceNameConfig = sp.GetRequiredService<IOptions<InstanceNameConfig>>();
     Console.WriteLine("Resolving ICentralErrorHandler");
     var centralErrorHandler = sp.GetRequiredService<ICentralErrorHandler>();
     Console.WriteLine("Resolving ICentralPerformanceMonitor");
@@ -294,13 +292,11 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
         serviceFactory,
         scopeFactory,
         tradingSnapshotServiceConfig,
-        generalExecutionConfig1,
-        generalExecutionConfig2,
+        instanceNameConfig,
         centralErrorHandler,
         centralPerformanceMonitor,
         marketManager,
         appLifetime,
-        scopeManagerService,
         statusTrackerService,
         botReadyStatus,
         brainStatusService,
