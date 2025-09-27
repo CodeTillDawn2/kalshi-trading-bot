@@ -33,7 +33,7 @@ namespace BacklashBot.Services
         /// Gets or sets whether performance metrics collection is enabled for the WebSocketMonitorService.
         /// When enabled, detailed timing and reliability metrics are tracked and reported.
         /// </summary>
-        [Required(ErrorMessage = "The 'EnableWebSocketMonitorMetrics' is missing in the configuration.")]
-        public bool EnableWebSocketMonitorMetrics { get; set; }
+        [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

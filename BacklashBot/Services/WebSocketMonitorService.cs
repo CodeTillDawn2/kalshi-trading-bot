@@ -42,7 +42,6 @@ namespace BacklashBot.Services
 
         // Configuration and dependencies
         private readonly bool _enableMetrics;
-        private readonly IPerformanceMonitor _performanceMonitor;
 
         // Performance metrics
         private int _exchangeStatusCheckCount = 0;
@@ -105,15 +104,14 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _performanceMonitor = performanceMonitor;
             _config = config.Value;
 
             // Load configuration values from injected options
             _monitoringIntervalMinutes = _config.MonitoringIntervalMinutes;
             _retryDelayMinutes = _config.RetryDelayMinutes;
-            _enableMetrics = _config.EnableWebSocketMonitorMetrics;
+            _enableMetrics = _config.EnablePerformanceMetrics;
 
-            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableWebSocketMonitorMetrics={EnableWebSocketMonitorMetrics}",
+            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnablePerformanceMetrics={EnablePerformanceMetrics}",
                 _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
         }
 

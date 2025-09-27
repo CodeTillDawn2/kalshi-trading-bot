@@ -104,8 +104,8 @@ builder.Services.AddOptions<SubscriptionManagerConfig>()
     .Bind(builder.Configuration.GetSection(SubscriptionManagerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<WebSocketMonitorConfig>()
-    .Bind(builder.Configuration.GetSection(WebSocketMonitorConfig.SectionName))
+builder.Services.AddOptions<WebSocketMonitorServiceConfig>()
+    .Bind(builder.Configuration.GetSection(WebSocketMonitorServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<KalshiWebSocketClientConfig>()
