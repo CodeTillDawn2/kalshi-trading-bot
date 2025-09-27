@@ -67,13 +67,6 @@ namespace BacklashBotTests
                 ValidateConfig(instance, section);
             }
 
-            // Special handling for nested configs
-            if (configInstances.TryGetValue(MarketServiceDataConfig.SectionName, out var marketDataInstance) &&
-                configInstances.TryGetValue(CalculationsConfig.SectionName, out var calculationsInstance))
-            {
-                ((MarketServiceDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
-                ValidateConfig(marketDataInstance, _configuration.GetSection(MarketServiceDataConfig.SectionName));
-            }
             TestContext.Out.WriteLine("Result: All configurations validated successfully.");
         }
 

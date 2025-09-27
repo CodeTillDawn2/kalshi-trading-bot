@@ -82,17 +82,6 @@ namespace BacklashBot.Management.Interfaces
         string BrainInstance { get; }
 
         /// <summary>
-        /// Gets a value indicating whether performance metrics for the WebSocket connection manager are currently being recorded.
-        /// </summary>
-        bool WebSocketConnectionManagerMetricsRecording { get; }
-
-        /// <summary>
-        /// Updates the WebSocket metrics recording status.
-        /// </summary>
-        /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
-        void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
-
-        /// <summary>
         /// Gets the current CPU usage percentage.
         /// </summary>
         double GetCurrentCpuUsage();

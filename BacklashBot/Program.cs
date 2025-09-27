@@ -396,7 +396,8 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ),
-            sp.GetRequiredService<IOptions<MarketServiceDataConfig>>()
+            sp.GetRequiredService<IOptions<MarketServiceDataConfig>>(),
+            sp.GetRequiredService<IOptions<BacklashBot.State.CalculationsConfig>>()
         );
     };
 });
@@ -458,6 +459,7 @@ builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
     sp.GetRequiredService<ILogger<IBroadcastService>>(),
     sp.GetRequiredService<IConfiguration>(),
     (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<BacklashBot.Configuration.BroadcastServiceConfig>>()));
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorService(

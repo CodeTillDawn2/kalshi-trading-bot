@@ -87,6 +87,18 @@ namespace KalshiBotAPI.Websockets
         private double _errorRate = 0; // messages with errors / total messages
         private int _queueDepth = 0; // current queue depth if implemented
 
+        // Additional performance metrics
+        private double _signatureGenerationTime = 0;
+        private int _signatureGenerationCount = 0;
+        private double _averageSignatureGenerationTime = 0;
+        private int _cacheSize = 0;
+        private double _currentSessionUptime = 0;
+        private double _averageMessageSize = 0;
+        private double _peakThroughput = 0;
+        private long _minConnectionLatency = long.MaxValue;
+        private long _maxConnectionLatency = 0;
+        private DateTime _managerStartTime;
+
         // Performance monitoring
         private DateTime _lastMetricsPost = DateTime.MinValue;
         private readonly TimeSpan _metricsPostInterval = TimeSpan.FromMinutes(1); // Post metrics every minute
@@ -114,7 +126,6 @@ namespace KalshiBotAPI.Websockets
                 if (_enableMetrics != value)
                 {
                     _enableMetrics = value;
-                    (_performanceMonitor as ICentralPerformanceMonitor)?.UpdateWebSocketMetricsRecordingStatus(_enableMetrics);
                     if (_enableMetrics && _performanceMonitor == null)
                     {
                         _logger.LogWarning("Performance metrics enabled but no ICentralPerformanceMonitor was provided. Metrics will be collected locally but not posted to central monitoring.");
@@ -149,6 +160,7 @@ namespace KalshiBotAPI.Websockets
             _performanceMonitor = performanceMonitor;
 
             _logger.LogInformation("WebSocketConnectionManager: Constructor called");
+            _managerStartTime = DateTime.UtcNow;
 
             _logger.LogInformation("WebSocketConnectionManager: Creating RSA key");
             _privateKey = RSA.Create();
@@ -182,9 +194,6 @@ namespace KalshiBotAPI.Websockets
 
             // Initialize metrics configuration (defaults to true if not specified)
             EnableMetrics = _websocketConfig.EnablePerformanceMetrics;
-
-            // Notify performance monitor of initial metrics status
-            _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(EnableMetrics);
         }
 
         /// <summary>
@@ -268,6 +277,8 @@ namespace KalshiBotAPI.Websockets
                 if (_enableMetrics)
                 {
                     _connectionLatencies.Add(stopwatch.ElapsedMilliseconds);
+                    _minConnectionLatency = Math.Min(_minConnectionLatency, stopwatch.ElapsedMilliseconds);
+                    _maxConnectionLatency = Math.Max(_maxConnectionLatency, stopwatch.ElapsedMilliseconds);
                     _connectionSuccesses++;
                     if (retryCount > 0) _reconnectionCount++;
                     _lastConnectionStart = DateTime.UtcNow; // Start tracking uptime
@@ -586,6 +597,7 @@ namespace KalshiBotAPI.Websockets
                                     _throughputWindow.Dequeue();
                                 }
                                 _messageThroughput = _throughputWindow.Count / 60.0; // messages per second over last 60 seconds
+                                if (_messageThroughput > _peakThroughput) _peakThroughput = _messageThroughput;
 
                                 _lastMessageTime = now;
 
@@ -889,12 +901,21 @@ namespace KalshiBotAPI.Websockets
             }
             if (_enableMetrics) _signatureCacheMisses++;
 
+            var sigStopwatch = Stopwatch.StartNew();
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var message = $"{timestamp}{method}{path.Split('?')[0]}";
             var signature = Convert.ToBase64String(_privateKey.SignData(
                 Encoding.UTF8.GetBytes(message),
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pss));
+            sigStopwatch.Stop();
+
+            if (_enableMetrics)
+            {
+                _signatureGenerationTime += sigStopwatch.Elapsed.TotalMilliseconds;
+                _signatureGenerationCount++;
+                _averageSignatureGenerationTime = _signatureGenerationTime / _signatureGenerationCount;
+            }
 
             _signatureCache[cacheKey] = (timestamp, signature, DateTime.UtcNow.Add(_signatureCacheDuration));
             return (timestamp, signature);
@@ -952,7 +973,16 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         private void PostMetricsSnapshot()
         {
-            if (_performanceMonitor == null || !_enableMetrics) return;
+            if (_performanceMonitor == null) return;
+
+            // Calculate additional metrics
+            _cacheSize = _signatureCache.Count;
+            if (_isConnected && _lastConnectionStart != DateTime.MinValue)
+            {
+                _currentSessionUptime = (DateTime.UtcNow - _lastConnectionStart).TotalSeconds;
+            }
+            _averageMessageSize = _messagesReceived > 0 ? (double)_totalBytesReceived / _messagesReceived : 0;
+            double uptimePercentage = (DateTime.UtcNow - _managerStartTime).TotalMilliseconds > 0 ? TotalConnectedTimeMs / (DateTime.UtcNow - _managerStartTime).TotalMilliseconds * 100 : 0;
 
             // Post connection success rate as progress bar
             _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "ConnectionSuccessRate", "WebSocket Connection Success Rate", "Percentage of successful connections", ConnectionSuccessRate * 100, "%", "WebSocket", 0, 100, 95, _enableMetrics);
@@ -965,6 +995,16 @@ namespace KalshiBotAPI.Websockets
 
             // Post bandwidth as speed dial
             _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "Bandwidth", "WebSocket Bandwidth", "Data received per second", BandwidthBps, "bytes/sec", "WebSocket", 0, 1000000, 100000, _enableMetrics);
+
+            // Post new metrics
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CacheSize", "Signature Cache Size", "Number of entries in signature cache", _cacheSize, "entries", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CurrentSessionUptime", "Current Session Uptime", "Time since last connection", _currentSessionUptime, "seconds", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageMessageSize", "Average Message Size", "Average size of received messages", _averageMessageSize, "bytes", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "PeakThroughput", "Peak Message Throughput", "Maximum messages per second achieved", _peakThroughput, "msg/sec", "WebSocket", 0, 1000, 100, _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MinConnectionLatency", "Min Connection Latency", "Minimum connection latency", _minConnectionLatency == long.MaxValue ? 0 : _minConnectionLatency, "ms", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MaxConnectionLatency", "Max Connection Latency", "Maximum connection latency", _maxConnectionLatency, "ms", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageSignatureGenerationTime", "Average Signature Generation Time", "Average time to generate RSA signature", _averageSignatureGenerationTime, "ms", "WebSocket", _enableMetrics);
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "UptimePercentage", "Uptime Percentage", "Percentage of time WebSocket has been connected", uptimePercentage, "%", "WebSocket", 0, 100, 99, _enableMetrics);
 
             _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }

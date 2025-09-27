@@ -2,6 +2,7 @@ using BacklashBot.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
@@ -132,6 +133,7 @@ namespace BacklashBot.Services
         }
         private TimeSpan RefreshInterval => _updateInterval;
         private readonly IScopeManagerService _scopeManagerService;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketRefreshService"/> class.
@@ -142,6 +144,7 @@ namespace BacklashBot.Services
         /// <param name="serviceFactory">Factory for accessing other services in the application.</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="statusTrackerService">Service for tracking application status and cancellation tokens.</param>
+        /// <param name="performanceMonitor">Service for recording performance metrics.</param>
         public MarketRefreshService(
             IServiceScopeFactory scopeFactory,
             ILogger<IMarketRefreshService> logger,
@@ -149,7 +152,8 @@ namespace BacklashBot.Services
             IOptions<GeneralExecutionConfig> generalConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService,
-            IStatusTrackerService statusTrackerService
+            IStatusTrackerService statusTrackerService,
+            IPerformanceMonitor performanceMonitor
             )
         {
             _logger = logger;
@@ -157,6 +161,7 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
             _generalConfig = generalConfig.Value;
             _statusTracker = statusTrackerService;
+            _performanceMonitor = performanceMonitor;
             _scopeFactory = scopeFactory;
             _marketRefreshServiceConfig = marketRefreshServiceConfig.Value;
             _updateInterval = TimeSpan.FromMinutes(_generalConfig.RefreshIntervalMinutes);
@@ -464,6 +469,34 @@ namespace BacklashBot.Services
                 RefreshThroughput = LastWorkDuration.TotalSeconds > 0 ? (double)LastRefreshCount / LastWorkDuration.TotalSeconds : 0;
             }
             stopwatch.Stop();
+
+            // Record performance metrics
+            bool enabled = _marketRefreshServiceConfig.EnablePerformanceMetrics;
+            string className = nameof(MarketRefreshService);
+
+            // Always record TotalRefreshOperations
+            _performanceMonitor.RecordCounterMetric(className, "TotalRefreshOperations", "Total Refresh Operations", "Total number of refresh operations performed", TotalRefreshOperations, "count", "MarketRefresh", enabled);
+
+            if (enabled)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 5000, criticalThreshold: 10000, enabled);
+                _performanceMonitor.RecordCounterMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh", enabled);
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 1000, criticalThreshold: 2000, enabled);
+                _performanceMonitor.RecordCounterMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh", enabled);
+                _performanceMonitor.RecordSpeedDialMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 2000, criticalThreshold: 5000, enabled);
+                _performanceMonitor.RecordNumericDisplayMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh", enabled);
+                _performanceMonitor.RecordSpeedDialMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh", minThreshold: null, warningThreshold: 1, criticalThreshold: 0.5, enabled);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh", enabled);
+            }
         }
 
 

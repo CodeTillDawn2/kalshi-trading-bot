@@ -51,6 +51,7 @@ namespace BacklashBot.Services
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketServiceDataConfig _marketDataConfig;
+        private readonly CalculationsConfig _calculationsConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketSyncLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
@@ -110,6 +111,7 @@ namespace BacklashBot.Services
         /// <param name="statusTracker">Service for tracking bot status and cancellation tokens.</param>
         /// <param name="readyStatus">Service for tracking bot readiness state.</param>
         /// <param name="brainStatus">Service for tracking brain status.</param>
+        /// <param name="calculationsConfig">Configuration options for calculation parameters.</param>
         public MarketDataService(
             IServiceFactory serviceFactory,
             ILogger<IMarketDataService> logger,
@@ -117,6 +119,7 @@ namespace BacklashBot.Services
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
             IOptions<MarketServiceDataConfig> marketDataConfigOptions,
+            IOptions<CalculationsConfig> calculationsConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
             IBotReadyStatus readyStatus,
@@ -129,6 +132,7 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _loggingConfig = loggingConfig.Value;
             _marketDataConfig = marketDataConfigOptions?.Value;
+            _calculationsConfig = calculationsConfig?.Value ?? throw new ArgumentNullException(nameof(calculationsConfig));
             _marketDataFactory = marketDataFactory;
             _statusTracker = statusTracker;
             _readyStatus = readyStatus;
@@ -1017,10 +1021,10 @@ namespace BacklashBot.Services
                         marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
                             marketTicker,
                             marketData.Candlesticks["minute"],
-                            minCandlestickPercentage: _marketDataConfig.Calculations.ResistanceLevels_MinCandlestickPercentage,
-                            maxLevels: _marketDataConfig.Calculations.ResistanceLevels_MaxLevels,
-                            sigma: _marketDataConfig.Calculations.ResistanceLevels_Sigma,
-                            minDistance: _marketDataConfig.Calculations.ResistanceLevels_MinDistance);
+                            minCandlestickPercentage: _calculationsConfig.ResistanceLevels_MinCandlestickPercentage,
+                            maxLevels: _calculationsConfig.ResistanceLevels_MaxLevels,
+                            sigma: _calculationsConfig.ResistanceLevels_Sigma,
+                            minDistance: _calculationsConfig.ResistanceLevels_MinDistance);
                     }
 
                     NotifyMarketDataUpdated(marketTicker);

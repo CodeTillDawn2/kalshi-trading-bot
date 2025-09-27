@@ -28,6 +28,7 @@ namespace BacklashBot.Services
         private readonly IStatusTrackerService _statusTracker;
         private readonly IConfiguration _configuration;
         private readonly IPerformanceMonitor _centralPerformanceMonitor;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitorInterface;
 
         /// <summary>
         /// The interval in seconds between broadcast operations.
@@ -118,6 +119,7 @@ namespace BacklashBot.Services
         /// <param name="logger">Logger for recording service operations and errors</param>
         /// <param name="configuration">Configuration instance for reading settings</param>
         /// <param name="centralPerformanceMonitor">The performance monitor to send metrics to</param>
+        /// <param name="centralPerformanceMonitorInterface">The central performance monitor interface</param>
         /// <param name="broadcastServiceConfig">Configuration options for broadcast service settings</param>
         public BroadcastService(
             IHubContext<BacklashBotHub> hubContext,
@@ -126,6 +128,7 @@ namespace BacklashBot.Services
             ILogger<IBroadcastService> logger,
             IConfiguration configuration,
             IPerformanceMonitor centralPerformanceMonitor,
+            ICentralPerformanceMonitor centralPerformanceMonitorInterface,
             IOptions<BroadcastServiceConfig> broadcastServiceConfig)
         {
             _hubContext = hubContext;
@@ -134,6 +137,7 @@ namespace BacklashBot.Services
             _logger = logger;
             _configuration = configuration;
             _centralPerformanceMonitor = centralPerformanceMonitor;
+            _centralPerformanceMonitorInterface = centralPerformanceMonitorInterface;
             _serviceStartTime = DateTime.Now;
 
             // Configure broadcast settings from BroadcastServiceConfig
@@ -237,7 +241,7 @@ namespace BacklashBot.Services
             {
                 var markets = await GetWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
-                var performanceTracker = _serviceFactory.GetPerformanceMonitor();
+                var performanceTracker = _centralPerformanceMonitorInterface;
                 if (errorHandler == null || performanceTracker == null) return;
 
                 var lastSnapshot = errorHandler.LastSuccessfulSnapshot;
@@ -288,7 +292,7 @@ namespace BacklashBot.Services
                     {
                         await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
                         broadcastSuccessful = true;
-                        var perfMonitor = _serviceFactory.GetPerformanceMonitor();
+                        var perfMonitor = _centralPerformanceMonitorInterface;
                         _logger.LogInformation("Status broadcast completed from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}",
                             perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount);
                         break;
