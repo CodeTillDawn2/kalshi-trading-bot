@@ -453,9 +453,7 @@ builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
     sp.GetRequiredService<IHubContext<BacklashBotHub>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<ILogger<IBroadcastService>>(),
-    sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IConfiguration>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<BacklashBot.Configuration.BroadcastServiceConfig>>()));

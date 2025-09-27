@@ -4,6 +4,7 @@ using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using OverseerBotShared;
@@ -24,11 +25,9 @@ namespace BacklashBot.Services
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IBroadcastService> _logger;
         private Task? _statusBroadcastTask;
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IScopeManagerService _scopeManagerService;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IConfiguration _configuration;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _centralPerformanceMonitor;
 
         /// <summary>
         /// The interval in seconds between broadcast operations.
@@ -116,27 +115,22 @@ namespace BacklashBot.Services
         /// <param name="hubContext">SignalR hub context for broadcasting messages to connected clients</param>
         /// <param name="serviceFactory">Factory for accessing other system services</param>
         /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
-        /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="logger">Logger for recording service operations and errors</param>
-        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="configuration">Configuration instance for reading settings</param>
+        /// <param name="centralPerformanceMonitor">The performance monitor to send metrics to</param>
         /// <param name="broadcastServiceConfig">Configuration options for broadcast service settings</param>
         public BroadcastService(
             IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
             IStatusTrackerService statusTracker,
-            IServiceScopeFactory scopeFactory,
             ILogger<IBroadcastService> logger,
-            IScopeManagerService scopeManagerService,
             IConfiguration configuration,
-            ICentralPerformanceMonitor centralPerformanceMonitor,
+            IPerformanceMonitor centralPerformanceMonitor,
             IOptions<BroadcastServiceConfig> broadcastServiceConfig)
         {
-            _scopeManagerService = scopeManagerService;
             _hubContext = hubContext;
             _statusTracker = statusTracker;
             _serviceFactory = serviceFactory;
-            _scopeFactory = scopeFactory;
             _logger = logger;
             _configuration = configuration;
             _centralPerformanceMonitor = centralPerformanceMonitor;
