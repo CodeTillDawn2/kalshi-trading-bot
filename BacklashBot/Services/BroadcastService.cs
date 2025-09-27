@@ -356,7 +356,7 @@ namespace BacklashBot.Services
                     double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
                     double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
 
-                    monitor.RecordBroadcastMetrics(
+                    RecordBroadcastMetrics(
                         _successfulBroadcasts,
                         _failedBroadcasts,
                         _totalBroadcastTime,

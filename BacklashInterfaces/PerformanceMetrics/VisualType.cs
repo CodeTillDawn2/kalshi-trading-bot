@@ -49,6 +49,11 @@ namespace BacklashInterfaces.PerformanceMetrics
         /// <summary>
         /// Data grid or table (good for detailed breakdowns)
         /// </summary>
-        DataGrid
+        DataGrid,
+
+        /// <summary>
+        /// Disabled metric indicator (for metrics that are not active)
+        /// </summary>
+        DisabledMetric
     }
 }

@@ -202,6 +202,29 @@ namespace BacklashInterfaces.PerformanceMetrics
         }
 
         /// <summary>
+        /// Records a DisabledMetric metric with the specified parameters.
+        /// </summary>
+        public virtual void RecordDisabledMetricMetric(string className, string id, string name, string description, double value, string unit, string category, bool metricsEnabled = true)
+        {
+            if (!metricsEnabled) return;
+
+            var metric = new GeneralPerformanceMetric
+            {
+                Id = id,
+                Name = name,
+                Description = description,
+                Value = value,
+                Unit = unit,
+                VisualType = VisualType.DisabledMetric,
+                Category = category,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _recordedMetrics.Add((className, metric));
+            _logger?.LogDebug("DisabledMetric metric recorded from {ClassName}: {Name}={Value}", className, name, value);
+        }
+
+        /// <summary>
         /// Records a LineChart metric.
         /// </summary>
         public virtual void RecordLineChartMetric(string className, PerformanceMetric metric)
