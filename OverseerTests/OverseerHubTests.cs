@@ -244,14 +244,6 @@ namespace OverseerTests
                 LastSnapshot = DateTime.UtcNow,
                 IsStartingUp = false,
                 IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 10,
-                MinimumInterest = 0.5,
-                UsageMin = 10,
-                UsageMax = 80,
                 CurrentCpuUsage = 25.5,
                 EventQueueAvg = 15.2,
                 TickerQueueAvg = 8.7,
@@ -263,8 +255,7 @@ namespace OverseerTests
                 LastRefreshUsagePercentage = 35.7,
                 LastRefreshTimeAcceptable = true,
                 LastPerformanceSampleDate = DateTime.UtcNow,
-                IsWebSocketConnected = true,
-                WatchedMarkets = new List<OverseerBotShared.MarketWatchData>()
+                IsWebSocketConnected = true
             };
 
             // Act

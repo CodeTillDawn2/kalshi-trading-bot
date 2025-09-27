@@ -301,30 +301,7 @@ namespace OverseerTests
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "MARKET1", "MARKET2" },
                 ErrorCount = 5,
-                LastSnapshot = DateTime.UtcNow,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 10,
-                MinimumInterest = 0.5,
-                UsageMin = 10,
-                UsageMax = 80,
-                CurrentCpuUsage = 25.5,
-                EventQueueAvg = 15.2,
-                TickerQueueAvg = 8.7,
-                NotificationQueueAvg = 12.3,
-                OrderbookQueueAvg = 6.4,
-                LastRefreshCycleSeconds = 45.2,
-                LastRefreshCycleInterval = 60.0,
-                LastRefreshMarketCount = 150,
-                LastRefreshUsagePercentage = 35.7,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = DateTime.UtcNow,
-                IsWebSocketConnected = true,
-                WatchedMarkets = new List<MarketWatchData>()
+                LastSnapshot = DateTime.UtcNow
             };
 
             // Act

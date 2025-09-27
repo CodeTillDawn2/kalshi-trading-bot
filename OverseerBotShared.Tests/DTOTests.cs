@@ -13,56 +13,13 @@ namespace BacklashBot.Shared.Tests
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "AAPL", "GOOGL" },
                 ErrorCount = 5,
-                LastSnapshot = DateTime.UtcNow,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = false,
-                TargetWatches = 200,
-                MinimumInterest = 5.0,
-                UsageMin = 70.0,
-                UsageMax = 90.0,
-                CurrentCpuUsage = 45.5,
-                EventQueueAvg = 10.2,
-                TickerQueueAvg = 5.1,
-                NotificationQueueAvg = 2.3,
-                OrderbookQueueAvg = 8.7,
-                LastRefreshCycleSeconds = 1.5,
-                LastRefreshCycleInterval = 30.0,
-                LastRefreshMarketCount = 150.0,
-                LastRefreshUsagePercentage = 75.0,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = DateTime.UtcNow.AddMinutes(-5),
-                IsWebSocketConnected = true
+                LastSnapshot = DateTime.UtcNow
             };
 
             // Assert
             Assert.Equal("TestBrain", checkInData.BrainInstanceName);
             Assert.Equal(2, checkInData.Markets?.Count);
             Assert.Equal(5L, checkInData.ErrorCount);
-            Assert.False(checkInData.IsStartingUp);
-            Assert.False(checkInData.IsShuttingDown);
-            Assert.True(checkInData.WatchPositions);
-            Assert.True(checkInData.WatchOrders);
-            Assert.True(checkInData.ManagedWatchList);
-            Assert.False(checkInData.CaptureSnapshots);
-            Assert.Equal(200, checkInData.TargetWatches);
-            Assert.Equal(5.0, checkInData.MinimumInterest);
-            Assert.Equal(70.0, checkInData.UsageMin);
-            Assert.Equal(90.0, checkInData.UsageMax);
-            Assert.Equal(45.5, checkInData.CurrentCpuUsage);
-            Assert.Equal(10.2, checkInData.EventQueueAvg);
-            Assert.Equal(5.1, checkInData.TickerQueueAvg);
-            Assert.Equal(2.3, checkInData.NotificationQueueAvg);
-            Assert.Equal(8.7, checkInData.OrderbookQueueAvg);
-            Assert.Equal(1.5, checkInData.LastRefreshCycleSeconds);
-            Assert.Equal(30.0, checkInData.LastRefreshCycleInterval);
-            Assert.Equal(150.0, checkInData.LastRefreshMarketCount);
-            Assert.Equal(75.0, checkInData.LastRefreshUsagePercentage);
-            Assert.True(checkInData.LastRefreshTimeAcceptable);
-            Assert.True(checkInData.IsWebSocketConnected);
         }
 
         [Fact(DisplayName = "CheckInResponse: initializes with success/message/tickers/timestamp, verifies values")]

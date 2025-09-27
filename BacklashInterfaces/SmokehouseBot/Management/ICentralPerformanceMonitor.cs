@@ -181,5 +181,65 @@ namespace BacklashBot.Management.Interfaces
         /// Gets the OverseerClientService performance metrics.
         /// </summary>
         IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; }
+
+        /// <summary>
+        /// Gets the current CPU usage percentage.
+        /// </summary>
+        double GetCurrentCpuUsage();
+
+        /// <summary>
+        /// Gets the average event queue depth.
+        /// </summary>
+        double GetEventQueueAvg();
+
+        /// <summary>
+        /// Gets the average ticker queue depth.
+        /// </summary>
+        double GetTickerQueueAvg();
+
+        /// <summary>
+        /// Gets the average notification queue depth.
+        /// </summary>
+        double GetNotificationQueueAvg();
+
+        /// <summary>
+        /// Gets the average order book queue depth.
+        /// </summary>
+        double GetOrderbookQueueAvg();
+
+        /// <summary>
+        /// Gets the duration of the last refresh cycle in seconds.
+        /// </summary>
+        double GetLastRefreshCycleSeconds();
+
+        /// <summary>
+        /// Gets the interval between the last two refresh cycles.
+        /// </summary>
+        double GetLastRefreshCycleInterval();
+
+        /// <summary>
+        /// Gets the number of markets processed in the last refresh cycle.
+        /// </summary>
+        double GetLastRefreshMarketCount();
+
+        /// <summary>
+        /// Gets the CPU usage percentage during the last refresh cycle.
+        /// </summary>
+        double GetLastRefreshUsagePercentage();
+
+        /// <summary>
+        /// Gets whether the last refresh cycle completed within acceptable time limits.
+        /// </summary>
+        bool GetLastRefreshTimeAcceptable();
+
+        /// <summary>
+        /// Gets the timestamp of the last performance sample.
+        /// </summary>
+        DateTime? GetLastPerformanceSampleDate();
+
+        /// <summary>
+        /// Gets a value indicating whether the WebSocket connection is currently active.
+        /// </summary>
+        bool IsWebSocketConnected { get; }
     }
 }

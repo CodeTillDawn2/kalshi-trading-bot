@@ -4,6 +4,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashOverseer.Config;
+using BacklashOverseer.Models;
 using BacklashOverseer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -30,6 +31,7 @@ namespace BacklashOverseer.Controllers
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
         private readonly SnapshotAggregationService _snapshotService;
+        private readonly BrainPersistenceService _brainService;
         private readonly ILogger<MarketWatchController> _logger;
         private readonly IConfiguration _configuration;
         private readonly PerformanceMetricsService _performanceMetricsService;
@@ -65,12 +67,13 @@ namespace BacklashOverseer.Controllers
         /// <param name="configuration">Configuration for cache durations and performance metrics settings.</param>
         /// <param name="performanceMetricsService">Service for tracking performance metrics and cache statistics.</param>
         /// <param name="config">Configuration options for MarketWatchController behavior, including cache durations and performance metrics settings.</param>
-        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService, IOptions<MarketWatchControllerConfig> config)
+        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, BrainPersistenceService brainService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService, IOptions<MarketWatchControllerConfig> config)
         {
             _context = context;
             _cache = cache;
             _apiService = apiService;
             _snapshotService = snapshotService;
+            _brainService = brainService;
             _logger = logger;
             _configuration = configuration;
             _performanceMetricsService = performanceMetricsService;
@@ -725,6 +728,25 @@ namespace BacklashOverseer.Controllers
                     .GroupBy(mw => mw.BrainLock.Value)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
+                // Get brain persistence data for historical metrics
+                var brainNames = brainInstances.Select(bi => bi.BrainInstanceName).ToList();
+                var brainPersistenceData = new Dictionary<string, BrainPersistence>();
+                foreach (var brainName in brainNames)
+                {
+                    try
+                    {
+                        var persistence = _brainService.GetBrain(brainName);
+                        if (persistence != null)
+                        {
+                            brainPersistenceData[brainName] = persistence;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to load brain persistence data for {BrainName}", brainName);
+                    }
+                }
+
                 // Create brain data with their watched markets
                 var brainData = new List<object>();
 
@@ -740,6 +762,9 @@ namespace BacklashOverseer.Controllers
                         watchedMarkets = markets;
                     }
 
+                    // Get historical data from brain persistence
+                    brainPersistenceData.TryGetValue(brainName, out var persistence);
+
                     // Use a single consistent property name for brain instance
                     // to avoid JSON property collisions due to camelCase naming policy.
                     brainData.Add(new
@@ -750,6 +775,11 @@ namespace BacklashOverseer.Controllers
                         brainInstance.LastSeen,
                         brainInstance.TargetWatches,
                         Mode = "Autonomous",
+                        // Include historical performance data for charts
+                        CpuUsageHistory = persistence?.CpuUsageHistory,
+                        EventQueueHistory = persistence?.EventQueueHistory,
+                        OrderbookQueueHistory = persistence?.OrderbookQueueHistory,
+                        ErrorHistory = persistence?.ErrorHistory,
                         WatchedMarkets = watchedMarkets.Select(mw => new
                         {
                             mw.market_ticker,

@@ -80,6 +80,129 @@ namespace BacklashBot.Management
         /// </summary>
         public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics => _overseerClientServiceMetrics;
 
+        /// <summary>
+        /// Gets the current CPU usage percentage.
+        /// </summary>
+        public double GetCurrentCpuUsage()
+        {
+            try
+            {
+                var process = System.Diagnostics.Process.GetCurrentProcess();
+                var cpuTime = process.TotalProcessorTime.TotalMilliseconds;
+                var elapsed = (DateTime.Now - process.StartTime).TotalMilliseconds;
+                return elapsed > 0 ? (cpuTime / elapsed) * 100.0 : 0.0;
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the average event queue depth.
+        /// </summary>
+        public double GetEventQueueAvg()
+        {
+            var (eventQueueAvg, _, _, _) = GetQueueCountRollingAverages();
+            return eventQueueAvg;
+        }
+
+        /// <summary>
+        /// Gets the average ticker queue depth.
+        /// </summary>
+        public double GetTickerQueueAvg()
+        {
+            var (_, tickerQueueAvg, _, _) = GetQueueCountRollingAverages();
+            return tickerQueueAvg;
+        }
+
+        /// <summary>
+        /// Gets the average notification queue depth.
+        /// </summary>
+        public double GetNotificationQueueAvg()
+        {
+            var (_, _, notificationQueueAvg, _) = GetQueueCountRollingAverages();
+            return notificationQueueAvg;
+        }
+
+        /// <summary>
+        /// Gets the average order book queue depth.
+        /// </summary>
+        public double GetOrderbookQueueAvg()
+        {
+            var (_, _, _, orderBookQueueAvg) = GetQueueCountRollingAverages();
+            return orderBookQueueAvg;
+        }
+
+        /// <summary>
+        /// Gets the duration of the last refresh cycle in seconds.
+        /// </summary>
+        public double GetLastRefreshCycleSeconds()
+        {
+            return LastRefreshCycleSeconds;
+        }
+
+        /// <summary>
+        /// Gets the interval between the last two refresh cycles.
+        /// </summary>
+        public double GetLastRefreshCycleInterval()
+        {
+            return LastRefreshCycleInterval;
+        }
+
+        /// <summary>
+        /// Gets the number of markets processed in the last refresh cycle.
+        /// </summary>
+        public double GetLastRefreshMarketCount()
+        {
+            return LastRefreshMarketCount;
+        }
+
+        /// <summary>
+        /// Gets the CPU usage percentage during the last refresh cycle.
+        /// </summary>
+        public double GetLastRefreshUsagePercentage()
+        {
+            return LastRefreshUsagePercentage;
+        }
+
+        /// <summary>
+        /// Gets whether the last refresh cycle completed within acceptable time limits.
+        /// </summary>
+        public bool GetLastRefreshTimeAcceptable()
+        {
+            return LastRefreshTimeAcceptable;
+        }
+
+        /// <summary>
+        /// Gets the timestamp of the last performance sample.
+        /// </summary>
+        public DateTime? GetLastPerformanceSampleDate()
+        {
+            return LastPerformanceSampleDate;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the WebSocket connection is currently active.
+        /// </summary>
+        public bool IsWebSocketConnected
+        {
+            get
+            {
+                try
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var serviceFactory = scope.ServiceProvider.GetRequiredService<IServiceFactory>();
+                    var kalshiWebSocketClient = serviceFactory.GetKalshiWebSocketClient();
+                    return kalshiWebSocketClient?.IsConnected() ?? false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         // Configurable metrics data structure for GUI consumption
         private Dictionary<string, object> _configurableMetrics;
 

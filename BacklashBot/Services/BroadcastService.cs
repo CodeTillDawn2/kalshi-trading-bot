@@ -267,29 +267,7 @@ namespace BacklashBot.Services
                     BrainInstanceName = brainInstanceName,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
-                    LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot,
-                    IsStartingUp = isStartingUp,
-                    IsShuttingDown = isShuttingDown,
-                    WatchPositions = false,
-                    WatchOrders = false,
-                    ManagedWatchList = false,
-                    CaptureSnapshots = false,
-                    TargetWatches = 0,
-                    MinimumInterest = 0.0,
-                    UsageMin = 0.0,
-                    UsageMax = 0.0,
-                    CurrentCpuUsage = currentCpuUsage,
-                    EventQueueAvg = eventQueueAvg,
-                    TickerQueueAvg = tickerQueueAvg,
-                    NotificationQueueAvg = notificationQueueAvg,
-                    OrderbookQueueAvg = orderBookQueueAvg,
-                    IsWebSocketConnected = isWebSocketConnected,
-                    LastRefreshCycleSeconds = performanceTracker.LastRefreshCycleSeconds,
-                    LastRefreshCycleInterval = performanceTracker.LastRefreshCycleInterval,
-                    LastRefreshMarketCount = performanceTracker.LastRefreshMarketCount,
-                    LastRefreshUsagePercentage = performanceTracker.LastRefreshUsagePercentage,
-                    LastRefreshTimeAcceptable = performanceTracker.LastRefreshTimeAcceptable,
-                    LastPerformanceSampleDate = performanceTracker.LastPerformanceSampleDate
+                    LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot
                 };
 
                 // Track data payload size

@@ -19,20 +19,10 @@ namespace OverseerBotShared
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
         public DateTime? LastSnapshot { get; set; }
+
+        // Status fields
         public bool IsStartingUp { get; set; }
         public bool IsShuttingDown { get; set; }
-
-        // Brain configuration
-        public bool WatchPositions { get; set; }
-        public bool WatchOrders { get; set; }
-        public bool ManagedWatchList { get; set; }
-        public bool CaptureSnapshots { get; set; }
-        public int TargetWatches { get; set; }
-        public double MinimumInterest { get; set; }
-        public double UsageMin { get; set; }
-        public double UsageMax { get; set; }
-
-        // Performance metrics
         public double CurrentCpuUsage { get; set; }
         public double EventQueueAvg { get; set; }
         public double TickerQueueAvg { get; set; }
@@ -44,13 +34,8 @@ namespace OverseerBotShared
         public double LastRefreshUsagePercentage { get; set; }
         public bool LastRefreshTimeAcceptable { get; set; }
         public DateTime? LastPerformanceSampleDate { get; set; }
-
-        // Connection status
         public bool IsWebSocketConnected { get; set; }
-
-        // Market watch data
-        [JsonPropertyName("watchedMarkets")]
-        public List<MarketWatchData>? WatchedMarkets { get; set; }
+        public double PortfolioValue { get; set; }
     }
 
     /// <summary>
@@ -388,6 +373,7 @@ namespace OverseerBotShared
         /// </summary>
         public object? LatestPerformanceMetrics { get; set; }
     }
+
 
     /// <summary>
     /// Contains detailed information about a market being watched by a brain instance.

@@ -1,4 +1,6 @@
 using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using BacklashOverseer.Services;
@@ -25,6 +27,7 @@ namespace BacklashOverseer
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
         private static readonly ConcurrentDictionary<string, ClientInfo> _clientInfo = new();
+        private static readonly ConcurrentDictionary<string, double> _brainPortfolioValues = new();
 
         // Performance metrics are now handled by PerformanceMetricsService
 
@@ -456,6 +459,32 @@ namespace BacklashOverseer
                     existingBrain = new BrainPersistence { BrainInstanceName = "" };
                 }
 
+                // Update BrainPersistence with status values from checkInData
+                if (existingBrain != null)
+                {
+                    existingBrain.IsStartingUp = checkInData.IsStartingUp;
+                    existingBrain.IsShuttingDown = checkInData.IsShuttingDown;
+                    existingBrain.ErrorCount = checkInData.ErrorCount;
+                    existingBrain.LastSnapshot = checkInData.LastSnapshot;
+                    existingBrain.IsWebSocketConnected = checkInData.IsWebSocketConnected;
+                    // The performance metrics are already updated via UpdateMetricHistoryAsync
+                }
+
+                // Get brain instance for TargetWatches
+                BrainInstanceDTO? brainInstanceDto = null;
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    try
+                    {
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                        brainInstanceDto = await context.GetBrainInstanceByName(clientInfo.ClientName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to get BrainInstance for {ClientName}", clientInfo.ClientName);
+                    }
+                }
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
@@ -466,20 +495,20 @@ namespace BacklashOverseer
                     ErrorCount = checkInData.ErrorCount,
                     LastSnapshot = checkInData.LastSnapshot,
                     LastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
-                    IsStartingUp = checkInData.IsStartingUp,
-                    IsShuttingDown = checkInData.IsShuttingDown,
+                    IsStartingUp = existingBrain?.IsStartingUp ?? false,
+                    IsShuttingDown = existingBrain?.IsShuttingDown ?? false,
 
-                    // Brain configuration
-                    WatchPositions = checkInData.WatchPositions,
-                    WatchOrders = checkInData.WatchOrders,
-                    ManagedWatchList = checkInData.ManagedWatchList,
-                    CaptureSnapshots = checkInData.CaptureSnapshots,
-                    TargetWatches = checkInData.TargetWatches,
-                    MinimumInterest = checkInData.MinimumInterest,
-                    UsageMin = checkInData.UsageMin,
-                    UsageMax = checkInData.UsageMax,
+                    // Brain configuration - sourced from database, not from client data
+                    WatchPositions = brainInstanceDto?.WatchPositions ?? false,
+                    WatchOrders = brainInstanceDto?.WatchOrders ?? false,
+                    ManagedWatchList = brainInstanceDto?.ManagedWatchList ?? false,
+                    CaptureSnapshots = brainInstanceDto?.CaptureSnapshots ?? false,
+                    TargetWatches = brainInstanceDto?.TargetWatches ?? 0,
+                    MinimumInterest = brainInstanceDto?.MinimumInterest ?? 0.0,
+                    UsageMin = brainInstanceDto?.UsageMin ?? 0.0,
+                    UsageMax = brainInstanceDto?.UsageMax ?? 0.0,
 
-                    // Performance metrics
+                    // Performance metrics - sourced from checkin data
                     CurrentCpuUsage = checkInData.CurrentCpuUsage,
                     EventQueueAvg = checkInData.EventQueueAvg,
                     TickerQueueAvg = checkInData.TickerQueueAvg,
@@ -493,10 +522,10 @@ namespace BacklashOverseer
                     LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
 
                     // Connection status
-                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
+                    IsWebSocketConnected = existingBrain?.IsWebSocketConnected ?? true,
 
                     // Market watch data
-                    WatchedMarkets = checkInData.WatchedMarkets
+                    WatchedMarkets = null
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
@@ -513,6 +542,11 @@ namespace BacklashOverseer
                     marketCount = brainStatus.Markets?.Count ?? 0,
                     serverUtc = DateTime.UtcNow
                 });
+
+                // Update and broadcast total portfolio value
+                _brainPortfolioValues[clientInfo.ClientName ?? ""] = checkInData.PortfolioValue;
+                double totalPortfolio = _brainPortfolioValues.Values.Sum();
+                await Clients.All.SendAsync("PortfolioUpdate", new { TotalPortfolio = totalPortfolio, Timestamp = DateTime.UtcNow });
 
             }
             catch (Exception ex)
@@ -677,9 +711,13 @@ namespace BacklashOverseer
 
             try
             {
+                string brainName = "DefaultBrain";
+                if (performanceMetrics is PerformanceMetricsData pmData && !string.IsNullOrEmpty(pmData.BrainInstanceName))
+                {
+                    brainName = pmData.BrainInstanceName;
+                }
                 // Store the performance metrics in the brain persistence service
-                // The brain instance name and other details are embedded in the metrics object
-                await _brainService.UpdatePerformanceMetricsAsync("DefaultBrain", performanceMetrics);
+                await _brainService.UpdatePerformanceMetricsAsync(brainName, performanceMetrics);
 
                 // Broadcast the performance metrics to all connected clients (including web UI)
                 var connections = _connectedClients.Count;

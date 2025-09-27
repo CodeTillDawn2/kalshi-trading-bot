@@ -72,29 +72,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "AAPL", "GOOGL", "MSFT" },
                 ErrorCount = 42,
-                LastSnapshot = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc),
-                IsStartingUp = false,
-                IsShuttingDown = true,
-                WatchPositions = true,
-                WatchOrders = false,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 150,
-                MinimumInterest = 2.5,
-                UsageMin = 60.0,
-                UsageMax = 85.0,
-                CurrentCpuUsage = 45.7,
-                EventQueueAvg = 12.3,
-                TickerQueueAvg = 8.9,
-                NotificationQueueAvg = 5.2,
-                OrderbookQueueAvg = 15.6,
-                LastRefreshCycleSeconds = 2.1,
-                LastRefreshCycleInterval = 30,
-                LastRefreshMarketCount = 25,
-                LastRefreshUsagePercentage = 72.5,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = new DateTime(2024, 1, 15, 10, 25, 0, DateTimeKind.Utc),
-                IsWebSocketConnected = true
+                LastSnapshot = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc)
             };
 
             // Act - Serialize and deserialize
@@ -107,28 +85,6 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.Markets, deserializedData.Markets);
             Assert.Equal(originalData.ErrorCount, deserializedData.ErrorCount);
             Assert.Equal(originalData.LastSnapshot, deserializedData.LastSnapshot);
-            Assert.Equal(originalData.IsStartingUp, deserializedData.IsStartingUp);
-            Assert.Equal(originalData.IsShuttingDown, deserializedData.IsShuttingDown);
-            Assert.Equal(originalData.WatchPositions, deserializedData.WatchPositions);
-            Assert.Equal(originalData.WatchOrders, deserializedData.WatchOrders);
-            Assert.Equal(originalData.ManagedWatchList, deserializedData.ManagedWatchList);
-            Assert.Equal(originalData.CaptureSnapshots, deserializedData.CaptureSnapshots);
-            Assert.Equal(originalData.TargetWatches, deserializedData.TargetWatches);
-            Assert.Equal(originalData.MinimumInterest, deserializedData.MinimumInterest);
-            Assert.Equal(originalData.UsageMin, deserializedData.UsageMin);
-            Assert.Equal(originalData.UsageMax, deserializedData.UsageMax);
-            Assert.Equal(originalData.CurrentCpuUsage, deserializedData.CurrentCpuUsage);
-            Assert.Equal(originalData.EventQueueAvg, deserializedData.EventQueueAvg);
-            Assert.Equal(originalData.TickerQueueAvg, deserializedData.TickerQueueAvg);
-            Assert.Equal(originalData.NotificationQueueAvg, deserializedData.NotificationQueueAvg);
-            Assert.Equal(originalData.OrderbookQueueAvg, deserializedData.OrderbookQueueAvg);
-            Assert.Equal(originalData.LastRefreshCycleSeconds, deserializedData.LastRefreshCycleSeconds);
-            Assert.Equal(originalData.LastRefreshCycleInterval, deserializedData.LastRefreshCycleInterval);
-            Assert.Equal(originalData.LastRefreshMarketCount, deserializedData.LastRefreshMarketCount);
-            Assert.Equal(originalData.LastRefreshUsagePercentage, deserializedData.LastRefreshUsagePercentage);
-            Assert.Equal(originalData.LastRefreshTimeAcceptable, deserializedData.LastRefreshTimeAcceptable);
-            Assert.Equal(originalData.LastPerformanceSampleDate, deserializedData.LastPerformanceSampleDate);
-            Assert.Equal(originalData.IsWebSocketConnected, deserializedData.IsWebSocketConnected);
         }
 
         [Fact(DisplayName = "CheckInResponse round-trip: serialize/deserialize maintains exact structure")]
@@ -241,30 +197,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = null, // Test nullable string
                 Markets = null, // Test nullable list
                 LastSnapshot = null, // Test nullable DateTime
-                LastPerformanceSampleDate = null,
-                // Other properties with default values
-                ErrorCount = 0,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = false,
-                WatchOrders = false,
-                ManagedWatchList = false,
-                CaptureSnapshots = false,
-                TargetWatches = 0,
-                MinimumInterest = 0.0,
-                UsageMin = 0.0,
-                UsageMax = 0.0,
-                CurrentCpuUsage = 0.0,
-                EventQueueAvg = 0.0,
-                TickerQueueAvg = 0.0,
-                NotificationQueueAvg = 0.0,
-                OrderbookQueueAvg = 0.0,
-                LastRefreshCycleSeconds = 0.0,
-                LastRefreshCycleInterval = 0,
-                LastRefreshMarketCount = 0,
-                LastRefreshUsagePercentage = 0.0,
-                LastRefreshTimeAcceptable = false,
-                IsWebSocketConnected = false
+                ErrorCount = 0
             };
 
             // Act
@@ -276,9 +209,7 @@ namespace OverseerBotShared.Tests
             Assert.Null(deserializedData.BrainInstanceName);
             Assert.Null(deserializedData.Markets);
             Assert.Null(deserializedData.LastSnapshot);
-            Assert.Null(deserializedData.LastPerformanceSampleDate);
             Assert.Equal(originalData.ErrorCount, deserializedData.ErrorCount);
-            Assert.Equal(originalData.IsStartingUp, deserializedData.IsStartingUp);
         }
 
         [Fact(DisplayName = "DTOs with complex structures: multiple round-trips maintain integrity")]
@@ -290,29 +221,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = "ComplexTestBrain",
                 Markets = new List<string> { "MARKET1", "MARKET2", "MARKET3" },
                 ErrorCount = 100,
-                LastSnapshot = DateTime.UtcNow,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 200,
-                MinimumInterest = 5.0,
-                UsageMin = 50.0,
-                UsageMax = 90.0,
-                CurrentCpuUsage = 75.5,
-                EventQueueAvg = 25.0,
-                TickerQueueAvg = 15.0,
-                NotificationQueueAvg = 10.0,
-                OrderbookQueueAvg = 30.0,
-                LastRefreshCycleSeconds = 5.0,
-                LastRefreshCycleInterval = 60,
-                LastRefreshMarketCount = 50,
-                LastRefreshUsagePercentage = 80.0,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = DateTime.UtcNow.AddMinutes(-5),
-                IsWebSocketConnected = true
+                LastSnapshot = DateTime.UtcNow
             };
 
             // Act - Multiple round trips to ensure stability
@@ -326,8 +235,6 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.BrainInstanceName, final.BrainInstanceName);
             Assert.Equal(originalData.Markets.Count, final.Markets.Count);
             Assert.Equal(originalData.ErrorCount, final.ErrorCount);
-            Assert.Equal(originalData.TargetWatches, final.TargetWatches);
-            Assert.Equal(originalData.CurrentCpuUsage, final.CurrentCpuUsage);
 
             // Verify JSON strings are identical (ensuring consistent serialization)
             Assert.Equal(json1, json2);

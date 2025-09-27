@@ -2,6 +2,7 @@ using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashCommon.Configuration;
+using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
@@ -1086,39 +1087,36 @@ namespace BacklashBot.Services
                 var markets = await _serviceFactory.GetMarketDataService().FetchWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
 
-                var checkInData = new
+                // Get brain instance configuration from database
+                BacklashDTOs.Data.BrainInstanceDTO? brainInstance = null;
+                using var scope = _serviceFactory.GetScopeManager().CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<BacklashBotData.Data.Interfaces.IBacklashBotContext>();
+                brainInstance = await context.GetBrainInstanceByName(_clientName);
+
+                var dataCache = _serviceFactory.GetDataCache();
+                var checkInData = new CheckInData
                 {
-                    BrainInstanceName = _clientName, // Add the brain instance name
+                    BrainInstanceName = _clientName,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = errorHandler.LastSuccessfulSnapshot == DateTime.MinValue
                         ? (DateTime?)null
                         : errorHandler.LastSuccessfulSnapshot,
-                    LastErrorDate = errorHandler.LastErrorDate == DateTime.MinValue
-                        ? (DateTime?)null
-                        : errorHandler.LastErrorDate,
-                    IsStartingUp = false, // Could be determined from service state
-                    IsShuttingDown = false,
-                    WatchPositions = true, // From configuration
-                    WatchOrders = true,
-                    ManagedWatchList = true,
-                    CaptureSnapshots = false,
-                    TargetWatches = 200, // From configuration
-                    MinimumInterest = 5.0,
-                    UsageMin = 70.0,
-                    UsageMax = 90.0,
-                    CurrentCpuUsage = 0.0, // Could get from system
-                    EventQueueAvg = 0.0,
-                    TickerQueueAvg = 0.0,
-                    NotificationQueueAvg = 0.0,
-                    OrderbookQueueAvg = 0.0,
-                    LastRefreshCycleSeconds = 0.0,
-                    LastRefreshCycleInterval = 0,
-                    LastRefreshMarketCount = 0,
-                    LastRefreshUsagePercentage = 0.0,
-                    LastRefreshTimeAcceptable = true,
-                    LastPerformanceSampleDate = (DateTime?)null,
-                    IsWebSocketConnected = true // Could be determined
+                    IsStartingUp = _centralPerformanceMonitor.IsStartingUp,
+                    IsShuttingDown = _centralPerformanceMonitor.IsShuttingDown,
+                    CurrentCpuUsage = _centralPerformanceMonitor.GetCurrentCpuUsage(),
+                    EventQueueAvg = _centralPerformanceMonitor.GetEventQueueAvg(),
+                    TickerQueueAvg = _centralPerformanceMonitor.GetTickerQueueAvg(),
+                    NotificationQueueAvg = _centralPerformanceMonitor.GetNotificationQueueAvg(),
+                    OrderbookQueueAvg = _centralPerformanceMonitor.GetOrderbookQueueAvg(),
+                    LastRefreshCycleSeconds = _centralPerformanceMonitor.GetLastRefreshCycleSeconds(),
+                    LastRefreshCycleInterval = _centralPerformanceMonitor.GetLastRefreshCycleInterval(),
+                    LastRefreshMarketCount = _centralPerformanceMonitor.GetLastRefreshMarketCount(),
+                    LastRefreshUsagePercentage = _centralPerformanceMonitor.GetLastRefreshUsagePercentage(),
+                    LastRefreshTimeAcceptable = _centralPerformanceMonitor.GetLastRefreshTimeAcceptable(),
+                    LastPerformanceSampleDate = _centralPerformanceMonitor.GetLastPerformanceSampleDate(),
+                    IsWebSocketConnected = _centralPerformanceMonitor.IsWebSocketConnected,
+                    PortfolioValue = dataCache.PortfolioValue
                 };
 
                 _logger.LogDebug("OVERSEER- Sending CheckIn to overseer: {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",

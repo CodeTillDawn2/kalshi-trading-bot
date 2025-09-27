@@ -323,7 +323,8 @@ function closeChartModal() {
 /**
  * Renders performance charts for brain instance cards
  * Creates mini charts showing CPU usage, queue depths, and error metrics
- * @param {Object} brainStatusMessage - Brain status data from SignalR
+ * Uses historical data from brainData that was loaded from the API
+ * @param {Object} brainStatusMessage - Brain status data from SignalR (used to identify the brain)
  */
 function renderPerformanceChartsForBrains(brainStatusMessage) {
     try {
@@ -333,29 +334,36 @@ function renderPerformanceChartsForBrains(brainStatusMessage) {
             return;
         }
 
+        const normalizedName = brainInstanceName.toLowerCase();
+        const brainDataEntry = brainData[normalizedName];
+        if (!brainDataEntry) {
+            console.warn('[renderPerformanceChartsForBrains] Brain data not found for:', brainInstanceName);
+            return;
+        }
+
         const safeName = brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_');
 
         // CPU Usage Performance Chart
-        if (brainStatusMessage.CpuUsageHistory && Array.isArray(brainStatusMessage.CpuUsageHistory) && brainStatusMessage.CpuUsageHistory.length > 0) {
-            renderPerformanceMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
+        if (brainDataEntry.CpuUsageHistory && Array.isArray(brainDataEntry.CpuUsageHistory) && brainDataEntry.CpuUsageHistory.length > 0) {
+            renderPerformanceMiniChart(`cpu-chart-${safeName}`, brainDataEntry.CpuUsageHistory, 'CPU %', '#28a745');
         }
 
         // Event Queue Depth Chart
-        if (brainStatusMessage.EventQueueHistory && Array.isArray(brainStatusMessage.EventQueueHistory) && brainStatusMessage.EventQueueHistory.length > 0) {
-            renderPerformanceMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
+        if (brainDataEntry.EventQueueHistory && Array.isArray(brainDataEntry.EventQueueHistory) && brainDataEntry.EventQueueHistory.length > 0) {
+            renderPerformanceMiniChart(`event-chart-${safeName}`, brainDataEntry.EventQueueHistory, 'Events', '#ffc107');
         }
 
         // Orderbook Queue Depth Chart
-        if (brainStatusMessage.OrderbookQueueHistory && Array.isArray(brainStatusMessage.OrderbookQueueHistory) && brainStatusMessage.OrderbookQueueHistory.length > 0) {
-            renderPerformanceMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
+        if (brainDataEntry.OrderbookQueueHistory && Array.isArray(brainDataEntry.OrderbookQueueHistory) && brainDataEntry.OrderbookQueueHistory.length > 0) {
+            renderPerformanceMiniChart(`orderbook-chart-${safeName}`, brainDataEntry.OrderbookQueueHistory, 'Orders', '#dc3545');
         }
 
         // Error Rate Chart
-        if (brainStatusMessage.ErrorHistory && Array.isArray(brainStatusMessage.ErrorHistory) && brainStatusMessage.ErrorHistory.length > 0) {
-            renderPerformanceMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
-        } else if (brainStatusMessage.NotificationQueueHistory && Array.isArray(brainStatusMessage.NotificationQueueHistory) && brainStatusMessage.NotificationQueueHistory.length > 0) {
+        if (brainDataEntry.ErrorHistory && Array.isArray(brainDataEntry.ErrorHistory) && brainDataEntry.ErrorHistory.length > 0) {
+            renderPerformanceMiniChart(`error-chart-${safeName}`, brainDataEntry.ErrorHistory, 'Errors', '#ff6b6b');
+        } else if (brainDataEntry.NotificationQueueHistory && Array.isArray(brainDataEntry.NotificationQueueHistory) && brainDataEntry.NotificationQueueHistory.length > 0) {
             // Fallback to NotificationQueueHistory if ErrorHistory is not available
-            renderPerformanceMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
+            renderPerformanceMiniChart(`error-chart-${safeName}`, brainDataEntry.NotificationQueueHistory, 'Errors', '#ff6b6b');
         }
     } catch (error) {
         console.error('[renderPerformanceChartsForBrains] Error rendering performance charts:', error);
