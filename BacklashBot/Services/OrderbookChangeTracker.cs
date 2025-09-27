@@ -899,18 +899,18 @@ namespace BacklashBot.Services
                 if (_eventProcessingCount > 0)
                 {
                     long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
+                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
                 }
 
                 if (_timerCallbackCount > 1)
                 {
                     long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
+                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
                 }
                 if (_timerCallbackCount > 0)
                 {
                     long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
+                    RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
                 }
             }
         }
@@ -2098,6 +2098,29 @@ namespace BacklashBot.Services
         }
 
         #endregion
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "OrderbookChangeTracker";
+            string category = "OrderbookTracking";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+            }
+            else
+            {
+                // Record actual metric
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+            }
+        }
 
         #region Dispose
         /// <summary>

@@ -243,33 +243,16 @@ namespace BacklashBot.Services
                 _logger.LogInformation("Market data initialization completed in {Duration} for {Count} markets", LastInitializationDuration, LastInitializationMarketCount);
 
                 // Post metrics to central performance monitor
-                if (_centralPerformanceMonitor is CentralPerformanceMonitor monitor)
-                {
-                    monitor.RecordMarketDataInitializerMetrics(
-                        LastInitializationDuration,
-                        LastInitializationMarketCount,
-                        AverageMarketInitializationTime,
-                        MemoryUsageDelta,
-                        CpuTimeDelta,
-                        SuccessfulMarketInitializations,
-                        FailedMarketInitializations,
-                        TotalWaitTime,
-                        _enablePerformanceMetrics);
-                }
-                else
-                {
-                    // Use interface method with enablement status
-                    _centralPerformanceMonitor.RecordMarketDataInitializerMetrics(
-                        LastInitializationDuration,
-                        LastInitializationMarketCount,
-                        AverageMarketInitializationTime,
-                        MemoryUsageDelta,
-                        CpuTimeDelta,
-                        SuccessfulMarketInitializations,
-                        FailedMarketInitializations,
-                        TotalWaitTime,
-                        _enablePerformanceMetrics);
-                }
+                RecordMarketDataInitializerMetricsPrivate(
+                    LastInitializationDuration,
+                    LastInitializationMarketCount,
+                    AverageMarketInitializationTime,
+                    MemoryUsageDelta,
+                    CpuTimeDelta,
+                    SuccessfulMarketInitializations,
+                    FailedMarketInitializations,
+                    TotalWaitTime,
+                    _enablePerformanceMetrics);
             }
             catch (OperationCanceledException)
             {
@@ -335,6 +318,58 @@ namespace BacklashBot.Services
             finally
             {
                 _logger.LogDebug("MarketDataInitializer.SetupAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTracker.GetCancellationToken().IsCancellationRequested);
+            }
+        }
+
+        /// <summary>
+        /// Records market data initializer performance metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="lastInitializationDuration">Total duration of the last initialization.</param>
+        /// <param name="lastInitializationMarketCount">Number of markets processed.</param>
+        /// <param name="averageMarketInitializationTime">Average time per market initialization.</param>
+        /// <param name="memoryUsageDelta">Change in memory usage during initialization.</param>
+        /// <param name="cpuTimeDelta">CPU time used during initialization.</param>
+        /// <param name="successfulMarketInitializations">Number of successful initializations.</param>
+        /// <param name="failedMarketInitializations">Number of failed initializations.</param>
+        /// <param name="totalWaitTime">Total time spent waiting.</param>
+        /// <param name="enablePerformanceMetrics">Whether performance metrics are enabled.</param>
+        private void RecordMarketDataInitializerMetricsPrivate(
+            TimeSpan lastInitializationDuration,
+            int lastInitializationMarketCount,
+            TimeSpan averageMarketInitializationTime,
+            long memoryUsageDelta,
+            TimeSpan cpuTimeDelta,
+            int successfulMarketInitializations,
+            int failedMarketInitializations,
+            TimeSpan totalWaitTime,
+            bool enablePerformanceMetrics)
+        {
+            string className = "MarketDataInitializer";
+            string category = "MarketDataInitialization";
+
+            if (!enablePerformanceMetrics)
+            {
+                // Send disabled metrics
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "LastInitializationDuration", "Last Initialization Duration", "Total duration of the last initialization", lastInitializationDuration.TotalMilliseconds, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "LastInitializationMarketCount", "Last Initialization Market Count", "Number of markets processed", lastInitializationMarketCount, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "AverageMarketInitializationTime", "Average Market Initialization Time", "Average time per market initialization", averageMarketInitializationTime.TotalMilliseconds, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "MemoryUsageDelta", "Memory Usage Delta", "Change in memory usage during initialization", memoryUsageDelta, "bytes", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "CpuTimeDelta", "CPU Time Delta", "CPU time used during initialization", cpuTimeDelta.TotalMilliseconds, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "SuccessfulMarketInitializations", "Successful Market Initializations", "Number of successful initializations", successfulMarketInitializations, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "FailedMarketInitializations", "Failed Market Initializations", "Number of failed initializations", failedMarketInitializations, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalWaitTime", "Total Wait Time", "Total time spent waiting", totalWaitTime.TotalMilliseconds, "ms", category, false);
+            }
+            else
+            {
+                // Record actual metrics
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "LastInitializationDuration", "Last Initialization Duration", "Total duration of the last initialization", lastInitializationDuration.TotalMilliseconds, "ms", category, null, null, null, true);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "LastInitializationMarketCount", "Last Initialization Market Count", "Number of markets processed", lastInitializationMarketCount, "count", category, true);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "AverageMarketInitializationTime", "Average Market Initialization Time", "Average time per market initialization", averageMarketInitializationTime.TotalMilliseconds, "ms", category, null, null, null, true);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "MemoryUsageDelta", "Memory Usage Delta", "Change in memory usage during initialization", memoryUsageDelta, "bytes", category, true);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "CpuTimeDelta", "CPU Time Delta", "CPU time used during initialization", cpuTimeDelta.TotalMilliseconds, "ms", category, null, null, null, true);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "SuccessfulMarketInitializations", "Successful Market Initializations", "Number of successful initializations", successfulMarketInitializations, "count", category, true);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "FailedMarketInitializations", "Failed Market Initializations", "Number of failed initializations", failedMarketInitializations, "count", category, true);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "TotalWaitTime", "Total Wait Time", "Total time spent waiting", totalWaitTime.TotalMilliseconds, "ms", category, null, null, null, true);
             }
         }
 

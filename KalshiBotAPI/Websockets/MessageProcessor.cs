@@ -1544,8 +1544,7 @@ namespace KalshiBotAPI.Websockets
                                     var maxWait = _maxWaitTimeMs;
                                     var avgWait = totalCalls > 0 ? (double)totalWait / totalCalls : 0;
 
-                                    _performanceMonitor.RecordDelayedApiCallMetrics(
-                                        "MessageProcessor",
+                                    RecordDelayedApiCallMetricsPrivate(
                                         totalCalls,
                                         avgWait,
                                         maxWait,
@@ -1574,6 +1573,37 @@ namespace KalshiBotAPI.Websockets
             finally
             {
                 _logger.LogInformation("Delayed API call processing task completed");
+            }
+        }
+
+        /// <summary>
+        /// Records delayed API call performance metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="totalCalls">Total number of delayed API calls processed</param>
+        /// <param name="avgWait">Average wait time in milliseconds</param>
+        /// <param name="maxWait">Maximum wait time in milliseconds</param>
+        /// <param name="queueCount">Current queue count</param>
+        /// <param name="enablePerformanceMonitoring">Whether performance monitoring is enabled</param>
+        private void RecordDelayedApiCallMetricsPrivate(long totalCalls, double avgWait, long maxWait, int queueCount, bool enablePerformanceMonitoring)
+        {
+            string className = "MessageProcessor";
+            string category = "DelayedApiCalls";
+
+            if (!enablePerformanceMonitoring)
+            {
+                // Send disabled metrics
+                _performanceMonitor.RecordDisabledMetricMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category, false);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetricMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category, false);
+            }
+            else
+            {
+                // Record actual metrics
+                _performanceMonitor.RecordCounterMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordCounterMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category, true);
             }
         }
 

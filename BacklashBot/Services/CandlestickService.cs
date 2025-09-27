@@ -142,7 +142,7 @@ namespace BacklashBot.Services
             var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
             if (performanceMonitor != null)
             {
-                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
+                RecordExecutionTimePrivate(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
             }
         }
 
@@ -1092,6 +1092,29 @@ namespace BacklashBot.Services
                     _logger.LogWarning(deleteEx, "Error deleting corrupted file {FilePath}: {Message}", filePath, deleteEx.Message);
                 }
                 return new List<CandlestickData>();
+            }
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "CandlestickService";
+            string category = "CandlestickOperations";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _serviceFactory.GetPerformanceMonitor()?.RecordDisabledMetricMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+            }
+            else
+            {
+                // Record actual metric
+                _serviceFactory.GetPerformanceMonitor()?.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
     }

@@ -202,11 +202,45 @@ namespace BacklashCommon.Helpers
                     totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
 
                 // Post metrics to central performance monitor if available
-                _centralPerformanceMonitor?.RecordMarketAnalysisHelperMetrics(totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, _errorCount);
+                if (_centralPerformanceMonitor != null)
+                {
+                    RecordMarketAnalysisHelperMetricsPrivate(totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, _errorCount, _metricsEnabled);
+                }
             }
             else
             {
                 _logger.LogInformation("Completed snapshot group generation process. Total markets processed: {TotalMarkets}.", totalMarketsProcessed);
+            }
+        }
+
+        /// <summary>
+        /// Records market analysis helper performance metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="totalMarketsProcessed">Total number of markets processed</param>
+        /// <param name="totalProcessingTime">Total processing time in milliseconds</param>
+        /// <param name="averageTimePerMarket">Average time per market in milliseconds</param>
+        /// <param name="errorCount">Number of errors encountered</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled</param>
+        private void RecordMarketAnalysisHelperMetricsPrivate(int totalMarketsProcessed, long totalProcessingTime, double averageTimePerMarket, int errorCount, bool metricsEnabled)
+        {
+            string className = "SnapshotGroupHelper";
+            string category = "SnapshotGroupGeneration";
+
+            if (!metricsEnabled)
+            {
+                // Send disabled metrics
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, false);
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, false);
+            }
+            else
+            {
+                // Record actual metrics
+                _centralPerformanceMonitor.RecordCounterMetric(className, "TotalMarketsProcessed", "Total Markets Processed", "Number of markets processed for snapshot groups", totalMarketsProcessed, "count", category, true);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "TotalProcessingTime", "Total Processing Time", "Total time spent processing snapshot groups", totalProcessingTime, "ms", category, null, null, null, true);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "AverageTimePerMarket", "Average Time Per Market", "Average processing time per market", averageTimePerMarket, "ms", category, null, null, null, true);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "ErrorCount", "Error Count", "Number of errors during processing", errorCount, "count", category, true);
             }
         }
 

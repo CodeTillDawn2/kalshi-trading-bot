@@ -290,7 +290,7 @@ namespace BacklashBot.Services
                 }
 
                 // Post to central performance monitor
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs, _enableMetrics);
+                RecordExecutionTimePrivate("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs, _enableMetrics);
             }
         }
 
@@ -353,7 +353,7 @@ namespace BacklashBot.Services
             if (_enableMetrics)
             {
                 _websocketLatenciesMs.Add(latencyMs);
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketLatency", latencyMs, _enableMetrics);
+                RecordExecutionTimePrivate("WebSocketMonitor.WebSocketLatency", latencyMs, _enableMetrics);
             }
         }
 
@@ -515,7 +515,7 @@ namespace BacklashBot.Services
                                         _connectionSuccessCount++;
                                         RecordConnectionRecovery();
                                         UpdateUptime(true);
-                                        _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
+                                        RecordExecutionTimePrivate("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                     }
                                     _logger.LogDebug("WebSocket connected successfully in {Duration}ms", connectionDuration);
                                 }
@@ -622,7 +622,7 @@ namespace BacklashBot.Services
                                     _connectionSuccessCount++;
                                     RecordConnectionRecovery();
                                     UpdateUptime(true);
-                                    _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
+                                    RecordExecutionTimePrivate("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                 }
                                 _logger.LogInformation("WebSocket connected successfully in {Duration}ms", connectionDuration);
                             }
@@ -688,6 +688,29 @@ namespace BacklashBot.Services
             finally
             {
                 _logger.LogDebug("MonitorAndManageWebSocketConnectionAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
+            }
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "WebSocketMonitorService";
+            string category = "WebSocketMonitoring";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _centralPerformanceMonitor.RecordDisabledMetricMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+            }
+            else
+            {
+                // Record actual metric
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
     }

@@ -107,7 +107,7 @@ namespace BacklashBot.Services
             {
                 stopwatch?.Stop();
                 _logger.LogInformation($"InitializeScope execution time: {stopwatch?.ElapsedMilliseconds} ms");
-                _monitor.RecordExecutionTime("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0, _enableMetrics);
+                RecordExecutionTimePrivate("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0, _enableMetrics);
                 _initializeScopeCallCount++;
                 _scopeCreationTime = DateTime.UtcNow;
             }
@@ -149,7 +149,7 @@ namespace BacklashBot.Services
             {
                 var lifetime = DateTime.UtcNow - _scopeCreationTime.Value;
                 _logger.LogInformation($"Managed scope lifetime: {lifetime.TotalMilliseconds} ms");
-                _monitor.RecordExecutionTime("ScopeLifetime", (long)lifetime.TotalMilliseconds, _enableMetrics);
+                RecordExecutionTimePrivate("ScopeLifetime", (long)lifetime.TotalMilliseconds, _enableMetrics);
                 _scopeCreationTime = null;
             }
             _scope?.Dispose();
@@ -157,6 +157,29 @@ namespace BacklashBot.Services
             if (_enableMetrics)
             {
                 _metricsTimer?.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "KalshiBotScopeManagerService";
+            string category = "ScopeManagement";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _monitor.RecordDisabledMetricMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+            }
+            else
+            {
+                // Record actual metric
+                _monitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
             }
         }
 
