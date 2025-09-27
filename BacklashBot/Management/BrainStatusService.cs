@@ -3,6 +3,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 
@@ -22,6 +23,7 @@ namespace BacklashBot.Management
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly InstanceNameConfig instanceNameConfig;
         private readonly BrainStatusServiceConfig _brainStatusConfig;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ILogger<BrainStatusService> _logger;
         private TimeSpan _initializationTime = TimeSpan.Zero;
         private int _initializationAttempts = 0;
@@ -32,19 +34,22 @@ namespace BacklashBot.Management
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
         /// <param name="brainStatusConfig">Configuration options for brain status settings.</param>
+        /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
         /// <param name="sessionIdentifier">The pre-generated session identifier.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<InstanceNameConfig> instanceNameConfig, IOptions<BrainStatusServiceConfig> brainStatusConfig, string sessionIdentifier, ILogger<BrainStatusService> logger)
+        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<InstanceNameConfig> instanceNameConfig, IOptions<BrainStatusServiceConfig> brainStatusConfig, IPerformanceMonitor performanceMonitor, string sessionIdentifier, ILogger<BrainStatusService> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(instanceNameConfig);
             ArgumentNullException.ThrowIfNull(brainStatusConfig);
+            ArgumentNullException.ThrowIfNull(performanceMonitor);
             ArgumentNullException.ThrowIfNull(sessionIdentifier);
             ArgumentNullException.ThrowIfNull(logger);
 
             _scopeFactory = scopeFactory;
             this.instanceNameConfig = instanceNameConfig.Value ?? throw new ArgumentNullException(nameof(instanceNameConfig.Value));
             _brainStatusConfig = brainStatusConfig.Value ?? throw new ArgumentNullException(nameof(brainStatusConfig.Value));
+            _performanceMonitor = performanceMonitor;
             _sessionIdentifier = sessionIdentifier;
 
             if (string.IsNullOrWhiteSpace(this.instanceNameConfig.Name))
@@ -130,6 +135,18 @@ namespace BacklashBot.Management
                 // _sessionIdentifier is already set in constructor
                 _initialized = true;
                 _initializationTime = DateTime.UtcNow - startTime;
+                if (_brainStatusConfig.EnablePerformanceMetrics)
+                {
+                    _performanceMonitor.RecordNumericDisplayMetric(
+                        className: nameof(BrainStatusService),
+                        id: "InitializationTime",
+                        name: "Initialization Time",
+                        description: "Time taken to initialize the brain status service",
+                        value: _initializationTime.TotalMilliseconds,
+                        unit: "ms",
+                        category: "Performance"
+                    );
+                }
                 _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", instanceNameConfig.Name);
             }
             catch (Exception ex)

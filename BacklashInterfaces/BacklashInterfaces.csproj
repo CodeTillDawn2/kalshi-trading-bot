@@ -23,6 +23,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="BacklashOverseer\**" />
+    <EmbeddedResource Remove="BacklashOverseer\**" />
+    <None Remove="BacklashOverseer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
   </ItemGroup>
 
@@ -31,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BacklashOverseer\" />
     <Folder Include="TradingStrategies\Models\" />
     <Folder Include="TradingStrategies\Trading\Overseer\" />
   </ItemGroup>

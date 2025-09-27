@@ -140,6 +140,10 @@ builder.Services.AddOptions<OverseerClientServiceConfig>()
     .Bind(builder.Configuration.GetSection(OverseerClientServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<BacklashBotHubConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBotHubConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<CandlestickServiceConfig>()
     .Bind(builder.Configuration.GetSection(CandlestickServiceConfig.SectionName))
     .ValidateDataAnnotations()
@@ -324,6 +328,7 @@ builder.Services.AddSingleton<IBrainStatusService>(sp => new BrainStatusService(
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<BrainStatusServiceConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
     sp.GetRequiredService<string>(), // sessionIdentifier
     sp.GetRequiredService<ILogger<BrainStatusService>>()));
 builder.Services.AddSingleton<ITargetCalculationService, TargetCalculationService>();
