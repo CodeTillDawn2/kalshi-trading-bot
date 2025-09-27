@@ -146,7 +146,7 @@ namespace OverseerTests
             //     );
             // });
 
-            Assert.DoesNotThrow(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
@@ -157,7 +157,7 @@ namespace OverseerTests
                 );
             });
 
-            Assert.DoesNotThrow(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var hub = new OverseerHub(
                     _loggerMock.Object,

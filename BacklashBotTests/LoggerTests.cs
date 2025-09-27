@@ -37,7 +37,8 @@ namespace BacklashBotTests
             services.Configure<InstanceNameConfig>(configuration.GetSection(InstanceNameConfig.SectionName));
             _serviceProvider = services.BuildServiceProvider();
 
-            _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            _loggingQueueMock = new Mock<DatabaseLoggingQueue>(serviceProviderMock.Object, ApplicationType.Bot);
         }
 
         /// <summary>
