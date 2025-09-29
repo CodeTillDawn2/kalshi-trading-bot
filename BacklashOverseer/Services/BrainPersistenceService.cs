@@ -2,6 +2,7 @@ using BacklashBotData.Data.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
@@ -25,7 +26,7 @@ namespace BacklashOverseer.Services
         private readonly ConcurrentDictionary<string, BrainPersistence> _brains = new();
         private readonly BrainPersistenceServiceConfig _config;
         private readonly ILogger<BrainPersistenceService>? _logger;
-        private readonly IBacklashBotContext? _context;
+        private readonly IServiceScopeFactory? _scopeFactory;
         private readonly IPerformanceMonitor? _performanceMonitor;
         private readonly Stopwatch _serviceStopwatch = new();
         private long _totalOperations;
@@ -39,25 +40,25 @@ namespace BacklashOverseer.Services
 
         /// <summary>
         /// Initializes a new instance of the BrainPersistenceService.
-        /// Automatically starts a background timer for periodic saves if context is provided.
+        /// Automatically starts a background timer for periodic saves if scope factory is provided.
         /// </summary>
         /// <param name="config">Configuration options including history limits and metric settings.</param>
-        /// <param name="context">Database context for persistence operations.</param>
+        /// <param name="scopeFactory">Service scope factory for creating database contexts.</param>
         /// <param name="logger">Optional logger for service operations and performance metrics.</param>
         /// <param name="performanceMonitor">Optional performance monitor for transmitting metrics.</param>
         public BrainPersistenceService(
             IOptions<BrainPersistenceServiceConfig> config,
-            IBacklashBotContext? context = null,
+            IServiceScopeFactory? scopeFactory = null,
             ILogger<BrainPersistenceService>? logger = null,
             IPerformanceMonitor? performanceMonitor = null)
         {
             _config = config.Value;
-            _context = context;
+            _scopeFactory = scopeFactory;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
             _serviceStopwatch.Start();
 
-            if (_context != null)
+            if (_scopeFactory != null)
             {
                 _persistenceTimer = new System.Timers.Timer(_config.PersistenceSaveIntervalMinutes * 60 * 1000);
                 _persistenceTimer.Elapsed += OnPersistenceTimerElapsed;
@@ -110,7 +111,7 @@ namespace BacklashOverseer.Services
                 _brains[brain.BrainInstanceName] = brain;
 
                 // Persist to database
-                if (_context != null)
+                if (_scopeFactory != null)
                 {
                     await PersistBrainAsync(brain.BrainInstanceName);
                 }
@@ -411,15 +412,18 @@ namespace BacklashOverseer.Services
         /// </summary>
         public async Task InitializeAsync()
         {
-            if (_isInitialized || _context == null)
+            if (_isInitialized || _scopeFactory == null)
                 return;
+
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             try
             {
-                var brainNames = await _context.GetAllBrainPersistenceNames();
+                var brainNames = await context.GetAllBrainPersistenceNames();
                 foreach (var brainName in brainNames)
                 {
-                    var persistenceData = await _context.LoadBrainPersistence(brainName);
+                    var persistenceData = await context.LoadBrainPersistence(brainName);
                     if (!string.IsNullOrEmpty(persistenceData))
                     {
                         try
@@ -451,8 +455,11 @@ namespace BacklashOverseer.Services
         /// </summary>
         public async Task PersistAllBrainsAsync()
         {
-            if (_context == null)
+            if (_scopeFactory == null)
                 return;
+
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             var stopwatch = Stopwatch.StartNew();
             try
@@ -460,7 +467,7 @@ namespace BacklashOverseer.Services
                 foreach (var (brainName, brain) in _brains)
                 {
                     var persistenceData = JsonSerializer.Serialize(brain);
-                    await _context.SaveBrainPersistence(brainName, persistenceData);
+                    await context.SaveBrainPersistence(brainName, persistenceData);
                 }
                 RecordOperationMetrics("PersistAllBrains", stopwatch.ElapsedMilliseconds);
                 _logger?.LogDebug("Persisted {BrainCount} brains to database", _brains.Count);
@@ -486,13 +493,16 @@ namespace BacklashOverseer.Services
         /// <param name="brainInstanceName">The name of the brain instance to persist.</param>
         private async Task PersistBrainAsync(string brainInstanceName)
         {
-            if (_context == null || !_brains.TryGetValue(brainInstanceName, out var brain))
+            if (_scopeFactory == null || !_brains.TryGetValue(brainInstanceName, out var brain))
                 return;
+
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             try
             {
                 var persistenceData = JsonSerializer.Serialize(brain);
-                await _context.SaveBrainPersistence(brainInstanceName, persistenceData);
+                await context.SaveBrainPersistence(brainInstanceName, persistenceData);
                 _logger?.LogDebug("Persisted brain {BrainName} to database", brainInstanceName);
             }
             catch (Exception ex)
@@ -675,7 +685,7 @@ namespace BacklashOverseer.Services
             _persistenceTimer?.Dispose();
 
             // Final persistence save
-            if (_context != null)
+            if (_scopeFactory != null)
             {
                 Task.Run(() => PersistAllBrainsAsync()).Wait();
             }

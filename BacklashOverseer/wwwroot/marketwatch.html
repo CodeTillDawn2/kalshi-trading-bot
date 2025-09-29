@@ -270,10 +270,27 @@
         </div>
     </div>
 
+    <!-- Performance Modal -->
+    <div id="performanceModal" class="chart-modal" style="display: none;">
+        <div class="chart-modal-content">
+            <div class="chart-modal-header">
+                <h2 id="performanceTitle" style="color: rgb(225, 221, 206); margin: 0;">Brain Performance</h2>
+                <button class="chart-close-btn" onclick="closePerformanceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chart-modal-body">
+                <div id="performanceContent">
+                    <!-- Performance metrics will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Context Menu for Brain Cards -->
     <div id="brainContextMenu" class="context-menu" style="display: none;">
         <ul>
-            <li onclick="handleBrainDetails()">Details</li>
+            <li onclick="handleBrainPerformance()">Performance</li>
             <li onclick="handleWatchedMarkets()">Watched Markets</li>
             <li onclick="handleChangeWatchSettings()">Change Watch Settings</li>
             <li onclick="handleLogs()">Logs</li>

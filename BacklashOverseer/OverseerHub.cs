@@ -693,20 +693,9 @@ namespace BacklashOverseer
                     }
                 }
 
-                // Broadcast performance metrics update to all connected clients (including web UI)
-                var connections = _connectedClients.Count;
-                _logger.LogInformation("Broadcasting PerformanceMetricsUpdate for {Brain} to {Count} connections",
-                    performanceMetrics.BrainInstanceName, connections);
-
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
-
-                await Clients.All.SendAsync("BroadcastTrace", new
-                {
-                    kind = "PerformanceMetricsUpdate",
-                    brain = performanceMetrics.BrainInstanceName,
-                    timestamp = performanceMetrics.Timestamp,
-                    serverUtc = DateTime.UtcNow
-                });
+                // Performance metrics stored successfully - no broadcasting needed
+                _logger.LogInformation("Performance metrics received and stored for brain: {BrainName}",
+                    performanceMetrics.BrainInstanceName);
 
                 await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
                 {
@@ -763,18 +752,7 @@ namespace BacklashOverseer
                 // Store the performance metrics in the brain persistence service
                 await _brainService.UpdatePerformanceMetricsAsync(brainName, performanceMetrics);
 
-                // Broadcast the performance metrics to all connected clients (including web UI)
-                var connections = _connectedClients.Count;
-                _logger.LogInformation("Broadcasting performance metrics update to {Count} connections", connections);
-
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
-
-                await Clients.All.SendAsync("BroadcastTrace", new
-                {
-                    kind = "PerformanceMetricsUpdate",
-                    timestamp = DateTime.UtcNow,
-                    serverUtc = DateTime.UtcNow
-                });
+                _logger.LogInformation("Performance metrics received and stored for brain: {BrainName}", brainName);
             }
             catch (Exception ex)
             {
@@ -816,15 +794,7 @@ namespace BacklashOverseer
                 // Store the performance metrics in brain persistence
                 await _brainService.UpdatePerformanceMetricsAsync(brainInstanceName, performanceMetrics);
 
-                // Broadcast the performance metrics update to all connected clients (including web UI)
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", new
-                {
-                    BrainInstanceName = brainInstanceName,
-                    PerformanceMetrics = performanceMetrics,
-                    Timestamp = timestamp
-                });
-
-                _logger.LogInformation("Performance metrics update processed and broadcasted for brain {BrainInstanceName}", brainInstanceName);
+                _logger.LogInformation("Performance metrics update processed and stored for brain {BrainInstanceName}", brainInstanceName);
             }
             catch (Exception ex)
             {

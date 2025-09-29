@@ -343,7 +343,7 @@ namespace BacklashOverseer
             // Register BrainPersistenceService
             services.AddScoped<BrainPersistenceService>(sp => new BrainPersistenceService(
                 sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
-                sp.GetRequiredService<IBacklashBotContext>(),
+                sp.GetRequiredService<IServiceScopeFactory>(),
                 sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
