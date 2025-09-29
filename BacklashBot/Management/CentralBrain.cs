@@ -637,6 +637,15 @@ namespace BacklashBot.Management
 
                 _errorHandler.LastSuccessfulSnapshot = DateTime.MinValue;
 
+                // Stop the error check timer to prevent it from firing during shutdown and restart
+                if (_errorCheckTimer != null)
+                {
+                    _errorCheckTimer.Stop();
+                    _errorCheckTimer.Dispose();
+                    _errorCheckTimer = null;
+                    _logger.LogDebug("BRAIN: Error check timer stopped and disposed");
+                }
+
                 var webSocketService = _serviceFactory.GetWebSocketHostedService();
                 _logger.LogDebug("Stopping WebSocketHostedService...");
                 await webSocketService.ShutdownAsync(CancellationToken.None);
