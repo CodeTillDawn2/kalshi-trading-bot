@@ -1,5 +1,4 @@
 using BacklashBot.Configuration;
-using BacklashBot.Helpers;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
@@ -22,9 +21,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
 using TradingSimulator.Strategies;
 using TradingStrategies.ML.SpikePrediction;
 

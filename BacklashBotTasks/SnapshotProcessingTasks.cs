@@ -1,5 +1,4 @@
 using BacklashBot.Configuration;
-using BacklashBot.Helpers;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
@@ -13,7 +12,6 @@ using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
 using BacklashDTOs;
-using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;

@@ -1,8 +1,6 @@
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
-using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
-using BacklashBot.State;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
@@ -10,7 +8,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
-using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
@@ -20,7 +17,6 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data;
 using KalshiBotLogging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -122,7 +118,8 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
-            services.AddScoped<IKalshiWebSocketClient>(sp => {
+            services.AddScoped<IKalshiWebSocketClient>(sp =>
+            {
                 var client = new KalshiWebSocketClient(
                     sp.GetRequiredService<IOptions<KalshiConfig>>(),
                     sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
@@ -300,8 +297,10 @@ namespace BacklashOverseer
             var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(Configuration);
             services.AddSingleton(connectionString);
 
-            services.PostConfigure<IBotReadyStatus>(status => {
-                if (status is OverseerReadyStatus ors) {
+            services.PostConfigure<IBotReadyStatus>(status =>
+            {
+                if (status is OverseerReadyStatus ors)
+                {
                     ors.InitializationCompleted.SetResult(true);
                 }
             });

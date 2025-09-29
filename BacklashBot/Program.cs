@@ -506,7 +506,8 @@ builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
     sp.GetRequiredService<IPerformanceMonitor>()
 ));
-builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
+builder.Services.AddScoped<IKalshiWebSocketClient>(sp =>
+{
     var client = new KalshiWebSocketClient(
         sp.GetRequiredService<IOptions<KalshiConfig>>(),
         sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),

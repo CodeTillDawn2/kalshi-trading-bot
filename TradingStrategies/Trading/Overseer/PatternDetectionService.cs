@@ -3,7 +3,6 @@ using BacklashInterfaces.PerformanceMetrics;
 using BacklashPatterns;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using TradingStrategies.Configuration;
 using TradingStrategies.Extensions;
 

@@ -1010,7 +1010,7 @@ namespace TradingStrategies.Trading.Overseer
                     {
                         _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", (double)kvp.Value, "ms", "PatternDetection", 0, 1000, 5000, true);
                     }
-                    
+
                 }
                 else
                 {

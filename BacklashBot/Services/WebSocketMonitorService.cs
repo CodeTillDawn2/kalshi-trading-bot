@@ -1,13 +1,9 @@
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.PerformanceMetrics;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Services

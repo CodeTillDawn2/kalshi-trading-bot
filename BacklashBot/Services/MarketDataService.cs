@@ -12,14 +12,13 @@ using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.Enums;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using System.Collections.Concurrent;
 using System.Data;
-using BacklashInterfaces.PerformanceMetrics;
 using System.Diagnostics;
 
 namespace BacklashBot.Services

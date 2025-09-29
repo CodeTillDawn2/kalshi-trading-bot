@@ -1,15 +1,14 @@
 using BacklashCommon.Helpers;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using TradingSimulator.Configuration;
 using TradingSimulator.Simulator;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Overseer;
-using TradingSimulator.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingSimulator
 {

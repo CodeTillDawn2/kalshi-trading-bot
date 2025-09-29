@@ -1,7 +1,6 @@
 // ChartHub.cs
 using BacklashBot.Configuration;
 using BacklashBot.Services.Interfaces;
-using BacklashBotData.Data.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;

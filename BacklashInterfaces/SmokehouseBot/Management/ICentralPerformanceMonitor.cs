@@ -1,5 +1,3 @@
-using BacklashInterfaces.PerformanceMetrics;
-
 namespace BacklashBot.Management.Interfaces
 {
     /// <summary>

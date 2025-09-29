@@ -1,5 +1,4 @@
 using BacklashBot.Helpers;
-using BacklashBot.State;
 using BacklashDTOs;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;

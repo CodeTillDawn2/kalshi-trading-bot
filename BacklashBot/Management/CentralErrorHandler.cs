@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.WebSockets;
-using System.Text.RegularExpressions;
 
 namespace BacklashBot.Management
 {

@@ -2,14 +2,12 @@ using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashCommon.Configuration;
-using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using OverseerBotShared;
 using System.Diagnostics;
-using System.Net.Http;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashBot.Services
 {

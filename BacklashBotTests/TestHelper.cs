@@ -18,7 +18,7 @@ namespace KalshiBotTests
         /// <returns>An IConfiguration instance loaded from the appsettings.json file.</returns>
         private static IConfiguration GetConfiguration()
         {
-            var currentDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..","..", "..", "..",  "BacklashBot");
+            var currentDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot");
             return BacklashCommon.Configuration.ConfigurationHelper.CreateConfigurationBuilder(currentDir, Array.Empty<string>()).Build();
         }
 

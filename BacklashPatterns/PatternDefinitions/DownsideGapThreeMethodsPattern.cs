@@ -4,11 +4,11 @@ using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
 
-    /// <summary>
-    /// Represents a Downside Gap Three Methods pattern, a bearish continuation pattern.
-    /// This pattern consists of three candles where the second gaps down from the first,
-    /// and the third partially fills that gap, indicating continued downward momentum in a downtrend.
-    /// </summary>
+/// <summary>
+/// Represents a Downside Gap Three Methods pattern, a bearish continuation pattern.
+/// This pattern consists of three candles where the second gaps down from the first,
+/// and the third partially fills that gap, indicating continued downward momentum in a downtrend.
+/// </summary>
 public class DownsideGapThreeMethodsPattern : PatternDefinition
 {
     /// <summary>

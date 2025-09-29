@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashInterfaces.PerformanceMetrics
 {

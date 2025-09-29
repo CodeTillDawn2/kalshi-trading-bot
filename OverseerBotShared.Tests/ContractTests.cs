@@ -1,6 +1,6 @@
+using BacklashInterfaces.PerformanceMetrics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace OverseerBotShared.Tests
 {

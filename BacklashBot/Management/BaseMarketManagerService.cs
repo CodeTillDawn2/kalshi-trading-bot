@@ -10,7 +10,6 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
-using System.Diagnostics;
 
 namespace BacklashBot.Management
 {

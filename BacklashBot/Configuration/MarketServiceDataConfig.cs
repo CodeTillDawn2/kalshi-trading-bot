@@ -1,4 +1,3 @@
-using BacklashBot.State;
 using System.ComponentModel.DataAnnotations;
 
 namespace BacklashBot.Configuration;

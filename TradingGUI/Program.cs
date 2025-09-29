@@ -1,6 +1,8 @@
-using BacklashBotData.Data;
 using BacklashBotData.Configuration;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotLogging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,15 +11,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Management;
-using System.Timers;
 using TradingGUI.Configuration;
 using TradingSimulator;
-using TradingStrategies.Configuration;
-using BacklashCommon.Configuration;
 using TradingSimulator.Configuration;
+using TradingStrategies.Configuration;
 using TradingStrategies.Trading.Overseer;
-using BacklashBotData.Data.Interfaces;
-using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingGUI
 {

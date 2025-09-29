@@ -1,11 +1,9 @@
 using BacklashBotData.Data.Interfaces;
-using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using BacklashOverseer.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -62,7 +60,7 @@ namespace BacklashOverseer
             // Initialize timers
             _healthCheckTimer = new Timer(PerformHealthChecks, null, 0, 60000); // 60 seconds
             _rateLimitCleanupTimer = new Timer(CleanupRateLimits, null, 0, 300000); // 5 minutes
-            
+
         }
 
         /// <summary>
@@ -315,7 +313,7 @@ namespace BacklashOverseer
             return false;
         }
 
-        
+
 
         /// <summary>
         /// Processes a check-in request from a connected brain instance.

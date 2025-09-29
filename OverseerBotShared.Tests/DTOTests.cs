@@ -1,5 +1,5 @@
-using OverseerBotShared;
 using BacklashInterfaces.PerformanceMetrics;
+using OverseerBotShared;
 
 namespace BacklashBot.Shared.Tests
 {

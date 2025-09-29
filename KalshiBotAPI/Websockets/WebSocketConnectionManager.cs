@@ -1,4 +1,3 @@
-using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Exceptions;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;

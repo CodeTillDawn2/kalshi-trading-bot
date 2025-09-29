@@ -2,16 +2,12 @@ using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.IO;
-using System.Net;
 
 namespace OverseerTests
 {
@@ -403,7 +399,7 @@ namespace OverseerTests
             Assert.That(hasClients, Is.False);
         }
 
-    
+
 
         /// <summary>
         /// Cleans up test fixtures after each test execution.

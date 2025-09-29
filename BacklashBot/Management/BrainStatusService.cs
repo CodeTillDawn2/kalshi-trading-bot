@@ -5,7 +5,6 @@ using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
 
 namespace BacklashBot.Management
 {

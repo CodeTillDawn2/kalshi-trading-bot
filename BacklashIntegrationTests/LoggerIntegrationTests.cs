@@ -1,4 +1,3 @@
-using BacklashBot.Configuration;
 using BacklashCommon.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;

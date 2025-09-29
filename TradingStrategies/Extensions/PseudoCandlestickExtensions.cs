@@ -1,7 +1,6 @@
 using BacklashDTOs;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using TradingStrategies.Configuration;
 
 namespace TradingStrategies.Extensions
 {
@@ -59,7 +58,7 @@ namespace TradingStrategies.Extensions
                     Close = curr.MidClose,
                     High = curr.MidHigh,
                     Low = curr.MidLow,
-                    Volume = Math.Round((double)curr.Volume, 2) 
+                    Volume = Math.Round((double)curr.Volume, 2)
                 });
             }
 

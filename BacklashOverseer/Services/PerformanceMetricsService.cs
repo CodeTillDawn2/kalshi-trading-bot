@@ -1,5 +1,4 @@
 using BacklashInterfaces.PerformanceMetrics;
-using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
@@ -143,9 +142,9 @@ namespace BacklashOverseer.Services
             };
         }
 
-     
 
-   
+
+
         #region SignalR Metrics
 
 
@@ -186,7 +185,7 @@ namespace BacklashOverseer.Services
 
         #region Overnight Task Metrics
 
-     
+
 
 
         /// <summary>
@@ -204,7 +203,7 @@ namespace BacklashOverseer.Services
 
         #endregion
 
-     
+
 
         /// <summary>
         /// Gets the current snapshot aggregation metrics.

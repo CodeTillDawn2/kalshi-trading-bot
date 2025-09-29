@@ -3,7 +3,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;

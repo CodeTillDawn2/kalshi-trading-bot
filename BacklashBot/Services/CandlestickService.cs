@@ -76,7 +76,7 @@ namespace BacklashBot.Services
         private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
         {
             RecordExecutionTimePrivate(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
-            
+
         }
 
         /// <summary>

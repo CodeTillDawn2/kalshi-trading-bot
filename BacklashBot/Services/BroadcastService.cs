@@ -1,6 +1,5 @@
 using BacklashBot.Configuration;
 using BacklashBot.Hubs;
-using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
