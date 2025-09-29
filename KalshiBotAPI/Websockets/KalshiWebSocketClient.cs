@@ -30,7 +30,7 @@ namespace KalshiBotAPI.Websockets
     /// - IStatusTrackerService: Provides cancellation tokens and status tracking
     /// - IBotReadyStatus: Tracks bot readiness state
     /// </remarks>
-    public class KalshiWebSocketClient : IKalshiWebSocketClient, IWebSocketPerformanceMetrics
+    public class KalshiWebSocketClient : IKalshiWebSocketClient
     {
         private readonly ISqlDataService _sqlDataService;
         private readonly IStatusTrackerService _statusTrackerService;
@@ -782,116 +782,6 @@ namespace KalshiBotAPI.Websockets
             await Task.CompletedTask;
         }
 
-        #region IWebSocketPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Records WebSocket message processing performance with enablement status.
-        /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
-        {
-            if (!EnablePerformanceMetrics || !metricsEnabled) return;
-
-            _messageProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
-            _messageProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
-            _bufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
-        }
-
-        /// <summary>
-        /// Records a WebSocket operation with timing information.
-        /// </summary>
-        /// <param name="operation">The operation name.</param>
-        /// <param name="duration">The duration of the operation.</param>
-        /// <param name="success">Whether the operation was successful.</param>
-        public void RecordWebSocketOperation(string operation, TimeSpan duration, bool success)
-        {
-            if (!EnablePerformanceMetrics) return;
-
-            _asyncOperationTimes[operation] = duration;
-        }
-
-        /// <summary>
-        /// Records semaphore wait time for WebSocket operations.
-        /// </summary>
-        /// <param name="operation">The operation name.</param>
-        /// <param name="waitTime">The time spent waiting for the semaphore.</param>
-        public void RecordSemaphoreWait(string operation, TimeSpan waitTime)
-        {
-            if (!EnablePerformanceMetrics) return;
-
-            // For now, just increment count, but could track time
-            _semaphoreWaitCount.AddOrUpdate(operation, 0, (k, v) => v + 1);
-        }
-
-        /// <summary>
-        /// Records WebSocket message processing time.
-        /// </summary>
-        /// <param name="messageType">The type of message processed.</param>
-        /// <param name="processingTime">The time spent processing the message.</param>
-        public void RecordWebSocketMessageProcessing(string messageType, TimeSpan processingTime)
-        {
-            if (!EnablePerformanceMetrics) return;
-
-            _messageProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTime.Ticks);
-            _messageProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + 1);
-        }
-
-        /// <summary>
-        /// Gets the average processing times for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAverageProcessingTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>(
-                _messageProcessingTimeTicks.ToDictionary(
-                    kv => kv.Key,
-                    kv => _messageProcessingCount.TryGetValue(kv.Key, out var count) && count > 0
-                        ? TimeSpan.FromTicks(kv.Value / count).TotalMilliseconds
-                        : 0.0
-                )
-            );
-        }
-
-        /// <summary>
-        /// Gets the total buffer usage for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, long> GetBufferUsageBytes()
-        {
-            return new ConcurrentDictionary<string, long>(_bufferUsageBytes);
-        }
-
-        /// <summary>
-        /// Gets the average times for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAsyncOperationTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>(
-                _asyncOperationTimes.ToDictionary(
-                    kv => kv.Key,
-                    kv => kv.Value.TotalMilliseconds
-                )
-            );
-        }
-
-        /// <summary>
-        /// Gets the semaphore wait counts for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, int> GetSemaphoreWaitCounts()
-        {
-            return new ConcurrentDictionary<string, int>(_semaphoreWaitCount);
-        }
-
-        /// <summary>
-        /// Resets all WebSocket performance metrics.
-        /// </summary>
-        public void ResetWebSocketMetrics()
-        {
-            _messageProcessingTimeTicks.Clear();
-            _messageProcessingCount.Clear();
-            _bufferUsageBytes.Clear();
-            _asyncOperationTimes.Clear();
-            _semaphoreWaitCount.Clear();
-        }
-
-        #endregion
 
     }
 

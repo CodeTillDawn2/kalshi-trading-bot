@@ -244,6 +244,10 @@ builder.Services.Configure<HostOptions>(options =>
 
 // ## Service Registrations
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
+builder.Services.AddSingleton<IStatusTrackerService>(sp => new KalshiBotStatusTracker(
+    sp.GetRequiredService<ILogger<KalshiBotStatusTracker>>(),
+    null, // performanceMonitor will be set later
+    sp.GetRequiredService<IOptions<KalshiBotStatusTrackerConfig>>()));
 builder.Services.AddSingleton<CentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
     sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
@@ -256,14 +260,6 @@ builder.Services.AddSingleton<ICentralPerformanceMonitor>(provider =>
     provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IPerformanceMonitor>(provider =>
     provider.GetRequiredService<CentralPerformanceMonitor>());
-builder.Services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
-    (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-    (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<ISubscriptionManagerPerformanceMetrics>(provider =>
-    (ISubscriptionManagerPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-    (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IScopeManagerService, KalshiBotScopeManagerService>();
 builder.Services.AddSingleton<IServiceFactory, ServiceFactory>();
 builder.Services.AddSingleton<ICentralBrain>(sp =>
@@ -315,10 +311,6 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
         centralBrainConfig,
         timerFactory);
 });
-builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-    (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-    (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerService(
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<ILogger<IMarketManagerService>>(),
@@ -332,10 +324,6 @@ builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerServ
     sp.GetRequiredService<IBrainStatusService>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<ITargetCalculationService>()));
-builder.Services.AddSingleton<IStatusTrackerService>(sp => new KalshiBotStatusTracker(
-    sp.GetRequiredService<ILogger<KalshiBotStatusTracker>>(),
-    sp.GetRequiredService<IPerformanceMonitor>(),
-    sp.GetRequiredService<IOptions<KalshiBotStatusTrackerConfig>>()));
 builder.Services.AddSingleton<IBotReadyStatus>(sp => new KalshiBotReadyStatus(
     sp.GetRequiredService<ILogger<KalshiBotReadyStatus>>(),
     sp.GetRequiredService<IPerformanceMonitor>(),
@@ -508,7 +496,6 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IKalshiAPIService>(),
     sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
     sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
-    sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
     sp.GetRequiredService<IPerformanceMonitor>()
 ));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
@@ -572,6 +559,13 @@ builder.Logging.SetMinimumLevel(consoleLogLevel);
 Console.WriteLine($"Building application at {DateTime.UtcNow}");
 var app = builder.Build();
 Console.WriteLine($"Application built at {DateTime.UtcNow}");
+
+// Set performance monitor for status tracker
+var statusTracker = app.Services.GetRequiredService<IStatusTrackerService>() as KalshiBotStatusTracker;
+if (statusTracker != null)
+{
+    statusTracker.SetPerformanceMonitor(app.Services.GetRequiredService<IPerformanceMonitor>());
+}
 
 // Validate DI container
 try

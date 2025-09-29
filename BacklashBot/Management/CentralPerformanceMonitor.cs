@@ -43,7 +43,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : BasePerformanceMonitor, ICentralPerformanceMonitor, IPerformanceMonitor
+    public class CentralPerformanceMonitor : BasePerformanceMonitor, ICentralPerformanceMonitor
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         /// <summary>
@@ -199,7 +199,6 @@ namespace BacklashBot.Management
                 }
             }
         }
-
         // Configurable metrics data structure for GUI consumption
         private Dictionary<string, object> _configurableMetrics;
 
@@ -803,126 +802,8 @@ namespace BacklashBot.Management
         }
 
 
-        #region WebSocket Performance Metrics Getters
 
-        /// <summary>
-        /// Gets the average processing times for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAverageProcessingTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>();
-        }
 
-        /// <summary>
-        /// Gets the total buffer usage for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, long> GetBufferUsageBytes()
-        {
-            return new ConcurrentDictionary<string, long>();
-        }
-
-        /// <summary>
-        /// Gets the average times for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAsyncOperationTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>();
-        }
-
-        /// <summary>
-        /// Gets the semaphore wait counts for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, int> GetSemaphoreWaitCounts()
-        {
-            return new ConcurrentDictionary<string, int>();
-        }
-
-        /// <summary>
-        /// Records a WebSocket operation with timing information.
-        /// </summary>
-        /// <param name="operation">The operation name.</param>
-        /// <param name="duration">The duration of the operation.</param>
-        /// <param name="success">Whether the operation was successful.</param>
-        public void RecordWebSocketOperation(string operation, TimeSpan duration, bool success)
-        {
-            // Implementation can be added here if needed
-        }
-
-        /// <summary>
-        /// Records semaphore wait time for WebSocket operations.
-        /// </summary>
-        /// <param name="operation">The operation name.</param>
-        /// <param name="waitTime">The time spent waiting for the semaphore.</param>
-        public void RecordSemaphoreWait(string operation, TimeSpan waitTime)
-        {
-            // Implementation can be added here if needed
-        }
-
-        /// <summary>
-        /// Records WebSocket message processing time.
-        /// </summary>
-        /// <param name="messageType">The type of message processed.</param>
-        /// <param name="processingTime">The time spent processing the message.</param>
-        public void RecordWebSocketMessageProcessing(string messageType, TimeSpan processingTime)
-        {
-            // Implementation can be added here if needed
-        }
-
-        #endregion
-
-        #region Subscription Manager Performance Metrics Getters
-
-        /// <summary>
-        /// Gets the current operation performance metrics.
-        /// </summary>
-        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
-        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> GetOperationMetrics()
-        {
-            return new Dictionary<string, (long, long, long)>();
-        }
-
-        /// <summary>
-        /// Gets the current lock contention metrics.
-        /// </summary>
-        /// <returns>Dictionary containing lock names and their contention statistics.</returns>
-        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> GetLockContentionMetrics()
-        {
-            return new Dictionary<string, (long, long, long)>();
-        }
-
-        #endregion
-
-        #region Message Processor Performance Metrics Getters
-
-        /// <summary>
-        /// Gets the current message processing performance metrics.
-        /// </summary>
-        /// <returns>Tuple containing current performance metrics.</returns>
-        public (long TotalMessagesProcessed, long TotalProcessingTimeMs, double AverageProcessingTimeMs,
-            double MessagesPerSecond, int OrderBookQueueDepth) GetMessageProcessingMetrics()
-        {
-            return (0, 0, 0.0, 0.0, 0);
-        }
-
-        /// <summary>
-        /// Gets the current duplicate message metrics.
-        /// </summary>
-        /// <returns>Tuple containing duplicate message statistics.</returns>
-        public (int DuplicateMessageCount, int DuplicatesInWindow, DateTime LastDuplicateWarningTime) GetDuplicateMessageMetrics()
-        {
-            return (0, 0, DateTime.MinValue);
-        }
-
-        /// <summary>
-        /// Gets the current message type distribution metrics.
-        /// </summary>
-        /// <returns>Dictionary containing message type counts.</returns>
-        public IReadOnlyDictionary<string, long> GetMessageTypeMetrics()
-        {
-            return new Dictionary<string, long>();
-        }
-
-        #endregion
 
         /// <summary>
         /// Collects and sends comprehensive performance metrics to the Overseer via SignalR.
@@ -943,19 +824,20 @@ namespace BacklashBot.Management
                     BrainInstanceName = BrainInstance,
                     Timestamp = DateTime.UtcNow,
 
-                    // Database metrics
-                    DatabaseMetrics = GetPerformanceMetrics(),
+                    // Unified collection of all metrics from all sources
+                    AllMetrics = base.RecordedMetrics.Select(m => new PerformanceMetricEntry
+                    {
+                        ClassName = m.ClassName,
+                        Metric = (GeneralPerformanceMetric)m.Metric
+                    }).ToList()
 
 
 
 
 
 
-                    // API execution times
-                    ApiExecutionTimes = ApiExecutionTimes,
 
-                    // Configurable metrics
-                    ConfigurableMetrics = (Dictionary<string, object>)GetConfigurableMetrics()
+
                 };
 
                 // Get the broadcast service and send the metrics
@@ -971,7 +853,7 @@ namespace BacklashBot.Management
                 if (broadcastService != null)
                 {
                     await broadcastService.BroadcastPerformanceMetricsAsync(performanceMetrics);
-                    _logger.LogInformation("Sent comprehensive performance metrics to Overseer for brain {BrainInstance}", BrainInstance);
+                    _logger.LogInformation("Sent unified performance metrics collection ({Count} metrics) to Overseer for brain {BrainInstance}", base.RecordedMetrics.Count, BrainInstance);
                 }
                 else
                 {
@@ -983,6 +865,7 @@ namespace BacklashBot.Management
                 _logger.LogError(ex, "Error sending performance metrics to Overseer");
             }
         }
+
 
     }
 }

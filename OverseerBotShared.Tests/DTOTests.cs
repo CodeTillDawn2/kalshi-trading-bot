@@ -1,4 +1,5 @@
 using OverseerBotShared;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashBot.Shared.Tests
 {
@@ -67,9 +68,106 @@ namespace BacklashBot.Shared.Tests
         public void PerformanceMetricsData_ShouldInitializeCorrectly()
         {
             // Arrange
-            var databaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>
+            var allMetrics = new List<PerformanceMetricEntry>
             {
-                ["Query1"] = (10, 2, TimeSpan.FromMilliseconds(150), 15.0)
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "total-messages",
+                        Name = "Total Messages Processed",
+                        Description = "Total number of messages processed",
+                        Value = 1000,
+                        Unit = "count",
+                        VisualType = VisualType.Counter,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "total-processing-time",
+                        Name = "Total Processing Time",
+                        Description = "Total processing time in milliseconds",
+                        Value = 5000,
+                        Unit = "ms",
+                        VisualType = VisualType.NumericDisplay,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "avg-processing-time",
+                        Name = "Average Processing Time",
+                        Description = "Average processing time per message",
+                        Value = 5.0,
+                        Unit = "ms",
+                        VisualType = VisualType.SpeedDial,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "messages-per-second",
+                        Name = "Messages Per Second",
+                        Description = "Processing rate",
+                        Value = 200.0,
+                        Unit = "msg/s",
+                        VisualType = VisualType.NumericDisplay,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "queue-depth",
+                        Name = "Order Book Queue Depth",
+                        Description = "Current queue depth",
+                        Value = 50,
+                        Unit = "count",
+                        VisualType = VisualType.Counter,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "duplicate-count",
+                        Name = "Duplicate Message Count",
+                        Description = "Number of duplicate messages detected",
+                        Value = 5,
+                        Unit = "count",
+                        VisualType = VisualType.Counter,
+                        Category = "Message Processing"
+                    }
+                },
+                new PerformanceMetricEntry
+                {
+                    ClassName = "MessageProcessor",
+                    Metric = new GeneralPerformanceMetric
+                    {
+                        Id = "duplicates-in-window",
+                        Name = "Duplicates In Window",
+                        Description = "Duplicates detected in current window",
+                        Value = 2,
+                        Unit = "count",
+                        VisualType = VisualType.Counter,
+                        Category = "Message Processing"
+                    }
+                }
             };
 
             // Act
@@ -77,29 +175,23 @@ namespace BacklashBot.Shared.Tests
             {
                 BrainInstanceName = "TestBrain",
                 Timestamp = DateTime.UtcNow,
-                DatabaseMetrics = databaseMetrics,
-                MessageProcessorTotalMessagesProcessed = 1000,
-                MessageProcessorTotalProcessingTimeMs = 5000,
-                MessageProcessorAverageProcessingTimeMs = 5.0,
-                MessageProcessorMessagesPerSecond = 200.0,
-                MessageProcessorOrderBookQueueDepth = 50,
-                MessageProcessorDuplicateMessageCount = 5,
-                MessageProcessorDuplicatesInWindow = 2,
-                MessageProcessorLastDuplicateWarningTime = DateTime.UtcNow.AddMinutes(-10)
+                AllMetrics = allMetrics
             };
 
             // Assert
             Assert.Equal("TestBrain", metrics.BrainInstanceName);
             Assert.NotEqual(default, metrics.Timestamp);
-            Assert.NotNull(metrics.DatabaseMetrics);
-            Assert.Equal(1000L, metrics.MessageProcessorTotalMessagesProcessed);
-            Assert.Equal(5000L, metrics.MessageProcessorTotalProcessingTimeMs);
-            Assert.Equal(5.0, metrics.MessageProcessorAverageProcessingTimeMs);
-            Assert.Equal(200.0, metrics.MessageProcessorMessagesPerSecond);
-            Assert.Equal(50, metrics.MessageProcessorOrderBookQueueDepth);
-            Assert.Equal(5, metrics.MessageProcessorDuplicateMessageCount);
-            Assert.Equal(2, metrics.MessageProcessorDuplicatesInWindow);
-            Assert.NotEqual(default, metrics.MessageProcessorLastDuplicateWarningTime);
+            Assert.NotNull(metrics.AllMetrics);
+            Assert.Equal(7, metrics.AllMetrics.Count);
+
+            // Verify specific metrics
+            var totalMessagesMetric = metrics.AllMetrics.First(m => m.Metric.Id == "total-messages");
+            Assert.Equal(1000, totalMessagesMetric.Metric.Value);
+            Assert.Equal("count", totalMessagesMetric.Metric.Unit);
+
+            var avgProcessingTimeMetric = metrics.AllMetrics.First(m => m.Metric.Id == "avg-processing-time");
+            Assert.Equal(5.0, avgProcessingTimeMetric.Metric.Value);
+            Assert.Equal("ms", avgProcessingTimeMetric.Metric.Unit);
         }
 
         [Fact(DisplayName = "BrainStatusData: initializes with comprehensive status data, verifies all properties")]

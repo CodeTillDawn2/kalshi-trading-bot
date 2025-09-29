@@ -33,7 +33,7 @@ namespace BacklashBot.State
         private readonly object _lock = new();
 
         private readonly ILogger<KalshiBotStatusTracker> _logger;
-        private readonly IPerformanceMonitor _performanceMonitor;
+        private IPerformanceMonitor? _performanceMonitor;
         private readonly IOptions<KalshiBotStatusTrackerConfig> _config;
         private readonly bool _enablePerformanceMetrics;
 
@@ -49,16 +49,25 @@ namespace BacklashBot.State
         /// <param name="config">Configuration options for the KalshiBotStatusTracker.</param>
         public KalshiBotStatusTracker(
             ILogger<KalshiBotStatusTracker> logger,
-            IPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor? performanceMonitor,
             IOptions<KalshiBotStatusTrackerConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
+            _performanceMonitor = performanceMonitor;
             _config = config ?? throw new ArgumentNullException(nameof(config));
 
             _enablePerformanceMetrics = _config.Value.EnablePerformanceMetrics;
 
             _logger.LogInformation("KalshiBotStatusTracker initialized with EnablePerformanceMetrics={EnablePerformanceMetrics}", _enablePerformanceMetrics);
+        }
+
+        /// <summary>
+        /// Sets the performance monitor for recording metrics.
+        /// </summary>
+        /// <param name="performanceMonitor">The performance monitor instance.</param>
+        public void SetPerformanceMonitor(IPerformanceMonitor performanceMonitor)
+        {
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -110,21 +119,21 @@ namespace BacklashBot.State
                     // Record cancellation timing metric
                     if (!_enablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker", _enablePerformanceMetrics);
                     }
                     else
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker", null, 1000, 5000, _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordSpeedDialMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker", null, 1000, 5000, _enablePerformanceMetrics);
                     }
 
                     // Record cancellation operations metric
                     if (!_enablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
                     }
                     else
                     {
-                        _performanceMonitor.RecordCounterMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordCounterMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
                     }
 
                     _logger.LogInformation("All operations cancelled successfully. Total cancellations: {Count}, timing: {Timing}ms",
@@ -174,21 +183,21 @@ namespace BacklashBot.State
                     // Record reset timing metric
                     if (!_enablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordDisabledMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker", _enablePerformanceMetrics);
                     }
                     else
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker", null, 500, 2000, _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordSpeedDialMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker", null, 500, 2000, _enablePerformanceMetrics);
                     }
 
                     // Record reset operations metric
                     if (!_enablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordDisabledMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
                     }
                     else
                     {
-                        _performanceMonitor.RecordCounterMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
+                        _performanceMonitor?.RecordCounterMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker", _enablePerformanceMetrics);
                     }
 
                     _logger.LogInformation("Cancellation state reset successfully, timing: {Timing}ms", timing);

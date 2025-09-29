@@ -113,7 +113,6 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IKalshiAPIService>(),
                 sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
                 sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
-                sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
             services.AddScoped<ISubscriptionManager>(sp => new BaseSubscriptionManager(
@@ -327,12 +326,6 @@ namespace BacklashOverseer
             services.AddSingleton<PerformanceMetricsService>();
             services.AddSingleton<IPerformanceMonitor>(provider =>
                 provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-                (IWebSocketPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
-                (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-                (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
 
             // Register services needed for OvernightActivitiesHelper

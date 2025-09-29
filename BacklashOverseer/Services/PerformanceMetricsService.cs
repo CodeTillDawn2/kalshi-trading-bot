@@ -10,7 +10,7 @@ namespace BacklashOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService : BasePerformanceMonitor, IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
+    public class PerformanceMetricsService : BasePerformanceMonitor
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -411,99 +411,7 @@ namespace BacklashOverseer.Services
             _logger.LogInformation("WebSocket performance metrics reset");
         }
 
-        #region ISubscriptionManagerPerformanceMetrics Implementation
 
-        /// <summary>
-        /// Gets the current operation performance metrics.
-        /// </summary>
-        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
-        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> GetOperationMetrics()
-        {
-            return _subscriptionManagerOperationMetrics ?? new Dictionary<string, (long, long, long)>();
-        }
-
-        /// <summary>
-        /// Gets the current lock contention metrics.
-        /// </summary>
-        /// <returns>Dictionary containing lock names and their contention statistics.</returns>
-        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> GetLockContentionMetrics()
-        {
-            return _subscriptionManagerLockMetrics ?? new Dictionary<string, (long, long, long)>();
-        }
-
-        /// <summary>
-        /// Resets all SubscriptionManager performance metrics.
-        /// </summary>
-        public void ResetSubscriptionManagerMetrics()
-        {
-            _subscriptionManagerOperationMetrics = null;
-            _subscriptionManagerLockMetrics = null;
-            _logger.LogInformation("SubscriptionManager performance metrics reset");
-        }
-
-        #endregion
-
-        #region IMessageProcessorPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Gets the current message processing performance metrics.
-        /// </summary>
-        /// <returns>Tuple containing current performance metrics.</returns>
-        public (long TotalMessagesProcessed, long TotalProcessingTimeMs, double AverageProcessingTimeMs,
-            double MessagesPerSecond, int OrderBookQueueDepth) GetMessageProcessingMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                return (_messageProcessorTotalMessagesProcessed, _messageProcessorTotalProcessingTimeMs,
-                    _messageProcessorAverageProcessingTimeMs, _messageProcessorMessagesPerSecond, _messageProcessorOrderBookQueueDepth);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current duplicate message metrics.
-        /// </summary>
-        /// <returns>Tuple containing duplicate message statistics.</returns>
-        public (int DuplicateMessageCount, int DuplicatesInWindow, DateTime LastDuplicateWarningTime) GetDuplicateMessageMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                return (_messageProcessorDuplicateMessageCount, _messageProcessorDuplicatesInWindow, _messageProcessorLastDuplicateWarningTime);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current message type distribution metrics.
-        /// </summary>
-        /// <returns>Dictionary containing message type counts.</returns>
-        public IReadOnlyDictionary<string, long> GetMessageTypeMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                return _messageProcessorMessageTypeCounts ?? new Dictionary<string, long>();
-            }
-        }
-
-        /// <summary>
-        /// Resets all MessageProcessor performance metrics.
-        /// </summary>
-        public void ResetMessageProcessorMetrics()
-        {
-            lock (_snapshotLock)
-            {
-                _messageProcessorTotalMessagesProcessed = 0;
-                _messageProcessorTotalProcessingTimeMs = 0;
-                _messageProcessorAverageProcessingTimeMs = 0;
-                _messageProcessorMessagesPerSecond = 0;
-                _messageProcessorOrderBookQueueDepth = 0;
-                _messageProcessorDuplicateMessageCount = 0;
-                _messageProcessorDuplicatesInWindow = 0;
-                _messageProcessorLastDuplicateWarningTime = DateTime.MinValue;
-                _messageProcessorMessageTypeCounts = null;
-                _logger.LogInformation("MessageProcessor performance metrics reset");
-            }
-        }
-
-        #endregion
 
 
     }

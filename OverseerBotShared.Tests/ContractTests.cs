@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace OverseerBotShared.Tests
 {
@@ -119,28 +120,106 @@ namespace OverseerBotShared.Tests
             {
                 BrainInstanceName = "TestBrain",
                 Timestamp = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc),
-                DatabaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>
+                AllMetrics = new List<PerformanceMetricEntry>
                 {
-                    ["Users"] = (100, 5, TimeSpan.FromMilliseconds(150), 0.85),
-                    ["Orders"] = (200, 10, TimeSpan.FromMilliseconds(300), 0.92)
-                },
-                MessageProcessorTotalMessagesProcessed = 1500,
-                MessageProcessorTotalProcessingTimeMs = 2500,
-                MessageProcessorAverageProcessingTimeMs = 1.67,
-                MessageProcessorMessagesPerSecond = 25.5,
-                MessageProcessorOrderBookQueueDepth = 12,
-                MessageProcessorDuplicateMessageCount = 3,
-                MessageProcessorDuplicatesInWindow = 1,
-                MessageProcessorLastDuplicateWarningTime = new DateTime(2024, 1, 15, 10, 25, 0, DateTimeKind.Utc),
-                MessageProcessorMessageTypeCounts = new Dictionary<string, long>
-                {
-                    ["MarketUpdate"] = 800,
-                    ["OrderBook"] = 700
-                },
-                ConfigurableMetrics = new Dictionary<string, object>
-                {
-                    ["CustomMetric1"] = 42.5,
-                    ["CustomMetric2"] = "test_value"
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "total-messages",
+                            Name = "Total Messages Processed",
+                            Description = "Total number of messages processed",
+                            Value = 1500,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "total-processing-time",
+                            Name = "Total Processing Time",
+                            Description = "Total processing time in milliseconds",
+                            Value = 2500,
+                            Unit = "ms",
+                            VisualType = VisualType.NumericDisplay,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "avg-processing-time",
+                            Name = "Average Processing Time",
+                            Description = "Average processing time per message",
+                            Value = 1.67,
+                            Unit = "ms",
+                            VisualType = VisualType.SpeedDial,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "messages-per-second",
+                            Name = "Messages Per Second",
+                            Description = "Processing rate",
+                            Value = 25.5,
+                            Unit = "msg/s",
+                            VisualType = VisualType.NumericDisplay,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "queue-depth",
+                            Name = "Order Book Queue Depth",
+                            Description = "Current queue depth",
+                            Value = 12,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "duplicate-count",
+                            Name = "Duplicate Message Count",
+                            Description = "Number of duplicate messages detected",
+                            Value = 3,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "duplicates-in-window",
+                            Name = "Duplicates In Window",
+                            Description = "Duplicates detected in current window",
+                            Value = 1,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    }
                 }
             };
 
@@ -152,16 +231,24 @@ namespace OverseerBotShared.Tests
             Assert.NotNull(deserializedMetrics);
             Assert.Equal(originalMetrics.BrainInstanceName, deserializedMetrics.BrainInstanceName);
             Assert.Equal(originalMetrics.Timestamp, deserializedMetrics.Timestamp);
-            Assert.Equal(originalMetrics.MessageProcessorTotalMessagesProcessed, deserializedMetrics.MessageProcessorTotalMessagesProcessed);
-            Assert.Equal(originalMetrics.MessageProcessorTotalProcessingTimeMs, deserializedMetrics.MessageProcessorTotalProcessingTimeMs);
-            Assert.Equal(originalMetrics.MessageProcessorAverageProcessingTimeMs, deserializedMetrics.MessageProcessorAverageProcessingTimeMs);
-            Assert.Equal(originalMetrics.MessageProcessorMessagesPerSecond, deserializedMetrics.MessageProcessorMessagesPerSecond);
-            Assert.Equal(originalMetrics.MessageProcessorOrderBookQueueDepth, deserializedMetrics.MessageProcessorOrderBookQueueDepth);
-            Assert.Equal(originalMetrics.MessageProcessorDuplicateMessageCount, deserializedMetrics.MessageProcessorDuplicateMessageCount);
-            Assert.Equal(originalMetrics.MessageProcessorDuplicatesInWindow, deserializedMetrics.MessageProcessorDuplicatesInWindow);
-            Assert.Equal(originalMetrics.MessageProcessorLastDuplicateWarningTime, deserializedMetrics.MessageProcessorLastDuplicateWarningTime);
-            Assert.Equal(originalMetrics.MessageProcessorMessageTypeCounts, deserializedMetrics.MessageProcessorMessageTypeCounts);
-            Assert.Equal(originalMetrics.ConfigurableMetrics, deserializedMetrics.ConfigurableMetrics);
+            Assert.NotNull(deserializedMetrics.AllMetrics);
+            Assert.Equal(originalMetrics.AllMetrics.Count, deserializedMetrics.AllMetrics.Count);
+
+            // Verify each metric matches
+            for (int i = 0; i < originalMetrics.AllMetrics.Count; i++)
+            {
+                var original = originalMetrics.AllMetrics[i];
+                var deserialized = deserializedMetrics.AllMetrics[i];
+
+                Assert.Equal(original.ClassName, deserialized.ClassName);
+                Assert.Equal(original.Metric.Id, deserialized.Metric.Id);
+                Assert.Equal(original.Metric.Name, deserialized.Metric.Name);
+                Assert.Equal(original.Metric.Description, deserialized.Metric.Description);
+                Assert.Equal(original.Metric.Value, deserialized.Metric.Value);
+                Assert.Equal(original.Metric.Unit, deserialized.Metric.Unit);
+                Assert.Equal(original.Metric.VisualType, deserialized.Metric.VisualType);
+                Assert.Equal(original.Metric.Category, deserialized.Metric.Category);
+            }
         }
 
         [Fact(DisplayName = "TargetTickersConfirmationResponse round-trip: serialize/deserialize maintains exact structure")]

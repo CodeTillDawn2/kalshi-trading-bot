@@ -36,7 +36,6 @@ namespace KalshiBotAPI.Websockets
         private readonly KalshiAPIServiceConfig _apiConfig;
         private bool _isDataPersistenceEnabled;
         private readonly bool _enablePerformanceMonitoring;
-        private readonly IMessageProcessorPerformanceMetrics _performanceMetrics;
         private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts;
         private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue;
@@ -180,7 +179,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="kalshiAPIService">Provides access to Kalshi API for market data retrieval and updates.</param>
         /// <param name="config">Configuration settings for WebSocket operations.</param>
         /// <param name="apiConfig">Configuration settings for Kalshi API operations.</param>
-        /// <param name="performanceMetrics">Service for posting performance metrics to central monitoring.</param>
+        /// <param name="performanceMonitor">Service for recording performance metrics.</param>
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
             IWebSocketConnectionManager connectionManager,
@@ -190,7 +189,6 @@ namespace KalshiBotAPI.Websockets
             IKalshiAPIService kalshiAPIService,
             MessageProcessorConfig config,
             IOptions<KalshiAPIServiceConfig> apiConfig,
-            IMessageProcessorPerformanceMetrics performanceMetrics,
             IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
@@ -201,7 +199,6 @@ namespace KalshiBotAPI.Websockets
             _kalshiAPIService = kalshiAPIService;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _apiConfig = apiConfig?.Value ?? throw new ArgumentNullException(nameof(apiConfig));
-            _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
             _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
             _enablePerformanceMonitoring = _config.EnablePerformanceMetrics;
