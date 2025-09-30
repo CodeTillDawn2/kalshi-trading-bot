@@ -33,6 +33,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         {
             if (!metricsEnabled) return;
 
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
+
             var metric = new GeneralPerformanceMetric
             {
                 Id = id,
@@ -58,6 +60,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         public virtual void RecordProgressBarMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true)
         {
             if (!metricsEnabled) return;
+
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
 
             var metric = new GeneralPerformanceMetric
             {
@@ -85,6 +89,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         {
             if (!metricsEnabled) return;
 
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
+
             var metric = new GeneralPerformanceMetric
             {
                 Id = id,
@@ -107,6 +113,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         public virtual void RecordTrafficLightMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true)
         {
             if (!metricsEnabled) return;
+
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
 
             var metric = new GeneralPerformanceMetric
             {
@@ -133,6 +141,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         public virtual void RecordPieChartMetric(string className, string id, string name, string description, double value, double? secondaryValue, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null, bool metricsEnabled = true)
         {
             if (!metricsEnabled) return;
+
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
 
             var metric = new GeneralPerformanceMetric
             {
@@ -161,6 +171,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         {
             if (!metricsEnabled) return;
 
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
+
             var metric = new GeneralPerformanceMetric
             {
                 Id = id,
@@ -184,6 +196,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         {
             if (!metricsEnabled) return;
 
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
+
             var metric = new GeneralPerformanceMetric
             {
                 Id = id,
@@ -205,6 +219,8 @@ namespace BacklashInterfaces.PerformanceMetrics
         /// </summary>
         public virtual void RecordDisabledMetric(string className, string id, string name, string description, double value, string unit, string category, bool metricsEnabled = true)
         {
+            _recordedMetrics.RemoveAll(m => m.ClassName == className && m.Metric?.Name == name);
+
             var metric = new GeneralPerformanceMetric
             {
                 Id = id,

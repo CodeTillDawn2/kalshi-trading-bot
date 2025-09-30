@@ -57,20 +57,7 @@ namespace BacklashBot.Management.Interfaces
         /// <returns><c>true</c> if internet connection is available; otherwise, <c>false</c>.</returns>
         Task<bool> CheckInternetConnection();
 
-        /// <summary>
-        /// Adds a warning to the error handler with the specified exception, identifier, and optional message.
-        /// </summary>
-        /// <param name="ex">The exception that caused the warning.</param>
-        /// <param name="identifier">A unique identifier for the warning source.</param>
-        /// <param name="message">An optional additional message describing the warning.</param>
-        void AddWarning(Exception ex, string identifier, string? message = null);
+  
 
-        /// <summary>
-        /// Adds an error to the error handler with the specified exception, identifier, and optional message.
-        /// </summary>
-        /// <param name="ex">The exception that caused the error.</param>
-        /// <param name="identifier">A unique identifier for the error source.</param>
-        /// <param name="message">An optional additional message describing the error.</param>
-        void AddError(Exception ex, string identifier, string? message = null);
     }
 }

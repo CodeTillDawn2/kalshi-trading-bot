@@ -68,6 +68,9 @@ namespace KalshiBotAPI.Websockets
         // Subscription deduplication
         private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
 
+        // Channel activity tracking for stale detection
+        private readonly ConcurrentDictionary<string, DateTime> _lastChannelActivity = new();
+
         /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
         /// </summary>
@@ -77,6 +80,12 @@ namespace KalshiBotAPI.Websockets
         /// Event raised when WebSocket health is restored for specific markets.
         /// </summary>
         public event EventHandler<string[]>? MarketWebSocketHealthy;
+
+        /// <summary>
+        /// Event raised when a message is received on a specific channel.
+        /// Used for tracking channel activity for stale detection.
+        /// </summary>
+        public event EventHandler<string>? ChannelMessageReceived;
 
         // Health monitoring
         private Task _healthMonitorTask = null!;
@@ -197,9 +206,9 @@ namespace KalshiBotAPI.Websockets
             // Check for subscription deduplication
             var deduplicationKey = $"{action}:{string.Join(",", marketTickers.OrderBy(m => m))}";
             if (_recentSubscriptions.TryGetValue(deduplicationKey, out var lastSubscriptionTime) &&
-                DateTime.UtcNow - lastSubscriptionTime < TimeSpan.FromSeconds(5))
+                DateTime.UtcNow - lastSubscriptionTime < TimeSpan.FromSeconds(30))
             {
-                _logger.LogWarning("Duplicate subscription attempt for {Action} with markets {Markets}, skipping", action, string.Join(", ", marketTickers));
+                _logger.LogDebug("Duplicate subscription attempt for {Action} with markets {Markets} within 30s, skipping", action, string.Join(", ", marketTickers));
                 return;
             }
             _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
@@ -1313,9 +1322,10 @@ namespace KalshiBotAPI.Websockets
                             var sid = subscription.Value.Sid;
                             if (sid != 0)
                             {
-                                // Check if this subscription has been active recently
-                                // Look for recent subscription activity (not pending confirmations since they're removed after confirmation)
-                                var hasRecentActivity = _recentSubscriptions.Any(r => r.Key.StartsWith($"{GetActionFromChannel(channel)}:") && (now - r.Value) < staleThreshold);
+                                // Check if this subscription has received messages recently
+                                // Use channel activity tracking instead of subscription attempts
+                                var hasRecentActivity = _lastChannelActivity.TryGetValue(channel, out var lastActivity) &&
+                                                       (now - lastActivity) < staleThreshold;
 
                                 if (!hasRecentActivity)
                                 {
@@ -1678,6 +1688,35 @@ namespace KalshiBotAPI.Websockets
         public void RaiseMarketWebSocketHealthy(string[] markets)
         {
             MarketWebSocketHealthy?.Invoke(this, markets);
+        }
+
+        /// <summary>
+        /// Records that a message was received on the specified channel.
+        /// Used for stale subscription detection.
+        /// </summary>
+        /// <param name="channel">The channel name where the message was received.</param>
+        public void RecordChannelActivity(string channel)
+        {
+            _lastChannelActivity[channel] = DateTime.UtcNow;
+            ChannelMessageReceived?.Invoke(this, channel);
+        }
+
+        /// <summary>
+        /// Handles WebSocket disconnection by clearing local subscription state.
+        /// This ensures clean reconnection without stale state assumptions.
+        /// </summary>
+        public void HandleDisconnection()
+        {
+            _logger.LogDebug("Handling WebSocket disconnection - clearing local subscription state");
+            // Clear channel subscriptions but keep WatchedMarkets
+            // On reconnection, SubscribeToWatchedMarketsAsync will be called to re-establish subscriptions
+            _channelSubscriptions.Clear();
+            _lastChannelActivity.Clear();
+            _recentSubscriptions.Clear();
+            _pendingSubscriptionConfirmations.Clear();
+            _pendingMarketSubscriptions.Clear();
+            _subscriptionRetryInfo.Clear();
+            _marketChannelSubscriptionStates.Clear();
         }
     }
 }

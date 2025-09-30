@@ -55,29 +55,7 @@ namespace BacklashBot.Services
         /// </summary>
         public TimeSpan TotalWaitTime { get; private set; }
 
-        /// <summary>
-        /// Validates a market ticker for basic format requirements.
-        /// Logs a warning if the ticker is invalid but does not throw an exception.
-        /// </summary>
-        /// <param name="ticker">The market ticker to validate.</param>
-        /// <returns>True if the ticker is valid; otherwise, false.</returns>
-        private bool ValidateMarketTicker(string ticker)
-        {
-            if (string.IsNullOrWhiteSpace(ticker))
-            {
-                _logger.LogWarning("Invalid market ticker: ticker is null or empty");
-                return false;
-            }
 
-            // Basic validation: alphanumeric, dashes, underscores, reasonable length
-            if (!System.Text.RegularExpressions.Regex.IsMatch(ticker, @"^[a-zA-Z0-9_-]{1,50}$"))
-            {
-                _logger.LogWarning("Invalid market ticker format: {Ticker}", ticker);
-                return false;
-            }
-
-            return true;
-        }
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketDataInitializer"/> class.
         /// </summary>
@@ -152,13 +130,6 @@ namespace BacklashBot.Services
                         {
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
 
-                            if (!ValidateMarketTicker(ticker))
-                            {
-                                if (_enablePerformanceMetrics) failedInitializations++;
-                                _logger.LogWarning("Skipping initialization for invalid ticker: {Ticker}", ticker);
-                                continue;
-                            }
-
                             var marketStart = _enablePerformanceMetrics ? DateTime.UtcNow : DateTime.MinValue;
                             _logger.LogDebug("Initializing market {MarketTicker} on low-priority thread", ticker);
                             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
@@ -192,6 +163,11 @@ namespace BacklashBot.Services
                         }
 
                         _logger.LogDebug("Market initialization completed on low-priority thread");
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogDebug("Market initialization on low-priority thread cancelled");
+                        throw;
                     }
                     catch (Exception ex)
                     {

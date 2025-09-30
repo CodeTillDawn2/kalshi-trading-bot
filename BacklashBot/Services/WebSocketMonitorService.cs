@@ -48,6 +48,7 @@ namespace BacklashBot.Services
 
         // Enhanced metrics for granularity
         private readonly List<long> _responseTimesMs = new List<long>();
+        private readonly object _responseTimesLock = new object();
         private long _minResponseTimeMs = long.MaxValue;
         private long _maxResponseTimeMs = 0;
         private double _averageResponseTimeMs = 0;
@@ -270,18 +271,21 @@ namespace BacklashBot.Services
         {
             if (_enableMetrics)
             {
-                _responseTimesMs.Add(responseTimeMs);
-                _minResponseTimeMs = Math.Min(_minResponseTimeMs, responseTimeMs);
-                _maxResponseTimeMs = Math.Max(_maxResponseTimeMs, responseTimeMs);
-
-                // Calculate average
-                _averageResponseTimeMs = _responseTimesMs.Average();
-
-                // Calculate standard deviation
-                if (_responseTimesMs.Count > 1)
+                lock (_responseTimesLock)
                 {
-                    double sumOfSquares = _responseTimesMs.Sum(rt => Math.Pow(rt - _averageResponseTimeMs, 2));
-                    _responseTimeStdDev = Math.Sqrt(sumOfSquares / (_responseTimesMs.Count - 1));
+                    _responseTimesMs.Add(responseTimeMs);
+                    _minResponseTimeMs = Math.Min(_minResponseTimeMs, responseTimeMs);
+                    _maxResponseTimeMs = Math.Max(_maxResponseTimeMs, responseTimeMs);
+
+                    // Calculate average
+                    _averageResponseTimeMs = _responseTimesMs.Average();
+
+                    // Calculate standard deviation
+                    if (_responseTimesMs.Count > 1)
+                    {
+                        double sumOfSquares = _responseTimesMs.Sum(rt => Math.Pow(rt - _averageResponseTimeMs, 2));
+                        _responseTimeStdDev = Math.Sqrt(sumOfSquares / (_responseTimesMs.Count - 1));
+                    }
                 }
 
                 // Post to central performance monitor

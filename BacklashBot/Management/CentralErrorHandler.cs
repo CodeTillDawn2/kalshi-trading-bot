@@ -431,75 +431,7 @@ namespace BacklashBot.Management
             return isCatastrophic;
         }
 
-        /// <summary>
-        /// Adds a warning to the processing queue for later handling.
-        /// </summary>
-        /// <param name="ex">The exception associated with the warning, if any.</param>
-        /// <param name="identifier">Identifier for the source of the warning (e.g., service or component name).</param>
-        /// <param name="message">Optional custom message to use instead of the exception message.</param>
-        /// <remarks>
-        /// Warnings are processed during the next HandleErrors() call. If an exception is provided,
-        /// it may be converted to an error if it matches certain criteria during processing.
-        /// </remarks>
-        public void AddWarning(Exception ex, string identifier, string? message = null)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
-            }
-            if (ex == null && string.IsNullOrWhiteSpace(message))
-            {
-                throw new ArgumentException("Either an exception or a message must be provided.");
-            }
-
-            var cts = new CancellationTokenSource();
-            Warnings.Enqueue(new ErrorHandlerTaskInfo
-            {
-                OriginalException = ex,
-                FormattedMessage = message ?? ex?.Message ?? "Warning added directly.",
-                LogSourceCategory = identifier,
-                Severity = LogLevel.Warning,
-                Timestamp = DateTime.Now
-            });
-            WarningCount++;
-        }
-
-        /// <summary>
-        /// Adds an error to the processing queue for immediate handling.
-        /// </summary>
-        /// <param name="ex">The exception associated with the error. If null, a default exception is created.</param>
-        /// <param name="identifier">Identifier for the source of the error (e.g., service or component name).</param>
-        /// <param name="message">Optional custom message to use instead of the exception message.</param>
-        /// <remarks>
-        /// Errors are processed during the next HandleErrors() call. This method increments
-        /// the error count and updates the last error timestamp.
-        /// </remarks>
-        public void AddError(Exception ex, string identifier, string? message = null)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
-            }
-            if (ex == null && string.IsNullOrWhiteSpace(message))
-            {
-                throw new ArgumentException("Either an exception or a message must be provided.");
-            }
-
-            var cts = new CancellationTokenSource();
-            var timestamp = DateTime.Now;
-            Errors.Enqueue(new ErrorHandlerTaskInfo
-            {
-                OriginalException = ex ?? new UnhandledSmokehouseException(message ?? "Error added directly with no original exception."),
-                FormattedMessage = message ?? ex?.Message ?? "Error added directly.",
-                LogSourceCategory = identifier,
-                Severity = LogLevel.Error,
-                Timestamp = timestamp
-            });
-            ErrorCount++;
-            LastErrorDate = timestamp;
-        }
-
-
+      
         /// <summary>
         /// Performs a series of internet connectivity checks with exponential backoff retry logic.
         /// </summary>

@@ -717,6 +717,7 @@ namespace KalshiBotAPI.Websockets
                             if (result.MessageType == WebSocketMessageType.Close)
                             {
                                 _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                                _subscriptionManager.HandleDisconnection();
                                 break;
                             }
 
@@ -764,6 +765,7 @@ namespace KalshiBotAPI.Websockets
                         catch (WebSocketException ex) when (ex.Message.Contains("without completing the close handshake"))
                         {
                             _logger.LogWarning("WebSocket connection lost, will attempt to reconnect. Exception: {Message}, Inner: {Inner}", ex.Message, ex.InnerException?.Message ?? "None");
+                            _subscriptionManager.HandleDisconnection();
                             break;
                         }
                         catch (Exception ex)

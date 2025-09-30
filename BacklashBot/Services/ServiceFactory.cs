@@ -40,11 +40,23 @@ namespace BacklashBot.Services
         /// Services are cached per scope to avoid repeated resolution calls.
         /// </summary>
         /// <typeparam name="T">The type of service to retrieve.</typeparam>
-        /// <returns>The service instance, or null if the service scope is not initialized.</returns>
+        /// <returns>The service instance, or null if the service scope is not initialized or disposed.</returns>
         private T? GetService<T>() where T : class
         {
             if (_scopeManager.Scope?.ServiceProvider == null)
                 return null;
+
+            // Check if the service provider is disposed
+            try
+            {
+                // Try to access a property that would fail if disposed
+                var _ = _scopeManager.Scope.ServiceProvider.GetHashCode();
+            }
+            catch (ObjectDisposedException)
+            {
+                _logger.LogDebug("SF: ServiceProvider is disposed, returning null for {ServiceType}", typeof(T).Name);
+                return null;
+            }
 
             try
             {
@@ -56,6 +68,11 @@ namespace BacklashBot.Services
                 });
                 _logger.LogDebug("SF: Successfully resolved service: {ServiceType}", typeof(T).Name);
                 return service;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _logger.LogDebug(ex, "SF: ServiceProvider disposed during service resolution for {ServiceType}", typeof(T).Name);
+                return null;
             }
             catch (Exception ex)
             {

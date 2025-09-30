@@ -190,5 +190,18 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// </summary>
         /// <param name="markets">Array of market tickers that have restored WebSocket connections.</param>
         void RaiseMarketWebSocketHealthy(string[] markets);
+
+        /// <summary>
+        /// Records that a message was received on the specified channel.
+        /// Used for stale subscription detection.
+        /// </summary>
+        /// <param name="channel">The channel name where the message was received.</param>
+        void RecordChannelActivity(string channel);
+
+        /// <summary>
+        /// Handles WebSocket disconnection by clearing local subscription state.
+        /// This ensures clean reconnection without stale state assumptions.
+        /// </summary>
+        void HandleDisconnection();
     }
 }

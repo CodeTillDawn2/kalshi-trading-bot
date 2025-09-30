@@ -1661,5 +1661,43 @@ namespace KalshiBotAPI.Websockets
         {
             MarketWebSocketHealthy?.Invoke(this, markets);
         }
+
+        /// <summary>
+        /// Records that a message was received on the specified channel.
+        /// Used for stale subscription detection.
+        /// </summary>
+        /// <param name="channel">The channel name where the message was received.</param>
+        public void RecordChannelActivity(string channel)
+        {
+            var action = GetActionFromChannel(channel);
+            var deduplicationKey = $"{action}:";
+            _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Handles WebSocket disconnection by clearing local subscription state.
+        /// This ensures clean reconnection without stale state assumptions.
+        /// </summary>
+        public void HandleDisconnection()
+        {
+            _logger.LogInformation("Handling WebSocket disconnection - clearing local subscription state");
+
+            // Clear all channel subscriptions
+            _channelSubscriptions.Clear();
+
+            // Clear all market channel subscription states
+            _marketChannelSubscriptionStates.Clear();
+
+            // Clear pending confirmations
+            _pendingSubscriptionConfirmations.Clear();
+
+            // Clear pending market subscriptions
+            _pendingMarketSubscriptions.Clear();
+
+            // Clear recent subscriptions to force fresh subscriptions on reconnect
+            _recentSubscriptions.Clear();
+
+            _logger.LogInformation("Local subscription state cleared due to disconnection");
+        }
     }
 }

@@ -61,6 +61,21 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         private int _duplicateMessagesInWindow = 0;
 
+        /// <summary>
+        /// Total count of "Already subscribed" error messages detected.
+        /// </summary>
+        private int _alreadySubscribedErrorCount = 0;
+
+        /// <summary>
+        /// Timestamp of the last "Already subscribed" error warning log.
+        /// </summary>
+        private DateTime _lastAlreadySubscribedWarningTime = DateTime.UtcNow;
+
+        /// <summary>
+        /// Count of "Already subscribed" errors detected within the current time window.
+        /// </summary>
+        private int _alreadySubscribedErrorsInWindow = 0;
+
         // Message batching fields
         /// <summary>
         /// Queue for batching messages when message batching is enabled for high-volume scenarios.
@@ -531,6 +546,24 @@ namespace KalshiBotAPI.Websockets
                 if (MessageReceived != null)
                     MessageReceived?.Invoke(this, DateTime.UtcNow);
 
+                // Record channel activity for stale detection
+                string channelForActivity = msgType switch
+                {
+                    "orderbook_snapshot" => "orderbook_delta",
+                    "orderbook_delta" => "orderbook_delta",
+                    "ticker" => "ticker",
+                    "trade" => "trade",
+                    "fill" => "fill",
+                    "market_lifecycle_v2" => "market_lifecycle_v2",
+                    "event_lifecycle" => "event_lifecycle",
+                    _ => null
+                };
+
+                if (channelForActivity != null)
+                {
+                    _subscriptionManager.RecordChannelActivity(channelForActivity);
+                }
+
                 switch (msgType)
                 {
                     case "orderbook_snapshot":
@@ -581,6 +614,11 @@ namespace KalshiBotAPI.Websockets
                     }
                 }
                 LogPerformanceMetrics();
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown when cancellation token is set
+                _logger.LogDebug("WebSocket message processing cancelled during shutdown");
             }
             catch (JsonException ex)
             {
@@ -1274,6 +1312,11 @@ namespace KalshiBotAPI.Websockets
                     // Handle specific error codes
                     if (errorCode == 6 && errorMsg.Contains("Already subscribed"))
                     {
+                        // Rate limit "Already subscribed" error logging
+                        _alreadySubscribedErrorCount++;
+                        _alreadySubscribedErrorsInWindow++;
+                        CheckAlreadySubscribedWarnings();
+
                         // If we get "Already subscribed", treat it as successful subscription
                         // Try to extract the ID and update subscription state
                         if (data.TryGetProperty("id", out var idProp))
@@ -1294,7 +1337,7 @@ namespace KalshiBotAPI.Websockets
                                 }
                             }
 
-                            _logger.LogInformation("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
+                            _logger.LogDebug("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
 
                             // Remove from pending confirmations since it's already subscribed
                             _subscriptionManager.RemovePendingConfirmation(id);
@@ -1655,6 +1698,38 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 _lastDuplicateWarningTime = now;
+            }
+        }
+
+        /// <summary>
+        /// Checks and logs warnings for "Already subscribed" error message detection.
+        /// Tracks these errors within a time window and warns periodically to reduce log spam.
+        /// </summary>
+        private void CheckAlreadySubscribedWarnings()
+        {
+            var now = DateTime.UtcNow;
+            var timeSinceLastWarning = now - _lastAlreadySubscribedWarningTime;
+
+            if (timeSinceLastWarning.TotalSeconds >= 30 && _alreadySubscribedErrorCount > 0)
+            {
+                _logger.LogWarning("Already subscribed errors detected: {ErrorCount} total 'Already subscribed' errors in the last {TimeWindow}s. This indicates redundant subscription attempts.",
+                    _alreadySubscribedErrorCount, timeSinceLastWarning.TotalSeconds);
+
+                // Post metrics to central monitoring
+                if (!_enablePerformanceMonitoring)
+                {
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalAlreadySubscribedErrors", "Total Already Subscribed Errors", "Total number of 'Already subscribed' errors detected", _alreadySubscribedErrorCount, "count", "SubscriptionErrors", false);
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "AlreadySubscribedErrorsInWindow", "Already Subscribed Errors In Window", "Number of 'Already subscribed' errors in current time window", _alreadySubscribedErrorsInWindow, "count", "SubscriptionErrors", false);
+                }
+                else
+                {
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalAlreadySubscribedErrors", "Total Already Subscribed Errors", "Total number of 'Already subscribed' errors detected", _alreadySubscribedErrorCount, "count", "SubscriptionErrors", true);
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "AlreadySubscribedErrorsInWindow", "Already Subscribed Errors In Window", "Number of 'Already subscribed' errors in current time window", _alreadySubscribedErrorsInWindow, "count", "SubscriptionErrors", true);
+                }
+
+                // Reset window counters
+                _alreadySubscribedErrorsInWindow = 0;
+                _lastAlreadySubscribedWarningTime = now;
             }
         }
 

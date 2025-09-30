@@ -10,6 +10,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using BTimer = BacklashInterfaces.SmokehouseBot.Timers.ITimer;
@@ -1434,6 +1435,13 @@ namespace BacklashBot.Management
         /// <param name="state">The state object passed to the timer callback.</param>
         private async void MonitorAndHandleErrors(object state)
         {
+            // Skip if catastrophic error already detected to prevent repeated shutdown attempts
+            if (_errorHandler.CatastrophicErrorAlreadyDetected)
+            {
+                _logger.LogDebug("BRAIN: Skipping error monitoring - catastrophic error already detected");
+                return;
+            }
+
             if (await _errorHandler.HandleErrors())
             {
                 await ShutdownDashboardAsync();
@@ -1442,6 +1450,9 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: Attempting restart.");
                 try
                 {
+                    // Reset all services before restart to ensure fresh instances and clear cancelled tokens
+                    _serviceFactory.ResetAll();
+                    _statusTrackerService.ResetAll();
                     await StartDashboard();
                     _logger.LogInformation("BRAIN: Restarted.");
                 }
