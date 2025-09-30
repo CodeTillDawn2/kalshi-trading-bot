@@ -119,8 +119,7 @@ namespace BacklashOverseer.Services
                     description: "Time taken to aggregate snapshot groups",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Performance",
-                    metricsEnabled: true);
+                    category: "Performance");
             }
             else
             {
@@ -131,8 +130,7 @@ namespace BacklashOverseer.Services
                     description: "Time taken to aggregate snapshot groups",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Performance",
-                    metricsEnabled: false);
+                    category: "Performance");
             }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
@@ -222,8 +220,7 @@ namespace BacklashOverseer.Services
                     description: "Time taken to aggregate snapshot groups",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Performance",
-                    metricsEnabled: true);
+                    category: "Performance");
             }
             else
             {
@@ -234,8 +231,7 @@ namespace BacklashOverseer.Services
                     description: "Time taken to aggregate snapshot groups",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Performance",
-                    metricsEnabled: false);
+                    category: "Performance");
             }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());

@@ -119,8 +119,7 @@ namespace BacklashOverseer
                 description: "WebSocket event received",
                 value: 1,
                 unit: "count",
-                category: "WebSocket",
-                metricsEnabled: _enableOverseerPerformanceMetrics);
+                category: "WebSocket");
 
             // Subscribe to WebSocket events for real-time market data processing
             _webSocketClient.FillReceived += HandleFillEvent;
@@ -174,8 +173,7 @@ namespace BacklashOverseer
                 description: "WebSocket event received",
                 value: 1,
                 unit: "count",
-                category: "WebSocket",
-                metricsEnabled: _enableOverseerPerformanceMetrics);
+                category: "WebSocket");
             _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
@@ -200,8 +198,7 @@ namespace BacklashOverseer
                 description: "WebSocket event received",
                 value: 1,
                 unit: "count",
-                category: "WebSocket",
-                metricsEnabled: _enableOverseerPerformanceMetrics);
+                category: "WebSocket");
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
         }
 
@@ -226,8 +223,7 @@ namespace BacklashOverseer
                 description: "WebSocket event received",
                 value: 1,
                 unit: "count",
-                category: "WebSocket",
-                metricsEnabled: _enableOverseerPerformanceMetrics);
+                category: "WebSocket");
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
             // Process check-in data from brain instances
@@ -392,8 +388,7 @@ namespace BacklashOverseer
                     description: "Time taken to fetch API data",
                     value: stopwatch.Elapsed.TotalMilliseconds,
                     unit: "ms",
-                    category: "API",
-                    metricsEnabled: _enableOverseerPerformanceMetrics);
+                    category: "API");
 
                 _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp} in {Duration}ms", DateTime.UtcNow, stopwatch.ElapsedMilliseconds);
             }

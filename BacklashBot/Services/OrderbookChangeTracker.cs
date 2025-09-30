@@ -2139,12 +2139,12 @@ namespace BacklashBot.Services
             if (!enableMetrics)
             {
                 // Send disabled metric
-                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, false);
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category);
             }
             else
             {
                 // Record actual metric
-                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null);
             }
         }
 
@@ -2153,17 +2153,17 @@ namespace BacklashBot.Services
             if (_enablePerformanceMetrics)
             {
                 if (isSpeedDial)
-                    _performanceMonitor.RecordSpeedDialMetric("OrderbookChangeTracker", id, name, description, value, unit, category, null, null, null, true);
+                    _performanceMonitor.RecordSpeedDialMetric("OrderbookChangeTracker", id, name, description, value, unit, category, null, null, null);
                 else if (isCounter)
-                    _performanceMonitor.RecordCounterMetric("OrderbookChangeTracker", id, name, description, value, unit, category, true);
+                    _performanceMonitor.RecordCounterMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
                 else if (isNumeric)
-                    _performanceMonitor.RecordNumericDisplayMetric("OrderbookChangeTracker", id, name, description, value, unit, category, true);
+                    _performanceMonitor.RecordNumericDisplayMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
                 else if (isProgressBar)
-                    _performanceMonitor.RecordProgressBarMetric("OrderbookChangeTracker", id, name, description, value, unit, category, 0, 100, null, true);
+                    _performanceMonitor.RecordProgressBarMetric("OrderbookChangeTracker", id, name, description, value, unit, category, 0, 100, null);
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("OrderbookChangeTracker", id, name, description, value, unit, category, false);
+                _performanceMonitor.RecordDisabledMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
             }
         }
 

@@ -650,8 +650,7 @@ namespace BacklashOverseer.Services
                 description: "Number of brain instances managed",
                 value: _brains.Count,
                 unit: "count",
-                category: "Persistence",
-                metricsEnabled: true);
+                category: "Persistence");
 
             // Record total operations
             _performanceMonitor.RecordCounterMetric(
@@ -661,8 +660,7 @@ namespace BacklashOverseer.Services
                 description: "Total number of operations performed",
                 value: _totalOperations,
                 unit: "count",
-                category: "Persistence",
-                metricsEnabled: true);
+                category: "Persistence");
 
             // Record total history entries
             _performanceMonitor.RecordCounterMetric(
@@ -672,8 +670,7 @@ namespace BacklashOverseer.Services
                 description: "Total number of metric history entries",
                 value: TotalHistoryEntries,
                 unit: "count",
-                category: "Persistence",
-                metricsEnabled: true);
+                category: "Persistence");
         }
 
         /// <summary>

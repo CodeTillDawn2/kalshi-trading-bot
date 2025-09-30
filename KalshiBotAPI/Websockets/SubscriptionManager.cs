@@ -1432,8 +1432,7 @@ namespace KalshiBotAPI.Websockets
                         $"Performance metrics for {operation} operations",
                         0,
                         "",
-                        "Performance",
-                        false
+                        "Performance"
                     );
                     continue;
                 }
@@ -1499,8 +1498,7 @@ namespace KalshiBotAPI.Websockets
                         $"Lock contention metrics for {lockName}",
                         0,
                         "",
-                        "Performance",
-                        false
+                        "Performance"
                     );
                     continue;
                 }

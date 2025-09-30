@@ -1801,8 +1801,7 @@ namespace BacklashBotData.Data
                     description: $"Performance metric for {operationName}",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Database",
-                    metricsEnabled: true
+                    category: "Database"
                 );
             }
             else
@@ -1814,8 +1813,7 @@ namespace BacklashBotData.Data
                     description: $"Disabled performance metric for {operationName}",
                     value: duration.TotalMilliseconds,
                     unit: "ms",
-                    category: "Database",
-                    metricsEnabled: false
+                    category: "Database"
                 );
             }
         }

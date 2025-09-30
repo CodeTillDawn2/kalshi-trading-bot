@@ -288,17 +288,17 @@ namespace TradingStrategies.Trading.Overseer
         {
             if (metricsEnabled)
             {
-                _performanceMonitor.RecordCounterMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", (double)metrics["CacheHits"], "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordCounterMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", (double)metrics["CacheMisses"], "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordSpeedDialMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", (double)metrics["AverageClassificationTimeMs"], "ms", "Performance", null, null, null, metricsEnabled);
-                _performanceMonitor.RecordCounterMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", (double)metrics["ClassificationCount"], "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordCounterMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", (double)metrics["CacheHits"], "count", "Performance");
+                _performanceMonitor.RecordCounterMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", (double)metrics["CacheMisses"], "count", "Performance");
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", (double)metrics["AverageClassificationTimeMs"], "ms", "Performance", null, null, null);
+                _performanceMonitor.RecordCounterMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", (double)metrics["ClassificationCount"], "count", "Performance");
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", 0, "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", 0, "count", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", 0, "ms", "Performance", metricsEnabled);
-                _performanceMonitor.RecordDisabledMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", 0, "count", "Performance", metricsEnabled);
+                _performanceMonitor.RecordDisabledMetric(className, "CacheHits", "Cache Hits", "Number of cache hits during market type classification", 0, "count", "Performance");
+                _performanceMonitor.RecordDisabledMetric(className, "CacheMisses", "Cache Misses", "Number of cache misses during market type classification", 0, "count", "Performance");
+                _performanceMonitor.RecordDisabledMetric(className, "AverageClassificationTimeMs", "Average Classification Time", "Average time spent on market type classification", 0, "ms", "Performance");
+                _performanceMonitor.RecordDisabledMetric(className, "ClassificationCount", "Classification Count", "Total number of market type classifications performed", 0, "count", "Performance");
             }
         }
     }

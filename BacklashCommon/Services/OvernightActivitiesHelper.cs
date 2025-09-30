@@ -178,17 +178,17 @@ namespace BacklashCommon.Services
                 // Record to performance monitor
                 if (_dataStorageConfig.EnablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", "TotalExecutionTime", "Total Execution Time", "Total time for all overnight tasks", _performanceMetrics.TotalExecutionTimeMs, "ms", "Performance", null, null, null, true);
-                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "MarketsProcessed", "Markets Processed", "Number of markets processed", _performanceMetrics.MarketsProcessed, "count", "Performance", true);
-                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "ApiCallsMade", "API Calls Made", "Number of API calls during overnight tasks", _performanceMetrics.ApiCallsMade, "count", "Performance", true);
-                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "ErrorsEncountered", "Errors Encountered", "Number of errors during overnight tasks", _performanceMetrics.ErrorsEncountered, "count", "Performance", true);
+                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", "TotalExecutionTime", "Total Execution Time", "Total time for all overnight tasks", _performanceMetrics.TotalExecutionTimeMs, "ms", "Performance", null, null, null);
+                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "MarketsProcessed", "Markets Processed", "Number of markets processed", _performanceMetrics.MarketsProcessed, "count", "Performance");
+                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "ApiCallsMade", "API Calls Made", "Number of API calls during overnight tasks", _performanceMetrics.ApiCallsMade, "count", "Performance");
+                    _performanceMonitor.RecordCounterMetric("OvernightActivitiesHelper", "ErrorsEncountered", "Errors Encountered", "Number of errors during overnight tasks", _performanceMetrics.ErrorsEncountered, "count", "Performance");
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "TotalExecutionTime", "Total Execution Time", "Total time for all overnight tasks", _performanceMetrics.TotalExecutionTimeMs, "ms", "Performance", false);
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "MarketsProcessed", "Markets Processed", "Number of markets processed", _performanceMetrics.MarketsProcessed, "count", "Performance", false);
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "ApiCallsMade", "API Calls Made", "Number of API calls during overnight tasks", _performanceMetrics.ApiCallsMade, "count", "Performance", false);
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "ErrorsEncountered", "Errors Encountered", "Number of errors during overnight tasks", _performanceMetrics.ErrorsEncountered, "count", "Performance", false);
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "TotalExecutionTime", "Total Execution Time", "Total time for all overnight tasks", _performanceMetrics.TotalExecutionTimeMs, "ms", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "MarketsProcessed", "Markets Processed", "Number of markets processed", _performanceMetrics.MarketsProcessed, "count", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "ApiCallsMade", "API Calls Made", "Number of API calls during overnight tasks", _performanceMetrics.ApiCallsMade, "count", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", "ErrorsEncountered", "Errors Encountered", "Number of errors during overnight tasks", _performanceMetrics.ErrorsEncountered, "count", "Performance");
                 }
 
             }
@@ -517,11 +517,11 @@ namespace BacklashCommon.Services
                 // Record to performance monitor
                 if (_dataStorageConfig.EnablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", null, null, null, true);
+                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", null, null, null);
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", false);
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance");
                 }
             }
             catch (Exception ex)
@@ -533,11 +533,11 @@ namespace BacklashCommon.Services
                 // Record to performance monitor
                 if (_dataStorageConfig.EnablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", null, null, null, true);
+                    _performanceMonitor.RecordSpeedDialMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", null, null, null);
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance", false);
+                    _performanceMonitor.RecordDisabledMetric("OvernightActivitiesHelper", taskName, taskName, $"Duration of {taskName} task", taskStopwatch.ElapsedMilliseconds, "ms", "Performance");
                 }
                 throw;
             }

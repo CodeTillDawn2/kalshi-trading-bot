@@ -832,7 +832,7 @@ namespace TradingStrategies.Trading.Overseer
             {
                 foreach (var kvp in metrics)
                 {
-                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category, false);
+                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category);
                 }
                 return;
             }
@@ -846,46 +846,46 @@ namespace TradingStrategies.Trading.Overseer
                 switch (id)
                 {
                     case "TotalExecutionTime":
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "AverageExecutionTimeMs":
-                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "PeakMemoryUsage":
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "TotalSnapshotsProcessed":
-                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "PerformanceThresholdMs":
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "SlowOperationsCount":
-                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "RestingOrdersCount":
-                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "CurrentPosition":
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "CurrentCash":
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "TotalTradesExecuted":
-                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "AverageDecisionTimeMs":
-                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "AverageApplyTimeMs":
-                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "SlowDecisionsCount":
-                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     default:
-                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                 }
             }

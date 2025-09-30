@@ -253,12 +253,6 @@ namespace BacklashBot.Services
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
 
-                if (!ValidateMarketTicker(marketTicker))
-                {
-                    _logger.LogWarning("Skipping immediate refresh for invalid ticker: {MarketTicker}", marketTicker);
-                    return;
-                }
-
                 _logger.LogInformation("Triggering immediate refresh for {MarketTicker}", marketTicker);
                 await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
                 if (OnMarketUpdated != null)
@@ -344,12 +338,6 @@ namespace BacklashBot.Services
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                 if (marketTicker == null) continue;
-
-                if (!ValidateMarketTicker(marketTicker))
-                {
-                    _logger.LogWarning("Skipping refresh for invalid ticker: {MarketTicker}", marketTicker);
-                    continue;
-                }
 
                 var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
                 if (marketData == null)
@@ -475,54 +463,28 @@ namespace BacklashBot.Services
             string className = nameof(MarketRefreshService);
 
             // Always record TotalRefreshOperations
-            _performanceMonitor.RecordCounterMetric(className, "TotalRefreshOperations", "Total Refresh Operations", "Total number of refresh operations performed", TotalRefreshOperations, "count", "MarketRefresh", enabled);
+            _performanceMonitor.RecordCounterMetric(className, "TotalRefreshOperations", "Total Refresh Operations", "Total number of refresh operations performed", TotalRefreshOperations, "count", "MarketRefresh");
 
             if (enabled)
             {
-                _performanceMonitor.RecordSpeedDialMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 5000, criticalThreshold: 10000, enabled);
-                _performanceMonitor.RecordCounterMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh", enabled);
-                _performanceMonitor.RecordSpeedDialMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 1000, criticalThreshold: 2000, enabled);
-                _performanceMonitor.RecordCounterMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh", enabled);
-                _performanceMonitor.RecordSpeedDialMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 2000, criticalThreshold: 5000, enabled);
-                _performanceMonitor.RecordNumericDisplayMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh", enabled);
-                _performanceMonitor.RecordSpeedDialMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh", minThreshold: null, warningThreshold: 1, criticalThreshold: 0.5, enabled);
+                _performanceMonitor.RecordSpeedDialMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 5000, criticalThreshold: 10000);
+                _performanceMonitor.RecordCounterMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh");
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 1000, criticalThreshold: 2000);
+                _performanceMonitor.RecordCounterMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh");
+                _performanceMonitor.RecordSpeedDialMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh", minThreshold: null, warningThreshold: 2000, criticalThreshold: 5000);
+                _performanceMonitor.RecordNumericDisplayMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh");
+                _performanceMonitor.RecordSpeedDialMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh", minThreshold: null, warningThreshold: 1, criticalThreshold: 0.5);
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh", enabled);
-                _performanceMonitor.RecordDisabledMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh", enabled);
+                _performanceMonitor.RecordDisabledMetric(className, "LastWorkDuration", "Last Work Duration", "Duration of the last market refresh operation", _lastWorkDuration.TotalMilliseconds, "ms", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "LastWorkMarketCount", "Last Work Market Count", "Number of markets processed in the last refresh operation", _lastWorkMarketCount, "count", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "AverageRefreshTimePerMarket", "Average Refresh Time Per Market", "Average time spent per market refresh", _averageRefreshTimePerMarket.TotalMilliseconds, "ms", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "LastRefreshCount", "Last Refresh Count", "Total number of markets refreshed in the last operation", _lastRefreshCount, "count", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "LastCpuTime", "Last CPU Time", "CPU time used in the last refresh operation", _lastCpuTime.TotalMilliseconds, "ms", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "LastMemoryUsage", "Last Memory Usage", "Memory usage at the end of the last refresh operation", _lastMemoryUsage, "bytes", "MarketRefresh");
+                _performanceMonitor.RecordDisabledMetric(className, "RefreshThroughput", "Refresh Throughput", "Throughput (markets refreshed per second)", _refreshThroughput, "markets/sec", "MarketRefresh");
             }
-        }
-
-
-
-        /// <summary>
-        /// Validates a market ticker for basic format requirements.
-        /// Logs a warning if the ticker is invalid but does not throw an exception.
-        /// </summary>
-        /// <param name="ticker">The market ticker to validate.</param>
-        /// <returns>True if the ticker is valid; otherwise, false.</returns>
-        private bool ValidateMarketTicker(string ticker)
-        {
-            if (string.IsNullOrWhiteSpace(ticker))
-            {
-                _logger.LogWarning("Invalid market ticker: ticker is null or empty");
-                return false;
-            }
-
-            // Basic validation: alphanumeric, dashes, underscores, reasonable length
-            if (!System.Text.RegularExpressions.Regex.IsMatch(ticker, @"^[a-zA-Z0-9_-]{1,50}$"))
-            {
-                _logger.LogWarning("Invalid market ticker format: {Ticker}", ticker);
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

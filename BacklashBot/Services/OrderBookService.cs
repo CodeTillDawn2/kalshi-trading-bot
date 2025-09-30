@@ -1049,10 +1049,6 @@ namespace BacklashBot.Services
                     var noBid = orderbook.LastOrDefault(x => x.Side == "no")?.Price;
                     if (yesBid == null) yesBid = 0;
                     if (noBid == null) noBid = 0;
-                    if (yesBid.HasValue && noBid.HasValue && yesBid == 100 - noBid)
-                    {
-                        _logger.LogWarning("Invalid order book state for {MarketTicker}: YesBid={YesBid}, NoBid={NoBid}", marketTicker, yesBid, noBid);
-                    }
                 }
 
 
@@ -1180,15 +1176,15 @@ namespace BacklashBot.Services
             if (_config.EnablePerformanceMetrics)
             {
                 if (isSpeedDial)
-                    _performanceMonitor.RecordSpeedDialMetric("OrderBookService", id, name, description, value, unit, category, null, null, null, true);
+                    _performanceMonitor.RecordSpeedDialMetric("OrderBookService", id, name, description, value, unit, category, null, null, null);
                 else if (isCounter)
-                    _performanceMonitor.RecordCounterMetric("OrderBookService", id, name, description, value, unit, category, true);
+                    _performanceMonitor.RecordCounterMetric("OrderBookService", id, name, description, value, unit, category);
                 else if (isNumeric)
-                    _performanceMonitor.RecordNumericDisplayMetric("OrderBookService", id, name, description, value, unit, category, true);
+                    _performanceMonitor.RecordNumericDisplayMetric("OrderBookService", id, name, description, value, unit, category);
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("OrderBookService", id, name, description, value, unit, category, false);
+                _performanceMonitor.RecordDisabledMetric("OrderBookService", id, name, description, value, unit, category);
             }
         }
 

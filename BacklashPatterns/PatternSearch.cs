@@ -589,7 +589,7 @@ namespace BacklashPatterns
                         };
 
                         // Call the new method for speed dial metric
-                        performanceMonitor.RecordSpeedDialMetric("PatternSearch", "DetectPatternsAsync", "Pattern Detection Execution Time", "Time taken to detect patterns", (double)summary.TotalDetectionTimeMs, "ms", "Performance", 0, 10000, 5000, _enablePerformanceMetrics);
+                        performanceMonitor.RecordSpeedDialMetric("PatternSearch", "DetectPatternsAsync", "Pattern Detection Execution Time", "Time taken to detect patterns", (double)summary.TotalDetectionTimeMs, "ms", "Performance", 0, 10000, 5000);
                     }
                 }
 

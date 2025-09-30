@@ -341,13 +341,13 @@ namespace BacklashOverseer
             _signalrMessages++;
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMonitor.RecordCounterMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR", true);
-                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR", true);
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR");
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR", false);
-                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR", false);
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR");
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
             }
 
             _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
@@ -593,11 +593,11 @@ namespace BacklashOverseer
                     _checkInLatencyCount++;
                     if (_config.EnablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
                     }
                     else
                     {
-                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", false);
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
                     }
                 }
             }
@@ -722,11 +722,11 @@ namespace BacklashOverseer
                     _messageLatencyCount++;
                     if (_config.EnablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
                     }
                     else
                     {
-                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", false);
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
                     }
                 }
             }
@@ -767,11 +767,11 @@ namespace BacklashOverseer
                     _messageLatencyCount++;
                     if (_config.EnablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
                     }
                     else
                     {
-                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", false);
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
                     }
                 }
             }
@@ -828,13 +828,13 @@ namespace BacklashOverseer
             _signalrMessages++;
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMonitor.RecordCounterMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR", true);
-                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR", true);
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR");
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR", false);
-                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR", false);
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR");
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
             }
 
             _logger.LogInformation("Handshake received from connection: {ConnectionId}", connectionId);
@@ -949,11 +949,11 @@ namespace BacklashOverseer
                     _handshakeLatencyCount++;
                     if (_config.EnablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
                     }
                     else
                     {
-                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", false);
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
                     }
                 }
             }
@@ -1021,11 +1021,11 @@ namespace BacklashOverseer
                     _messageLatencyCount++;
                     if (_config.EnablePerformanceMetrics)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null, true);
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
                     }
                     else
                     {
-                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", false);
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
                     }
                 }
             }

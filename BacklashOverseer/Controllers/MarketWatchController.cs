@@ -601,8 +601,7 @@ namespace BacklashOverseer.Controllers
                     description: "Number of cache hits",
                     value: _localCacheHits,
                     unit: "count",
-                    category: "Cache",
-                    metricsEnabled: true);
+                    category: "Cache");
                 _performanceMonitor.RecordCounterMetric(
                     className: "MarketWatchController",
                     id: "CacheMisses",
@@ -610,8 +609,7 @@ namespace BacklashOverseer.Controllers
                     description: "Number of cache misses",
                     value: _localCacheMisses,
                     unit: "count",
-                    category: "Cache",
-                    metricsEnabled: true);
+                    category: "Cache");
                 _localCacheHits = 0;
                 _localCacheMisses = 0;
             }

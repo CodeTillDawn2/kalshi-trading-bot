@@ -2454,8 +2454,7 @@ namespace KalshiBotAPI.KalshiAPI
                     nameof(KalshiAPIService),
                     0,
                     10000,
-                    1000,
-                    _enablePerformanceMetrics);
+                    1000);
             }
         }
 

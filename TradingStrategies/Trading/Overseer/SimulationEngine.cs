@@ -185,19 +185,19 @@ namespace TradingStrategies.Trading.Overseer
                 // Record metrics to PerformanceMonitor
                 if (_enablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", LastExecutionTime.TotalMilliseconds, "ms", "Simulation", 0, 1000, 5000, true);
-                    _performanceMonitor.RecordProgressBarMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", LastMemoryUsed, "bytes", "Simulation", 0, 1000000, 10000000, true);
-                    _performanceMonitor.RecordNumericDisplayMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", LastThroughputSnapshotsPerSecond, "/s", "Simulation", true);
-                    _performanceMonitor.RecordCounterMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", snapshots.Count, "count", "Simulation", true);
-                    _performanceMonitor.RecordTrafficLightMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", _enablePerformanceMetrics ? 1 : 0, "", "Simulation", 0, 0.5, 1, true);
+                    _performanceMonitor.RecordSpeedDialMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", LastExecutionTime.TotalMilliseconds, "ms", "Simulation", 0, 1000, 5000);
+                    _performanceMonitor.RecordProgressBarMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", LastMemoryUsed, "bytes", "Simulation", 0, 1000000, 10000000);
+                    _performanceMonitor.RecordNumericDisplayMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", LastThroughputSnapshotsPerSecond, "/s", "Simulation");
+                    _performanceMonitor.RecordCounterMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", snapshots.Count, "count", "Simulation");
+                    _performanceMonitor.RecordTrafficLightMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", _enablePerformanceMetrics ? 1 : 0, "", "Simulation", 0, 0.5, 1);
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", 0, "ms", "Simulation", false);
-                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", 0, "bytes", "Simulation", false);
-                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", 0, "/s", "Simulation", false);
-                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", 0, "count", "Simulation", false);
-                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", 0, "", "Simulation", false);
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", 0, "ms", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", 0, "bytes", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", 0, "/s", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", 0, "count", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", 0, "", "Simulation");
                 }
             }
 
@@ -1003,23 +1003,23 @@ namespace TradingStrategies.Trading.Overseer
             {
                 if (_enablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", result.ExecutionTimeMs.Value, "ms", "PatternDetection", 0, 1000, 5000, true);
-                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", result.TotalCandlesProcessed ?? 0, "count", "PatternDetection", true);
-                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", result.TotalPatternsFound ?? 0, "count", "PatternDetection", true);
+                    _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", result.ExecutionTimeMs.Value, "ms", "PatternDetection", 0, 1000, 5000);
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", result.TotalCandlesProcessed ?? 0, "count", "PatternDetection");
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", result.TotalPatternsFound ?? 0, "count", "PatternDetection");
                     foreach (var kvp in result.PatternCheckTimes)
                     {
-                        _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", (double)kvp.Value, "ms", "PatternDetection", 0, 1000, 5000, true);
+                        _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", (double)kvp.Value, "ms", "PatternDetection", 0, 1000, 5000);
                     }
 
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", 0, "ms", "PatternDetection", false);
-                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", 0, "count", "PatternDetection", false);
-                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", 0, "count", "PatternDetection", false);
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", 0, "ms", "PatternDetection");
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", 0, "count", "PatternDetection");
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", 0, "count", "PatternDetection");
                     foreach (var kvp in result.PatternCheckTimes)
                     {
-                        _performanceMonitor.RecordDisabledMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", 0, "ms", "PatternDetection", false);
+                        _performanceMonitor.RecordDisabledMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", 0, "ms", "PatternDetection");
                     }
                 }
             }

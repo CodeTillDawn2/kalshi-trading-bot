@@ -37,7 +37,7 @@ namespace TradingStrategies.Trading.Overseer
             {
                 foreach (var kvp in metrics)
                 {
-                    RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category, false);
+                    RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category);
                 }
                 return;
             }
@@ -51,55 +51,55 @@ namespace TradingStrategies.Trading.Overseer
                 switch (id)
                 {
                     case "TotalExecutionTime":
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "AverageExecutionTimeMs":
-                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "PeakMemoryUsage":
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "TotalSnapshotsProcessed":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "PerformanceThresholdMs":
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "SlowOperationsCount":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "RestingOrdersCount":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "CurrentPosition":
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "CurrentCash":
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                     case "TotalTradesExecuted":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "AverageDecisionTimeMs":
-                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "AverageApplyTimeMs":
-                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "SlowDecisionsCount":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "MethodName":
-                        RecordNumericDisplayMetric(className, id, name, description, 0, unit, category, true); // or something
+                        RecordNumericDisplayMetric(className, id, name, description, 0, unit, category); // or something
                         break;
                     case "TotalExecutionTimeMs":
-                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null, true);
+                        RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
                         break;
                     case "TotalItemsProcessed":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "TotalItemsFound":
-                        RecordCounterMetric(className, id, name, description, value, unit, category, true);
+                        RecordCounterMetric(className, id, name, description, value, unit, category);
                         break;
                     case "ItemCheckTimes":
                         // Skip or handle differently
@@ -108,7 +108,7 @@ namespace TradingStrategies.Trading.Overseer
                         // Skip
                         break;
                     default:
-                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category, true);
+                        RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
                         break;
                 }
             }

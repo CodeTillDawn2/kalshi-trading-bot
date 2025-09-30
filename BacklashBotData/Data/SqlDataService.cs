@@ -974,8 +974,7 @@ namespace KalshiBotData.Data
                             description: $"Time to process a batch of {operations.Count} {operationName} operations",
                             value: stopwatch.ElapsedMilliseconds,
                             unit: "ms",
-                            category: "Database",
-                            metricsEnabled: true
+                            category: "Database"
                         );
                     }
                     else
@@ -987,8 +986,7 @@ namespace KalshiBotData.Data
                             description: $"Disabled metric for {operationName} batch processing",
                             value: stopwatch.ElapsedMilliseconds,
                             unit: "ms",
-                            category: "Database",
-                            metricsEnabled: false
+                            category: "Database"
                         );
                     }
 

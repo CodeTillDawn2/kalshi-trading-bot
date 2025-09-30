@@ -101,11 +101,11 @@ namespace BacklashBot.State
             // Record readiness state change metric
             if (!_enablePerformanceMetrics)
             {
-                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             else
             {
-                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             _logger.LogInformation("All readiness status indicators reset to initial state");
         }
@@ -135,11 +135,11 @@ namespace BacklashBot.State
             // Record initialization timing metric
             if (!_enablePerformanceMetrics)
             {
-                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness");
             }
             else
             {
-                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness", null, 10000, 30000, _enablePerformanceMetrics);
+                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness", null, 10000, 30000);
             }
 
             InitializationCompleted.SetResult(result);
@@ -147,11 +147,11 @@ namespace BacklashBot.State
             // Record readiness state change metric
             if (!_enablePerformanceMetrics)
             {
-                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             else
             {
-                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             _logger.LogInformation("Initialization completed with result: {Result}, timing: {Timing}ms", result, timing);
         }
@@ -181,11 +181,11 @@ namespace BacklashBot.State
             // Record browser ready timing metric
             if (!_enablePerformanceMetrics)
             {
-                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness");
             }
             else
             {
-                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness", null, 5000, 15000, _enablePerformanceMetrics);
+                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness", null, 5000, 15000);
             }
 
             BrowserReady.SetResult(result);
@@ -193,11 +193,11 @@ namespace BacklashBot.State
             // Record readiness state change metric
             if (!_enablePerformanceMetrics)
             {
-                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             else
             {
-                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness", _enablePerformanceMetrics);
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
             }
             _logger.LogInformation("Browser ready with result: {Result}, timing: {Timing}ms", result, timing);
         }

@@ -279,11 +279,11 @@ namespace KalshiBotAPI.Websockets
                 if (EnablePerformanceMetrics)
                 {
                     _asyncOperationTimes["Shutdown"] = stopwatch.Elapsed;
-                    _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null, metricsEnabled: true);
+                    _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
                 }
                 else
                 {
-                    _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", 0, "ms", "WebSocket", metricsEnabled: false);
+                    _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", 0, "ms", "WebSocket");
                 }
                 _logger.LogDebug("KalshiWebSocketClient.ShutdownAsync completed at {Timestamp}", DateTime.UtcNow);
             }
@@ -351,13 +351,13 @@ namespace KalshiBotAPI.Websockets
             {
                 _asyncOperationTimes[$"UpdateSubscription_{action}"] = stopwatch.Elapsed;
                 _semaphoreWaitCount.AddOrUpdate($"UpdateSubscription_{action}", 0, (k, v) => v + 1); // Assuming one wait per call
-                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null, metricsEnabled: true);
-                _performanceMonitor?.RecordCounterMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", _semaphoreWaitCount[$"UpdateSubscription_{action}"], "count", "WebSocket", metricsEnabled: true);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+                _performanceMonitor?.RecordCounterMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", _semaphoreWaitCount[$"UpdateSubscription_{action}"], "count", "WebSocket");
             }
             else
             {
-                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", 0, "ms", "WebSocket", metricsEnabled: false);
-                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", 0, "count", "WebSocket", metricsEnabled: false);
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", 0, "ms", "WebSocket");
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", 0, "count", "WebSocket");
             }
         }
 
@@ -399,11 +399,11 @@ namespace KalshiBotAPI.Websockets
             if (EnablePerformanceMetrics)
             {
                 _asyncOperationTimes["Connect"] = stopwatch.Elapsed;
-                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null, metricsEnabled: true);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
             }
             else
             {
-                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", 0, "ms", "WebSocket", metricsEnabled: false);
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", 0, "ms", "WebSocket");
             }
             if (_connectionManager.IsConnected())
             {
@@ -580,11 +580,11 @@ namespace KalshiBotAPI.Websockets
             if (EnablePerformanceMetrics)
             {
                 _asyncOperationTimes[$"SubscribeToChannel_{action}"] = stopwatch.Elapsed;
-                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null, metricsEnabled: true);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
             }
             else
             {
-                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", 0, "ms", "WebSocket", metricsEnabled: false);
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", 0, "ms", "WebSocket");
             }
         }
 
@@ -742,11 +742,11 @@ namespace KalshiBotAPI.Websockets
                                         _bufferUsageBytes.AddOrUpdate("WebSocketMessage", 0, (k, v) => v + fullMessage.Length);
 
                                         // Post to performance service
-                                        _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null, metricsEnabled: true);
+                                        _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
                                     }
                                     else
                                     {
-                                        _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", 0, "ms", "WebSocket", metricsEnabled: false);
+                                        _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", 0, "ms", "WebSocket");
                                     }
 
                                     messageBuilder.Clear();

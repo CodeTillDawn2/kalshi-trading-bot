@@ -127,8 +127,7 @@ namespace TradingStrategies.Trading.Helpers
                     description: "Performance metrics for strategy instantiation (disabled)",
                     value: 0,
                     unit: "",
-                    category: "Performance",
-                    metricsEnabled: false
+                    category: "Performance"
                 );
                 return;
             }
@@ -161,8 +160,7 @@ namespace TradingStrategies.Trading.Helpers
                     category: "Performance",
                     minThreshold: 0,
                     warningThreshold: 1000,
-                    criticalThreshold: 5000,
-                    metricsEnabled: true
+                    criticalThreshold: 5000
                 );
 
                 _performanceMonitor.RecordSpeedDialMetric(
@@ -175,8 +173,7 @@ namespace TradingStrategies.Trading.Helpers
                     category: "Performance",
                     minThreshold: 0,
                     warningThreshold: 100,
-                    criticalThreshold: 500,
-                    metricsEnabled: true
+                    criticalThreshold: 500
                 );
 
                 _performanceMonitor.RecordCounterMetric(
@@ -186,8 +183,7 @@ namespace TradingStrategies.Trading.Helpers
                     description: $"Total number of {strategyType} strategy instances created",
                     value: totalInstances,
                     unit: "count",
-                    category: "Performance",
-                    metricsEnabled: true
+                    category: "Performance"
                 );
 
                 _performanceMonitor.RecordNumericDisplayMetric(
@@ -197,8 +193,7 @@ namespace TradingStrategies.Trading.Helpers
                     description: $"Total memory allocated for {strategyType} strategy instantiation",
                     value: totalMemory,
                     unit: "bytes",
-                    category: "Performance",
-                    metricsEnabled: true
+                    category: "Performance"
                 );
 
                 _performanceMonitor.RecordCounterMetric(
@@ -208,8 +203,7 @@ namespace TradingStrategies.Trading.Helpers
                     description: $"Number of metric records for {strategyType} strategy instantiation",
                     value: metrics.Count,
                     unit: "count",
-                    category: "Performance",
-                    metricsEnabled: true
+                    category: "Performance"
                 );
             }
         }

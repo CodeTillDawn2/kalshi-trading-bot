@@ -235,11 +235,11 @@ namespace TradingStrategies.Trading.Overseer
         {
             if (!enabled)
             {
-                _performanceMonitor.RecordDisabledMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance", false);
+                _performanceMonitor.RecordDisabledMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance");
             }
             else
             {
-                _performanceMonitor.RecordSpeedDialMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance", null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance", null, null, null);
             }
         }
     }

@@ -48,11 +48,11 @@ namespace BacklashCommon.Services
             Interlocked.Increment(ref _cacheHits);
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance", true);
+                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance");
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance", false);
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance");
             }
             LogMetricsIfNeeded();
         }
@@ -67,11 +67,11 @@ namespace BacklashCommon.Services
             Interlocked.Increment(ref _cacheMisses);
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance", true);
+                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance");
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance", false);
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance");
             }
             LogMetricsIfNeeded();
         }
@@ -94,11 +94,11 @@ namespace BacklashCommon.Services
             }
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance", null, null, null, true);
+                _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance", null, null, null);
             }
             else
             {
-                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance", false);
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance");
             }
             LogMetricsIfNeeded();
         }
@@ -168,15 +168,15 @@ namespace BacklashCommon.Services
 
                 if (_config.EnablePerformanceMetrics)
                 {
-                    _performanceMonitor.RecordProgressBarMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance", 0, 50, 90, true);
-                    _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance", null, null, null, true);
-                    _performanceMonitor.RecordCounterMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance", true);
+                    _performanceMonitor.RecordProgressBarMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance", 0, 50, 90);
+                    _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance", null, null, null);
+                    _performanceMonitor.RecordCounterMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance");
                 }
                 else
                 {
-                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance", false);
-                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance", false);
-                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance", false);
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance");
                 }
 
                 _lastMetricsLog = DateTime.UtcNow;

@@ -959,7 +959,7 @@ namespace KalshiBotAPI.Websockets
         {
             if (_performanceMonitor != null && _enableMetrics)
             {
-                _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", operation, $"WebSocket {operation} Time", $"Time taken for {operation}", (double)milliseconds, "ms", "WebSocket", 0, 10000, 1000, _enableMetrics);
+                _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", operation, $"WebSocket {operation} Time", $"Time taken for {operation}", (double)milliseconds, "ms", "WebSocket", 0, 10000, 1000);
             }
         }
 
@@ -984,26 +984,26 @@ namespace KalshiBotAPI.Websockets
             double uptimePercentage = (DateTime.UtcNow - _managerStartTime).TotalMilliseconds > 0 ? TotalConnectedTimeMs / (DateTime.UtcNow - _managerStartTime).TotalMilliseconds * 100 : 0;
 
             // Post connection success rate as progress bar
-            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "ConnectionSuccessRate", "WebSocket Connection Success Rate", "Percentage of successful connections", ConnectionSuccessRate * 100, "%", "WebSocket", 0, 100, 95, _enableMetrics);
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "ConnectionSuccessRate", "WebSocket Connection Success Rate", "Percentage of successful connections", ConnectionSuccessRate * 100, "%", "WebSocket", 0, 100, 95);
 
             // Post throughput as speed dial
-            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "MessageThroughput", "WebSocket Message Throughput", "Messages received per second", MessageThroughput, "msg/sec", "WebSocket", 0, 1000, 100, _enableMetrics);
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "MessageThroughput", "WebSocket Message Throughput", "Messages received per second", MessageThroughput, "msg/sec", "WebSocket", 0, 1000, 100);
 
             // Post error rate as traffic light
-            _performanceMonitor.RecordTrafficLightMetric("WebSocketConnectionManager", "ErrorRate", "WebSocket Error Rate", "Percentage of messages with errors", ErrorRate * 100, "%", "WebSocket", 0, 5, 1, _enableMetrics);
+            _performanceMonitor.RecordTrafficLightMetric("WebSocketConnectionManager", "ErrorRate", "WebSocket Error Rate", "Percentage of messages with errors", ErrorRate * 100, "%", "WebSocket", 0, 5, 1);
 
             // Post bandwidth as speed dial
-            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "Bandwidth", "WebSocket Bandwidth", "Data received per second", BandwidthBps, "bytes/sec", "WebSocket", 0, 1000000, 100000, _enableMetrics);
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "Bandwidth", "WebSocket Bandwidth", "Data received per second", BandwidthBps, "bytes/sec", "WebSocket", 0, 1000000, 100000);
 
             // Post new metrics
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CacheSize", "Signature Cache Size", "Number of entries in signature cache", _cacheSize, "entries", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CurrentSessionUptime", "Current Session Uptime", "Time since last connection", _currentSessionUptime, "seconds", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageMessageSize", "Average Message Size", "Average size of received messages", _averageMessageSize, "bytes", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "PeakThroughput", "Peak Message Throughput", "Maximum messages per second achieved", _peakThroughput, "msg/sec", "WebSocket", 0, 1000, 100, _enableMetrics);
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MinConnectionLatency", "Min Connection Latency", "Minimum connection latency", _minConnectionLatency == long.MaxValue ? 0 : _minConnectionLatency, "ms", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MaxConnectionLatency", "Max Connection Latency", "Maximum connection latency", _maxConnectionLatency, "ms", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageSignatureGenerationTime", "Average Signature Generation Time", "Average time to generate RSA signature", _averageSignatureGenerationTime, "ms", "WebSocket", _enableMetrics);
-            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "UptimePercentage", "Uptime Percentage", "Percentage of time WebSocket has been connected", uptimePercentage, "%", "WebSocket", 0, 100, 99, _enableMetrics);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CacheSize", "Signature Cache Size", "Number of entries in signature cache", _cacheSize, "entries", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CurrentSessionUptime", "Current Session Uptime", "Time since last connection", _currentSessionUptime, "seconds", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageMessageSize", "Average Message Size", "Average size of received messages", _averageMessageSize, "bytes", "WebSocket");
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "PeakThroughput", "Peak Message Throughput", "Maximum messages per second achieved", _peakThroughput, "msg/sec", "WebSocket", 0, 1000, 100);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MinConnectionLatency", "Min Connection Latency", "Minimum connection latency", _minConnectionLatency == long.MaxValue ? 0 : _minConnectionLatency, "ms", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MaxConnectionLatency", "Max Connection Latency", "Maximum connection latency", _maxConnectionLatency, "ms", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageSignatureGenerationTime", "Average Signature Generation Time", "Average time to generate RSA signature", _averageSignatureGenerationTime, "ms", "WebSocket");
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "UptimePercentage", "Uptime Percentage", "Percentage of time WebSocket has been connected", uptimePercentage, "%", "WebSocket", 0, 100, 99);
 
             _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }

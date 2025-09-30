@@ -104,8 +104,7 @@ namespace TradingSimulator
                     milliseconds,
                     "ms",
                     "Performance",
-                    null, null, null,
-                    true
+                    null, null, null
                 );
             }
             else
@@ -117,8 +116,7 @@ namespace TradingSimulator
                     $"Time taken for {id}",
                     milliseconds,
                     "ms",
-                    "Performance",
-                    false
+                    "Performance"
                 );
             }
         }

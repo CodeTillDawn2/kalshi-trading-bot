@@ -277,7 +277,7 @@ namespace BacklashCommon.Services
 
                 if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "SaveSnapshotAsync", "Save Snapshot Execution Time", "Time taken to save a snapshot", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 1000, 5000, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "SaveSnapshotAsync", "Save Snapshot Execution Time", "Time taken to save a snapshot", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 1000, 5000);
                 }
 
                 if (_enablePerformanceMetrics)
@@ -409,7 +409,7 @@ namespace BacklashCommon.Services
 
                 if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "LoadManySnapshots", "Load Many Snapshots Execution Time", "Time taken to load multiple snapshots", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 10000, 50000, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "LoadManySnapshots", "Load Many Snapshots Execution Time", "Time taken to load multiple snapshots", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 10000, 50000);
                 }
 
                 if (_enablePerformanceMetrics)
