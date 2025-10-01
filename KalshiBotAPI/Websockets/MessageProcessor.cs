@@ -797,7 +797,7 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
-        /// Processes order book snapshot and delta messages, updating event counts and triggering events.
+        /// Processes order book snapshot and delta messages, enqueuing them for ordered processing.
         /// Handles both full snapshots and incremental updates to maintain current order book state.
         /// </summary>
         /// <param name="data">The JSON data containing the order book message.</param>
@@ -810,18 +810,29 @@ namespace KalshiBotAPI.Websockets
 
             try
             {
-                var offerType = msgType == "orderbook_snapshot" ? "SNP" : "DEL";
-                var eventArgs = new OrderBookEventArgs(offerType == "SNP" ? "snapshot" : "delta", data);
-                OrderBookReceived?.Invoke(this, eventArgs);
-
-                if (_isDataPersistenceEnabled)
+                // Extract sid and seq for enqueuing
+                if (data.TryGetProperty("sid", out var sidProp) && data.TryGetProperty("seq", out var seqProp))
                 {
-                    _logger.LogDebug("Persisting order book data: {MsgType}, offerType: {OfferType}", msgType, offerType);
-                    await _sqlDataService.StoreOrderBookAsync(data, offerType);
+                    var sid = sidProp.GetInt32();
+                    var seq = seqProp.GetInt64();
+                    var offerType = msgType == "orderbook_snapshot" ? "SNP" : "DEL";
+
+                    // Enqueue the message for ordered processing
+                    _subscriptionManager.EnqueueOrderBookMessage(sid, data, offerType, seq);
+
+                    if (_isDataPersistenceEnabled)
+                    {
+                        _logger.LogDebug("Persisting order book data: {MsgType}, offerType: {OfferType}", msgType, offerType);
+                        await _sqlDataService.StoreOrderBookAsync(data, offerType);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Skipping data persistence for order book: DataPersistence is disabled");
+                    }
                 }
                 else
                 {
-                    _logger.LogDebug("Skipping data persistence for order book: DataPersistence is disabled");
+                    _logger.LogWarning("Order book message missing sid or seq properties, cannot enqueue for ordered processing");
                 }
             }
             catch (Exception ex)
@@ -1198,6 +1209,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Processes general confirmation messages for various operations (updates, subscriptions).
         /// Handles both subscription confirmations with SIDs and general operation confirmations.
+        /// Enqueues ok messages with seq for ordered processing.
         /// </summary>
         /// <param name="data">The JSON data containing the confirmation message.</param>
         /// <returns>A task representing the asynchronous processing operation.</returns>
@@ -1254,6 +1266,14 @@ namespace KalshiBotAPI.Websockets
 
                     // Remove from pending confirmations
                     _subscriptionManager.RemovePendingConfirmation(id);
+                }
+
+                // Enqueue ALL ok messages with sid and seq for ordered processing
+                if (data.TryGetProperty("sid", out var okSidProp) && data.TryGetProperty("seq", out var okSeqProp))
+                {
+                    var okSid = okSidProp.GetInt32();
+                    var okSeq = okSeqProp.GetInt64();
+                    _subscriptionManager.EnqueueOkMessage(okSid, data, okSeq);
                 }
             }
             catch (Exception ex)

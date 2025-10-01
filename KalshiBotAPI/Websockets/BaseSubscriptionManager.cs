@@ -47,9 +47,9 @@ namespace KalshiBotAPI.Websockets
         private Task _subscriptionQueueProcessorTask = null!;
         private Task _pendingConfirmationMonitorTask = null!;
         private readonly object _sequenceNumberSynchronizationLock = new object();
+        private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
         private long _latestProcessedSequenceNumber = 0;
         // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
-        private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
         private readonly object _orderBookQueueSynchronizationLock = new object();
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
         private Task _orderBookQueueProcessorTask = null!;
@@ -91,6 +91,11 @@ namespace KalshiBotAPI.Websockets
         /// Event raised when WebSocket health is restored for specific markets.
         /// </summary>
         public event EventHandler<string[]>? MarketWebSocketHealthy;
+
+        /// <summary>
+        /// Event raised when an order book update is received.
+        /// </summary>
+        public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
 
         // Health monitoring
         private Task _healthMonitorTask = null!;
@@ -1038,7 +1043,9 @@ namespace KalshiBotAPI.Websockets
 
                     hasPendingUpdates = _orderBookUpdateQueue.Count > 0 &&
                                 _orderBookUpdateQueue.UnorderedItems.Any(item =>
-                                    item.Element.Data.GetProperty("msg").GetProperty("market_ticker").GetString() == marketTicker);
+                                    item.Element.Data.TryGetProperty("msg", out var msg) &&
+                                    msg.TryGetProperty("market_ticker", out var tickerProp) &&
+                                    tickerProp.GetString() == marketTicker);
                 }
 
                 if (!hasPendingUpdates)
@@ -1267,7 +1274,7 @@ namespace KalshiBotAPI.Websockets
 
         /// <summary>
         /// Background task that periodically processes the order book update queue.
-        /// Handles order book messages in sequence order, updating sequence numbers and processing updates.
+        /// Handles all messages (orderbook and ok) in strict sequence order with buffering for true gaps.
         /// </summary>
         /// <returns>A task representing the background operation.</returns>
         private async Task ProcessOrderBookQueuePeriodicallyAsync()
@@ -1275,55 +1282,88 @@ namespace KalshiBotAPI.Websockets
             _logger.LogDebug("Starting order book queue processor");
             while (!_processingCancellationToken.IsCancellationRequested)
             {
-                try
+                bool processedAny = false;
+                var expectedSeq = _latestProcessedSequenceNumber + 1;
+
+                lock (_orderBookQueueSynchronizationLock)
                 {
-                    if (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
+                    while (_orderBookUpdateQueue.TryPeek(out var message, out var seq))
                     {
-                        _logger.LogDebug("Processing order book message with seq {Seq}", seq);
-
-                        // Check for sequence gap (global across all markets)
-                        var lockWaitStart = DateTime.UtcNow;
-                        lock (_sequenceNumberSynchronizationLock)
+                        if (seq == expectedSeq)
                         {
-                            var lockWaitTime = DateTime.UtcNow - lockWaitStart;
-                            RecordLockMetrics("SequenceNumberLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+                            // Process the message (either orderbook or ok)
+                            _orderBookUpdateQueue.TryDequeue(out _, out _);
+                            _latestProcessedSequenceNumber = seq;
 
-                            if (_latestProcessedSequenceNumber > 0 && seq != _latestProcessedSequenceNumber + 1)
+                            // Only raise OrderBookReceived event for actual orderbook messages
+                            if (message.OfferType != "ok")
                             {
-                                _logger.LogWarning("Sequence gap detected: expected {Expected}, got {Seq}. Triggering full orderbook channel resubscribe for new snapshot.",
-                                    _latestProcessedSequenceNumber + 1, seq);
-                                // Trigger resubscribe of entire orderbook channel to get new snapshot
-                                _ = Task.Run(async () =>
-                                {
-                                    try
-                                    {
-                                        await UnsubscribeFromChannelAsync("orderbook");
-                                        await SubscribeToChannelAsync("orderbook", WatchedMarkets.ToArray());
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _logger.LogError(ex, "Failed to resubscribe orderbook channel after sequence gap");
-                                    }
-                                }, _processingCancellationToken);
+                                var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
+                                OrderBookReceived?.Invoke(this, eventArgs);
                             }
-
-                            if (seq > _latestProcessedSequenceNumber)
-                            {
-                                _latestProcessedSequenceNumber = seq;
-                            }
+                            processedAny = true;
                         }
-
-                        // Process the message
-                        var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                        // TODO: Coordinate with MessageProcessor to trigger OrderBookReceived event
+                        else if (seq > expectedSeq)
+                        {
+                            // Gap detected, handle outside lock to avoid await in lock
+                            break;
+                        }
+                        else
+                        {
+                            // seq < expected, duplicate or old, skip
+                            _orderBookUpdateQueue.TryDequeue(out _, out _);
+                            _logger.LogDebug("Skipping old or duplicate seq {Seq}", seq);
+                        }
                     }
                 }
-                catch (Exception ex)
+
+                // Handle gap outside lock
+                if (_orderBookUpdateQueue.TryPeek(out var gapMessage, out var gapSeq) && gapSeq > expectedSeq)
                 {
-                    _logger.LogError(ex, "Error processing order book queue message");
+                    // Gap detected, wait up to 1 second for the missing sequence
+                    var waitStart = DateTime.UtcNow;
+                    bool gapFilled = false;
+
+                    while ((DateTime.UtcNow - waitStart).TotalSeconds < 1 && !gapFilled)
+                    {
+                        await Task.Delay(10, _processingCancellationToken);
+
+                        // Check if the expected sequence is now anywhere in the queue
+                        lock (_orderBookQueueSynchronizationLock)
+                        {
+                            gapFilled = _orderBookUpdateQueue.UnorderedItems.Any(item => item.Priority == expectedSeq);
+                        }
+                    }
+
+                    lock (_orderBookQueueSynchronizationLock)
+                    {
+                        if (gapFilled)
+                        {
+                            // The gap was filled, continue processing from the expected sequence
+                            continue;
+                        }
+                        else
+                        {
+                            // Gap not filled after 1 second - this is a true missing message
+                            // Process the out-of-order message without logging a warning
+                            _orderBookUpdateQueue.TryDequeue(out _, out _);
+                            _latestProcessedSequenceNumber = gapSeq;
+
+                            // Process the out-of-order message
+                            if (gapMessage.OfferType != "ok")
+                            {
+                                var eventArgs = new OrderBookEventArgs(gapMessage.OfferType, gapMessage.Data);
+                                OrderBookReceived?.Invoke(this, eventArgs);
+                            }
+                            processedAny = true;
+                        }
+                    }
                 }
 
-                await Task.Delay(10, _processingCancellationToken);
+                if (!processedAny)
+                {
+                    await Task.Delay(10, _processingCancellationToken);
+                }
             }
             _logger.LogDebug("Order book queue processor stopped");
         }
@@ -1675,6 +1715,35 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Enqueues an order book message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="offerType">The offer type.</param>
+        /// <param name="seq">The sequence number.</param>
+        public void EnqueueOrderBookMessage(int sid, JsonElement data, string offerType, long seq)
+        {
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Enqueue((data, offerType, seq, Guid.NewGuid()), seq);
+            }
+        }
+
+        /// <summary>
+        /// Enqueues an ok message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="seq">The sequence number.</param>
+        public void EnqueueOkMessage(int sid, JsonElement data, long seq)
+        {
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Enqueue((data, "ok", seq, Guid.NewGuid()), seq);
+            }
+        }
+
+        /// <summary>
         /// Handles WebSocket disconnection by clearing local subscription state.
         /// This ensures clean reconnection without stale state assumptions.
         /// </summary>
@@ -1696,6 +1765,13 @@ namespace KalshiBotAPI.Websockets
 
             // Clear recent subscriptions to force fresh subscriptions on reconnect
             _recentSubscriptions.Clear();
+
+            // Clear order book queue and reset sequence tracking
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Clear();
+                _latestProcessedSequenceNumber = 0;
+            }
 
             _logger.LogInformation("Local subscription state cleared due to disconnection");
         }

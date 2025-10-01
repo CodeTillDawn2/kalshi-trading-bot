@@ -707,7 +707,7 @@ namespace KalshiBotAPI.Websockets
                         try
                         {
                             var webSocket = _connectionManager.GetWebSocket();
-                            if (webSocket == null || webSocket.State != WebSocketState.Open)
+                            if (webSocket == null)
                             {
                                 await Task.Delay(1000, _globalCancellationToken);
                                 continue;

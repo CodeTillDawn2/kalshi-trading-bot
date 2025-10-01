@@ -1,5 +1,6 @@
 using BacklashInterfaces.Enums;
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 namespace KalshiBotAPI.WebSockets.Interfaces
 {
@@ -197,6 +198,23 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// </summary>
         /// <param name="channel">The channel name where the message was received.</param>
         void RecordChannelActivity(string channel);
+
+        /// <summary>
+        /// Enqueues an order book message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="offerType">The offer type.</param>
+        /// <param name="seq">The sequence number.</param>
+        void EnqueueOrderBookMessage(int sid, JsonElement data, string offerType, long seq);
+
+        /// <summary>
+        /// Enqueues an ok message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="seq">The sequence number.</param>
+        void EnqueueOkMessage(int sid, JsonElement data, long seq);
 
         /// <summary>
         /// Handles WebSocket disconnection by clearing local subscription state.
