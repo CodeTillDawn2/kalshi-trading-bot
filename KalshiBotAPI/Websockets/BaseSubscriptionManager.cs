@@ -53,7 +53,10 @@ namespace KalshiBotAPI.Websockets
         private readonly object _orderBookQueueSynchronizationLock = new object();
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
         private Task _orderBookQueueProcessorTask = null!;
-        private CancellationToken _processingCancellationToken;
+        /// <summary>
+        /// Cancellation token used to coordinate graceful shutdown of background processing tasks.
+        /// </summary>
+        protected CancellationToken _processingCancellationToken;
 
         // Configuration options
         private readonly int _subscriptionTimeoutMs;
@@ -96,6 +99,30 @@ namespace KalshiBotAPI.Websockets
         /// Event raised when an order book update is received.
         /// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+
+        /// <summary>
+        /// Event raised when an order book message has been processed in sequence order.
+        /// Allows subscribers to be notified after ordered processing is complete.
+        /// </summary>
+        public event EventHandler<OrderBookEventArgs>? OrderBookProcessed;
+
+        /// <summary>
+        /// Raises the OrderBookReceived event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected virtual void OnOrderBookReceived(OrderBookEventArgs e)
+        {
+            OrderBookReceived?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Raises the OrderBookProcessed event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected virtual void OnOrderBookProcessed(OrderBookEventArgs e)
+        {
+            OrderBookProcessed?.Invoke(this, e);
+        }
 
         // Health monitoring
         private Task _healthMonitorTask = null!;
@@ -455,7 +482,7 @@ namespace KalshiBotAPI.Websockets
         /// receive real-time data for all supported channel types.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SubscribeToWatchedMarketsAsync()
+        public virtual async Task SubscribeToWatchedMarketsAsync()
         {
             try
             {
@@ -1295,11 +1322,11 @@ namespace KalshiBotAPI.Websockets
                             _orderBookUpdateQueue.TryDequeue(out _, out _);
                             _latestProcessedSequenceNumber = seq;
 
-                            // Only raise OrderBookReceived event for actual orderbook messages
+                            // Only raise OrderBookProcessed event for actual orderbook messages
                             if (message.OfferType != "ok")
                             {
                                 var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                                OrderBookReceived?.Invoke(this, eventArgs);
+                                OnOrderBookProcessed(eventArgs);
                             }
                             processedAny = true;
                         }
@@ -1353,7 +1380,7 @@ namespace KalshiBotAPI.Websockets
                             if (gapMessage.OfferType != "ok")
                             {
                                 var eventArgs = new OrderBookEventArgs(gapMessage.OfferType, gapMessage.Data);
-                                OrderBookReceived?.Invoke(this, eventArgs);
+                                OnOrderBookProcessed(eventArgs);
                             }
                             processedAny = true;
                         }

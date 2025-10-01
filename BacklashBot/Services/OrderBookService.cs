@@ -105,14 +105,11 @@ namespace BacklashBot.Services
             _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _config = config;
 
-            _logger.LogDebug("OrderBookService constructor initializing processors...");
-            StartProcessors();
+            _logger.LogDebug("OrderBookService constructor initialized");
             _metricsTimer = new System.Timers.Timer(10000); // 10 seconds
             _metricsTimer.Elapsed += (sender, e) => RecordPerformanceMetrics();
             _metricsTimer.AutoReset = true;
             _metricsTimer.Start();
-            _logger.LogDebug("OrderBookService initialized with processors and metrics timer, EventProcessor Status: {EventStatus}, TickerProcessor Status: {TickerStatus}, NotificationProcessor Status: {NotificationStatus}",
-                _eventProcessor.Status, _tickerProcessor.Status, _notificationProcessor.Status);
         }
 
         /// <summary>
@@ -837,13 +834,13 @@ namespace BacklashBot.Services
                 var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
                 bool priceChanged = false;
 
-                if (offerType == "snapshot")
+                if (offerType == "SNP")
                 {
                     _logger.LogInformation("Processing snapshot for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                     updatedOrderbook = ProcessOrderBookSnapshotAsync(message, marketTicker);
                     priceChanged = true;
                 }
-                else if (offerType == "delta")
+                else if (offerType == "DEL")
                 {
                     _logger.LogDebug("Processing delta for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                     updatedOrderbook = ProcessOrderBookDeltaAsync(message, marketTicker);

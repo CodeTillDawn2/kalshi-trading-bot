@@ -1280,7 +1280,7 @@ namespace KalshiBotAPI.Websockets
 
                         // Process the message
                         var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                        // TODO: Coordinate with MessageProcessor to trigger OrderBookReceived event
+                        OnOrderBookReceived(eventArgs);
                     }
                 }
                 catch (Exception ex)

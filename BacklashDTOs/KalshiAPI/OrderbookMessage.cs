@@ -71,7 +71,7 @@ namespace BacklashDTOs.KalshiAPI
                     ? tickerProp.GetString() ?? string.Empty
                     : string.Empty;
 
-                if (offerType == "snapshot")
+                if (offerType == "SNP")
                 {
                     YesOrders = new List<PriceLevel>();
                     NoOrders = new List<PriceLevel>();
@@ -94,7 +94,7 @@ namespace BacklashDTOs.KalshiAPI
                         }));
                     }
                 }
-                else if (offerType == "delta") // DEL
+                else if (offerType == "DEL") // delta
                 {
                     Price = msg.TryGetProperty("price", out var priceProp) ? priceProp.GetInt32() : null;
                     Delta = msg.TryGetProperty("delta", out var deltaProp) ? deltaProp.GetInt32() : null;

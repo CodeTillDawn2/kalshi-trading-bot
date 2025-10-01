@@ -1,4 +1,5 @@
 using BacklashInterfaces.Enums;
+using BacklashDTOs;
 using System.Collections.Concurrent;
 using System.Text.Json;
 
@@ -179,6 +180,12 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// Event raised when WebSocket health is restored for specific markets.
         /// </summary>
         event EventHandler<string[]>? MarketWebSocketHealthy;
+
+        /// <summary>
+        /// Event raised when an order book message has been processed in sequence order.
+        /// Allows subscribers to be notified after ordered processing is complete.
+        /// </summary>
+        event EventHandler<OrderBookEventArgs>? OrderBookProcessed;
 
         /// <summary>
         /// Raises the MarketWebSocketUnhealthy event for the specified markets.

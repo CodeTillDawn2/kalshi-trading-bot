@@ -183,6 +183,16 @@ namespace KalshiBotAPI.Websockets
         public event EventHandler<DateTime>? MessageReceived;
 
         /// <summary>
+        /// Handles order book processed events from the subscription manager and forwards them as OrderBookReceived events.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The order book event arguments.</param>
+        private void OnOrderBookProcessed(object? sender, OrderBookEventArgs e)
+        {
+            OrderBookReceived?.Invoke(this, e);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the MessageProcessor with required dependencies.
         /// Sets up internal data structures for message processing, event counting, and queue management.
         /// </summary>
@@ -254,6 +264,9 @@ namespace KalshiBotAPI.Websockets
 
             _logger.LogInformation("MessageProcessor initialized with configuration: Batching={BatchingEnabled}, AdvancedLocking={AdvancedLockingEnabled}, Metrics={MetricsEnabled}",
                 _config.EnableMessageBatching, _config.UseAdvancedLocking, _enablePerformanceMonitoring);
+
+            // Subscribe to order book processed events from subscription manager
+            _subscriptionManager.OrderBookProcessed += OnOrderBookProcessed;
         }
 
         /// <summary>

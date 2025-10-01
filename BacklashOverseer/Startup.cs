@@ -17,6 +17,7 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotLogging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -111,7 +112,7 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
-            services.AddScoped<ISubscriptionManager>(sp => new BaseSubscriptionManager(
+            services.AddScoped<ISubscriptionManager>(sp => new OverseerSubscriptionManager(
                 sp.GetRequiredService<ILogger<BaseSubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
