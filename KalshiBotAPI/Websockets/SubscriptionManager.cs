@@ -348,9 +348,9 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                // Only add pending confirmations for update_subscription, not for initial subscribe
-                // Subscribe confirmations may not include ID, so we don't track them as pending
-                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage && message.Contains("\"cmd\": \"update_subscription\""))
+                // Track pending confirmations for both initial subscribe and update_subscription messages
+                // Both can receive "ok" or "subscribed" confirmations with IDs
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage)
                 {
                     _pendingSubscriptionConfirmations.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
                 }
@@ -821,6 +821,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "market_lifecycle_v2" => "lifecycle",
+            "event_lifecycle" => "lifecycle",
             _ => throw new ArgumentException($"Unknown channel: {channel}")
         };
 
@@ -1057,7 +1058,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "lifecycle" => "market_lifecycle_v2",
-            "event_lifecycle" => "market_lifecycle_v2",
+            "event_lifecycle" => "event_lifecycle",
             _ => throw new ArgumentException($"Invalid action: {action}")
         };
 

@@ -458,7 +458,16 @@ namespace KalshiBotAPI.Websockets
                             // Use batching or direct processing based on configuration
                             if (_config.EnableMessageBatching)
                             {
-                                _messageBatchQueue.Enqueue(fullMessage);
+                                // Process confirmation messages immediately to avoid timeout issues
+                                // when batching is enabled, as they are critical for subscription management
+                                if (IsConfirmationMessage(fullMessage))
+                                {
+                                    await ProcessMessageAsync(fullMessage);
+                                }
+                                else
+                                {
+                                    _messageBatchQueue.Enqueue(fullMessage);
+                                }
                             }
                             else
                             {
@@ -1411,6 +1420,31 @@ namespace KalshiBotAPI.Websockets
             }
 
             await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Checks if a WebSocket message is a confirmation message that should be processed immediately.
+        /// Used to prioritize processing of critical confirmation messages when batching is enabled.
+        /// </summary>
+        /// <param name="message">The raw JSON message string to check.</param>
+        /// <returns>True if the message is a confirmation type message, false otherwise.</returns>
+        private bool IsConfirmationMessage(string message)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(message);
+                if (doc.RootElement.TryGetProperty("type", out var typeProp))
+                {
+                    var type = typeProp.GetString();
+                    return type == "ok" || type == "subscribed" || type == "unsubscribed" || type == "error";
+                }
+                return false;
+            }
+            catch
+            {
+                // If we can't parse it, assume it's not a confirmation message
+                return false;
+            }
         }
 
         /// <summary>

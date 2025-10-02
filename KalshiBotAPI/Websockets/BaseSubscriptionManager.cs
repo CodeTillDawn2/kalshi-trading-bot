@@ -920,7 +920,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "market_lifecycle_v2" => "lifecycle",
-            "event_lifecycle" => "lifecycle",
+            "event_lifecycle" => "event_lifecycle",
             _ => throw new ArgumentException($"Unknown channel: {channel}")
         };
 
@@ -1159,6 +1159,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "lifecycle" => "market_lifecycle_v2",
+            "event_lifecycle" => "event_lifecycle",
             _ => throw new ArgumentException($"Invalid action: {action}")
         };
 

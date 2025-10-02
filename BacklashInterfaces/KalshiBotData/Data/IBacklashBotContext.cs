@@ -182,14 +182,15 @@ namespace BacklashBotData.Data.Interfaces
         /// <param name="excludedStatuses">Optional set of excluded market statuses.</param>
         /// <param name="includedMarkets">Optional set of included market tickers.</param>
         /// <param name="excludedMarkets">Optional set of excluded market tickers.</param>
+        /// <param name="eventTicker">Optional event ticker to filter markets by.</param>
         /// <param name="hasMarketWatch">Optional flag to filter markets with a market watch.</param>
         /// <param name="minimumInterestScore">Optional minimum interest score threshold.</param>
         /// <param name="maxInterestScoreDate">Optional maximum date for interest score filtering.</param>
         /// <param name="maxAPILastFetchTime">Optional maximum API last fetch time for filtering.</param>
         /// <returns>A list of filtered market DTOs.</returns>
         Task<List<MarketDTO>> GetMarkets(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
-            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, bool? hasMarketWatch = null,
-            double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, string? eventTicker = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
 
         /// <summary>
         /// Updates the last candlestick timestamp for a market.

@@ -1,4 +1,5 @@
 using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashInterfaces.PerformanceMetrics;
@@ -379,6 +380,15 @@ namespace BacklashOverseer
                 var exchangeScheduleResult = await kalshiApiService.FetchExchangeScheduleAsync();
                 _logger?.LogInformation("Exchange schedule fetch completed: {ProcessedCount} processed, {ErrorCount} errors",
                     exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
+
+                // Update CurrentSchedule table with flattened schedule data
+                _logger?.LogInformation("Updating CurrentSchedule table with flattened schedule data...");
+                var dbContext = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                if (dbContext is BacklashBotContext backlashContext)
+                {
+                    await backlashContext.PopulateCurrentScheduleFromStandardHours();
+                    _logger?.LogInformation("CurrentSchedule table updated successfully");
+                }
 
                 stopwatch.Stop();
                 _performanceMonitor.RecordSpeedDialMetric(

@@ -62,6 +62,7 @@ namespace BacklashBotData.Data
         private DbSet<MaintenanceWindow> MaintenanceWindows { get; set; }
         private DbSet<StandardHours> StandardHours { get; set; }
         private DbSet<StandardHoursSession> StandardHoursSessions { get; set; }
+        private DbSet<CurrentSchedule> CurrentSchedules { get; set; }
         private DbSet<BacklashDTOs.SignalRClient> SignalRClients { get; set; }
         private DbSet<BacklashDTOs.Data.OverseerInfo> OverseerInfos { get; set; }
 
@@ -365,6 +366,24 @@ namespace BacklashBotData.Data
                 }
             }
         }
+
+        /// <summary>
+        /// Retrieves a list of events with optional wildcard search on ticker.
+        /// </summary>
+        /// <param name="tickerWildcard">Optional wildcard pattern to search in event ticker (e.g., "mention*").</param>
+        /// <returns>List of event data transfer objects matching the specified criteria.</returns>
+        public async Task<List<EventDTO>> GetEvents(string? tickerWildcard = null)
+        {
+            IQueryable<Event> query = Events.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(tickerWildcard))
+            {
+                // Use EF.Functions.Like for SQL LIKE pattern matching
+                query = query.Where(x => EF.Functions.Like(x.event_ticker, tickerWildcard));
+            }
+
+            return await query.Select(x => x.ToEventDTO()).ToListAsync();
+        }
         #endregion
 
         #region Markets
@@ -604,6 +623,7 @@ namespace BacklashBotData.Data
         /// <param name="excludedStatuses">Set of market statuses to exclude. If specified, markets with these statuses are filtered out.</param>
         /// <param name="includedMarkets">Set of specific market tickers to include. If specified, only these markets are returned.</param>
         /// <param name="excludedMarkets">Set of specific market tickers to exclude. If specified, these markets are filtered out.</param>
+        /// <param name="eventTicker">Filter for markets belonging to a specific event ticker.</param>
         /// <param name="hasMarketWatch">Filter for markets that have (true) or don't have (false) market watch data.</param>
         /// <param name="minimumInterestScore">Minimum interest score threshold for markets with market watch data.</param>
         /// <param name="maxInterestScoreDate">Maximum interest score date for filtering market watch data.</param>
@@ -616,6 +636,7 @@ namespace BacklashBotData.Data
         public async Task<List<MarketDTO>> GetMarkets(
             HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
             HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            string? eventTicker = null,
             bool? hasMarketWatch = null, double? minimumInterestScore = null,
             DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
         {
@@ -628,6 +649,8 @@ namespace BacklashBotData.Data
                 query = query.Where(x => includedStatuses.Contains(x.status));
             if (excludedStatuses != null && excludedStatuses.Count > 0)
                 query = query.Where(x => !excludedStatuses.Contains(x.status));
+            if (!string.IsNullOrWhiteSpace(eventTicker))
+                query = query.Where(x => x.event_ticker == eventTicker);
             if (maxAPILastFetchTime != null)
                 query = query.Where(x => x.APILastFetchedDate <= maxAPILastFetchTime.Value);
             if (hasMarketWatch != null)
@@ -790,7 +813,7 @@ namespace BacklashBotData.Data
             bool? hasMarketWatch = null, double? minimumInterestScore = null,
             DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
         {
-            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
+            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, null, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
         }
 
         public async Task<HashSet<MarketWatchDTO>> GetMarketWatchesFiltered(HashSet<string>? marketTickers = null,
@@ -1729,6 +1752,86 @@ namespace BacklashBotData.Data
         }
         #endregion
 
+        #region Current Schedule
+        /// <summary>
+        /// Populates the CurrentSchedule table with the latest schedule data from StandardHoursSessions.
+        /// This creates a flattened view of the current weekly trading schedule.
+        /// Uses the most recent StandardHours data (max StandardHoursID).
+        /// For each day, takes the start time from the session with the latest start time,
+        /// and the end time from the maximum end time across all sessions for that day.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task PopulateCurrentScheduleFromStandardHours()
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                // Get the latest standard hours sessions (based on max StandardHoursID) and group by day of week
+                // For each day, take the start time from the session with the latest start time,
+                // and the end time from the maximum end time across all sessions
+                var maxStandardHoursId = await StandardHoursSessions
+                    .AsNoTracking()
+                    .MaxAsync(s => s.StandardHoursID);
+
+                var allLatestSessions = await StandardHoursSessions
+                    .AsNoTracking()
+                    .Where(s => s.StandardHoursID == maxStandardHoursId)
+                    .ToListAsync();
+
+                var sessionsByDay = allLatestSessions
+                    .GroupBy(s => s.DayOfWeek)
+                    .Select(g =>
+                    {
+                        var sessions = g.ToList();
+                        var latestStartSession = sessions.OrderByDescending(s => s.StartTime).First();
+                        var maxEndTime = sessions.Max(s => s.EndTime);
+                        return new
+                        {
+                            DayOfWeek = g.Key,
+                            StartTime = latestStartSession.StartTime,
+                            EndTime = maxEndTime
+                        };
+                    })
+                    .ToList();
+
+                // Clear existing current schedule
+                var existingSchedules = await CurrentSchedules.ToListAsync();
+                if (existingSchedules.Any())
+                {
+                    CurrentSchedules.RemoveRange(existingSchedules);
+                    await SaveChangesAsync();
+                }
+
+                // Add new current schedule entries
+                foreach (var daySchedule in sessionsByDay)
+                {
+                    // Use start time from latest session, end time from max end time
+                    var currentSchedule = new CurrentSchedule
+                    {
+                        DayOfWeek = daySchedule.DayOfWeek,
+                        StartTime = daySchedule.StartTime,
+                        EndTime = daySchedule.EndTime,
+                        LastModifiedDate = DateTime.UtcNow
+                    };
+                    CurrentSchedules.Add(currentSchedule);
+
+                    _logger?.LogDebug("Added CurrentSchedule for {DayOfWeek}: {StartTime} - {EndTime}",
+                        daySchedule.DayOfWeek, daySchedule.StartTime, daySchedule.EndTime);
+                }
+
+                await SaveChangesAsync();
+                TrackPerformanceMetric("PopulateCurrentScheduleFromStandardHours", true, stopwatch.Elapsed);
+                _logger?.LogInformation("Successfully populated CurrentSchedule table with {Count} entries", sessionsByDay.Count);
+            }
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("PopulateCurrentScheduleFromStandardHours", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error populating CurrentSchedule from StandardHours");
+                throw;
+            }
+        }
+        #endregion
+
         #region Overseer Info
         public async Task AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo overseerInfo)
         {
@@ -2567,6 +2670,29 @@ namespace BacklashBotData.Data
 
             modelBuilder.Entity<StandardHoursSession>()
                 .Property(s => s.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .ToTable("t_CurrentSchedule")
+                .HasKey(cs => cs.DayOfWeek);
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.DayOfWeek)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.StartTime)
+                .HasColumnType("time(7)")
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.EndTime)
+                .HasColumnType("time(7)")
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.LastModifiedDate)
                 .HasDefaultValueSql("GETDATE()");
 
             modelBuilder.Entity<BacklashDTOs.SignalRClient>()
