@@ -177,7 +177,7 @@ namespace BacklashBot.Services
                     throw new Exception("WebSocket client is null.");
                 }
 
-                _serviceFactory.GetKalshiWebSocketClient().TickerReceived += (sender, args) => _ = Task.Run(() => ProcessTickerUpdate(
+                _serviceFactory.GetKalshiWebSocketClient().TickerReceived += async (sender, args) => await ProcessTickerUpdate(
                     args.market_ticker,
                     args.market_id,
                     args.price,
@@ -190,7 +190,7 @@ namespace BacklashBot.Services
                     args.ts,
                     args.LoggedDate,
                     args.ProcessedDate
-                ));
+                );
                 _serviceFactory.GetKalshiWebSocketClient().MarketLifecycleReceived += ProcessMarketLifecycleEventAsync;
                 _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += ProcessEventLifecycleEventAsync;
                 _serviceFactory.GetKalshiWebSocketClient().FillReceived += (sender, args) =>
@@ -1213,22 +1213,42 @@ namespace BacklashBot.Services
                 allWatchedMarkets = allWatchedMarkets.Distinct().ToHashSet();
                 _logger.LogDebug("Total watched markets after union: {Count}: {Markets}", allWatchedMarkets.Count, string.Join(", ", allWatchedMarkets));
 
-                if (!allWatchedMarkets.OrderBy(x => x).SequenceEqual(_lastWatchedMarkets.OrderBy(x => x)))
+                // Always sync WatchedMarkets to the database to prevent temporary modifications from affecting cache
+                var currentWatched = _serviceFactory.GetDataCache().WatchedMarkets ?? new HashSet<string>();
+                _serviceFactory.GetDataCache().WatchedMarkets = new HashSet<string>(allWatchedMarkets);
+                _lastWatchedMarkets = currentWatched;
+                _serviceFactory.GetKalshiWebSocketClient().WatchedMarkets = allWatchedMarkets;
+
+                var newMarkets = allWatchedMarkets.Except(_lastWatchedMarkets).ToList();
+                var removedMarkets = _lastWatchedMarkets.Except(allWatchedMarkets).ToList();
+
+                foreach (var market in removedMarkets)
                 {
-                    _logger.LogDebug("Watched markets changed, updating cache: {Markets}", string.Join(", ", allWatchedMarkets));
-                    _serviceFactory.GetDataCache().WatchedMarkets = new HashSet<string>(allWatchedMarkets);
-                    _lastWatchedMarkets = allWatchedMarkets.ToHashSet();
-                    _serviceFactory.GetKalshiWebSocketClient().WatchedMarkets = allWatchedMarkets;
-                    var newMarkets = allWatchedMarkets.Except(_lastWatchedMarkets).ToArray();
-                    if (newMarkets.Any())
+                    _serviceFactory.GetDataCache().Markets.TryRemove(market, out var _);
+                    _serviceFactory.GetDataCache().RecentlyRemovedMarkets.Add(market);
+                    _logger.LogInformation("Removed market {MarketTicker} from cache", market);
+                }
+
+                foreach (var market in newMarkets)
+                {
+                    // Add to cache if not already there
+                    if (!_serviceFactory.GetDataCache().Markets.ContainsKey(market))
                     {
-                        _logger.LogDebug("Triggering subscriptions for new markets: {Markets}", string.Join(", ", newMarkets));
-                        await _serviceFactory.GetKalshiWebSocketClient().SubscribeToWatchedMarketsAsync();
+                        var marketData = await EnsureMarketDataAsync(market);
+                        if (marketData != null)
+                        {
+                            _serviceFactory.GetDataCache().Markets[market] = _marketDataFactory(marketData);
+                            _serviceFactory.GetDataCache().Markets[market].OrderbookData = new List<OrderbookData>();
+                            _serviceFactory.GetDataCache().Markets[market].LastSuccessfulSync = DateTime.UtcNow;
+                            _logger.LogInformation("Added market {MarketTicker} to cache", market);
+                        }
                     }
                 }
-                else
+
+                if (newMarkets.Any())
                 {
-                    _logger.LogDebug("Watched markets unchanged: {Markets}", string.Join(", ", allWatchedMarkets));
+                    _logger.LogDebug("Triggering subscriptions for new markets: {Markets}", string.Join(", ", newMarkets));
+                    await _serviceFactory.GetKalshiWebSocketClient().SubscribeToWatchedMarketsAsync();
                 }
             }
             catch (OperationCanceledException)
@@ -1462,7 +1482,7 @@ namespace BacklashBot.Services
         /// <summary>
         /// Processes ticker updates from WebSocket messages, including data validation and deduplication.
         /// </summary>
-        public void ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null)
+        public async Task ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null)
         {
             if (!ValidateTickerData(marketTicker, price, yesBid, yesAsk, volume, openInterest, dollarVolume, dollarOpenInterest, ts, loggedDate, processedDate))
             {
@@ -1489,9 +1509,30 @@ namespace BacklashBot.Services
 
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
             {
-                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Market {marketTicker} not found for ticker update")
-                    , "Market {MarketTicker} not found for ticker update", marketTicker);
-                return;
+                if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
+                {
+                    // Market is watched but not in cache, re-add it
+                    var market = await EnsureMarketDataAsync(marketTicker);
+                    if (market != null)
+                    {
+                        _serviceFactory.GetDataCache().Markets[marketTicker] = _marketDataFactory(market);
+                        _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = new List<OrderbookData>();
+                        _serviceFactory.GetDataCache().Markets[marketTicker].LastSuccessfulSync = DateTime.UtcNow;
+                        marketData = _serviceFactory.GetDataCache().Markets[marketTicker];
+                        _logger.LogInformation("Re-added market {MarketTicker} to cache for ticker update", marketTicker);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to re-add market {MarketTicker} to cache for ticker update", marketTicker);
+                        return;
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Market {marketTicker} not found for ticker update")
+                        , "Market {MarketTicker} not found for ticker update", marketTicker);
+                    return;
+                }
             }
 
             try

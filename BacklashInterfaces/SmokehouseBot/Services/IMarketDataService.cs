@@ -189,7 +189,8 @@ namespace BacklashBot.Services.Interfaces
         /// <param name="ts">The timestamp.</param>
         /// <param name="loggedDate">The logged date.</param>
         /// <param name="processedDate">Optional processed date.</param>
-        void ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null);
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null);
 
         /// <summary>
         /// Notifies listeners that market data has been updated for the specified market ticker.

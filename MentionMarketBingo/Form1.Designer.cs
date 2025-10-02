@@ -28,51 +28,53 @@ partial class Form1
     /// </summary>
     private void InitializeComponent()
     {
-        this.components = new System.ComponentModel.Container();
-        this.eventComboBox = new System.Windows.Forms.ComboBox();
-        this.bingoPanel = new System.Windows.Forms.FlowLayoutPanel();
-        this.label1 = new System.Windows.Forms.Label();
-        this.SuspendLayout();
-        //
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+        eventComboBox = new ComboBox();
+        bingoPanel = new FlowLayoutPanel();
+        label1 = new Label();
+        SuspendLayout();
+        // 
         // eventComboBox
-        //
-        this.eventComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-        this.eventComboBox.FormattingEnabled = true;
-        this.eventComboBox.Location = new System.Drawing.Point(12, 32);
-        this.eventComboBox.Name = "eventComboBox";
-        this.eventComboBox.Size = new System.Drawing.Size(300, 28);
-        this.eventComboBox.TabIndex = 0;
-        this.eventComboBox.SelectedIndexChanged += new System.EventHandler(this.eventComboBox_SelectedIndexChanged);
-        //
+        // 
+        eventComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        eventComboBox.FormattingEnabled = true;
+        eventComboBox.Location = new Point(12, 32);
+        eventComboBox.Name = "eventComboBox";
+        eventComboBox.Size = new Size(300, 23);
+        eventComboBox.TabIndex = 0;
+        eventComboBox.SelectedIndexChanged += eventComboBox_SelectedIndexChanged;
+        // 
         // bingoPanel
-        //
-        this.bingoPanel.AutoScroll = true;
-        this.bingoPanel.Location = new System.Drawing.Point(12, 66);
-        this.bingoPanel.Name = "bingoPanel";
-        this.bingoPanel.Size = new System.Drawing.Size(776, 372);
-        this.bingoPanel.TabIndex = 1;
-        //
+        // 
+        bingoPanel.AutoScroll = true;
+        bingoPanel.Location = new Point(12, 66);
+        bingoPanel.Name = "bingoPanel";
+        bingoPanel.Size = new Size(776, 372);
+        bingoPanel.TabIndex = 1;
+        // 
         // label1
-        //
-        this.label1.AutoSize = true;
-        this.label1.Location = new System.Drawing.Point(12, 9);
-        this.label1.Name = "label1";
-        this.label1.Size = new System.Drawing.Size(89, 20);
-        this.label1.TabIndex = 2;
-        this.label1.Text = "Select Event:";
-        //
+        // 
+        label1.AutoSize = true;
+        label1.Location = new Point(12, 9);
+        label1.Name = "label1";
+        label1.Size = new Size(73, 15);
+        label1.TabIndex = 2;
+        label1.Text = "Select Event:";
+        // 
         // Form1
-        //
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(800, 450);
-        this.Controls.Add(this.label1);
-        this.Controls.Add(this.bingoPanel);
-        this.Controls.Add(this.eventComboBox);
-        this.Name = "Form1";
-        this.Text = "Mention Market Bingo";
-        this.Load += new System.EventHandler(this.Form1_Load);
-        this.ResumeLayout(false);
-        this.PerformLayout();
+        // 
+        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(800, 450);
+        Controls.Add(label1);
+        Controls.Add(bingoPanel);
+        Controls.Add(eventComboBox);
+        Icon = (Icon)resources.GetObject("$this.Icon");
+        Name = "Form1";
+        Text = "Mention Market Bingo";
+        Load += Form1_Load;
+        ResumeLayout(false);
+        PerformLayout();
     }
 
     private System.Windows.Forms.ComboBox eventComboBox;
