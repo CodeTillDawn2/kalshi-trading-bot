@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using KalshiBotAPI.Configuration;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using BacklashBot.State.Interfaces;
+using BacklashDTOs;
 
 namespace MentionMarketBingo;
 
@@ -98,6 +101,81 @@ static class Program
             sp.GetRequiredService<IPerformanceMonitor>()
         ));
 
+        // Register web socket related services
+        services.AddOptions<KalshiBotAPI.Configuration.MessageProcessorConfig>()
+            .Bind(configuration.GetSection("Websockets:MessageProcessor"))
+            .ValidateOnStart();
+        services.AddOptions<KalshiBotAPI.Configuration.SubscriptionManagerConfig>()
+            .Bind(configuration.GetSection("Websockets:SubscriptionManager"))
+            .ValidateOnStart();
+        services.AddOptions<KalshiBotAPI.Configuration.WebSocketConnectionManagerConfig>()
+            .Bind(configuration.GetSection("Websockets:WebSocketConnectionManager"))
+            .ValidateOnStart();
+        services.AddOptions<KalshiBotAPI.Configuration.KalshiWebSocketClientConfig>()
+            .Bind(configuration.GetSection("Websockets:KalshiWebSocketClient"))
+            .ValidateOnStart();
+
+        services.AddScoped<KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager, KalshiBotAPI.Websockets.WebSocketConnectionManager>();
+        services.AddScoped<KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor>(sp => new KalshiBotAPI.Websockets.MessageProcessor(
+            sp.GetRequiredService<ILogger<KalshiBotAPI.Websockets.MessageProcessor>>(),
+            sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager>(),
+            sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager>(),
+            sp.GetRequiredService<BacklashBot.State.Interfaces.IStatusTrackerService>(),
+            sp.GetRequiredService<BacklashBot.Services.Interfaces.ISqlDataService>(),
+            sp.GetRequiredService<BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService>(),
+            sp.GetRequiredService<IOptions<KalshiBotAPI.Configuration.MessageProcessorConfig>>().Value,
+            sp.GetRequiredService<IOptions<KalshiBotAPI.Configuration.KalshiAPIServiceConfig>>(),
+            sp.GetRequiredService<IPerformanceMonitor>()
+        ));
+        services.AddScoped<KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager>(sp => new KalshiBotAPI.Websockets.SubscriptionManager(
+            sp.GetRequiredService<ILogger<KalshiBotAPI.Websockets.SubscriptionManager>>(),
+            sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager>(),
+            sp.GetRequiredService<BacklashBot.State.Interfaces.IDataCache>(),
+            sp.GetRequiredService<BacklashBot.State.Interfaces.IStatusTrackerService>(),
+            sp.GetRequiredService<IOptions<KalshiBotAPI.Configuration.SubscriptionManagerConfig>>(),
+            sp.GetRequiredService<IPerformanceMonitor>()
+        ));
+        services.AddScoped<BacklashBot.Services.Interfaces.ISqlDataService>(serviceProvider =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<BacklashBot.Services.Interfaces.ISqlDataService>>();
+            var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotData.Configuration.BacklashBotDataConfig>>().Value;
+            var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
+            var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
+            return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
+        });
+
+        // Register simple data cache
+        services.AddSingleton<BacklashBot.State.Interfaces.IDataCache, SimpleDataCache>();
+        services.AddScoped<KalshiBotAPI.Websockets.KalshiWebSocketClient>(sp =>
+        {
+            var client = new KalshiBotAPI.Websockets.KalshiWebSocketClient(
+                sp.GetRequiredService<IOptions<KalshiBotAPI.Configuration.KalshiConfig>>(),
+                sp.GetRequiredService<IOptions<KalshiBotAPI.Configuration.KalshiWebSocketClientConfig>>(),
+                sp.GetRequiredService<ILogger<KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient>>(),
+                sp.GetRequiredService<BacklashBot.State.Interfaces.IStatusTrackerService>(),
+                new SimpleBotReadyStatus(),
+                sp.GetRequiredService<BacklashBot.Services.Interfaces.ISqlDataService>(),
+                sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager>(),
+                sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager>(),
+                sp.GetRequiredService<KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor>(),
+                sp.GetRequiredService<IPerformanceMonitor>(),
+                false, // storeWebSocketEvents
+                16384, // bufferSize
+                false // enablePerformanceMetrics
+            );
+            // Enable required channels for MentionMarketBingo
+            client.EnableChannel("orderbook");
+            client.EnableChannel("fill");
+            return client;
+        });
+        services.AddScoped<KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient>(sp => sp.GetRequiredService<KalshiBotAPI.Websockets.KalshiWebSocketClient>());
+
+        // Register the orderbook service
+        services.AddScoped<MentionMarketBingoOrderBookService>();
+
+        // Register the WebSocket monitor service
+        services.AddScoped<MentionMarketBingoWebSocketMonitorService>();
+
         // Register Form1 with dependencies
         services.AddTransient<Form1>();
 
@@ -140,4 +218,33 @@ public class SimpleStatusTrackerService : BacklashBot.State.Interfaces.IStatusTr
         _cts.Cancel();
         // Note: In a real implementation, you'd create a new CTS, but for simplicity we'll just leave it cancelled
     }
+}
+
+// Simple bot ready status for the GUI app
+public class SimpleBotReadyStatus : BacklashBot.State.Interfaces.IBotReadyStatus
+{
+    public TaskCompletionSource<bool> InitializationCompleted { get; set; } = new TaskCompletionSource<bool>();
+    public TaskCompletionSource<bool> BrowserReady { get; set; } = new TaskCompletionSource<bool>();
+
+    public void ResetAll()
+    {
+        // For GUI app, just set completed
+        InitializationCompleted.TrySetResult(true);
+        BrowserReady.TrySetResult(true);
+    }
+}
+
+// Simple data cache for the GUI app
+public class SimpleDataCache : BacklashBot.State.Interfaces.IDataCache
+{
+    public ConcurrentDictionary<string, IMarketData> Markets { get; } = new();
+    public HashSet<string> WatchedMarkets { get; set; } = new();
+    public double AccountBalance { get; set; }
+    public DateTime LastWebSocketTimestamp { get; set; }
+    public bool ExchangeStatus { get; set; }
+    public bool TradingStatus { get; set; }
+    public string SoftwareVersion => "MentionMarketBingo v1.0.0";
+    public event EventHandler<StatusChangedEventArgs>? ExchangeStatusChanged;
+    public double PortfolioValue => 0.0; // Not used in this app
+    public HashSet<string> RecentlyRemovedMarkets { get; set; } = new();
 }
