@@ -418,9 +418,9 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                // Add pending confirmations for both update_subscription and initial subscribe
+                // Add pending confirmations for subscribe and update_subscription commands
                 // Both can receive "ok" confirmations with ID
-                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage &&
+                if (!skipMessage &&
                     (message.Contains("\"cmd\": \"update_subscription\"") || message.Contains("\"cmd\": \"subscribe\"")))
                 {
                     _pendingSubscriptionConfirmations.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
@@ -1159,7 +1159,6 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "lifecycle" => "market_lifecycle_v2",
-            "event_lifecycle" => "market_lifecycle_v2",
             _ => throw new ArgumentException($"Invalid action: {action}")
         };
 
@@ -1742,6 +1741,21 @@ namespace KalshiBotAPI.Websockets
             if (_pendingSubscriptionConfirmations.TryGetValue(id, out var confirm))
             {
                 return (confirm.Channel, confirm.MarketTickers);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Retrieves the most recent pending confirmation.
+        /// Used to handle "Already subscribed" errors that may not have IDs.
+        /// </summary>
+        /// <returns>A tuple containing the ID, channel, and market tickers of the last pending confirmation, or null if none exist.</returns>
+        public (int Id, string Channel, string[] MarketTickers)? GetLastPendingConfirmation()
+        {
+            var last = _pendingSubscriptionConfirmations.OrderByDescending(kvp => kvp.Value.SentTime).FirstOrDefault();
+            if (last.Key != 0)
+            {
+                return (last.Key, last.Value.Channel, last.Value.MarketTickers);
             }
             return null;
         }

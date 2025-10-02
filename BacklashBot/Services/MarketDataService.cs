@@ -1489,7 +1489,8 @@ namespace BacklashBot.Services
 
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
             {
-                _logger.LogWarning("Market {MarketTicker} not found for ticker update", marketTicker);
+                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Market {marketTicker} not found for ticker update")
+                    , "Market {MarketTicker} not found for ticker update", marketTicker);
                 return;
             }
 

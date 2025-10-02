@@ -1388,6 +1388,16 @@ namespace KalshiBotAPI.Websockets
                             // Remove from pending confirmations since it's already subscribed
                             _subscriptionManager.RemovePendingConfirmation(id);
                         }
+                        else
+                        {
+                            // No ID in the error message, treat as confirmation for the last pending subscribe
+                            var lastPending = _subscriptionManager.GetLastPendingConfirmation();
+                            if (lastPending.HasValue)
+                            {
+                                _subscriptionManager.RemovePendingConfirmation(lastPending.Value.Id);
+                                _logger.LogDebug("Treated 'Already subscribed' as confirmation for last pending ID {Id} on channel '{Channel}' | Source: {Source}", lastPending.Value.Id, lastPending.Value.Channel, "MessageProcessor");
+                            }
+                        }
                     }
                 }
                 else

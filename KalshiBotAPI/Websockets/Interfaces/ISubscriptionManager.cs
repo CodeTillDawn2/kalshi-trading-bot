@@ -172,6 +172,13 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         (string Channel, string[] MarketTickers)? GetPendingConfirm(int id);
 
         /// <summary>
+        /// Gets the most recent pending confirmation.
+        /// Used to handle "Already subscribed" errors that may not have IDs.
+        /// </summary>
+        /// <returns>A tuple with ID, channel, and market tickers of the last pending confirmation, or null if none exist.</returns>
+        (int Id, string Channel, string[] MarketTickers)? GetLastPendingConfirmation();
+
+        /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
         /// </summary>
         event EventHandler<string[]>? MarketWebSocketUnhealthy;
