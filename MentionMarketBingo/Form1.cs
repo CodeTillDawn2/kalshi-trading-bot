@@ -1,3 +1,4 @@
+
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
@@ -13,6 +14,7 @@ using BacklashCommon.Configuration;
 using System.Data.SqlClient;
 using BacklashInterfaces.Constants;
 using System.IO;
+using System;
 
 namespace MentionMarketBingo;
 
@@ -144,9 +146,23 @@ public partial class Form1 : Form
 
             // Clear existing buttons
             bingoPanel.Controls.Clear();
-            bingoPanel.ColumnCount = 5;
-            int rows = (activeMarkets.Count + 4) / 5;
+
+            // Calculate optimal number of columns for square panels
+            int n = activeMarkets.Count;
+            int cols = n > 0 ? (int)Math.Ceiling(Math.Sqrt(n)) : 1;
+            int rows = (n + cols - 1) / cols;
+
+            bingoPanel.ColumnCount = cols;
+            for (int c = 0; c < cols; c++)
+            {
+                bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / cols));
+            }
+
             bingoPanel.RowCount = rows;
+            for (int r = 0; r < rows; r++)
+            {
+                bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f / rows));
+            }
 
             // Create panels for each market, arranged in a grid
             for (int i = 0; i < activeMarkets.Count; i++)
@@ -169,9 +185,11 @@ public partial class Form1 : Form
                     ColumnCount = 3,
                     Padding = new Padding(2)
                 };
-                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
-                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
+
+                // Set column styles for proper progress bar sizing
+                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45)); // Column 0: Yes progress bar
+                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Column 1: Spacer
+                tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45)); // Column 2: No progress bar
 
                 // Row 0: Title
                 tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
@@ -225,48 +243,21 @@ public partial class Form1 : Form
 
                 // Row 3: Progress bars
                 tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20));
-                var yesProgressBar = new ProgressBar
+                var yesProgressBar = new CustomProgressBar
                 {
-                    Dock = DockStyle.Fill,
-                    Style = ProgressBarStyle.Continuous,
                     Maximum = 100,
                     Value = 0,
-                    Tag = "yes"
-                };
-                var noProgressBar = new ProgressBar
-                {
+                    BarColor = Color.Green,
                     Dock = DockStyle.Fill,
-                    Style = ProgressBarStyle.Continuous,
+                    Height = 20
+                };
+                var noProgressBar = new CustomProgressBar
+                {
                     Maximum = 100,
                     Value = 0,
-                    Tag = "no"
-                };
-
-                // Custom paint for green/red colors
-                yesProgressBar.Paint += (s, e) =>
-                {
-                    var pb = (ProgressBar)s;
-                    var rect = new Rectangle(0, 0, pb.Width, pb.Height);
-                    var fillRect = new Rectangle(0, 0, (int)(pb.Width * pb.Value / (double)pb.Maximum), pb.Height);
-
-                    // Draw background
-                    e.Graphics.FillRectangle(Brushes.LightGray, rect);
-                    // Draw filled portion in green
-                    if (fillRect.Width > 0)
-                        e.Graphics.FillRectangle(Brushes.Green, fillRect);
-                };
-
-                noProgressBar.Paint += (s, e) =>
-                {
-                    var pb = (ProgressBar)s;
-                    var rect = new Rectangle(0, 0, pb.Width, pb.Height);
-                    var fillRect = new Rectangle(0, 0, (int)(pb.Width * pb.Value / (double)pb.Maximum), pb.Height);
-
-                    // Draw background
-                    e.Graphics.FillRectangle(Brushes.LightGray, rect);
-                    // Draw filled portion in red
-                    if (fillRect.Width > 0)
-                        e.Graphics.FillRectangle(Brushes.Red, fillRect);
+                    BarColor = Color.Red,
+                    Dock = DockStyle.Fill,
+                    Height = 20
                 };
 
                 tableLayout.Controls.Add(yesProgressBar, 0, 3);
@@ -281,8 +272,8 @@ public partial class Form1 : Form
                 noLabel.Click += (s, e) => MarketPanel_Click(panel, market);
 
                 // Calculate row and column
-                int row = i / 5;
-                int col = i % 5;
+                int row = i / cols;
+                int col = i % cols;
                 bingoPanel.Controls.Add(panel, col, row);
             }
 
@@ -496,44 +487,46 @@ public partial class Form1 : Form
 
     private void UpdateAllProgressBars()
     {
-        // Calculate max dollar values across all markets for relative scaling
-        decimal maxYesValue = 0;
-        decimal maxNoValue = 0;
+        // Collect all dollar values first to ensure consistent scaling
+        var marketValues = new Dictionary<Panel, (decimal yesValue, decimal noValue)>();
 
         foreach (var panel in bingoPanel.Controls.OfType<Panel>())
         {
             var market = (KalshiMarket)panel.Tag;
             var orderBook = _orderBookService.GetOrderBook(market.Ticker);
             var (yesValue, noValue) = CalculateOrderBookDollarValues(orderBook);
-
-            maxYesValue = Math.Max(maxYesValue, yesValue);
-            maxNoValue = Math.Max(maxNoValue, noValue);
+            marketValues[panel] = (yesValue, noValue);
         }
 
+        // Find maximum values across all markets
+        decimal maxYesValue = marketValues.Values.Max(v => v.yesValue);
+        decimal maxNoValue = marketValues.Values.Max(v => v.noValue);
+
         // Update all progress bars with relative scaling
-        foreach (var panel in bingoPanel.Controls.OfType<Panel>())
+        foreach (var kvp in marketValues)
         {
-            var market = (KalshiMarket)panel.Tag;
-            var orderBook = _orderBookService.GetOrderBook(market.Ticker);
-            var (yesValue, noValue) = CalculateOrderBookDollarValues(orderBook);
+            var panel = kvp.Key;
+            var (yesValue, noValue) = kvp.Value;
 
             var tableLayout = panel.Controls.OfType<TableLayoutPanel>().FirstOrDefault();
             if (tableLayout == null) continue;
 
             // Update progress bars (row 3)
-            var yesProgressBar = tableLayout.GetControlFromPosition(0, 3) as ProgressBar;
-            var noProgressBar = tableLayout.GetControlFromPosition(2, 3) as ProgressBar;
+            var yesProgressBar = tableLayout.GetControlFromPosition(0, 3) as CustomProgressBar;
+            var noProgressBar = tableLayout.GetControlFromPosition(2, 3) as CustomProgressBar;
 
             if (yesProgressBar != null)
             {
                 int yesPercentage = maxYesValue > 0 ? (int)((yesValue / maxYesValue) * 100) : 0;
                 yesProgressBar.Value = Math.Min(yesPercentage, 100);
+                yesProgressBar.Invalidate(); // Force repaint for custom colors
             }
 
             if (noProgressBar != null)
             {
                 int noPercentage = maxNoValue > 0 ? (int)((noValue / maxNoValue) * 100) : 0;
                 noProgressBar.Value = Math.Min(noPercentage, 100);
+                noProgressBar.Invalidate(); // Force repaint for custom colors
             }
         }
     }
