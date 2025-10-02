@@ -11,6 +11,8 @@ using BacklashInterfaces.PerformanceMetrics;
 using BacklashCommon.Configuration;
 using System.Data.SqlClient;
 using BacklashInterfaces.Constants;
+using System.IO;
+using BacklashDTOs.KalshiAPI;
 
 namespace MentionMarketBingo;
 
@@ -25,61 +27,30 @@ public partial class Form1 : Form
         InitializeComponent();
     }
 
-    public async Task InitializeAsync()
+    private async void Form1_Load(object sender, EventArgs e)
+    {
+        // Load config
+        LoadConfig();
+
+        await InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
     {
         try
         {
             using var scope = _serviceProvider.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            // Test API call, offloaded to thread pool to avoid sync context deadlock
-            try
-            {
-                var testResponse = await Task.Run(() => apiService.GetExchangeStatusAsync()).ConfigureAwait(false);
-                if (testResponse != null)
-                {
-                    MessageBox.Show($"Test API call succeeded. Exchange status: {testResponse.exchange_active}", "Test Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Test API call returned null", "Test Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            catch (Exception testEx)
-            {
-                MessageBox.Show($"Test API call failed: {testEx.Message}", "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; // Stop if test fails
-            }
 
-            // Fetch all open events from API using pagination, with offloaded calls
-            var allEvents = new List<KalshiEvent>();
-            string? cursor = null;
+            // Fetch all open events from API (pagination handled internally)
+            var eventsResponse = await Task.Run(() => apiService.GetEventsAsync(
+                status: KalshiConstants.Status_Open,
+                limit: 200,
+                withNestedMarkets: false
+            ));
 
-            do
-            {
-                var eventsResponse = await Task.Run(() => apiService.GetEventsAsync(
-                    limit: 50,
-                    status: KalshiConstants.Status_Open,
-                    cursor: cursor,
-                    withNestedMarkets: false
-                )).ConfigureAwait(false);
-
-                if (eventsResponse?.Events != null)
-                {
-                    allEvents.AddRange(eventsResponse.Events);
-                    cursor = eventsResponse.Cursor;
-                }
-                else
-                {
-                    cursor = null; // No more pages
-                }
-
-                // Add rate limiting delay between requests to avoid API throttling
-                if (!string.IsNullOrEmpty(cursor))
-                {
-                    await Task.Delay(250).ConfigureAwait(false); // 250ms delay
-                }
-            } while (!string.IsNullOrEmpty(cursor));
+            var allEvents = eventsResponse?.Events ?? new List<KalshiEvent>();
 
             // Filter events that contain "mention" in the ticker
             var mentionEvents = allEvents
@@ -107,6 +78,12 @@ public partial class Form1 : Form
             eventComboBox.DataSource = _events;
             eventComboBox.DisplayMember = "title";
             eventComboBox.ValueMember = "event_ticker";
+
+            // Load markets for the first event
+            if (_events.Count > 0)
+            {
+                eventComboBox.SelectedIndex = 0;
+            }
         }
         catch (Exception ex)
         {
@@ -126,7 +103,7 @@ public partial class Form1 : Form
             using var scope = _serviceProvider.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            var eventResponse = await Task.Run(() => apiService.FetchEventAsync(selectedEvent.event_ticker, withNestedMarkets: true)).ConfigureAwait(false);
+            var eventResponse = await Task.Run(() => apiService.FetchEventAsync(selectedEvent.event_ticker, withNestedMarkets: true));
             if (eventResponse?.Event?.Markets == null)
             {
                 MessageBox.Show($"No markets found for event '{selectedEvent.title}' (ticker: {selectedEvent.event_ticker}).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -146,25 +123,61 @@ public partial class Form1 : Form
 
             // Clear existing buttons
             bingoPanel.Controls.Clear();
+            bingoPanel.ColumnCount = 5;
+            int rows = (activeMarkets.Count + 4) / 5;
+            bingoPanel.RowCount = rows;
 
-            // Create buttons for each market, arranged in a 5x5 grid
-            int maxButtons = Math.Min(activeMarkets.Count, 25); // Limit to 25 for bingo board
-            for (int i = 0; i < maxButtons; i++)
+            // Create panels for each market, arranged in a grid
+            for (int i = 0; i < activeMarkets.Count; i++)
             {
                 var market = activeMarkets[i];
-                var button = new Button
+                var panel = new Panel
                 {
-                    Text = market.Title ?? market.Ticker ?? "Unknown",
                     Dock = DockStyle.Fill,
                     Margin = new Padding(2),
-                    Tag = market
+                    Tag = market,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    BackColor = Color.LightGray
                 };
-                button.Click += MarketButton_Click;
 
-                // Calculate row and column for 5x5 grid
+                var subtitleLabel = new Label
+                {
+                    Text = market.YesSubTitle ?? market.Ticker ?? "Unknown",
+                    Font = new Font(DefaultFont.FontFamily, DefaultFont.Size + 2, FontStyle.Bold),
+                    Dock = DockStyle.Top,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Height = 40
+                };
+
+                var yesLabel = new Label
+                {
+                    Text = $"Yes: {market.YesBid}¢",
+                    Dock = DockStyle.Top,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Height = 20
+                };
+
+                var noLabel = new Label
+                {
+                    Text = $"No: {market.NoBid}¢",
+                    Dock = DockStyle.Top,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Height = 20
+                };
+
+                panel.Controls.Add(noLabel);
+                panel.Controls.Add(yesLabel);
+                panel.Controls.Add(subtitleLabel);
+
+                panel.Click += (s, e) => MarketPanel_Click(panel, market);
+                subtitleLabel.Click += (s, e) => MarketPanel_Click(panel, market);
+                yesLabel.Click += (s, e) => MarketPanel_Click(panel, market);
+                noLabel.Click += (s, e) => MarketPanel_Click(panel, market);
+
+                // Calculate row and column
                 int row = i / 5;
                 int col = i % 5;
-                bingoPanel.Controls.Add(button, col, row);
+                bingoPanel.Controls.Add(panel, col, row);
             }
         }
         catch (Exception ex)
@@ -179,5 +192,120 @@ public partial class Form1 : Form
         var market = (KalshiMarket)button.Tag;
 
         MessageBox.Show($"Selected market: {market.Title}\nTicker: {market.Ticker}", "Market Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private async void MarketPanel_Click(Panel panel, KalshiMarket market)
+    {
+        panel.Enabled = false; // Disable to prevent multiple clicks
+        try
+        {
+            if (!decimal.TryParse(maxExposureTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
+            {
+                MessageBox.Show("Invalid Max Exposure value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!decimal.TryParse(maxYesPriceTextBox.Text, out decimal maxYesPriceDollars) || maxYesPriceDollars <= 0)
+            {
+                MessageBox.Show("Invalid Max Yes Price value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int maxExposureCents = (int)(maxExposureDollars * 100);
+            int yesPriceCents = (int)(maxYesPriceDollars * 100);
+            int count = maxExposureCents / yesPriceCents;
+
+            if (count <= 0)
+            {
+                MessageBox.Show("Max Exposure too low for the given Max Yes Price.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using var scope = _serviceProvider.CreateScope();
+            var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
+
+            var orderRequest = new CreateOrderRequest
+            {
+                Action = "buy",
+                Type = "limit",
+                Ticker = market.Ticker,
+                Side = "yes",
+                Count = count,
+                YesPrice = yesPriceCents,
+                ClientOrderId = Guid.NewGuid().ToString()
+            };
+
+            var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
+
+            if (response != null)
+            {
+                MessageBox.Show($"Order placed successfully!\nOrder ID: {response.Order.OrderId}\nCount: {count}\nPrice: ${maxYesPriceDollars:F2}", "Order Placed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Keep disabled
+            }
+            else
+            {
+                MessageBox.Show("Failed to place order.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                panel.Enabled = true; // Re-enable on failure
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error placing order: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            panel.Enabled = true; // Re-enable on error
+        }
+    }
+
+    private async void RefreshButton_Click(object sender, EventArgs e)
+    {
+        await InitializeAsync();
+    }
+
+    private void BuyNosButton_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("Event finished - buying No positions for all active markets.", "Buy Nos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private void maxExposureTextBox_TextChanged(object sender, EventArgs e)
+    {
+        SaveConfig();
+    }
+
+    private void maxNoPriceTextBox_TextChanged(object sender, EventArgs e)
+    {
+        SaveConfig();
+    }
+
+    private void maxYesPriceTextBox_TextChanged(object sender, EventArgs e)
+    {
+        SaveConfig();
+    }
+
+    private async void refreshButton_Click(object sender, EventArgs e)
+    {
+        await InitializeAsync();
+    }
+
+    private void buyNosButton_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("Event finished - buying No positions for all active markets.", "Buy Nos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private void LoadConfig()
+    {
+        if (File.Exists("config.txt"))
+        {
+            var lines = File.ReadAllLines("config.txt");
+            if (lines.Length >= 3)
+            {
+                maxExposureTextBox.Text = lines[0];
+                maxNoPriceTextBox.Text = lines[1];
+                maxYesPriceTextBox.Text = lines[2];
+            }
+        }
+    }
+
+    private void SaveConfig()
+    {
+        File.WriteAllLines("config.txt", new[] { maxExposureTextBox.Text, maxNoPriceTextBox.Text, maxYesPriceTextBox.Text });
     }
 }

@@ -122,5 +122,13 @@ namespace BacklashBot.KalshiAPI.Interfaces
         /// </summary>
         /// <returns>A tuple containing processed count and error count.</returns>
         Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync();
+
+        /// <summary>
+        /// Creates an order on the Kalshi platform.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker.</param>
+        /// <param name="orderRequest">The order request details.</param>
+        /// <returns>The create order response if successful, null otherwise.</returns>
+        Task<CreateOrderResponse?> CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest);
     }
 }

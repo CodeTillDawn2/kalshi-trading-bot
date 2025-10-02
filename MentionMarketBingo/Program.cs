@@ -18,7 +18,7 @@ static class Program
     ///  The main entry point for the application.
     /// </summary>
     [STAThread]
-    static async Task Main()
+    static void Main()
     {
         // ## Configuration Setup - match test setup for proper secrets loading
         string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
@@ -103,21 +103,12 @@ static class Program
 
         var serviceProvider = services.BuildServiceProvider();
 
-        // Debug: Show configured credentials after resolution using IOptions
-        var kalshiOptions = serviceProvider.GetRequiredService<IOptions<KalshiBotAPI.Configuration.KalshiConfig>>();
-        var kalshiConfig = kalshiOptions.Value;
-        var debugKeyId = kalshiConfig.KeyId ?? "NOT SET";
-        var debugKeyFile = kalshiConfig.KeyFile ?? "NOT SET";
-        var debugConnStr = connectionString ?? "NOT SET";
-        MessageBox.Show($"Debug Configured Credentials:\nKeyId: {debugKeyId}\nKeyFile: {debugKeyFile}\nConnectionString: {debugConnStr.Substring(0, Math.Min(100, debugConnStr.Length))}...", "Config Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
-        var form = serviceProvider.GetRequiredService<Form1>();
-        await form.InitializeAsync();
-
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
+
+        var form = serviceProvider.GetRequiredService<Form1>();
+
         Application.Run(form);
     }
 }

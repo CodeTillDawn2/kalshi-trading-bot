@@ -696,14 +696,15 @@ namespace KalshiBotAPI.KalshiAPI
         /// Fetches a paginated list of events from the Kalshi API.
         /// Retrieves events based on various filter criteria with support for pagination.
         /// Optionally includes nested market data for each event.
+        /// This method automatically paginates to retrieve all matching events.
         /// </summary>
         /// <param name="limit">Optional limit on the number of events to retrieve per request (1-200, defaults to 100).</param>
-        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages.</param>
+        /// <param name="cursor">Optional starting pagination cursor. If null, fetches from the beginning.</param>
         /// <param name="withNestedMarkets">If true, includes detailed market data nested within each event response.</param>
         /// <param name="status">Optional filter for event status ('open', 'closed', 'settled').</param>
         /// <param name="seriesTicker">Optional filter for events by series ticker.</param>
         /// <param name="minCloseTs">Optional filter for events with at least one market having close timestamp greater than this Unix timestamp.</param>
-        /// <returns>The API response containing events list if successful, null if the operation fails or is cancelled.</returns>
+        /// <returns>The API response containing all events list if successful, null if the operation fails or is cancelled. Cursor is set to empty string.</returns>
         public async Task<EventsResponse?> GetEventsAsync(
             int? limit = null,
             string? cursor = null,
@@ -712,111 +713,138 @@ namespace KalshiBotAPI.KalshiAPI
             string? seriesTicker = null,
             long? minCloseTs = null)
         {
-            string url = "events";
-            if (withNestedMarkets)
-            {
-                url += "?with_nested_markets=true";
-            }
-
             var stopwatch = Stopwatch.StartNew();
             try
             {
                 const int maxRetries = 5;
-                int retryCount = 0;
-                int delayMs = 1000; // Start with 1 second
-                EventsResponse? eventsResponse = null;
+                var allEvents = new List<KalshiEvent>();
+                string currentCursor = cursor ?? "";
+                bool hasMorePages = true;
 
-                var queryParams = new Dictionary<string, string>();
-                if (limit.HasValue)
+                while (hasMorePages)
                 {
-                    if (limit.Value < 1 || limit.Value > 200)
-                        throw new ArgumentOutOfRangeException(nameof(limit), "Limit must be between 1 and 200");
-                    queryParams["limit"] = limit.Value.ToString();
-                }
-                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
-                if (!string.IsNullOrEmpty(status)) queryParams["status"] = status;
-                if (!string.IsNullOrEmpty(seriesTicker)) queryParams["series_ticker"] = seriesTicker;
-                if (minCloseTs.HasValue) queryParams["min_close_ts"] = minCloseTs.Value.ToString();
-
-                if (queryParams.Count > 0)
-                {
-                    string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
-                    if (url.Contains("?"))
+                    int retryCount = 0;
+                    int delayMs = 1000; // Start with 1 second
+                    EventsResponse? pageResponse = null;
+                    string pageUrl = "events";
+                    if (withNestedMarkets)
                     {
-                        url += "&" + queryString;
+                        pageUrl += "?with_nested_markets=true";
                     }
-                    else
-                    {
-                        url += "?" + queryString;
-                    }
-                }
 
-                while (true)
-                {
-                    try
+                    var queryParams = new Dictionary<string, string>();
+                    if (limit.HasValue)
                     {
-                        // Create a new request message for each retry attempt
-                        var headers = GenerateAuthHeaders("GET", "/trade-api/v2/events");
-                        var request = new HttpRequestMessage(HttpMethod.Get, url);
-                        foreach (var header in headers)
+                        queryParams["limit"] = limit.Value.ToString();
+                    }
+                    if (!string.IsNullOrEmpty(currentCursor)) queryParams["cursor"] = currentCursor;
+                    if (!string.IsNullOrEmpty(status)) queryParams["status"] = status;
+                    if (!string.IsNullOrEmpty(seriesTicker)) queryParams["series_ticker"] = seriesTicker;
+                    if (minCloseTs.HasValue) queryParams["min_close_ts"] = minCloseTs.Value.ToString();
+
+                    if (queryParams.Count > 0)
+                    {
+                        string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                        if (pageUrl.Contains("?"))
                         {
-                            request.Headers.Add(header.Key, header.Value);
+                            pageUrl += "&" + queryString;
                         }
-
-                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
-
-                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        else
                         {
-                            retryCount++;///////////////
-                            if (retryCount >= maxRetries)
+                            pageUrl += "?" + queryString;
+                        }
+                    }
+
+                    // Inner retry loop for this page
+                    while (true)
+                    {
+                        try
+                        {
+                            // Create a new request message for each retry attempt
+                            var headers = GenerateAuthHeaders("GET", "/trade-api/v2/events");
+                            var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+                            foreach (var header in headers)
                             {
-                                _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries - 404 Not Found", maxRetries);
-                                return null;
+                                request.Headers.Add(header.Key, header.Value);
                             }
 
-                            _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} - 404 Not Found, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
+                            var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
+
+                            if (response.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                retryCount++;
+                                if (retryCount >= maxRetries)
+                                {
+                                    _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries for page - 404 Not Found", maxRetries);
+                                    hasMorePages = false;
+                                    break;
+                                }
+
+                                _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} for page - 404 Not Found, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
+                                await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
+                                delayMs *= 2; // Exponential backoff
+                                continue;
+                            }
+
+                            response.EnsureSuccessStatusCode();
+                            var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
+                            pageResponse = JsonSerializer.Deserialize<EventsResponse>(
+                                jsonString,
+                                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                            );
+                            break; // Exit the retry loop on success
+                        }
+                        catch (TaskCanceledException ex)
+                        {
+                            // Retry on timeout (TaskCanceledException from HttpClient timeout)
+                            retryCount++;
+                            if (retryCount >= maxRetries)
+                            {
+                                _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries for page - Timeout", maxRetries);
+                                hasMorePages = false;
+                                break;
+                            }
+
+                            _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} for page - Timeout, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
                             await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
                             delayMs *= 2; // Exponential backoff
                             continue;
                         }
-
-                        response.EnsureSuccessStatusCode();
-                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
-                        eventsResponse = JsonSerializer.Deserialize<EventsResponse>(
-                            jsonString,
-                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                        );
-                        break; // Exit the retry loop on success
-                    }
-                    catch (TaskCanceledException ex)
-                    {
-                        // Retry on timeout (TaskCanceledException from HttpClient timeout)
-                        retryCount++;
-                        if (retryCount >= maxRetries)
+                        catch (Exception ex)
                         {
-                            _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries - Timeout", maxRetries);
-                            return null;
+                            // For other exceptions, don't retry
+                            _logger.LogWarning("Unexpected error in GetEventsAsync for page: {ExceptionType} - {Message}, Url: {0} Inner {1}"
+                                , ex.GetType().Name, ex.Message, pageUrl, ex.InnerException != null ? ex.InnerException.Message : "");
+                            hasMorePages = false;
+                            break;
                         }
+                    }
 
-                        _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} - Timeout, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
-                        await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
-                        delayMs *= 2; // Exponential backoff
-                        continue;
-                    }
-                    catch (Exception ex)
+                    if (pageResponse == null)
                     {
-                        // For other exceptions, don't retry
-                        _logger.LogWarning("Unexpected error in GetEventsAsync: {ExceptionType} - {Message}, Url: {0} Inner {1}"
-                            , ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
-                        return null;
+                        _logger.LogWarning("Failed to retrieve page in GetEventsAsync");
+                        break;
                     }
+
+                    allEvents.AddRange(pageResponse.Events ?? new List<KalshiEvent>());
+
+                    currentCursor = pageResponse.Cursor ?? "";
+                    hasMorePages = !string.IsNullOrEmpty(currentCursor);
+
+                    _logger.LogInformation("Retrieved {Count} events from current page (total so far: {Total})", pageResponse.Events?.Count ?? 0, allEvents.Count);
                 }
 
-                _logger.LogInformation("Retrieved {Count} events from API", eventsResponse?.Events?.Count ?? 0);
+                var finalResponse = new EventsResponse
+                {
+                    Events = allEvents,
+                    Cursor = ""
+                };
+
+                _logger.LogInformation("Retrieved total {TotalCount} events from API after pagination", finalResponse.Events.Count);
 
                 stopwatch.Stop();
                 RecordMethodExecutionDuration(nameof(GetEventsAsync), stopwatch.ElapsedMilliseconds);
-                return eventsResponse;
+                return finalResponse;
             }
             catch (OperationCanceledException)
             {
@@ -827,8 +855,7 @@ namespace KalshiBotAPI.KalshiAPI
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogWarning("Unexpected error in GetEventsAsync: {ExceptionType} - {Message}, Url: {0} Inner {1}"
-                    , ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
+                _logger.LogWarning("Unexpected error in GetEventsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
                 return null;
             }
         }
