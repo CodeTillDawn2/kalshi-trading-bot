@@ -41,6 +41,20 @@ namespace BacklashBot.KalshiAPI.Interfaces
         Task<EventResponse?> FetchEventAsync(string eventTicker, bool withNestedMarkets = false);
 
         /// <summary>
+        /// Fetches a paginated list of events from the Kalshi API.
+        /// </summary>
+        /// <param name="limit">Optional limit on the number of events to retrieve (1-200, defaults to 100).</param>
+        /// <param name="cursor">Optional cursor for pagination.</param>
+        /// <param name="withNestedMarkets">Whether to include nested markets in the response.</param>
+        /// <param name="status">Optional status filter ('open', 'closed', 'settled').</param>
+        /// <param name="seriesTicker">Optional series ticker filter.</param>
+        /// <param name="minCloseTs">Optional minimum close timestamp filter.</param>
+        /// <returns>The events response if successful, null otherwise.</returns>
+        Task<EventsResponse?> GetEventsAsync(
+            int? limit = null, string? cursor = null, bool withNestedMarkets = false,
+            string? status = null, string? seriesTicker = null, long? minCloseTs = null);
+
+        /// <summary>
         /// Fetches positions from the Kalshi API based on specified filters.
         /// </summary>
         /// <param name="cursor">Optional cursor for pagination.</param>

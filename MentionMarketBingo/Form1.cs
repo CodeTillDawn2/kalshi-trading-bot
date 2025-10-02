@@ -1,63 +1,108 @@
+using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs.Data;
+using BacklashDTOs.KalshiAPI;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashCommon.Configuration;
 using System.Data.SqlClient;
+using BacklashInterfaces.Constants;
 
 namespace MentionMarketBingo;
 
 public partial class Form1 : Form
 {
-    private BacklashBotContext? _context;
+    private readonly IServiceProvider _serviceProvider;
     private List<EventDTO> _events = new();
-    private List<MarketDTO> _markets = new();
 
-    public Form1()
+    public Form1(IServiceProvider serviceProvider)
     {
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         InitializeComponent();
-        InitializeDatabase();
     }
 
-    private void InitializeDatabase()
+    public async Task InitializeAsync()
     {
         try
         {
-            // Load configuration using ConfigurationHelper
-            var configBuilder = ConfigurationHelper.CreateConfigurationBuilder(AppDomain.CurrentDomain.BaseDirectory, Array.Empty<string>());
-            var configuration = configBuilder.Build();
+            using var scope = _serviceProvider.CreateScope();
+            var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            // Build connection string with secrets interpolation
-            string connectionString = ConfigurationHelper.BuildConnectionString(configuration);
-
-            // Get BacklashBotData configuration
-            var dataConfig = configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
-            if (dataConfig == null)
+            // Test API call, offloaded to thread pool to avoid sync context deadlock
+            try
             {
-                throw new InvalidOperationException("BacklashBotData configuration section is missing or invalid");
+                var testResponse = await Task.Run(() => apiService.GetExchangeStatusAsync()).ConfigureAwait(false);
+                if (testResponse != null)
+                {
+                    MessageBox.Show($"Test API call succeeded. Exchange status: {testResponse.exchange_active}", "Test Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Test API call returned null", "Test Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception testEx)
+            {
+                MessageBox.Show($"Test API call failed: {testEx.Message}", "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Stop if test fails
             }
 
-            var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<BacklashBotContext>();
-            var performanceMonitor = new MockPerformanceMonitor();
+            // Fetch all open events from API using pagination, with offloaded calls
+            var allEvents = new List<KalshiEvent>();
+            string? cursor = null;
 
-            _context = new BacklashBotContext(connectionString, logger, dataConfig, performanceMonitor);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Failed to initialize database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
+            do
+            {
+                var eventsResponse = await Task.Run(() => apiService.GetEventsAsync(
+                    limit: 50,
+                    status: KalshiConstants.Status_Open,
+                    cursor: cursor,
+                    withNestedMarkets: false
+                )).ConfigureAwait(false);
 
-    private async void Form1_Load(object sender, EventArgs e)
-    {
-        if (_context == null) return;
+                if (eventsResponse?.Events != null)
+                {
+                    allEvents.AddRange(eventsResponse.Events);
+                    cursor = eventsResponse.Cursor;
+                }
+                else
+                {
+                    cursor = null; // No more pages
+                }
 
-        try
-        {
-            // Load events with "mention" in ticker
-            _events = await _context.GetEvents(tickerWildcard: "%mention%");
+                // Add rate limiting delay between requests to avoid API throttling
+                if (!string.IsNullOrEmpty(cursor))
+                {
+                    await Task.Delay(250).ConfigureAwait(false); // 250ms delay
+                }
+            } while (!string.IsNullOrEmpty(cursor));
+
+            // Filter events that contain "mention" in the ticker
+            var mentionEvents = allEvents
+                .Where(e => e.EventTicker?.Contains("mention", StringComparison.OrdinalIgnoreCase) == true)
+                .ToList();
+
+            // Convert to EventDTO for the UI
+            _events = mentionEvents.Select(apiEvent => new EventDTO
+            {
+                event_ticker = apiEvent.EventTicker,
+                title = apiEvent.Title,
+                sub_title = apiEvent.SubTitle,
+                category = apiEvent.Category,
+                series_ticker = apiEvent.SeriesTicker,
+                mutually_exclusive = apiEvent.MutuallyExclusive,
+                collateral_return_type = apiEvent.CollateralReturnType
+            }).ToList();
+
+            if (_events.Count == 0)
+            {
+                MessageBox.Show("No events with 'mention' in the ticker could be found.", "No Events Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
             eventComboBox.DataSource = _events;
             eventComboBox.DisplayMember = "title";
@@ -71,31 +116,55 @@ public partial class Form1 : Form
 
     private async void eventComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (_context == null || eventComboBox.SelectedItem == null) return;
+        if (eventComboBox.SelectedItem == null) return;
 
         var selectedEvent = (EventDTO)eventComboBox.SelectedItem;
 
         try
         {
-            // Load markets for the selected event
-            var activeStatuses = new HashSet<string> { "active" };
-            _markets = await _context.GetMarkets(includedStatuses: activeStatuses, eventTicker: selectedEvent.event_ticker);
+            // Fetch markets for the selected event from API with nested markets, offloaded to thread pool
+            using var scope = _serviceProvider.CreateScope();
+            var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
+
+            var eventResponse = await Task.Run(() => apiService.FetchEventAsync(selectedEvent.event_ticker, withNestedMarkets: true)).ConfigureAwait(false);
+            if (eventResponse?.Event?.Markets == null)
+            {
+                MessageBox.Show($"No markets found for event '{selectedEvent.title}' (ticker: {selectedEvent.event_ticker}).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var apiMarkets = eventResponse.Event.Markets;
+
+            // Filter for active markets only
+            var activeMarkets = apiMarkets.Where(m => m.Status == "active").ToList();
+
+            if (activeMarkets.Count == 0)
+            {
+                MessageBox.Show($"No active markets found for event '{selectedEvent.title}' (ticker: {selectedEvent.event_ticker}). Loading all markets for this event.", "Debug Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                activeMarkets = apiMarkets; // Use all markets if no active ones
+            }
 
             // Clear existing buttons
             bingoPanel.Controls.Clear();
 
-            // Create buttons for each market
-            foreach (var market in _markets)
+            // Create buttons for each market, arranged in a 5x5 grid
+            int maxButtons = Math.Min(activeMarkets.Count, 25); // Limit to 25 for bingo board
+            for (int i = 0; i < maxButtons; i++)
             {
+                var market = activeMarkets[i];
                 var button = new Button
                 {
-                    Text = market.title ?? market.market_ticker ?? "Unknown",
-                    Size = new Size(120, 80),
-                    Margin = new Padding(5),
+                    Text = market.Title ?? market.Ticker ?? "Unknown",
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(2),
                     Tag = market
                 };
                 button.Click += MarketButton_Click;
-                bingoPanel.Controls.Add(button);
+
+                // Calculate row and column for 5x5 grid
+                int row = i / 5;
+                int col = i % 5;
+                bingoPanel.Controls.Add(button, col, row);
             }
         }
         catch (Exception ex)
@@ -107,52 +176,8 @@ public partial class Form1 : Form
     private void MarketButton_Click(object sender, EventArgs e)
     {
         var button = (Button)sender;
-        var market = (MarketDTO)button.Tag;
+        var market = (KalshiMarket)button.Tag;
 
-        MessageBox.Show($"Selected market: {market.title}\nTicker: {market.market_ticker}", "Market Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
-    }
-}
-
-// Mock performance monitor for simplicity
-public class MockPerformanceMonitor : IPerformanceMonitor
-{
-    public void RecordSpeedDialMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)
-    {
-        // Do nothing
-    }
-
-    public void RecordProgressBarMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)
-    {
-        // Do nothing
-    }
-
-    public void RecordCounterMetric(string className, string id, string name, string description, double value, string unit, string category)
-    {
-        // Do nothing
-    }
-
-    public void RecordTrafficLightMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)
-    {
-        // Do nothing
-    }
-
-    public void RecordPieChartMetric(string className, string id, string name, string description, double value, double? secondaryValue, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)
-    {
-        // Do nothing
-    }
-
-    public void RecordNumericDisplayMetric(string className, string id, string name, string description, double value, string unit, string category)
-    {
-        // Do nothing
-    }
-
-    public void RecordBadgeMetric(string className, string id, string name, string description, double value, string unit, string category)
-    {
-        // Do nothing
-    }
-
-    public void RecordDisabledMetric(string className, string id, string name, string description, double value, string unit, string category)
-    {
-        // Do nothing
+        MessageBox.Show($"Selected market: {market.Title}\nTicker: {market.Ticker}", "Market Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

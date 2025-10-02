@@ -30,7 +30,7 @@ partial class Form1
     {
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
         eventComboBox = new ComboBox();
-        bingoPanel = new FlowLayoutPanel();
+        bingoPanel = new TableLayoutPanel();
         label1 = new Label();
         SuspendLayout();
         // 
@@ -43,12 +43,24 @@ partial class Form1
         eventComboBox.Size = new Size(300, 23);
         eventComboBox.TabIndex = 0;
         eventComboBox.SelectedIndexChanged += eventComboBox_SelectedIndexChanged;
-        // 
+        //
         // bingoPanel
-        // 
+        //
         bingoPanel.AutoScroll = true;
+        bingoPanel.ColumnCount = 5;
+        bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+        bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+        bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+        bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+        bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
         bingoPanel.Location = new Point(12, 66);
         bingoPanel.Name = "bingoPanel";
+        bingoPanel.RowCount = 5;
+        bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+        bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+        bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+        bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+        bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
         bingoPanel.Size = new Size(776, 372);
         bingoPanel.TabIndex = 1;
         // 
@@ -72,13 +84,12 @@ partial class Form1
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
         Text = "Mention Market Bingo";
-        Load += Form1_Load;
         ResumeLayout(false);
         PerformLayout();
     }
 
     private System.Windows.Forms.ComboBox eventComboBox;
-    private System.Windows.Forms.FlowLayoutPanel bingoPanel;
+    private System.Windows.Forms.TableLayoutPanel bingoPanel;
     private System.Windows.Forms.Label label1;
 
     #endregion

@@ -210,14 +210,14 @@ namespace KalshiBotAPI.KalshiAPI
                         try
                         {
                             var apiStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
-                            var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                            var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                             if (apiStopwatch != null)
                             {
                                 apiStopwatch.Stop();
                                 RecordApiResponseDuration(nameof(FetchMarketsAsync), apiStopwatch.ElapsedMilliseconds);
                             }
                             response.EnsureSuccessStatusCode();
-                            jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                            jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
                             responseData = JsonSerializer.Deserialize<MarketResponse>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                         }
                         catch (JsonException ex)
@@ -431,9 +431,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var scheduleData = JsonSerializer.Deserialize<ExchangeScheduleResponse>(
                     jsonString,
@@ -510,9 +510,9 @@ namespace KalshiBotAPI.KalshiAPI
                 });
                 request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var orderResponse = JsonSerializer.Deserialize<CreateOrderResponse>(
                     jsonString,
@@ -566,9 +566,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var cancelResponse = JsonSerializer.Deserialize<CancelOrderResponse>(
                     jsonString,
@@ -624,9 +624,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
                 var seriesResponse = JsonSerializer.Deserialize<SeriesResponse>(
                     jsonString,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -693,6 +693,147 @@ namespace KalshiBotAPI.KalshiAPI
         }
 
         /// <summary>
+        /// Fetches a paginated list of events from the Kalshi API.
+        /// Retrieves events based on various filter criteria with support for pagination.
+        /// Optionally includes nested market data for each event.
+        /// </summary>
+        /// <param name="limit">Optional limit on the number of events to retrieve per request (1-200, defaults to 100).</param>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages.</param>
+        /// <param name="withNestedMarkets">If true, includes detailed market data nested within each event response.</param>
+        /// <param name="status">Optional filter for event status ('open', 'closed', 'settled').</param>
+        /// <param name="seriesTicker">Optional filter for events by series ticker.</param>
+        /// <param name="minCloseTs">Optional filter for events with at least one market having close timestamp greater than this Unix timestamp.</param>
+        /// <returns>The API response containing events list if successful, null if the operation fails or is cancelled.</returns>
+        public async Task<EventsResponse?> GetEventsAsync(
+            int? limit = null,
+            string? cursor = null,
+            bool withNestedMarkets = false,
+            string? status = null,
+            string? seriesTicker = null,
+            long? minCloseTs = null)
+        {
+            string url = "events";
+            if (withNestedMarkets)
+            {
+                url += "?with_nested_markets=true";
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                const int maxRetries = 5;
+                int retryCount = 0;
+                int delayMs = 1000; // Start with 1 second
+                EventsResponse? eventsResponse = null;
+
+                var queryParams = new Dictionary<string, string>();
+                if (limit.HasValue)
+                {
+                    if (limit.Value < 1 || limit.Value > 200)
+                        throw new ArgumentOutOfRangeException(nameof(limit), "Limit must be between 1 and 200");
+                    queryParams["limit"] = limit.Value.ToString();
+                }
+                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
+                if (!string.IsNullOrEmpty(status)) queryParams["status"] = status;
+                if (!string.IsNullOrEmpty(seriesTicker)) queryParams["series_ticker"] = seriesTicker;
+                if (minCloseTs.HasValue) queryParams["min_close_ts"] = minCloseTs.Value.ToString();
+
+                if (queryParams.Count > 0)
+                {
+                    string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                    if (url.Contains("?"))
+                    {
+                        url += "&" + queryString;
+                    }
+                    else
+                    {
+                        url += "?" + queryString;
+                    }
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        // Create a new request message for each retry attempt
+                        var headers = GenerateAuthHeaders("GET", "/trade-api/v2/events");
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        foreach (var header in headers)
+                        {
+                            request.Headers.Add(header.Key, header.Value);
+                        }
+
+                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
+
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            retryCount++;///////////////
+                            if (retryCount >= maxRetries)
+                            {
+                                _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries - 404 Not Found", maxRetries);
+                                return null;
+                            }
+
+                            _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} - 404 Not Found, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
+                            await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
+                            delayMs *= 2; // Exponential backoff
+                            continue;
+                        }
+
+                        response.EnsureSuccessStatusCode();
+                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
+                        eventsResponse = JsonSerializer.Deserialize<EventsResponse>(
+                            jsonString,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+                        break; // Exit the retry loop on success
+                    }
+                    catch (TaskCanceledException ex)
+                    {
+                        // Retry on timeout (TaskCanceledException from HttpClient timeout)
+                        retryCount++;
+                        if (retryCount >= maxRetries)
+                        {
+                            _logger.LogWarning("GetEventsAsync failed after {RetryCount} retries - Timeout", maxRetries);
+                            return null;
+                        }
+
+                        _logger.LogInformation("GetEventsAsync retry {RetryCount}/{MaxRetries} - Timeout, waiting {DelayMs}ms", retryCount, maxRetries, delayMs);
+                        await Task.Delay(delayMs, _statusTrackerService.GetCancellationToken());
+                        delayMs *= 2; // Exponential backoff
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        // For other exceptions, don't retry
+                        _logger.LogWarning("Unexpected error in GetEventsAsync: {ExceptionType} - {Message}, Url: {0} Inner {1}"
+                            , ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
+                        return null;
+                    }
+                }
+
+                _logger.LogInformation("Retrieved {Count} events from API", eventsResponse?.Events?.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordMethodExecutionDuration(nameof(GetEventsAsync), stopwatch.ElapsedMilliseconds);
+                return eventsResponse;
+            }
+            catch (OperationCanceledException)
+            {
+                stopwatch.Stop();
+                _logger.LogDebug("GetEventsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogWarning("Unexpected error in GetEventsAsync: {ExceptionType} - {Message}, Url: {0} Inner {1}"
+                    , ex.GetType().Name, ex.Message, url, ex.InnerException != null ? ex.InnerException.Message : "");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Fetches detailed information about a specific event from the Kalshi API.
         /// Optionally includes nested market data if requested. Processes the event data into DTOs
         /// and persists both event and market information to the database.
@@ -736,7 +877,7 @@ namespace KalshiBotAPI.KalshiAPI
                             request.Headers.Add(header.Key, header.Value);
                         }
 
-                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
 
                         if (response.StatusCode == HttpStatusCode.NotFound)
                         {
@@ -754,7 +895,7 @@ namespace KalshiBotAPI.KalshiAPI
                         }
 
                         response.EnsureSuccessStatusCode();
-                        var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
                         eventResponse = JsonSerializer.Deserialize<EventResponse>(
                             jsonString,
                             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -946,9 +1087,9 @@ namespace KalshiBotAPI.KalshiAPI
 
                     try
                     {
-                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                         response.EnsureSuccessStatusCode();
-                        var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                         var responseData = JsonSerializer.Deserialize<PositionsResponse>(
                             jsonString,
@@ -1132,7 +1273,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                     try
                     {
-                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
 
                         // Handle rate limiting (429 Too Many Requests)
                         if (response.StatusCode == HttpStatusCode.TooManyRequests)
@@ -1144,7 +1285,7 @@ namespace KalshiBotAPI.KalshiAPI
                         }
 
                         response.EnsureSuccessStatusCode();
-                        var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                         var responseData = JsonSerializer.Deserialize<CandlestickResponse>(
                             jsonString,
@@ -1308,14 +1449,14 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 var apiStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 if (apiStopwatch != null)
                 {
                     apiStopwatch.Stop();
                     RecordApiResponseDuration(nameof(GetExchangeScheduleAsync), apiStopwatch.ElapsedMilliseconds);
                 }
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var balanceData = JsonSerializer.Deserialize<BalanceResponse>(
                     jsonString,
@@ -1366,9 +1507,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                string? jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                string? jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 JsonSerializerOptions? options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -1449,9 +1590,9 @@ namespace KalshiBotAPI.KalshiAPI
 
                     try
                     {
-                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                        var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                         response.EnsureSuccessStatusCode();
-                        var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                        var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                         var responseData = JsonSerializer.Deserialize<OrdersResponse>(
                             jsonString,
@@ -1575,9 +1716,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var responseData = JsonSerializer.Deserialize<AnnouncementResponse>(
                     jsonString,
@@ -1648,9 +1789,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var responseData = JsonSerializer.Deserialize<ExchangeScheduleResponse>(
                     jsonString,
@@ -1821,9 +1962,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<TotalRestingOrderValueResponse>(
                     jsonString,
@@ -1873,9 +2014,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<OrderQueuePositionResponse>(
                     jsonString,
@@ -1926,9 +2067,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<OrderResponse>(
                     jsonString,
@@ -1981,9 +2122,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<QueuePositionsResponse>(
                     jsonString,
@@ -2040,9 +2181,9 @@ namespace KalshiBotAPI.KalshiAPI
                 });
                 httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<BatchOrdersResponse>(
                     jsonString,
@@ -2099,9 +2240,9 @@ namespace KalshiBotAPI.KalshiAPI
                 });
                 httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<DeleteOrdersBatchResponse>(
                     jsonString,
@@ -2151,7 +2292,7 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
 
                 _logger.LogInformation("Order group {OrderGroupId} reset successfully", orderGroupId);
@@ -2198,7 +2339,7 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
 
                 _logger.LogInformation("Order group {OrderGroupId} deleted successfully", orderGroupId);
@@ -2245,9 +2386,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<SettlementsResponse>(
                     jsonString,
@@ -2297,9 +2438,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<FillsResponse>(
                     jsonString,
@@ -2349,9 +2490,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<IncentiveProgramsResponse>(
                     jsonString,
@@ -2401,9 +2542,9 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
                 response.EnsureSuccessStatusCode();
-                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
 
                 var result = JsonSerializer.Deserialize<EventMetadataResponse>(
                     jsonString,

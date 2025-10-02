@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -12,6 +12,13 @@
     <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
     <ProjectReference Include="..\BacklashCommon\BacklashCommon.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
+    <ProjectReference Include="..\KalshiBotAPI\KalshiBotAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

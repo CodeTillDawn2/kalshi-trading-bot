@@ -42,6 +42,13 @@ namespace BacklashBotData.Data.Interfaces
         /// </summary>
         /// <param name="dtos">The list of event DTOs to add or update.</param>
         Task AddOrUpdateEvents(List<EventDTO> dtos);
+
+        /// <summary>
+        /// Retrieves a list of events with optional wildcard search on ticker.
+        /// </summary>
+        /// <param name="tickerWildcard">Optional wildcard pattern to search in event ticker (e.g., "mention*").</param>
+        /// <returns>List of event data transfer objects matching the specified criteria.</returns>
+        Task<List<EventDTO>> GetEvents(string? tickerWildcard = null);
         #endregion
 
         #region Markets
