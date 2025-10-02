@@ -431,15 +431,17 @@ public partial class Form1 : Form
         // Update labels and bars on UI thread
         if (panel.InvokeRequired)
         {
-            panel.Invoke(() => UpdatePanelLabelsAndBars(panel, yesBid, noBid, yesDollarValue, noDollarValue));
+            panel.Invoke(() =>
+            {
+                UpdatePanelLabelsAndBars(panel, yesBid, noBid, yesDollarValue, noDollarValue);
+                UpdateProgressBarsForPanel(panel, yesDollarValue, noDollarValue);
+            });
         }
         else
         {
             UpdatePanelLabelsAndBars(panel, yesBid, noBid, yesDollarValue, noDollarValue);
+            UpdateProgressBarsForPanel(panel, yesDollarValue, noDollarValue);
         }
-
-        // Update all progress bars to maintain relative scaling
-        UpdateAllProgressBars();
     }
 
     private (decimal yesDollarValue, decimal noDollarValue) CalculateOrderBookDollarValues(List<OrderbookData> orderBook)
@@ -485,48 +487,45 @@ public partial class Form1 : Form
         if (noDollarLabel != null) noDollarLabel.Text = $"${noDollarValue:F2}";
     }
 
-    private void UpdateAllProgressBars()
+    private void UpdateProgressBarsForPanel(Panel panel, decimal yesValue, decimal noValue)
     {
-        // Collect all dollar values first to ensure consistent scaling
-        var marketValues = new Dictionary<Panel, (decimal yesValue, decimal noValue)>();
+        var tableLayout = panel.Controls.OfType<TableLayoutPanel>().FirstOrDefault();
+        if (tableLayout == null) return;
 
-        foreach (var panel in bingoPanel.Controls.OfType<Panel>())
+        var yesProgressBar = tableLayout.GetControlFromPosition(0, 3) as CustomProgressBar;
+        var noProgressBar = tableLayout.GetControlFromPosition(2, 3) as CustomProgressBar;
+
+        decimal maxValue = Math.Max(yesValue, noValue);
+
+        if (maxValue > 0)
         {
-            var market = (KalshiMarket)panel.Tag;
-            var orderBook = _orderBookService.GetOrderBook(market.Ticker);
-            var (yesValue, noValue) = CalculateOrderBookDollarValues(orderBook);
-            marketValues[panel] = (yesValue, noValue);
-        }
-
-        // Find maximum values across all markets
-        decimal maxYesValue = marketValues.Values.Max(v => v.yesValue);
-        decimal maxNoValue = marketValues.Values.Max(v => v.noValue);
-
-        // Update all progress bars with relative scaling
-        foreach (var kvp in marketValues)
-        {
-            var panel = kvp.Key;
-            var (yesValue, noValue) = kvp.Value;
-
-            var tableLayout = panel.Controls.OfType<TableLayoutPanel>().FirstOrDefault();
-            if (tableLayout == null) continue;
-
-            // Update progress bars (row 3)
-            var yesProgressBar = tableLayout.GetControlFromPosition(0, 3) as CustomProgressBar;
-            var noProgressBar = tableLayout.GetControlFromPosition(2, 3) as CustomProgressBar;
+            int yesPercentage = (int)((yesValue / maxValue) * 100);
+            int noPercentage = (int)((noValue / maxValue) * 100);
 
             if (yesProgressBar != null)
             {
-                int yesPercentage = maxYesValue > 0 ? (int)((yesValue / maxYesValue) * 100) : 0;
                 yesProgressBar.Value = Math.Min(yesPercentage, 100);
-                yesProgressBar.Invalidate(); // Force repaint for custom colors
+                yesProgressBar.Invalidate();
             }
 
             if (noProgressBar != null)
             {
-                int noPercentage = maxNoValue > 0 ? (int)((noValue / maxNoValue) * 100) : 0;
                 noProgressBar.Value = Math.Min(noPercentage, 100);
-                noProgressBar.Invalidate(); // Force repaint for custom colors
+                noProgressBar.Invalidate();
+            }
+        }
+        else
+        {
+            if (yesProgressBar != null)
+            {
+                yesProgressBar.Value = 0;
+                yesProgressBar.Invalidate();
+            }
+
+            if (noProgressBar != null)
+            {
+                noProgressBar.Value = 0;
+                noProgressBar.Invalidate();
             }
         }
     }
