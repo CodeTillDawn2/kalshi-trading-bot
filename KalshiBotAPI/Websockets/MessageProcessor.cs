@@ -1368,17 +1368,25 @@ namespace KalshiBotAPI.Websockets
                                     var markets = string.Join(", ", pending.Value.MarketTickers);
                                     marketInfo = $" for markets: {markets}";
                                 }
+
+                                // Get the current SID for this channel
+                                var currentSid = _subscriptionManager.GetChannelSid(channel);
+                                if (currentSid > 0)
+                                {
+                                    // Update subscription state to include the pending markets
+                                    await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(currentSid, channel);
+                                    _logger.LogDebug("Updated subscription state for 'Already subscribed' on channel '{Channel}' with SID {Sid}{MarketInfo}", channel, currentSid, marketInfo);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("No existing SID found for channel '{Channel}' when handling 'Already subscribed' error", channel);
+                                }
                             }
 
                             _logger.LogDebug("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
 
                             // Remove from pending confirmations since it's already subscribed
                             _subscriptionManager.RemovePendingConfirmation(id);
-
-                            // Try to find the subscription and update its state
-                            // We need to look at the original message to determine what was being subscribed to
-                            // For now, just log that we handled it
-                            _logger.LogDebug("Handled 'Already subscribed' error for ID {Id}", id);
                         }
                     }
                 }

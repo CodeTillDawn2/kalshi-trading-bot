@@ -224,6 +224,13 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         void EnqueueOkMessage(int sid, JsonElement data, long seq);
 
         /// <summary>
+        /// Gets the current subscription ID for a specific channel.
+        /// </summary>
+        /// <param name="channel">The channel name.</param>
+        /// <returns>The subscription ID, or 0 if not subscribed.</returns>
+        int GetChannelSid(string channel);
+
+        /// <summary>
         /// Handles WebSocket disconnection by clearing local subscription state.
         /// This ensures clean reconnection without stale state assumptions.
         /// </summary>

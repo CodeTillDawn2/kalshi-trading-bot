@@ -85,6 +85,9 @@ namespace KalshiBotAPI.Websockets
         // Subscription deduplication
         private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
 
+        // Channel activity tracking for health monitoring
+        private readonly ConcurrentDictionary<string, DateTime> _channelLastActivity = new();
+
         /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
         /// </summary>
@@ -415,9 +418,10 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                // Only add pending confirmations for update_subscription, not for initial subscribe
-                // Subscribe confirmations may not include ID, so we don't track them as pending
-                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage && message.Contains("\"cmd\": \"update_subscription\""))
+                // Add pending confirmations for both update_subscription and initial subscribe
+                // Both can receive "ok" confirmations with ID
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage &&
+                    (message.Contains("\"cmd\": \"update_subscription\"") || message.Contains("\"cmd\": \"subscribe\"")))
                 {
                     _pendingSubscriptionConfirmations.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
                 }
@@ -841,6 +845,8 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resubscribes to existing channel subscriptions, either selectively or forcefully.
         /// Used to restore subscriptions after connection recovery or when forcing a complete resubscription.
+        /// For market-specific channels, removes markets then adds them back to avoid "already subscribed" errors.
+        /// For non-market-specific channels, unsubscribes then resubscribes.
         /// </summary>
         /// <param name="force">If true, resubscribes to all channels regardless of current state. If false, only resubscribes to channels without active subscriptions.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
@@ -870,11 +876,37 @@ namespace KalshiBotAPI.Websockets
             {
                 var channel = subscription.Key;
                 var markets = subscription.Value.Markets.ToArray();
+                var action = GetActionFromChannel(channel);
 
                 if (markets.Any() || new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
                 {
                     _logger.LogDebug("Resubscribing to {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
-                    await SubscribeToChannelAsync(GetActionFromChannel(channel), markets);
+
+                    // For market-specific channels, remove markets then add them back to avoid "already subscribed" errors
+                    if (KalshiConstants.MarketChannelsDelta.Contains(channel) && markets.Any())
+                    {
+                        _logger.LogDebug("Using remove-then-add approach for market-specific channel {Channel}", channel);
+
+                        // First remove all markets from the subscription
+                        await UpdateSubscriptionAsync("delete_markets", markets, action);
+
+                        // Small delay to ensure the unsubscribe is processed
+                        await Task.Delay(100, _processingCancellationToken);
+
+                        // Then add them back
+                        await UpdateSubscriptionAsync("add_markets", markets, action);
+                    }
+                    else
+                    {
+                        // For non-market-specific channels, unsubscribe then resubscribe
+                        _logger.LogDebug("Using unsubscribe-then-resubscribe approach for non-market-specific channel {Channel}", channel);
+                        await UnsubscribeFromChannelAsync(action);
+
+                        // Small delay to ensure the unsubscribe is processed
+                        await Task.Delay(100, _processingCancellationToken);
+
+                        await SubscribeToChannelAsync(action, markets);
+                    }
                 }
             }
 
@@ -888,6 +920,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "market_lifecycle_v2" => "lifecycle",
+            "event_lifecycle" => "lifecycle",
             _ => throw new ArgumentException($"Unknown channel: {channel}")
         };
 
@@ -1424,13 +1457,15 @@ namespace KalshiBotAPI.Websockets
                             var sid = subscription.Value.Sid;
                             if (sid != 0)
                             {
-                                // Check if this subscription has been active recently
-                                // Look for recent subscription activity (not pending confirmations since they're removed after confirmation)
-                                var hasRecentActivity = _recentSubscriptions.Any(r => r.Key.StartsWith($"{GetActionFromChannel(channel)}:") && (now - r.Value) < staleThreshold);
+                                // Check if this subscription has received messages recently
+                                // If we receive any events from one of the channels, we consider that an active channel for all markets
+                                var hasRecentActivity = _channelLastActivity.TryGetValue(channel, out var lastActivity) &&
+                                                       (now - lastActivity) < staleThreshold;
 
                                 if (!hasRecentActivity)
                                 {
-                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, will resubscribe all", channel, sid);
+                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid} (no messages received in {ThresholdMinutes} minutes), will resubscribe all",
+                                        channel, sid, staleThreshold.TotalMinutes);
                                     hasStaleSubscriptions = true;
                                     break; // No need to check further, we'll resubscribe all
                                 }
@@ -1736,9 +1771,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="channel">The channel name where the message was received.</param>
         public void RecordChannelActivity(string channel)
         {
-            var action = GetActionFromChannel(channel);
-            var deduplicationKey = $"{action}:";
-            _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
+            _channelLastActivity[channel] = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -1771,6 +1804,16 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Gets the current subscription ID for a specific channel.
+        /// </summary>
+        /// <param name="channel">The channel name.</param>
+        /// <returns>The subscription ID, or 0 if not subscribed.</returns>
+        public int GetChannelSid(string channel)
+        {
+            return _channelSubscriptions.TryGetValue(channel, out var subscription) ? subscription.Sid : 0;
+        }
+
+        /// <summary>
         /// Handles WebSocket disconnection by clearing local subscription state.
         /// This ensures clean reconnection without stale state assumptions.
         /// </summary>
@@ -1792,6 +1835,9 @@ namespace KalshiBotAPI.Websockets
 
             // Clear recent subscriptions to force fresh subscriptions on reconnect
             _recentSubscriptions.Clear();
+
+            // Clear channel activity tracking
+            _channelLastActivity.Clear();
 
             // Clear order book queue and reset sequence tracking
             lock (_orderBookQueueSynchronizationLock)

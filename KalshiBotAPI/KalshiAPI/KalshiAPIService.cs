@@ -719,13 +719,6 @@ namespace KalshiBotAPI.KalshiAPI
                     throw new ArgumentNullException(nameof(eventTicker), "Event ticker is required");
                 }
 
-                var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/events/{eventTicker}");
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-                foreach (var header in headers)
-                {
-                    request.Headers.Add(header.Key, header.Value);
-                }
-
                 const int maxRetries = 5;
                 int retryCount = 0;
                 int delayMs = 1000; // Start with 1 second
@@ -735,6 +728,14 @@ namespace KalshiBotAPI.KalshiAPI
                 {
                     try
                     {
+                        // Create a new request message for each retry attempt
+                        var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/events/{eventTicker}");
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        foreach (var header in headers)
+                        {
+                            request.Headers.Add(header.Key, header.Value);
+                        }
+
                         var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
 
                         if (response.StatusCode == HttpStatusCode.NotFound)
