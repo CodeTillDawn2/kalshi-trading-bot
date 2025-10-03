@@ -1134,6 +1134,7 @@ namespace BacklashBot.Management
 
             foreach (var level in kvp.Value.OrderbookData)
             {
+                if (level == null) continue; // Skip null levels to prevent NullReferenceException
                 if (level.Side == "yes")
                 {
                     totalYesDepth += level.RestingContracts * level.Price;

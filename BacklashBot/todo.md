@@ -13,9 +13,9 @@
 - [ ] Subscribe to rss feed for ChangeLog
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
-
-
-# v0.3.0
+- [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
+- [ ] Rebrand
+- [ ] Rotate all credentials
 - [ ] Automate data cleanup
 - [ ] Make database logging of debug work
 - [ ] Was forced to upgrade to market lifecycle v2, need to update code to capture new fields if necessary
@@ -23,16 +23,17 @@
 - [ ] Ensure category properly retrieved and saved (missing on some markets still)
 - [ ] Revisit market interest score
 - [ ] Make various refresh threshholds configurable (timing between refreshes, number of extras forced when not many to refresh, etc)
-- [ ] Investigate: Exchange is inactive or reconnection disabled, skipping reconnection attempt (id 458076146,followed by no reconnection attempt for 2 hours, then skipping "late" snapshots, only restarting because of no snapshots in 10 minutes)
-- [ ] Start periodically sampling exchange status and find out if they are warning about sudden outages
+
+# v0.3.0
+- [x] Start periodically sampling exchange status and find out if they are warning about sudden outages
 - [x] Start with no markets watched then build list so there isn't so much of a downtime, start with most active markets to minimize impact of restart
-- [ ] Need to let market refresh service run before init finishes if long running
-- [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
-- [ ] Rebrand
-- [ ] Rotate overseer-dev kalshi key
+- [x] Need to let market refresh service run before init finishes if long running
+- [x] Overseer stable
+- [x] Re-architect
 - [x] New API calls
 - [x] Kalshi Overseer now out there, running
 - [x] Major rework - renamed things to be more clear, added xml docs, cleaned up logging, removed vestigial comments
+- [x] So many things
 
 # v0.2.5
 Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.

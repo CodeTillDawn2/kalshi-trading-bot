@@ -498,13 +498,14 @@ public partial class Form1 : Form
 
             var panels = bingoPanel.Controls.OfType<Panel>().ToList();
 
-            // Sort panels by favorability: lowest no bid first
+            // Sort panels by favorability: lowest no ask first (since no ask = 100 - yes bid, lowest ask is highest yes bid)
             var sortedPanels = panels.OrderBy(p =>
             {
                 var market = (KalshiMarket)p.Tag;
                 var orderBook = _orderBookService.GetOrderBook(market.Ticker);
-                var noBid = orderBook.LastOrDefault(o => o.Side == "no")?.Price ?? market.NoBid;
-                return noBid;
+                var yesBid = orderBook.LastOrDefault(o => o.Side == "yes")?.Price ?? market.YesBid;
+                var noAsk = 10000 - yesBid; // No ask in cents
+                return noAsk;
             }).ToList();
 
             decimal remainingExposure = maxExposureDollars;
@@ -515,25 +516,21 @@ public partial class Form1 : Form
             orderDetails.AppendLine($"No Orders Placed - Max Exposure: ${maxExposureDollars:F2}, Max No Price: ${maxNoPriceDollars:F2}");
             orderDetails.AppendLine("---");
 
-            // Aggregate all no levels from all markets
-            var allNoLevels = new List<(KalshiMarket market, OrderbookData level)>();
+            // Place orders at calculated ask prices, rate limited to 20 per second
+            var startTime = DateTime.UtcNow;
+            int ordersThisSecond = 0;
             foreach (var panel in sortedPanels)
             {
                 var market = (KalshiMarket)panel.Tag;
                 var orderBook = _orderBookService.GetOrderBook(market.Ticker);
-                var noLevels = orderBook.Where(o => o.Side == "no" && o.Price <= noPriceCents).Select(level => (market, level));
-                allNoLevels.AddRange(noLevels);
-            }
-            allNoLevels = allNoLevels.OrderBy(x => x.level.Price).ToList();
+                var yesBid = orderBook.LastOrDefault(o => o.Side == "yes")?.Price ?? market.YesBid;
+                var noAskCents = 10000 - yesBid; // No ask in cents
+                var orderPriceCents = Math.Min(noPriceCents, noAskCents); // Cap at max no price
+                var orderPriceDollars = orderPriceCents / 100.0m;
 
-            // Place orders on cheapest levels first, rate limited to 20 per second
-            var startTime = DateTime.UtcNow;
-            int ordersThisSecond = 0;
-            foreach (var (market, level) in allNoLevels)
-            {
-                if (remainingExposure < level.Price / 100.0m) break;
+                if (remainingExposure < orderPriceDollars) break;
 
-                int count = (int)Math.Min(level.RestingContracts, remainingExposure * 100 / level.Price);
+                int count = (int)(remainingExposure / orderPriceDollars);
                 if (count <= 0) break;
 
                 // Rate limiting: 20 orders per second
@@ -555,7 +552,7 @@ public partial class Form1 : Form
                     Ticker = market.Ticker,
                     Side = "no",
                     Count = count,
-                    NoPrice = level.Price,
+                    NoPrice = orderPriceCents,
                     ClientOrderId = Guid.NewGuid().ToString()
                 };
 
@@ -564,11 +561,11 @@ public partial class Form1 : Form
                 if (response != null)
                 {
                     totalOrdersPlaced++;
-                    decimal exposureUsed = count * (level.Price / 100.0m);
+                    decimal exposureUsed = count * orderPriceDollars;
                     totalExposureUsed += exposureUsed;
                     remainingExposure -= exposureUsed;
 
-                    orderDetails.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Market: {market.Ticker}, Price: {level.Price}¢, Count: {count}, Exposure: ${exposureUsed:F2}, Order ID: {response.Order.OrderId}");
+                    orderDetails.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Market: {market.Ticker}, Price: {orderPriceCents}¢, Count: {count}, Exposure: ${exposureUsed:F2}, Order ID: {response.Order.OrderId}");
                 }
 
                 ordersThisSecond++;

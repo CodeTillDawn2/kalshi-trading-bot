@@ -362,6 +362,10 @@ namespace BacklashBot.Management
                             _logger.LogInformation("OVERSEER- Overseer connection failed: {Message}. This is optional and not catastrophic.", exception.Message);
                             // Don't increment error count or mark as catastrophic
                         }
+                        else if (exception is Microsoft.Data.SqlClient.SqlException sqlEx && sqlEx.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _logger.LogInformation("HANDLED ERROR: (SqlException - Duplicate Key): {ErrorMessage} ... not catastrophic.", sqlEx.Message);
+                        }
                         else
                         {
                             _logger.LogCritical(exception, "UNHANDLED ERROR: from {Identifier}. Original Message: '{OriginalMessage}', Type: {ExceptionType}, Inner exception: {InnerExceptionMessage}",

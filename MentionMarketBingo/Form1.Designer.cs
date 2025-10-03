@@ -300,7 +300,7 @@ partial class Form1
         Controls.Add(bottomPanel);
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
-        Text = "Mention Market Bingo";
+        Text = "Backlash Studios' Mention Market Bingo";
         Load += Form1_Load;
         topPanel.ResumeLayout(false);
         topPanel.PerformLayout();
