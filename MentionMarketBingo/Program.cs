@@ -23,9 +23,19 @@ static class Program
     [STAThread]
     static void Main()
     {
-        // ## Configuration Setup - match test setup for proper secrets loading
-        string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-        var configuration = BacklashCommon.Configuration.ConfigurationHelper.CreateConfigurationBuilder(basePath, Array.Empty<string>()).Build();
+        try
+        {
+            // ## Configuration Setup - match test setup for proper secrets loading
+            string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+
+            // Debug: Check if the path exists
+            if (!Directory.Exists(basePath))
+            {
+                MessageBox.Show($"Configuration directory not found: {basePath}\nCurrent directory: {AppDomain.CurrentDomain.BaseDirectory}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var configuration = BacklashCommon.Configuration.ConfigurationHelper.CreateConfigurationBuilder(basePath, Array.Empty<string>()).Build();
 
         // Set up DI container
         var services = new ServiceCollection();
@@ -188,6 +198,11 @@ static class Program
         var form = serviceProvider.GetRequiredService<Form1>();
 
         Application.Run(form);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Application startup failed: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 }
 

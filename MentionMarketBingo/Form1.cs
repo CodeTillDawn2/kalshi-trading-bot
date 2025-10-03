@@ -18,6 +18,7 @@ using System;
 
 namespace MentionMarketBingo;
 
+
 public partial class Form1 : Form
 {
     private readonly IServiceProvider _serviceProvider;
@@ -26,12 +27,17 @@ public partial class Form1 : Form
     private List<EventDTO> _events = new();
     private List<string> _currentMarketTickers = new();
 
+    private SystemAudioRecognizer _audioRecognizer;
+    private bool _isAudioListening = false;
+
     public Form1(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _orderBookService = serviceProvider.GetRequiredService<MentionMarketBingoOrderBookService>();
         _webSocketMonitorService = serviceProvider.GetRequiredService<MentionMarketBingoWebSocketMonitorService>();
         InitializeComponent();
+
+        InitializeAudioRecognition();
     }
 
     private async void Form1_Load(object sender, EventArgs e)
@@ -51,13 +57,87 @@ public partial class Form1 : Form
         _orderBookService.OrderBookUpdated += OnOrderBookUpdated;
     }
 
+    private void InitializeAudioRecognition()
+    {
+        try
+        {
+            _audioRecognizer = new SystemAudioRecognizer();
+            _audioRecognizer.SpeechRecognized += OnSpeechRecognized;
+            _audioRecognizer.ErrorOccurred += OnAudioError;
+        }
+        catch (Exception ex)
+        {
+            // If anything fails, show it in a message box
+            MessageBox.Show($"Audio initialization failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void ToggleAudioButton_Click(object sender, EventArgs e)
+    {
+        if (_isAudioListening)
+        {
+            _audioRecognizer.StopListening();
+            toggleAudioButton.Text = "Start Audio Recognition";
+            toggleAudioButton.BackColor = Color.LightBlue;
+            _isAudioListening = false;
+            recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Stopped audio recognition\r\n");
+        }
+        else
+        {
+            try
+            {
+                _audioRecognizer.StartListening();
+                toggleAudioButton.Text = "Stop Audio Recognition";
+                toggleAudioButton.BackColor = Color.LightCoral;
+                _isAudioListening = true;
+                recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Started audio recognition\r\n");
+
+                // Force UI refresh
+                toggleAudioButton.Refresh();
+                recognizedTextBox.Refresh();
+                this.Refresh();
+                Application.DoEvents();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to start audio recognition: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Failed to start audio recognition: {ex.Message}\r\n");
+            }
+        }
+        recognizedTextBox.ScrollToCaret();
+    }
+
+    private void OnSpeechRecognized(object sender, System.Speech.Recognition.SpeechRecognizedEventArgs e)
+    {
+        if (this.InvokeRequired)
+        {
+            this.Invoke(new Action(() => OnSpeechRecognized(sender, e)));
+            return;
+        }
+
+        string text = $"{DateTime.Now:HH:mm:ss}: {e.Result.Text} (Confidence: {e.Result.Confidence:P1})\r\n";
+        recognizedTextBox.AppendText(text);
+        recognizedTextBox.ScrollToCaret();
+    }
+
+    private void OnAudioError(object sender, string error)
+    {
+        if (this.InvokeRequired)
+        {
+            this.Invoke(new Action(() => OnAudioError(sender, error)));
+            return;
+        }
+
+        recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Error - {error}\r\n");
+        recognizedTextBox.ScrollToCaret();
+    }
+
     private async Task InitializeAsync()
     {
         try
         {
             using var scope = _serviceProvider.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-
 
             // Fetch all open events from API (pagination handled internally)
             var eventsResponse = await Task.Run(() => apiService.GetEventsAsync(
@@ -100,10 +180,11 @@ public partial class Form1 : Form
             {
                 eventComboBox.SelectedIndex = 0;
             }
+
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to load events: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load events: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -528,5 +609,11 @@ public partial class Form1 : Form
                 noProgressBar.Invalidate();
             }
         }
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        _audioRecognizer?.Dispose();
+        base.OnFormClosing(e);
     }
 }

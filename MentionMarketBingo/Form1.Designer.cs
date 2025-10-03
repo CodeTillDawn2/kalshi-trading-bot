@@ -40,6 +40,8 @@ partial class Form1
         maxYesPriceTextBox = new TextBox();
         refreshButton = new Button();
         buyNosButton = new Button();
+        toggleAudioButton = new Button();
+        recognizedTextBox = new TextBox();
         topPanel = new TableLayoutPanel();
         topPanel.SuspendLayout();
         SuspendLayout();
@@ -66,7 +68,7 @@ partial class Form1
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
         bingoPanel.Dock = DockStyle.Fill;
-        bingoPanel.Location = new Point(0, 60);
+        bingoPanel.Location = new Point(0, 0);
         bingoPanel.Name = "bingoPanel";
         bingoPanel.RowCount = 5;
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
@@ -74,7 +76,7 @@ partial class Form1
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-        bingoPanel.Size = new Size(1000, 440);
+        bingoPanel.Size = new Size(1000, 446);
         bingoPanel.TabIndex = 1;
         // 
         // label1
@@ -173,6 +175,31 @@ partial class Form1
         buyNosButton.UseVisualStyleBackColor = true;
         buyNosButton.Click += buyNosButton_Click;
         // 
+        // toggleAudioButton
+        // 
+        toggleAudioButton.BackColor = Color.LightBlue;
+        toggleAudioButton.Dock = DockStyle.Fill;
+        toggleAudioButton.Location = new Point(833, 33);
+        toggleAudioButton.Name = "toggleAudioButton";
+        toggleAudioButton.Size = new Size(164, 24);
+        toggleAudioButton.TabIndex = 13;
+        toggleAudioButton.Text = "Start Audio Recognition";
+        toggleAudioButton.UseVisualStyleBackColor = false;
+        toggleAudioButton.Click += ToggleAudioButton_Click;
+        // 
+        // recognizedTextBox
+        // 
+        recognizedTextBox.BackColor = Color.White;
+        recognizedTextBox.Dock = DockStyle.Bottom;
+        recognizedTextBox.Font = new Font("Consolas", 9F);
+        recognizedTextBox.Location = new Point(0, 446);
+        recognizedTextBox.Multiline = true;
+        recognizedTextBox.Name = "recognizedTextBox";
+        recognizedTextBox.ReadOnly = true;
+        recognizedTextBox.ScrollBars = ScrollBars.Vertical;
+        recognizedTextBox.Size = new Size(1000, 54);
+        recognizedTextBox.TabIndex = 14;
+        // 
         // topPanel
         // 
         topPanel.ColumnCount = 6;
@@ -192,6 +219,7 @@ partial class Form1
         topPanel.Controls.Add(eventComboBox, 1, 1);
         topPanel.Controls.Add(refreshButton, 3, 1);
         topPanel.Controls.Add(buyNosButton, 4, 1);
+        topPanel.Controls.Add(toggleAudioButton, 5, 1);
         topPanel.Dock = DockStyle.Top;
         topPanel.Location = new Point(0, 0);
         topPanel.Name = "topPanel";
@@ -206,8 +234,9 @@ partial class Form1
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(1000, 500);
-        Controls.Add(bingoPanel);
         Controls.Add(topPanel);
+        Controls.Add(bingoPanel);
+        Controls.Add(recognizedTextBox);
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
         Text = "Mention Market Bingo";
@@ -215,6 +244,7 @@ partial class Form1
         topPanel.ResumeLayout(false);
         topPanel.PerformLayout();
         ResumeLayout(false);
+        PerformLayout();
     }
 
     private System.Windows.Forms.ComboBox eventComboBox;
@@ -228,6 +258,8 @@ partial class Form1
     private System.Windows.Forms.TextBox maxYesPriceTextBox;
     private System.Windows.Forms.Button refreshButton;
     private System.Windows.Forms.Button buyNosButton;
+    private System.Windows.Forms.Button toggleAudioButton;
+    private System.Windows.Forms.TextBox recognizedTextBox;
     private System.Windows.Forms.TableLayoutPanel topPanel;
 
     #endregion
