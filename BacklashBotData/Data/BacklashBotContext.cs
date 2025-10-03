@@ -1653,9 +1653,27 @@ namespace BacklashBotData.Data
         #region Milestones
         public async Task AddMilestones(List<MilestoneDTO> milestones)
         {
-            var milestoneModels = milestones.Select(m => m.ToMilestone()).ToList();
-            await Milestones.AddRangeAsync(milestoneModels);
+            foreach (var milestoneDTO in milestones)
+            {
+                var existing = await Milestones.FirstOrDefaultAsync(m => m.Id == milestoneDTO.Id);
+                if (existing != null)
+                {
+                    existing.UpdateMilestone(milestoneDTO);
+                }
+                else
+                {
+                    await Milestones.AddAsync(milestoneDTO.ToMilestone());
+                }
+            }
             await SaveChangesAsync();
+        }
+
+        public async Task<List<MilestoneDTO>> GetMilestonesByEventTickerAsync(string eventTicker)
+        {
+            var milestones = await Milestones.AsNoTracking().ToListAsync();
+            return milestones.Where(m => (m.PrimaryEventTickers != null && m.PrimaryEventTickers.Contains(eventTicker)) ||
+                                          (m.RelatedEventTickers != null && m.RelatedEventTickers.Contains(eventTicker)))
+                             .Select(m => m.ToMilestoneDTO()).ToList();
         }
         #endregion
 

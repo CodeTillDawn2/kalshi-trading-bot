@@ -28,6 +28,8 @@ public partial class Form1 : Form
     private readonly ILogger<Form1> _logger;
     private List<EventDTO> _events = new();
     private List<string> _currentMarketTickers = new();
+    private MilestoneDTO? currentNextMilestone;
+    private System.Windows.Forms.Timer countdownTimer;
 
     public Form1(IServiceProvider serviceProvider)
     {
@@ -53,6 +55,12 @@ public partial class Form1 : Form
 
         // Subscribe to orderbook updates
         _orderBookService.OrderBookUpdated += OnOrderBookUpdated;
+
+        // Start countdown timer
+        countdownTimer = new System.Windows.Forms.Timer();
+        countdownTimer.Interval = 1000; // 1 second
+        countdownTimer.Tick += CountdownTimer_Tick;
+        countdownTimer.Start();
     }
 
 
@@ -126,6 +134,21 @@ public partial class Form1 : Form
                 MessageBox.Show("No events with 'mention' in the ticker could be found.", "No Events Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            // Sort events by next milestone start date
+            var sortedEvents = new List<EventDTO>();
+            foreach (var eventDto in _events)
+            {
+                using var milestoneScope = _serviceProvider.CreateScope();
+                var context = milestoneScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                var milestones = await context.GetMilestonesByEventTickerAsync(eventDto.event_ticker);
+                var nextMilestone = milestones.Where(m => m.StartDate > DateTime.UtcNow).OrderBy(m => m.StartDate).FirstOrDefault();
+                eventDto.NextMilestoneStart = nextMilestone?.StartDate;
+                sortedEvents.Add(eventDto);
+            }
+            sortedEvents = sortedEvents.OrderBy(e => e.NextMilestoneStart ?? DateTime.MaxValue).ToList();
+
+            _events = sortedEvents;
 
             eventComboBox.DataSource = _events;
             eventComboBox.DisplayMember = "title";
@@ -300,6 +323,13 @@ public partial class Form1 : Form
                 tableLayout.Controls.Add(yesProgressBar, 0, 3);
                 tableLayout.Controls.Add(noProgressBar, 2, 3);
 
+                // Add click handlers to all controls
+                tableLayout.Click += (s, e) => MarketPanel_Click(panel, market);
+                yesProgressBar.Click += (s, e) => MarketPanel_Click(panel, market);
+                noProgressBar.Click += (s, e) => MarketPanel_Click(panel, market);
+                yesDollarLabel.Click += (s, e) => MarketPanel_Click(panel, market);
+                noDollarLabel.Click += (s, e) => MarketPanel_Click(panel, market);
+
                 // Store references for later updates
                 panel.Controls.Add(tableLayout);
 
@@ -322,6 +352,9 @@ public partial class Form1 : Form
 
             // Track markets for monitoring purposes
             await _webSocketMonitorService.SubscribeToEventMarketsAsync(selectedEvent.event_ticker, _currentMarketTickers.ToArray());
+
+            // Update milestone labels
+            await UpdateMilestoneLabels();
         }
         catch (Exception ex)
         {
@@ -342,7 +375,7 @@ public partial class Form1 : Form
         panel.Enabled = false; // Disable to prevent multiple clicks
         try
         {
-            if (!decimal.TryParse(maxExposureTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
+            if (!decimal.TryParse(maxExposureNoTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
             {
                 MessageBox.Show("Invalid Max Exposure value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -354,45 +387,52 @@ public partial class Form1 : Form
                 return;
             }
 
-            int maxExposureCents = (int)(maxExposureDollars * 100);
-            int yesPriceCents = (int)(maxYesPriceDollars * 100);
-            int count = maxExposureCents / yesPriceCents;
-
-            if (count <= 0)
-            {
-                MessageBox.Show("Max Exposure too low for the given Max Yes Price.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
             using var scope = _serviceProvider.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            var orderRequest = new CreateOrderRequest
-            {
-                Action = "buy",
-                Type = "limit",
-                Ticker = market.Ticker,
-                Side = "yes",
-                Count = count,
-                YesPrice = yesPriceCents,
-                ClientOrderId = Guid.NewGuid().ToString()
-            };
+            var orderBook = _orderBookService.GetOrderBook(market.Ticker);
+            var yesLevels = orderBook.Where(o => o.Side == "yes" && o.Price <= (int)(maxYesPriceDollars * 100)).OrderBy(o => o.Price).ToList();
 
-            var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
+            decimal remainingExposure = maxExposureDollars;
+            int ordersPlaced = 0;
 
-            if (response != null)
+            foreach (var level in yesLevels)
             {
-                decimal exposureUsed = count * maxYesPriceDollars;
-                string orderDetails = $"Yes Order Placed:\nMarket: {market.Ticker}\nCount: {count}\nPrice: ${maxYesPriceDollars:F2}\nExposure: ${exposureUsed:F2}\nOrder ID: {response.Order.OrderId}\n---\n";
-                orderLogTextBox.Text += orderDetails;
-                // Keep disabled
+                if (remainingExposure < level.Price / 100.0m) break;
+
+                int count = (int)Math.Min(level.RestingContracts, remainingExposure * 100 / level.Price);
+                if (count <= 0) break;
+
+                var orderRequest = new CreateOrderRequest
+                {
+                    Action = "buy",
+                    Type = "limit",
+                    Ticker = market.Ticker,
+                    Side = "yes",
+                    Count = count,
+                    YesPrice = level.Price,
+                    ClientOrderId = Guid.NewGuid().ToString()
+                };
+
+                var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
+
+                if (response != null)
+                {
+                    ordersPlaced++;
+                    decimal exposureUsed = count * (level.Price / 100.0m);
+                    remainingExposure -= exposureUsed;
+                    string orderDetails = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Yes Order Placed: Market: {market.Ticker}, Price: {level.Price}¢, Count: {count}, Exposure: ${exposureUsed:F2}, Order ID: {response.Order.OrderId}\n";
+                    orderLogTextBox.AppendText(orderDetails);
+                }
             }
-            else
+
+            if (ordersPlaced == 0)
             {
-                string errorDetails = $"Failed to place yes order for market {market.Ticker}.\n---\n";
-                orderLogTextBox.Text += errorDetails;
-                panel.Enabled = true; // Re-enable on failure
+                string errorDetails = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] No suitable yes levels found for market {market.Ticker}.\n---\n";
+                orderLogTextBox.AppendText(errorDetails);
+                panel.Enabled = true; // Re-enable if no orders placed
             }
+            // Keep disabled if orders were placed
         }
         catch (Exception ex)
         {
@@ -412,6 +452,11 @@ public partial class Form1 : Form
     }
 
     private void maxExposureTextBox_TextChanged(object sender, EventArgs e)
+    {
+        SaveConfig();
+    }
+
+    private void maxExposureNoTextBox_TextChanged(object sender, EventArgs e)
     {
         SaveConfig();
     }
@@ -436,7 +481,7 @@ public partial class Form1 : Form
         buyNosButton.Enabled = false;
         try
         {
-            if (!decimal.TryParse(maxExposureTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
+            if (!decimal.TryParse(maxExposureYesTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
             {
                 MessageBox.Show("Invalid Max Exposure value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -470,14 +515,39 @@ public partial class Form1 : Form
             orderDetails.AppendLine($"No Orders Placed - Max Exposure: ${maxExposureDollars:F2}, Max No Price: ${maxNoPriceDollars:F2}");
             orderDetails.AppendLine("---");
 
+            // Aggregate all no levels from all markets
+            var allNoLevels = new List<(KalshiMarket market, OrderbookData level)>();
             foreach (var panel in sortedPanels)
             {
-                if (remainingExposure < maxNoPriceDollars) break;
+                var market = (KalshiMarket)panel.Tag;
+                var orderBook = _orderBookService.GetOrderBook(market.Ticker);
+                var noLevels = orderBook.Where(o => o.Side == "no" && o.Price <= noPriceCents).Select(level => (market, level));
+                allNoLevels.AddRange(noLevels);
+            }
+            allNoLevels = allNoLevels.OrderBy(x => x.level.Price).ToList();
 
-                int count = (int)(remainingExposure / maxNoPriceDollars);
+            // Place orders on cheapest levels first, rate limited to 20 per second
+            var startTime = DateTime.UtcNow;
+            int ordersThisSecond = 0;
+            foreach (var (market, level) in allNoLevels)
+            {
+                if (remainingExposure < level.Price / 100.0m) break;
+
+                int count = (int)Math.Min(level.RestingContracts, remainingExposure * 100 / level.Price);
                 if (count <= 0) break;
 
-                var market = (KalshiMarket)panel.Tag;
+                // Rate limiting: 20 orders per second
+                if (ordersThisSecond >= 20)
+                {
+                    var elapsed = DateTime.UtcNow - startTime;
+                    if (elapsed.TotalMilliseconds < 1000)
+                    {
+                        await Task.Delay(1000 - (int)elapsed.TotalMilliseconds);
+                    }
+                    startTime = DateTime.UtcNow;
+                    ordersThisSecond = 0;
+                }
+
                 var orderRequest = new CreateOrderRequest
                 {
                     Action = "buy",
@@ -485,7 +555,7 @@ public partial class Form1 : Form
                     Ticker = market.Ticker,
                     Side = "no",
                     Count = count,
-                    NoPrice = noPriceCents,
+                    NoPrice = level.Price,
                     ClientOrderId = Guid.NewGuid().ToString()
                 };
 
@@ -494,24 +564,22 @@ public partial class Form1 : Form
                 if (response != null)
                 {
                     totalOrdersPlaced++;
-                    decimal exposureUsed = count * maxNoPriceDollars;
+                    decimal exposureUsed = count * (level.Price / 100.0m);
                     totalExposureUsed += exposureUsed;
                     remainingExposure -= exposureUsed;
 
-                    orderDetails.AppendLine($"Market: {market.Ticker}");
-                    orderDetails.AppendLine($"  Count: {count}");
-                    orderDetails.AppendLine($"  Price: ${maxNoPriceDollars:F2}");
-                    orderDetails.AppendLine($"  Exposure: ${exposureUsed:F2}");
-                    orderDetails.AppendLine($"  Order ID: {response.Order.OrderId}");
-                    orderDetails.AppendLine("---");
+                    orderDetails.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Market: {market.Ticker}, Price: {level.Price}¢, Count: {count}, Exposure: ${exposureUsed:F2}, Order ID: {response.Order.OrderId}");
                 }
+
+                ordersThisSecond++;
             }
 
             orderDetails.AppendLine($"Total Orders Placed: {totalOrdersPlaced}");
             orderDetails.AppendLine($"Total Exposure Used: ${totalExposureUsed:F2}");
             orderDetails.AppendLine($"Remaining Exposure: ${remainingExposure:F2}");
+            orderDetails.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] --- End of No Orders ---");
 
-            orderLogTextBox.Text = orderDetails.ToString();
+            orderLogTextBox.AppendText(orderDetails.ToString());
         }
         catch (Exception ex)
         {
@@ -523,23 +591,25 @@ public partial class Form1 : Form
         }
     }
 
+
     private void LoadConfig()
     {
         if (File.Exists("config.txt"))
         {
             var lines = File.ReadAllLines("config.txt");
-            if (lines.Length >= 3)
+            if (lines.Length >= 4)
             {
-                maxExposureTextBox.Text = lines[0];
-                maxNoPriceTextBox.Text = lines[1];
-                maxYesPriceTextBox.Text = lines[2];
+                maxExposureYesTextBox.Text = lines[0];
+                maxExposureNoTextBox.Text = lines[1];
+                maxNoPriceTextBox.Text = lines[2];
+                maxYesPriceTextBox.Text = lines[3];
             }
         }
     }
 
     private void SaveConfig()
     {
-        File.WriteAllLines("config.txt", new[] { maxExposureTextBox.Text, maxNoPriceTextBox.Text, maxYesPriceTextBox.Text });
+        File.WriteAllLines("config.txt", new[] { maxExposureYesTextBox.Text, maxExposureNoTextBox.Text, maxNoPriceTextBox.Text, maxYesPriceTextBox.Text });
     }
 
     private void OnOrderBookUpdated(object? sender, string ticker)
@@ -657,8 +727,60 @@ public partial class Form1 : Form
         }
     }
 
+    private void CountdownTimer_Tick(object sender, EventArgs e)
+    {
+        UpdateCountdown();
+    }
+
+    private void UpdateCountdown()
+    {
+        if (currentNextMilestone != null)
+        {
+            var timeLeft = currentNextMilestone.StartDate - DateTime.UtcNow;
+            if (timeLeft.TotalSeconds > 0)
+            {
+                nextMilestoneCountdownLabel.Text = $"{(int)timeLeft.TotalDays}d {(int)timeLeft.TotalHours % 24}h {timeLeft.Minutes}m {timeLeft.Seconds}s";
+            }
+            else
+            {
+                nextMilestoneCountdownLabel.Text = "Started";
+            }
+        }
+        else
+        {
+            nextMilestoneCountdownLabel.Text = "";
+        }
+    }
+
+    private async Task UpdateMilestoneLabels()
+    {
+        var selectedEvent = (EventDTO)eventComboBox.SelectedItem;
+        if (selectedEvent != null)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+            var milestones = await context.GetMilestonesByEventTickerAsync(selectedEvent.event_ticker);
+            currentNextMilestone = milestones.Where(m => m.StartDate > DateTime.UtcNow).OrderBy(m => m.StartDate).FirstOrDefault();
+            if (currentNextMilestone != null)
+            {
+                var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                var localTime = TimeZoneInfo.ConvertTimeFromUtc(currentNextMilestone.StartDate, easternTimeZone);
+                nextMilestoneTimeLabel.Text = localTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            else
+            {
+                nextMilestoneTimeLabel.Text = "No upcoming milestone";
+            }
+        }
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         base.OnFormClosing(e);
+    }
+
+    private void topPanel_Paint(object sender, PaintEventArgs e)
+    {
+
     }
 }

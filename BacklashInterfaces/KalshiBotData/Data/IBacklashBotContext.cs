@@ -639,6 +639,13 @@ namespace BacklashBotData.Data.Interfaces
         /// </summary>
         /// <param name="milestones">The list of milestone DTOs to add.</param>
         Task AddMilestones(List<MilestoneDTO> milestones);
+
+        /// <summary>
+        /// Gets milestones by event ticker.
+        /// </summary>
+        /// <param name="eventTicker">The event ticker to filter by.</param>
+        /// <returns>A list of milestone DTOs for the event.</returns>
+        Task<List<MilestoneDTO>> GetMilestonesByEventTickerAsync(string eventTicker);
         #endregion
 
         #region Exchange Schedule
