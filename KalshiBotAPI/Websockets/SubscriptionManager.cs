@@ -1320,7 +1320,7 @@ namespace KalshiBotAPI.Websockets
 
                     var now = DateTime.UtcNow;
                     var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
-                    bool hasStaleSubscriptions = false;
+                    var staleSubscriptions = new List<(string Channel, string[] Markets)>();
 
                     _subscriptionLock.EnterReadLock();
                     try
@@ -1334,13 +1334,14 @@ namespace KalshiBotAPI.Websockets
                                 // Check if this subscription has received messages recently
                                 // Use channel activity tracking instead of subscription attempts
                                 var hasRecentActivity = _lastChannelActivity.TryGetValue(channel, out var lastActivity) &&
-                                                       (now - lastActivity) < staleThreshold;
+                                                        (now - lastActivity) < staleThreshold;
 
                                 if (!hasRecentActivity)
                                 {
-                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, will resubscribe all", channel, sid);
-                                    hasStaleSubscriptions = true;
-                                    break; // No need to check further, we'll resubscribe all
+                                    if (channel != "fill") {
+                                        _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, will resubscribe", channel, sid);
+                                    }
+                                    staleSubscriptions.Add((channel, subscription.Value.Markets.ToArray()));
                                 }
                             }
                         }
@@ -1350,10 +1351,17 @@ namespace KalshiBotAPI.Websockets
                         _subscriptionLock.ExitReadLock();
                     }
 
-                    if (hasStaleSubscriptions)
+                    if (staleSubscriptions.Any())
                     {
-                        _logger.LogInformation("Resubscribing to all subscriptions due to detected stale subscriptions");
-                        await ResubscribeAsync(true); // Force resubscribe to all
+                        _logger.LogInformation("Resubscribing to {Count} stale subscriptions", staleSubscriptions.Count);
+                        foreach (var (channel, markets) in staleSubscriptions)
+                        {
+                            if (markets.Any() || new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
+                            {
+                                _logger.LogDebug("Resubscribing to stale {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
+                                await SubscribeToChannelAsync(GetActionFromChannel(channel), markets);
+                            }
+                        }
                     }
                 }
                 catch (OperationCanceledException)
