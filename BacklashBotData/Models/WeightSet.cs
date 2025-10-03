@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a set of trading weights for portfolio optimization and strategy allocation.

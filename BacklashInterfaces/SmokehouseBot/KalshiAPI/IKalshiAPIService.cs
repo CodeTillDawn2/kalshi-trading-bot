@@ -124,6 +124,27 @@ namespace BacklashBot.KalshiAPI.Interfaces
         Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync();
 
         /// <summary>
+        /// Retrieves milestones from the Kalshi API with support for various filters and pagination.
+        /// Provides information about important events, deadlines, or significant occurrences related to markets and trading activities.
+        /// </summary>
+        /// <param name="minimumStartDate">Optional minimum start date filter for milestones (RFC3339 timestamp).</param>
+        /// <param name="category">Optional filter for milestone category.</param>
+        /// <param name="competition">Optional filter for competition.</param>
+        /// <param name="type">Optional filter for milestone type.</param>
+        /// <param name="relatedEventTicker">Optional filter for related event ticker.</param>
+        /// <param name="limit">Required limit on the number of milestones to retrieve per request (1-200).</param>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of milestones.</param>
+        /// <returns>The milestones response containing milestone data, or null if the operation fails.</returns>
+        Task<MilestonesResponse?> GetMilestonesAsync(
+            string? minimumStartDate = null,
+            string? category = null,
+            string? competition = null,
+            string? type = null,
+            string? relatedEventTicker = null,
+            int? limit = null,
+            string? cursor = null);
+
+        /// <summary>
         /// Creates an order on the Kalshi platform.
         /// </summary>
         /// <param name="marketTicker">The market ticker.</param>

@@ -151,7 +151,7 @@ static class Program
             var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotData.Configuration.BacklashBotDataConfig>>().Value;
             var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
             var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
-            return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
+            return new BacklashBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
         });
 
         // Register simple data cache

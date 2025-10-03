@@ -1,5 +1,5 @@
 
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a category or type classification for markets in the Kalshi trading system.

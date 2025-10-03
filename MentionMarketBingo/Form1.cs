@@ -15,6 +15,7 @@ using System.Data.SqlClient;
 using BacklashInterfaces.Constants;
 using System.IO;
 using System;
+using BacklashBotData.Extensions;
 
 namespace MentionMarketBingo;
 
@@ -24,20 +25,17 @@ public partial class Form1 : Form
     private readonly IServiceProvider _serviceProvider;
     private readonly MentionMarketBingoOrderBookService _orderBookService;
     private readonly MentionMarketBingoWebSocketMonitorService _webSocketMonitorService;
+    private readonly ILogger<Form1> _logger;
     private List<EventDTO> _events = new();
     private List<string> _currentMarketTickers = new();
-
-    private SystemAudioRecognizer _audioRecognizer;
-    private bool _isAudioListening = false;
 
     public Form1(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _orderBookService = serviceProvider.GetRequiredService<MentionMarketBingoOrderBookService>();
         _webSocketMonitorService = serviceProvider.GetRequiredService<MentionMarketBingoWebSocketMonitorService>();
+        _logger = serviceProvider.GetRequiredService<ILogger<Form1>>();
         InitializeComponent();
-
-        InitializeAudioRecognition();
     }
 
     private async void Form1_Load(object sender, EventArgs e)
@@ -57,80 +55,6 @@ public partial class Form1 : Form
         _orderBookService.OrderBookUpdated += OnOrderBookUpdated;
     }
 
-    private void InitializeAudioRecognition()
-    {
-        try
-        {
-            _audioRecognizer = new SystemAudioRecognizer();
-            _audioRecognizer.SpeechRecognized += OnSpeechRecognized;
-            _audioRecognizer.ErrorOccurred += OnAudioError;
-        }
-        catch (Exception ex)
-        {
-            // If anything fails, show it in a message box
-            MessageBox.Show($"Audio initialization failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    private void ToggleAudioButton_Click(object sender, EventArgs e)
-    {
-        if (_isAudioListening)
-        {
-            _audioRecognizer.StopListening();
-            toggleAudioButton.Text = "Start Audio Recognition";
-            toggleAudioButton.BackColor = Color.LightBlue;
-            _isAudioListening = false;
-            recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Stopped audio recognition\r\n");
-        }
-        else
-        {
-            try
-            {
-                _audioRecognizer.StartListening();
-                toggleAudioButton.Text = "Stop Audio Recognition";
-                toggleAudioButton.BackColor = Color.LightCoral;
-                _isAudioListening = true;
-                recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Started audio recognition\r\n");
-
-                // Force UI refresh
-                toggleAudioButton.Refresh();
-                recognizedTextBox.Refresh();
-                this.Refresh();
-                Application.DoEvents();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to start audio recognition: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Failed to start audio recognition: {ex.Message}\r\n");
-            }
-        }
-        recognizedTextBox.ScrollToCaret();
-    }
-
-    private void OnSpeechRecognized(object sender, System.Speech.Recognition.SpeechRecognizedEventArgs e)
-    {
-        if (this.InvokeRequired)
-        {
-            this.Invoke(new Action(() => OnSpeechRecognized(sender, e)));
-            return;
-        }
-
-        string text = $"{DateTime.Now:HH:mm:ss}: {e.Result.Text} (Confidence: {e.Result.Confidence:P1})\r\n";
-        recognizedTextBox.AppendText(text);
-        recognizedTextBox.ScrollToCaret();
-    }
-
-    private void OnAudioError(object sender, string error)
-    {
-        if (this.InvokeRequired)
-        {
-            this.Invoke(new Action(() => OnAudioError(sender, error)));
-            return;
-        }
-
-        recognizedTextBox.AppendText($"{DateTime.Now:HH:mm:ss}: Error - {error}\r\n");
-        recognizedTextBox.ScrollToCaret();
-    }
 
     private async Task InitializeAsync()
     {
@@ -153,17 +77,49 @@ public partial class Form1 : Form
                 .Where(e => e.EventTicker?.Contains("mention", StringComparison.OrdinalIgnoreCase) == true)
                 .ToList();
 
-            // Convert to EventDTO for the UI
-            _events = mentionEvents.Select(apiEvent => new EventDTO
+            // Convert to EventDTO for the UI and fetch milestones for each event
+            var eventDTOs = new List<EventDTO>();
+            foreach (var apiEvent in mentionEvents)
             {
-                event_ticker = apiEvent.EventTicker,
-                title = apiEvent.Title,
-                sub_title = apiEvent.SubTitle,
-                category = apiEvent.Category,
-                series_ticker = apiEvent.SeriesTicker,
-                mutually_exclusive = apiEvent.MutuallyExclusive,
-                collateral_return_type = apiEvent.CollateralReturnType
-            }).ToList();
+                var eventDTO = new EventDTO
+                {
+                    event_ticker = apiEvent.EventTicker,
+                    title = apiEvent.Title,
+                    sub_title = apiEvent.SubTitle,
+                    category = apiEvent.Category,
+                    series_ticker = apiEvent.SeriesTicker,
+                    mutually_exclusive = apiEvent.MutuallyExclusive,
+                    collateral_return_type = apiEvent.CollateralReturnType
+                };
+
+                // Fetch milestones for this event
+                try
+                {
+                    var milestonesResponse = await Task.Run(() => apiService.GetMilestonesAsync(
+                        relatedEventTicker: apiEvent.EventTicker,
+                        limit: 200
+                    ));
+
+                    if (milestonesResponse?.Milestones != null && milestonesResponse.Milestones.Count > 0)
+                    {
+                        _logger?.LogInformation("Fetched {Count} milestones for event {EventTicker}", milestonesResponse.Milestones.Count, apiEvent.EventTicker);
+
+                        // Save milestones to DB
+                        var milestoneDTOs = milestonesResponse.Milestones.Select(m => m.ToMilestoneDTO()).ToList();
+                        using var milestoneScope = _serviceProvider.CreateScope();
+                        var context = milestoneScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                        await context.AddMilestones(milestoneDTOs);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "Failed to fetch milestones for event {EventTicker}", apiEvent.EventTicker);
+                }
+
+                eventDTOs.Add(eventDTO);
+            }
+
+            _events = eventDTOs;
 
             if (_events.Count == 0)
             {
@@ -422,18 +378,21 @@ public partial class Form1 : Form
                 ClientOrderId = Guid.NewGuid().ToString()
             };
 
-            //var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
+            var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
 
-            //if (response != null)
-            //{
-            //    MessageBox.Show($"Order placed successfully!\nOrder ID: {response.Order.OrderId}\nCount: {count}\nPrice: ${maxYesPriceDollars:F2}", "Order Placed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    // Keep disabled
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Failed to place order.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    panel.Enabled = true; // Re-enable on failure
-            //}
+            if (response != null)
+            {
+                decimal exposureUsed = count * maxYesPriceDollars;
+                string orderDetails = $"Yes Order Placed:\nMarket: {market.Ticker}\nCount: {count}\nPrice: ${maxYesPriceDollars:F2}\nExposure: ${exposureUsed:F2}\nOrder ID: {response.Order.OrderId}\n---\n";
+                orderLogTextBox.Text += orderDetails;
+                // Keep disabled
+            }
+            else
+            {
+                string errorDetails = $"Failed to place yes order for market {market.Ticker}.\n---\n";
+                orderLogTextBox.Text += errorDetails;
+                panel.Enabled = true; // Re-enable on failure
+            }
         }
         catch (Exception ex)
         {
@@ -472,9 +431,96 @@ public partial class Form1 : Form
         await InitializeAsync();
     }
 
-    private void buyNosButton_Click(object sender, EventArgs e)
+    private async void buyNosButton_Click(object sender, EventArgs e)
     {
-        MessageBox.Show("Event finished - buying No positions for all active markets.", "Buy Nos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        buyNosButton.Enabled = false;
+        try
+        {
+            if (!decimal.TryParse(maxExposureTextBox.Text, out decimal maxExposureDollars) || maxExposureDollars <= 0)
+            {
+                MessageBox.Show("Invalid Max Exposure value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!decimal.TryParse(maxNoPriceTextBox.Text, out decimal maxNoPriceDollars) || maxNoPriceDollars <= 0)
+            {
+                MessageBox.Show("Invalid Max No Price value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using var scope = _serviceProvider.CreateScope();
+            var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
+
+            var panels = bingoPanel.Controls.OfType<Panel>().ToList();
+
+            // Sort panels by favorability: lowest no bid first
+            var sortedPanels = panels.OrderBy(p =>
+            {
+                var market = (KalshiMarket)p.Tag;
+                var orderBook = _orderBookService.GetOrderBook(market.Ticker);
+                var noBid = orderBook.LastOrDefault(o => o.Side == "no")?.Price ?? market.NoBid;
+                return noBid;
+            }).ToList();
+
+            decimal remainingExposure = maxExposureDollars;
+            int noPriceCents = (int)(maxNoPriceDollars * 100);
+            int totalOrdersPlaced = 0;
+            decimal totalExposureUsed = 0;
+            var orderDetails = new System.Text.StringBuilder();
+            orderDetails.AppendLine($"No Orders Placed - Max Exposure: ${maxExposureDollars:F2}, Max No Price: ${maxNoPriceDollars:F2}");
+            orderDetails.AppendLine("---");
+
+            foreach (var panel in sortedPanels)
+            {
+                if (remainingExposure < maxNoPriceDollars) break;
+
+                int count = (int)(remainingExposure / maxNoPriceDollars);
+                if (count <= 0) break;
+
+                var market = (KalshiMarket)panel.Tag;
+                var orderRequest = new CreateOrderRequest
+                {
+                    Action = "buy",
+                    Type = "limit",
+                    Ticker = market.Ticker,
+                    Side = "no",
+                    Count = count,
+                    NoPrice = noPriceCents,
+                    ClientOrderId = Guid.NewGuid().ToString()
+                };
+
+                var response = await apiService.CreateOrderAsync(market.Ticker, orderRequest);
+
+                if (response != null)
+                {
+                    totalOrdersPlaced++;
+                    decimal exposureUsed = count * maxNoPriceDollars;
+                    totalExposureUsed += exposureUsed;
+                    remainingExposure -= exposureUsed;
+
+                    orderDetails.AppendLine($"Market: {market.Ticker}");
+                    orderDetails.AppendLine($"  Count: {count}");
+                    orderDetails.AppendLine($"  Price: ${maxNoPriceDollars:F2}");
+                    orderDetails.AppendLine($"  Exposure: ${exposureUsed:F2}");
+                    orderDetails.AppendLine($"  Order ID: {response.Order.OrderId}");
+                    orderDetails.AppendLine("---");
+                }
+            }
+
+            orderDetails.AppendLine($"Total Orders Placed: {totalOrdersPlaced}");
+            orderDetails.AppendLine($"Total Exposure Used: ${totalExposureUsed:F2}");
+            orderDetails.AppendLine($"Remaining Exposure: ${remainingExposure:F2}");
+
+            orderLogTextBox.Text = orderDetails.ToString();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error placing orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            buyNosButton.Enabled = true;
+        }
     }
 
     private void LoadConfig()
@@ -613,7 +659,6 @@ public partial class Form1 : Form
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
-        _audioRecognizer?.Dispose();
         base.OnFormClosing(e);
     }
 }

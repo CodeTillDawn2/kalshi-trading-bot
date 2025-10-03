@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a trade execution (fill) in the Kalshi trading system.

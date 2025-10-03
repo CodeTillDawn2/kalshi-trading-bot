@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a group of snapshots aggregated over a specific time period for a market.

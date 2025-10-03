@@ -428,7 +428,7 @@ builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
     var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
     var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
     var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
-    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
+    return new BacklashBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
 });
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();

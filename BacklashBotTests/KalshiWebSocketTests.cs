@@ -8,7 +8,7 @@ using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data;
+using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,4 +1,4 @@
-namespace KalshiBotData.Extensions
+namespace BacklashBotData.Extensions
 {
     /// <summary>
     /// Configuration class for extension methods, providing customizable options

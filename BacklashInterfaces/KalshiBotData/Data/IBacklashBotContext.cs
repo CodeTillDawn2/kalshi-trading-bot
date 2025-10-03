@@ -633,6 +633,14 @@ namespace BacklashBotData.Data.Interfaces
         Task AddAnnouncements(List<AnnouncementDTO> announcements);
         #endregion
 
+        #region Milestones
+        /// <summary>
+        /// Adds multiple milestones to the database.
+        /// </summary>
+        /// <param name="milestones">The list of milestone DTOs to add.</param>
+        Task AddMilestones(List<MilestoneDTO> milestones);
+        #endregion
+
         #region Exchange Schedule
         /// <summary>
         /// Adds an exchange schedule to the database.

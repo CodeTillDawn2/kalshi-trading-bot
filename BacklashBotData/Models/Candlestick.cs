@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a candlestick data point for a market in the Kalshi trading bot.

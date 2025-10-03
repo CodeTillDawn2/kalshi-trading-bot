@@ -4,13 +4,14 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
+using BacklashBotData.Extensions;
+using BacklashBotData.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Polly;
 using System.Data;
+using BacklashBotData.Extensions;
 
 namespace BacklashBotData.Data
 {
@@ -65,6 +66,7 @@ namespace BacklashBotData.Data
         private DbSet<CurrentSchedule> CurrentSchedules { get; set; }
         private DbSet<BacklashDTOs.SignalRClient> SignalRClients { get; set; }
         private DbSet<BacklashDTOs.Data.OverseerInfo> OverseerInfos { get; set; }
+        private DbSet<Milestone> Milestones { get; set; }
 
         private readonly string _connectionString;
         private readonly ILogger<BacklashBotContext>? _logger;
@@ -1648,6 +1650,15 @@ namespace BacklashBotData.Data
         }
         #endregion
 
+        #region Milestones
+        public async Task AddMilestones(List<MilestoneDTO> milestones)
+        {
+            var milestoneModels = milestones.Select(m => m.ToMilestone()).ToList();
+            await Milestones.AddRangeAsync(milestoneModels);
+            await SaveChangesAsync();
+        }
+        #endregion
+
         #region Exchange Schedule
         public async Task AddExchangeSchedule(ExchangeScheduleDTO exchangeSchedule)
         {
@@ -2777,6 +2788,93 @@ namespace BacklashBotData.Data
             modelBuilder.Entity<OverseerInfo>()
                 .HasIndex(oi => oi.LastHeartbeat)
                 .HasDatabaseName("IX_t_OverseerInfo_LastHeartbeat");
+
+            modelBuilder.Entity<Milestone>()
+                .ToTable("t_Milestones")
+                .HasKey(m => m.Id);
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Id)
+                .HasColumnName("id")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Category)
+                .HasColumnName("category")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Details)
+                .HasColumnName("details")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.EndDate)
+                .HasColumnName("end_date");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.LastUpdatedTs)
+                .HasColumnName("last_updated_ts");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.NotificationMessage)
+                .HasColumnName("notification_message")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.PrimaryEventTickers)
+                .HasColumnName("primary_event_tickers")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.RelatedEventTickers)
+                .HasColumnName("related_event_tickers")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.SourceId)
+                .HasColumnName("source_id")
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.StartDate)
+                .HasColumnName("start_date");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Title)
+                .HasColumnName("title")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Type)
+                .HasColumnName("type")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.CreatedDate)
+                .HasColumnName("CreatedDate")
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.LastModifiedDate)
+                .HasColumnName("LastModifiedDate");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.Category)
+                .HasDatabaseName("IX_t_Milestones_category");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.Type)
+                .HasDatabaseName("IX_t_Milestones_type");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.StartDate)
+                .HasDatabaseName("IX_t_Milestones_start_date");
         }
     }
 }

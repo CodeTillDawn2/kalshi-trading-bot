@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a specific session within the standard operating hours of the Kalshi exchange.

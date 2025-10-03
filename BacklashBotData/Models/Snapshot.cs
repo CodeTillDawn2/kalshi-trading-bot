@@ -2,7 +2,7 @@
 using BacklashDTOs.Converters;
 using System.Text.Json.Serialization;
 
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents a comprehensive snapshot of market state and trading activity at a specific point in time.

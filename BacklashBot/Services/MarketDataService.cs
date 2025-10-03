@@ -798,8 +798,8 @@ namespace BacklashBot.Services
                     }
 
                     // Shutdown change tracker if in cache
-                    if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData)) {
-                        marketData.ChangeTracker.Shutdown();
+                    if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData2)) {
+                        marketData2.ChangeTracker.Shutdown();
                     }
                 }
                 else

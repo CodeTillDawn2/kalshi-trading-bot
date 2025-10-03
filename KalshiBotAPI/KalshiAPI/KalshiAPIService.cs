@@ -1,6 +1,7 @@
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Extensions;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
@@ -2594,6 +2595,91 @@ namespace KalshiBotAPI.KalshiAPI
             {
                 _logger.LogWarning("Unexpected error in GetEventMetadataAsync for {EventTicker}: {ExceptionType} - {Message}",
                     eventTicker, ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves milestones from the Kalshi API with support for various filters and pagination.
+        /// Provides information about important events, deadlines, or significant occurrences related to markets and trading activities.
+        /// Automatically saves retrieved milestones to the database.
+        /// </summary>
+        /// <param name="minimumStartDate">Optional minimum start date filter for milestones (RFC3339 timestamp).</param>
+        /// <param name="category">Optional filter for milestone category.</param>
+        /// <param name="competition">Optional filter for competition.</param>
+        /// <param name="type">Optional filter for milestone type.</param>
+        /// <param name="relatedEventTicker">Optional filter for related event ticker.</param>
+        /// <param name="limit">Required limit on the number of milestones to retrieve per request (1-200).</param>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of milestones.</param>
+        /// <returns>The milestones response containing milestone data, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentException">Thrown when limit is not provided or is outside the valid range.</exception>
+        public async Task<MilestonesResponse?> GetMilestonesAsync(
+            string? minimumStartDate = null,
+            string? category = null,
+            string? competition = null,
+            string? type = null,
+            string? relatedEventTicker = null,
+            int? limit = null,
+            string? cursor = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (!limit.HasValue || limit.Value < 1 || limit.Value > 200)
+                {
+                    throw new ArgumentException("Limit is required and must be between 1 and 200", nameof(limit));
+                }
+
+                var queryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(minimumStartDate)) queryParams["minimum_start_date"] = minimumStartDate;
+                if (!string.IsNullOrEmpty(category)) queryParams["category"] = category;
+                if (!string.IsNullOrEmpty(competition)) queryParams["competition"] = competition;
+                if (!string.IsNullOrEmpty(type)) queryParams["type"] = type;
+                if (!string.IsNullOrEmpty(relatedEventTicker)) queryParams["related_event_ticker"] = relatedEventTicker;
+                if (limit.HasValue) queryParams["limit"] = limit.Value.ToString();
+                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
+
+                string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                string url = $"milestones{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/milestones");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await Task.Run(async () => await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken()));
+                response.EnsureSuccessStatusCode();
+                var jsonString = await Task.Run(async () => await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken()));
+
+                var result = JsonSerializer.Deserialize<MilestonesResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved {Count} milestones", result?.Milestones?.Count ?? 0);
+
+                // Save milestones to database if any were retrieved
+                if (result?.Milestones != null && result.Milestones.Count > 0)
+                {
+                    var milestoneDTOs = result.Milestones.Select(m => m.ToMilestoneDTO()).ToList();
+                    using var scope = _scopeFactory.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                    await context.AddMilestones(milestoneDTOs);
+                }
+
+                stopwatch.Stop();
+                RecordMethodExecutionDuration(nameof(GetMilestonesAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetMilestonesAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetMilestonesAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
                 return null;
             }
         }

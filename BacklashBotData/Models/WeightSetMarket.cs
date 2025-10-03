@@ -1,5 +1,5 @@
 
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents the market-specific allocation and performance data within a weight set.

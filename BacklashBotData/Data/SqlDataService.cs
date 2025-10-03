@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
-namespace KalshiBotData.Data
+namespace BacklashBotData.Data
 {
     /// <summary>
     /// Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.

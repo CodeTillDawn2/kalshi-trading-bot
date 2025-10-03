@@ -1,6 +1,6 @@
 using BacklashDTOs.Data;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
+using BacklashBotData.Extensions;
+using BacklashBotData.Models;
 
 namespace BacklashBotTests
 {

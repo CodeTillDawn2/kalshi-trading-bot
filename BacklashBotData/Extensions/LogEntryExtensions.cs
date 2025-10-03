@@ -1,9 +1,9 @@
 using BacklashDTOs.Data;
-using KalshiBotData.Models;
+using BacklashBotData.Models;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace KalshiBotData.Extensions
+namespace BacklashBotData.Extensions
 {
     /// <summary>
     /// Provides extension methods for converting between LogEntry models and DTOs,

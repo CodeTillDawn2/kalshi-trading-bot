@@ -8,7 +8,7 @@ using BacklashCommon.Helpers;
 using BacklashCommon.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using KalshiBotData.Data;
+using BacklashBotData.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

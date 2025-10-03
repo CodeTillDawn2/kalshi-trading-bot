@@ -40,10 +40,10 @@ partial class Form1
         maxYesPriceTextBox = new TextBox();
         refreshButton = new Button();
         buyNosButton = new Button();
-        toggleAudioButton = new Button();
-        recognizedTextBox = new TextBox();
         topPanel = new TableLayoutPanel();
         topPanel.SuspendLayout();
+        bottomPanel = new Panel();
+        orderLogTextBox = new RichTextBox();
         SuspendLayout();
         // 
         // eventComboBox
@@ -52,14 +52,15 @@ partial class Form1
         eventComboBox.Dock = DockStyle.Fill;
         eventComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
         eventComboBox.FormattingEnabled = true;
-        eventComboBox.Location = new Point(169, 33);
+        eventComboBox.Location = new Point(145, 33);
         eventComboBox.Name = "eventComboBox";
-        eventComboBox.Size = new Size(326, 23);
+        eventComboBox.Size = new Size(278, 23);
         eventComboBox.TabIndex = 0;
         eventComboBox.SelectedIndexChanged += eventComboBox_SelectedIndexChanged;
         // 
         // bingoPanel
         // 
+        bingoPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         bingoPanel.AutoScroll = true;
         bingoPanel.ColumnCount = 5;
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
@@ -67,8 +68,7 @@ partial class Form1
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
         bingoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        bingoPanel.Dock = DockStyle.Fill;
-        bingoPanel.Location = new Point(0, 0);
+        bingoPanel.Location = new Point(0, 60);
         bingoPanel.Name = "bingoPanel";
         bingoPanel.RowCount = 5;
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
@@ -76,7 +76,7 @@ partial class Form1
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
         bingoPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-        bingoPanel.Size = new Size(1000, 446);
+        bingoPanel.Size = new Size(1000, 386);
         bingoPanel.TabIndex = 1;
         // 
         // label1
@@ -85,7 +85,7 @@ partial class Form1
         label1.Dock = DockStyle.Fill;
         label1.Location = new Point(3, 30);
         label1.Name = "label1";
-        label1.Size = new Size(160, 30);
+        label1.Size = new Size(136, 30);
         label1.TabIndex = 11;
         label1.Text = "Select Event:";
         label1.TextAlign = ContentAlignment.MiddleLeft;
@@ -96,7 +96,7 @@ partial class Form1
         maxExposureLabel.Dock = DockStyle.Fill;
         maxExposureLabel.Location = new Point(3, 0);
         maxExposureLabel.Name = "maxExposureLabel";
-        maxExposureLabel.Size = new Size(160, 30);
+        maxExposureLabel.Size = new Size(136, 30);
         maxExposureLabel.TabIndex = 3;
         maxExposureLabel.Text = "Max Exposure:";
         maxExposureLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -104,9 +104,9 @@ partial class Form1
         // maxExposureTextBox
         // 
         maxExposureTextBox.Dock = DockStyle.Fill;
-        maxExposureTextBox.Location = new Point(169, 3);
+        maxExposureTextBox.Location = new Point(145, 3);
         maxExposureTextBox.Name = "maxExposureTextBox";
-        maxExposureTextBox.Size = new Size(160, 23);
+        maxExposureTextBox.Size = new Size(136, 23);
         maxExposureTextBox.TabIndex = 4;
         maxExposureTextBox.Text = "10.00";
         maxExposureTextBox.TextChanged += maxExposureTextBox_TextChanged;
@@ -115,9 +115,9 @@ partial class Form1
         // 
         maxNoPriceLabel.AutoSize = true;
         maxNoPriceLabel.Dock = DockStyle.Fill;
-        maxNoPriceLabel.Location = new Point(335, 0);
+        maxNoPriceLabel.Location = new Point(287, 0);
         maxNoPriceLabel.Name = "maxNoPriceLabel";
-        maxNoPriceLabel.Size = new Size(160, 30);
+        maxNoPriceLabel.Size = new Size(136, 30);
         maxNoPriceLabel.TabIndex = 5;
         maxNoPriceLabel.Text = "Max No Price:";
         maxNoPriceLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -125,9 +125,9 @@ partial class Form1
         // maxNoPriceTextBox
         // 
         maxNoPriceTextBox.Dock = DockStyle.Fill;
-        maxNoPriceTextBox.Location = new Point(501, 3);
+        maxNoPriceTextBox.Location = new Point(429, 3);
         maxNoPriceTextBox.Name = "maxNoPriceTextBox";
-        maxNoPriceTextBox.Size = new Size(160, 23);
+        maxNoPriceTextBox.Size = new Size(136, 23);
         maxNoPriceTextBox.TabIndex = 6;
         maxNoPriceTextBox.Text = "0.90";
         maxNoPriceTextBox.TextChanged += maxNoPriceTextBox_TextChanged;
@@ -136,9 +136,9 @@ partial class Form1
         // 
         maxYesPriceLabel.AutoSize = true;
         maxYesPriceLabel.Dock = DockStyle.Fill;
-        maxYesPriceLabel.Location = new Point(667, 0);
+        maxYesPriceLabel.Location = new Point(571, 0);
         maxYesPriceLabel.Name = "maxYesPriceLabel";
-        maxYesPriceLabel.Size = new Size(160, 30);
+        maxYesPriceLabel.Size = new Size(136, 30);
         maxYesPriceLabel.TabIndex = 7;
         maxYesPriceLabel.Text = "Max Yes Price:";
         maxYesPriceLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -146,9 +146,9 @@ partial class Form1
         // maxYesPriceTextBox
         // 
         maxYesPriceTextBox.Dock = DockStyle.Fill;
-        maxYesPriceTextBox.Location = new Point(833, 3);
+        maxYesPriceTextBox.Location = new Point(713, 3);
         maxYesPriceTextBox.Name = "maxYesPriceTextBox";
-        maxYesPriceTextBox.Size = new Size(164, 23);
+        maxYesPriceTextBox.Size = new Size(136, 23);
         maxYesPriceTextBox.TabIndex = 8;
         maxYesPriceTextBox.Text = "0.50";
         maxYesPriceTextBox.TextChanged += maxYesPriceTextBox_TextChanged;
@@ -156,9 +156,9 @@ partial class Form1
         // refreshButton
         // 
         refreshButton.Dock = DockStyle.Fill;
-        refreshButton.Location = new Point(501, 33);
+        refreshButton.Location = new Point(429, 33);
         refreshButton.Name = "refreshButton";
-        refreshButton.Size = new Size(160, 24);
+        refreshButton.Size = new Size(136, 24);
         refreshButton.TabIndex = 9;
         refreshButton.Text = "Refresh";
         refreshButton.UseVisualStyleBackColor = true;
@@ -167,38 +167,13 @@ partial class Form1
         // buyNosButton
         // 
         buyNosButton.Dock = DockStyle.Fill;
-        buyNosButton.Location = new Point(667, 33);
+        buyNosButton.Location = new Point(571, 33);
         buyNosButton.Name = "buyNosButton";
-        buyNosButton.Size = new Size(160, 24);
+        buyNosButton.Size = new Size(136, 24);
         buyNosButton.TabIndex = 10;
         buyNosButton.Text = "Event Finished, Buy Nos";
         buyNosButton.UseVisualStyleBackColor = true;
         buyNosButton.Click += buyNosButton_Click;
-        // 
-        // toggleAudioButton
-        // 
-        toggleAudioButton.BackColor = Color.LightBlue;
-        toggleAudioButton.Dock = DockStyle.Fill;
-        toggleAudioButton.Location = new Point(833, 33);
-        toggleAudioButton.Name = "toggleAudioButton";
-        toggleAudioButton.Size = new Size(164, 24);
-        toggleAudioButton.TabIndex = 13;
-        toggleAudioButton.Text = "Start Audio Recognition";
-        toggleAudioButton.UseVisualStyleBackColor = false;
-        toggleAudioButton.Click += ToggleAudioButton_Click;
-        // 
-        // recognizedTextBox
-        // 
-        recognizedTextBox.BackColor = Color.White;
-        recognizedTextBox.Dock = DockStyle.Bottom;
-        recognizedTextBox.Font = new Font("Consolas", 9F);
-        recognizedTextBox.Location = new Point(0, 446);
-        recognizedTextBox.Multiline = true;
-        recognizedTextBox.Name = "recognizedTextBox";
-        recognizedTextBox.ReadOnly = true;
-        recognizedTextBox.ScrollBars = ScrollBars.Vertical;
-        recognizedTextBox.Size = new Size(1000, 54);
-        recognizedTextBox.TabIndex = 14;
         // 
         // topPanel
         // 
@@ -219,7 +194,6 @@ partial class Form1
         topPanel.Controls.Add(eventComboBox, 1, 1);
         topPanel.Controls.Add(refreshButton, 3, 1);
         topPanel.Controls.Add(buyNosButton, 4, 1);
-        topPanel.Controls.Add(toggleAudioButton, 5, 1);
         topPanel.Dock = DockStyle.Top;
         topPanel.Location = new Point(0, 0);
         topPanel.Name = "topPanel";
@@ -228,15 +202,33 @@ partial class Form1
         topPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
         topPanel.Size = new Size(1000, 60);
         topPanel.TabIndex = 12;
-        // 
+        //
+        // bottomPanel
+        //
+        bottomPanel.Controls.Add(orderLogTextBox);
+        bottomPanel.Dock = DockStyle.Bottom;
+        bottomPanel.Height = 150;
+        bottomPanel.Name = "bottomPanel";
+        //
+        // orderLogTextBox
+        //
+        orderLogTextBox.BackColor = SystemColors.Window;
+        orderLogTextBox.Dock = DockStyle.Fill;
+        orderLogTextBox.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
+        orderLogTextBox.Name = "orderLogTextBox";
+        orderLogTextBox.ReadOnly = true;
+        orderLogTextBox.Size = new Size(1000, 150);
+        orderLogTextBox.TabIndex = 0;
+        orderLogTextBox.Text = "";
+        //
         // Form1
-        // 
+        //
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(1000, 500);
         Controls.Add(topPanel);
         Controls.Add(bingoPanel);
-        Controls.Add(recognizedTextBox);
+        Controls.Add(bottomPanel);
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
         Text = "Mention Market Bingo";
@@ -258,9 +250,9 @@ partial class Form1
     private System.Windows.Forms.TextBox maxYesPriceTextBox;
     private System.Windows.Forms.Button refreshButton;
     private System.Windows.Forms.Button buyNosButton;
-    private System.Windows.Forms.Button toggleAudioButton;
-    private System.Windows.Forms.TextBox recognizedTextBox;
     private System.Windows.Forms.TableLayoutPanel topPanel;
+    private System.Windows.Forms.Panel bottomPanel;
+    private System.Windows.Forms.RichTextBox orderLogTextBox;
 
     #endregion
 }
