@@ -787,6 +787,20 @@ namespace BacklashBot.Services
                     marketWatch.InterestScoreDate = DateTime.Now;
                     await context.AddOrUpdateMarketWatch(marketWatch);
                     _logger.LogInformation("Successfully marked market {MarketTicker} as unhealthy (interest score = 0)", marketTicker);
+
+                    // Proper unsubscription
+                    await UpdateMarketSubscriptionAsync("delete_markets", new[] { marketTicker });
+
+                    // Add to refresh for recovery
+                    if (!MarketsToRefresh.Contains(marketTicker)) {
+                        MarketsToRefresh.Add(marketTicker);
+                        _logger.LogDebug("Added {MarketTicker} to MarketsToRefresh for recovery", marketTicker);
+                    }
+
+                    // Shutdown change tracker if in cache
+                    if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData)) {
+                        marketData.ChangeTracker.Shutdown();
+                    }
                 }
                 else
                 {
@@ -1509,7 +1523,12 @@ namespace BacklashBot.Services
 
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
             {
-                if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
+                // Check if still watched in DB
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                var marketWatch = await context.GetMarketWatchByTicker(marketTicker);
+
+                if (marketWatch != null) // DB-watched
                 {
                     // Market is watched but not in cache, re-add it
                     var market = await EnsureMarketDataAsync(marketTicker);
@@ -1520,6 +1539,12 @@ namespace BacklashBot.Services
                         _serviceFactory.GetDataCache().Markets[marketTicker].LastSuccessfulSync = DateTime.UtcNow;
                         marketData = _serviceFactory.GetDataCache().Markets[marketTicker];
                         _logger.LogInformation("Re-added market {MarketTicker} to cache for ticker update", marketTicker);
+
+                        // Subscribe to market channels for recovery
+                        await SubscribeToMarketChannelsAsync(marketTicker);
+
+                        // Mark as healthy after recovery
+                        marketData.WebSocketHealthy = true;
                     }
                     else
                     {

@@ -22,6 +22,7 @@ namespace KalshiBotAPI.Websockets
         private readonly ILogger<SubscriptionManager> _logger;
         private readonly IDataCache _dataCache;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
+        private readonly ConcurrentDictionary<string, int> _perMarketRetryCounts = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
         private readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
@@ -1174,8 +1175,15 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogWarning("Pending confirmation expired for ID {Id}, channel {Channel}, markets {Markets} after {_confirmationTimeoutSeconds} seconds. Retry {RetryCount}/{MaxRetries} with exponential backoff (total retry time: {TotalTime:F1}min).",
                             confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), _confirmationTimeoutSeconds, currentRetryCount + 1, _maxSubscriptionRetries, totalRetryTime.TotalMinutes);
 
-                        // Raise unhealthy event for affected markets
-                        RaiseMarketWebSocketUnhealthy(confirm.Value.MarketTickers);
+                        // Track per-market retries
+                        var marketKey = $"{confirm.Value.Channel}:{string.Join(",", confirm.Value.MarketTickers.OrderBy(m => m))}";
+                        var retryCount = _perMarketRetryCounts.AddOrUpdate(marketKey, 1, (k, v) => v + 1);
+
+                        if (retryCount > _maxSubscriptionRetries) {
+                            // Only raise for market-specific persistent failure
+                            RaiseMarketWebSocketUnhealthy(confirm.Value.MarketTickers);
+                            _perMarketRetryCounts.TryRemove(marketKey, out _);
+                        }
 
                         // Clean up the expired subscription state
                         await CleanupExpiredSubscriptionAsync(confirm.Value.Channel, confirm.Value.MarketTickers);
