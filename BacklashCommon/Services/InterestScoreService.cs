@@ -480,7 +480,6 @@ CalculateMarketInterestScoreAsync(
                     continuity: continuityScore * 10.0
                 );
 
-                _logger.LogInformation("Calculated interest score {Score} for market.", finalScore);
                 RecordScoringOperationTime(DateTime.UtcNow - startTime);
                 return (finalScore, scoreParts);
             }

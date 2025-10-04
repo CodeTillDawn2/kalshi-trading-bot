@@ -102,7 +102,6 @@ namespace KalshiBotLogging
         /// <param name="formatter">A function to format the state and exception into a string message.</param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            Console.WriteLine($"DatabaseLogger.Log called for {logLevel}: {formatter(state, exception)}");
             var message = formatter(state, exception);
 
             // Get dynamic values or use defaults

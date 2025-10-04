@@ -36,7 +36,6 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         public event EventHandler<string>? ChannelMessageReceived;
 
-
         /// <summary>
         /// Initializes a new instance of the SubscriptionManager with required dependencies.
         /// Sets up internal data structures for subscription management, state tracking, and queue processing.
@@ -68,7 +67,6 @@ namespace KalshiBotAPI.Websockets
         public async Task StartAsync()
         {
             await base.StartAsync();
-            _healthMonitorTask = Task.Run(() => MonitorSubscriptionHealthAsync(), base._processingCancellationToken);
             await Task.CompletedTask;
         }
 
@@ -80,10 +78,6 @@ namespace KalshiBotAPI.Websockets
         public async Task StopAsync()
         {
             await base.StopAsync();
-            if (_healthMonitorTask != null && !_healthMonitorTask.IsCompleted)
-            {
-                await _healthMonitorTask.ConfigureAwait(false);
-            }
         }
 
         /// <summary>

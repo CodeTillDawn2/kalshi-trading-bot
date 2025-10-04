@@ -1463,35 +1463,44 @@ namespace KalshiBotAPI.Websockets
             _logger.LogDebug("Starting order book queue processor");
             while (!_processingCancellationToken.IsCancellationRequested)
             {
-                bool processedAny = false;
-
+                await Task.Delay(_batchSize * 10, _processingCancellationToken);
                 lock (_orderBookQueueSynchronizationLock)
                 {
-                    while (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
+                    while (_orderBookUpdateQueue.TryDequeue(out var item, out _))
                     {
-                        var expectedSeq = _latestProcessedSequenceNumber + 1;
-                        if (seq != expectedSeq)
-                        {
-                            _logger.LogWarning("Sequence gap detected: expected {ExpectedSeq}, received {Seq}", expectedSeq, seq);
-                        }
-                        _latestProcessedSequenceNumber = seq;
-
-                        // Only raise OrderBookProcessed event for actual orderbook messages
-                        if (message.OfferType != "ok")
-                        {
-                            var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                            OnOrderBookProcessed(eventArgs);
-                        }
-                        processedAny = true;
+                        var (data, offerType, seq, eventId) = item;
+                        ProcessOrderBookMessageInternal(data, offerType, seq, eventId);
                     }
-                }
-
-                if (!processedAny)
-                {
-                    await Task.Delay(10, _processingCancellationToken);
                 }
             }
             _logger.LogDebug("Order book queue processor stopped");
+        }
+
+        /// <summary>
+        /// Processes a single order book message internally, handling sequence checks and event raising.
+        /// </summary>
+        /// <param name="data">The message data.</param>
+        /// <param name="offerType">The offer type.</param>
+        /// <param name="seq">The sequence number.</param>
+        /// <param name="eventId">The event ID.</param>
+        private void ProcessOrderBookMessageInternal(JsonElement data, string offerType, long seq, Guid eventId)
+        {
+            lock (_sequenceNumberSynchronizationLock)
+            {
+                long expected = _latestProcessedSequenceNumber + 1;
+                if (seq != expected)
+                {
+                    _logger.LogWarning("Sequence gap detected: expected {Expected}, received {Seq}", expected, seq);
+                }
+                _logger.LogDebug("Processed seq {Seq} (expected {Expected}, queue remaining: {Remaining})", seq, expected, _orderBookUpdateQueue.Count);
+                _latestProcessedSequenceNumber = Math.Max(_latestProcessedSequenceNumber, seq);
+            }
+            // Only raise OrderBookProcessed event for actual orderbook messages
+            if (offerType != "ok")
+            {
+                var eventArgs = new OrderBookEventArgs(offerType, data);
+                OnOrderBookProcessed(eventArgs);
+            }
         }
 
         /// <summary>
