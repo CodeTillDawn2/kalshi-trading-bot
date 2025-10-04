@@ -195,6 +195,12 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         event EventHandler<OrderBookEventArgs>? OrderBookProcessed;
 
         /// <summary>
+        /// Event raised when FirstSnapshotReceived needs to be reset for specific markets.
+        /// This occurs when resubscribing to orderbook channels due to sequence gaps.
+        /// </summary>
+        event EventHandler<string[]>? FirstSnapshotReceivedReset;
+
+        /// <summary>
         /// Raises the MarketWebSocketUnhealthy event for the specified markets.
         /// </summary>
         /// <param name="markets">Array of market tickers that have unhealthy WebSocket connections.</param>

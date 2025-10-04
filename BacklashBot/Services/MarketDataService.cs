@@ -1552,41 +1552,7 @@ namespace BacklashBot.Services
 
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
             {
-                // Check if still watched in DB
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-                var marketWatch = await context.GetMarketWatchByTicker(marketTicker);
-
-                if (marketWatch != null) // DB-watched
-                {
-                    // Market is watched but not in cache, re-add it
-                    var market = await EnsureMarketDataAsync(marketTicker);
-                    if (market != null)
-                    {
-                        _serviceFactory.GetDataCache().Markets[marketTicker] = _marketDataFactory(market);
-                        _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = new List<OrderbookData>();
-                        _serviceFactory.GetDataCache().Markets[marketTicker].LastSuccessfulSync = DateTime.UtcNow;
-                        marketData = _serviceFactory.GetDataCache().Markets[marketTicker];
-                        _logger.LogInformation("Re-added market {MarketTicker} to cache for ticker update", marketTicker);
-
-                        // Subscribe to market channels for recovery
-                        await SubscribeToMarketChannelsAsync(marketTicker);
-
-                        // Mark as healthy after recovery
-                        marketData.WebSocketHealthy = true;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to re-add market {MarketTicker} to cache for ticker update", marketTicker);
-                        return;
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Market {marketTicker} not found for ticker update")
-                        , "Market {MarketTicker} not found for ticker update", marketTicker);
-                    return;
-                }
+                return;
             }
 
             try

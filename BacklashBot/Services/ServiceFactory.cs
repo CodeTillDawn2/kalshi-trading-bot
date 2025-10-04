@@ -150,6 +150,17 @@ namespace BacklashBot.Services
                     }
                 };
                 _logger.LogInformation("SF: MarketWebSocketHealthy event wired up successfully");
+
+                _logger.LogInformation("SF: Wiring up FirstSnapshotReceivedReset event from SubscriptionManager to MarketDataService");
+                subscriptionManager.FirstSnapshotReceivedReset += (sender, markets) =>
+                {
+                    _logger.LogInformation("SF: FirstSnapshotReceivedReset event received for markets: {Markets}", string.Join(", ", markets));
+                    foreach (var market in markets)
+                    {
+                        marketDataService.ResetReceivedFirstSnapshot(market);
+                    }
+                };
+                _logger.LogInformation("SF: FirstSnapshotReceivedReset event wired up successfully");
             }
         }
 

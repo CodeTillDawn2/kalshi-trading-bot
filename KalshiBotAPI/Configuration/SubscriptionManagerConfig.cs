@@ -53,4 +53,16 @@ public class SubscriptionManagerConfig
     /// </summary>
     [Required(ErrorMessage = "The 'HealthCheckIntervalMs' is missing in the configuration.")]
     public int HealthCheckIntervalMs { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timeout in seconds for waiting for sequence gaps to be filled before resetting subscriptions.
+    /// </summary>
+    [Required(ErrorMessage = "The 'SequenceGapTimeoutSeconds' is missing in the configuration.")]
+    public int SequenceGapTimeoutSeconds { get; set; }
+
+    /// <summary>
+    /// Gets or sets the interval in milliseconds between processing batches of subscription requests.
+    /// </summary>
+    [Required(ErrorMessage = "The 'SubscriptionBatchIntervalMs' is missing in the configuration.")]
+    public int SubscriptionBatchIntervalMs { get; set; }
 }
