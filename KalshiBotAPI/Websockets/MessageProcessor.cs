@@ -572,8 +572,24 @@ namespace KalshiBotAPI.Websockets
                         await ProcessUnsubscriptionConfirmationAsync(data);
                         break;
                     case "ok":
+                        // Existing: Extract id and other properties
+                        int id = data.GetProperty("id").GetInt32();
+                        int sid = data.GetProperty("sid").GetInt32();
+
+                        // Existing: Synchronous confirmation handling
                         await ProcessOkConfirmationAsync(data);
-                        break;
+
+                        if (data.TryGetProperty("seq", out var seqElement) && _subscriptionManager.GetChannelSid("orderbook_delta") == sid)
+                        {
+                            long seq = seqElement.GetInt64();
+                            _subscriptionManager.EnqueueOkMessage(sid, data, seq);
+                            _logger.LogDebug("Enqueued sequenced 'ok' for sid {Sid}, seq {Seq}", sid, seq);
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Skipped enqueuing non-sequenced 'ok' or non-orderbook sid for id {Id}, sid {Sid}", id, sid);
+                        }
+                        break; 
                     case "error":
                         await ProcessErrorMessageAsync(data);
                         break;
@@ -1255,13 +1271,13 @@ namespace KalshiBotAPI.Websockets
                     _subscriptionManager.RemovePendingConfirmation(id);
                 }
 
-                // Enqueue ALL ok messages with sid and seq for ordered processing
-                if (data.TryGetProperty("sid", out var okSidProp) && data.TryGetProperty("seq", out var okSeqProp))
-                {
-                    var okSid = okSidProp.GetInt32();
-                    var okSeq = okSeqProp.GetInt64();
-                    _subscriptionManager.EnqueueOkMessage(okSid, data, okSeq);
-                }
+                //// Enqueue ALL ok messages with sid and seq for ordered processing
+                //if (data.TryGetProperty("sid", out var okSidProp) && data.TryGetProperty("seq", out var okSeqProp))
+                //{
+                //    var okSid = okSidProp.GetInt32();
+                //    var okSeq = okSeqProp.GetInt64();
+                //    _subscriptionManager.EnqueueOkMessage(okSid, data, okSeq);
+                //}
             }
             catch (Exception ex)
             {

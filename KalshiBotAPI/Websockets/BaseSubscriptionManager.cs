@@ -1469,39 +1469,49 @@ namespace KalshiBotAPI.Websockets
                     while (_orderBookUpdateQueue.TryDequeue(out var item, out _))
                     {
                         var (data, offerType, seq, eventId) = item;
-                        ProcessOrderBookMessageInternal(data, offerType, seq, eventId);
+                        if (seq == 1)
+                        {
+                            string test = "";
+                        }
+                        lock (_sequenceNumberSynchronizationLock)
+                        {
+                            long expected = _latestProcessedSequenceNumber + 1;
+                            if (seq != expected)
+                            {
+                                _logger.LogWarning("Sequence gap detected: expected {Expected}, received {ReceivedSeq}", expected, seq);
+                                // Raise unhealthy only for significant gaps, excluding "ok"
+                                if (seq - expected > 1 && offerType != "ok")
+                                {
+                                    // Extract market from data
+                                    if (data.TryGetProperty("msg", out var msgElement) && msgElement.TryGetProperty("market_ticker", out var tickerElement))
+                                    {
+                                        var market = tickerElement.GetString();
+                                        if (!string.IsNullOrEmpty(market))
+                                        {
+                                            RaiseMarketWebSocketUnhealthy(new[] { market });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogInformation("Processing OB seq {Seq} as expected", seq);
+                            }
+                            _logger.LogDebug("Processed seq {Seq} (expected {Expected}, queue remaining: {Remaining})", seq, expected, _orderBookUpdateQueue.Count);
+                            _latestProcessedSequenceNumber = seq;
+                        }
+                        // Skip order book event for non-orderbook types
+                        if (offerType != "ok")
+                        {
+                            var eventArgs = new OrderBookEventArgs(offerType, data);
+                            OnOrderBookProcessed(eventArgs);
+                        }
                     }
                 }
             }
             _logger.LogDebug("Order book queue processor stopped");
         }
 
-        /// <summary>
-        /// Processes a single order book message internally, handling sequence checks and event raising.
-        /// </summary>
-        /// <param name="data">The message data.</param>
-        /// <param name="offerType">The offer type.</param>
-        /// <param name="seq">The sequence number.</param>
-        /// <param name="eventId">The event ID.</param>
-        private void ProcessOrderBookMessageInternal(JsonElement data, string offerType, long seq, Guid eventId)
-        {
-            lock (_sequenceNumberSynchronizationLock)
-            {
-                long expected = _latestProcessedSequenceNumber + 1;
-                if (seq != expected)
-                {
-                    _logger.LogWarning("Sequence gap detected: expected {Expected}, received {Seq}", expected, seq);
-                }
-                _logger.LogDebug("Processed seq {Seq} (expected {Expected}, queue remaining: {Remaining})", seq, expected, _orderBookUpdateQueue.Count);
-                _latestProcessedSequenceNumber = Math.Max(_latestProcessedSequenceNumber, seq);
-            }
-            // Only raise OrderBookProcessed event for actual orderbook messages
-            if (offerType != "ok")
-            {
-                var eventArgs = new OrderBookEventArgs(offerType, data);
-                OnOrderBookProcessed(eventArgs);
-            }
-        }
 
         /// <summary>
         /// Background task that monitors subscription health and detects stale subscriptions.
