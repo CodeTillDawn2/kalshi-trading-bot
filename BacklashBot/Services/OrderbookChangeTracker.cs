@@ -1035,14 +1035,6 @@ namespace BacklashBot.Services
             _logger.LogDebug("Processing {YesChangeCount} Yes-side and {NoChangeCount} No-side order book changes for {MarketTicker}",
                 validYesChanges.Count, validNoChanges.Count, _marketTicker);
 
-            var (isValid, invalidCount) = ValidateEvents(validYesChanges.Concat(validNoChanges).ToList());
-            if (!isValid)
-            {
-                _logger.LogWarning("Event validation failed for {MarketTicker}: {InvalidCount} invalid events found, skipping metric recalculation", _marketTicker, invalidCount);
-                MarketInvalid?.Invoke(this, _marketTicker);
-                return;
-            }
-
             if (Market == null)
             {
                 _logger.LogWarning("OrderbookChangeTracker survived market {ticker}", _marketTicker);
@@ -1285,82 +1277,6 @@ namespace BacklashBot.Services
             }
         }
 
-        private (bool isValid, int invalidCount) ValidateEvents(List<OrderbookChange> orderbookChanges)
-        {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogDebug("Event validation cancelled for {MarketTicker}", _marketTicker);
-                return (false, 0);
-            }
-
-            bool isValid = true;
-            HashSet<string> changeIds = new HashSet<string>();
-            int invalidCount = 0;
-
-            foreach (var change in orderbookChanges)
-            {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogDebug("Event validation loop cancelled for {MarketTicker}", _marketTicker);
-                    return (false, invalidCount);
-                }
-
-                if (!changeIds.Add(change.Id))
-                {
-                    _logger.LogWarning("DUP-Duplicate ChangeID detected for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Side, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.Price < 0 || change.Price > 100)
-                {
-                    _logger.LogWarning("Invalid price for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.DeltaContracts == 0)
-                {
-                    _logger.LogWarning("Invalid DeltaContracts for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.Timestamp > DateTime.UtcNow.AddMinutes(1) || change.Timestamp < DateTime.UtcNow.AddMinutes(-_trackerConfig.Value.EventCalculationPeriod))
-                {
-                    string reason;
-                    if (change.Timestamp > DateTime.UtcNow.AddMinutes(1))
-                    {
-                        reason = $"timestamp is more than 1 minute in the future (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
-                    }
-                    else
-                    {
-                        reason = $"timestamp is more than {_trackerConfig.Value.EventCalculationPeriod} minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
-                    }
-                    _logger.LogWarning("Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
-                        _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts, reason);
-                    isValid = false;
-                    invalidCount++;
-                }
-            }
-
-            if (invalidCount > 0)
-            {
-                _logger.LogWarning("Found {InvalidCount} invalid order book changes for {MarketTicker}", invalidCount, _marketTicker);
-            }
-            else
-            {
-                _logger.LogDebug("All order book changes validated successfully for {MarketTicker}", _marketTicker);
-            }
-
-            return (isValid, invalidCount);
-        }
 
         private void CleanupOldTrades()
         {

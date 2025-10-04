@@ -9,10 +9,12 @@ using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
+using Polly;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -172,11 +174,15 @@ namespace BacklashBot.Services
 
                 try
                 {
-                    await context.UpdateMarketLastCandlestick(marketTicker);
+                    var retryPolicy = Policy.Handle<Exception>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(1) * (i + 1));
+                    await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        await context.UpdateMarketLastCandlestick(marketTicker);
+                    });
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning("Error updating last candlestick metadata for {MarketTicker}: {Message}, Inner: {Inner}",
+                    _logger.LogWarning("Error updating last candlestick metadata for {MarketTicker} after retries: {Message}, Inner: {Inner}",
                         marketTicker, ex.Message, ex.InnerException?.Message ?? "None");
                 }
 
@@ -1026,6 +1032,22 @@ namespace BacklashBot.Services
                 }
                 return new List<CandlestickData>();
             }
+        }
+
+        /// <summary>
+        /// Determines whether an exception represents a transient error that should be retried.
+        /// Checks against a predefined list of SQL error codes known to be transient in nature.
+        /// </summary>
+        /// <param name="ex">The exception to evaluate.</param>
+        /// <returns>True if the exception is transient and should be retried; otherwise, false.</returns>
+        private static bool IsTransient(Exception ex)
+        {
+            if (ex is SqlException sqlEx)
+            {
+                var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
+                return transientErrors.Contains(sqlEx.Number);
+            }
+            return false;
         }
 
         /// <summary>

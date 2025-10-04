@@ -1017,8 +1017,8 @@ namespace KalshiBotAPI.Websockets
                         // First remove all markets from the subscription
                         await UpdateSubscriptionAsync("delete_markets", markets, action);
 
-                        // Small delay to ensure the unsubscribe is processed
-                        await Task.Delay(100, _processingCancellationToken);
+                        // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                        await Task.Delay(1000, _processingCancellationToken);
 
                         // Then add them back
                         await UpdateSubscriptionAsync("add_markets", markets, action);
@@ -1029,8 +1029,8 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogDebug("Using unsubscribe-then-resubscribe approach for non-market-specific channel {Channel}", channel);
                         await UnsubscribeFromChannelAsync(action);
 
-                        // Small delay to ensure the unsubscribe is processed
-                        await Task.Delay(100, _processingCancellationToken);
+                        // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                        await Task.Delay(1000, _processingCancellationToken);
 
                         await SubscribeToChannelAsync(action, markets);
                     }
@@ -1038,6 +1038,43 @@ namespace KalshiBotAPI.Websockets
             }
 
             _logger.LogInformation("Resubscription completed");
+        }
+
+        /// <summary>
+        /// Resubscribes a specific stale channel by unsubscribing, waiting, then resubscribing to prevent duplicate messages.
+        /// </summary>
+        /// <param name="channel">The channel name to resubscribe.</param>
+        /// <param name="markets">The markets subscribed to this channel.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task ResubscribeChannelAsync(string channel, HashSet<string> markets)
+        {
+            _logger.LogInformation("Resubscribing stale channel {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
+
+            if (!_connectionManager.IsConnected())
+            {
+                _logger.LogWarning("WebSocket not connected, cannot resubscribe channel {Channel}", channel);
+                return;
+            }
+
+            var action = GetActionFromChannel(channel);
+            if (KalshiConstants.MarketChannelsDelta.Contains(channel) && markets.Any())
+            {
+                // Market-specific channel: delete then add markets
+                _logger.LogDebug("Using delete-then-add approach for market-specific channel {Channel}", channel);
+                await UpdateSubscriptionAsync("delete_markets", markets.ToArray(), action);
+                await Task.Delay(1000, _processingCancellationToken);
+                await UpdateSubscriptionAsync("add_markets", markets.ToArray(), action);
+            }
+            else
+            {
+                // Non-market-specific or no markets: unsubscribe then subscribe
+                _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
+                await UnsubscribeFromChannelAsync(action);
+                await Task.Delay(1000, _processingCancellationToken);
+                await SubscribeToChannelAsync(action, markets.ToArray());
+            }
+
+            _logger.LogInformation("Resubscription completed for channel {Channel}", channel);
         }
 
         /// <summary>
@@ -1071,8 +1108,8 @@ namespace KalshiBotAPI.Websockets
                     // Remove markets then add them back to avoid "already subscribed" errors
                     await UpdateSubscriptionAsync("delete_markets", markets, action);
 
-                    // Small delay to ensure the unsubscribe is processed
-                    await Task.Delay(100, _processingCancellationToken);
+                    // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                    await Task.Delay(1000, _processingCancellationToken);
 
                     // Then add them back
                     await UpdateSubscriptionAsync("add_markets", markets, action);
@@ -1608,7 +1645,6 @@ namespace KalshiBotAPI.Websockets
 
                     var now = DateTime.UtcNow;
                     var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
-                    bool hasStaleSubscriptions = false;
 
                     _subscriptionLock.EnterReadLock();
                     try
@@ -1627,22 +1663,21 @@ namespace KalshiBotAPI.Websockets
                                 {
                                     // Check activity on the normalized lifecycle channel
                                     hasRecentActivity = _channelLastActivity.TryGetValue("lifecycle", out var lifecycleActivity) &&
-                                                       (now - lifecycleActivity) < staleThreshold;
+                                                        (now - lifecycleActivity) < staleThreshold;
                                 }
                                 else
                                 {
                                     // For non-lifecycle channels, check the specific channel
                                     hasRecentActivity = _channelLastActivity.TryGetValue(channel, out var lastActivity) &&
-                                                       (now - lastActivity) < staleThreshold;
+                                                        (now - lastActivity) < staleThreshold;
                                 }
 
                                 if (!hasRecentActivity)
                                 {
                                     var englishChannelName = GetEnglishChannelName(channel);
-                                    _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), will resubscribe all",
+                                    _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel",
                                         englishChannelName, channel, sid, staleThreshold.TotalMinutes);
-                                    hasStaleSubscriptions = true;
-                                    break; // No need to check further, we'll resubscribe all
+                                    await ResubscribeChannelAsync(channel, subscription.Value.Markets);
                                 }
                             }
                         }
@@ -1650,12 +1685,6 @@ namespace KalshiBotAPI.Websockets
                     finally
                     {
                         _subscriptionLock.ExitReadLock();
-                    }
-
-                    if (hasStaleSubscriptions)
-                    {
-                        _logger.LogInformation("Resubscribing to all subscriptions due to detected stale subscriptions");
-                        await ResubscribeAsync(true); // Force resubscribe to all
                     }
                 }
                 catch (OperationCanceledException)
