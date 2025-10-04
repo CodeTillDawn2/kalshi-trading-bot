@@ -241,5 +241,12 @@ namespace BacklashBot.Services.Interfaces
         /// <param name="marketTicker">The market ticker to subscribe to.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task SubscribeToMarketChannelsAsync(string marketTicker);
+
+        /// <summary>
+        /// Resets the ReceivedFirstSnapshot flag for the specified market ticker.
+        /// This forces the market to wait for a new snapshot before processing updates.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to reset the snapshot flag for.</param>
+        void ResetReceivedFirstSnapshot(string marketTicker);
     }
 }

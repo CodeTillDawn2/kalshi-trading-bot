@@ -765,5 +765,11 @@ namespace BacklashBot.State.Interfaces
         /// Gets the list of recent pseudo candlesticks.
         /// </summary>
         List<PseudoCandlestick> RecentCandlesticks { get; }
+
+        /// <summary>
+        /// Cancels all ongoing operations for this market data instance.
+        /// Used when the market is being removed from watch list to prevent further processing.
+        /// </summary>
+        void CancelOperations();
     }
 }

@@ -925,6 +925,22 @@ namespace KalshiBotAPI.Websockets
         };
 
         /// <summary>
+        /// Gets the English name for a channel for more readable logging.
+        /// </summary>
+        /// <param name="channel">The technical channel name.</param>
+        /// <returns>The English name for the channel.</returns>
+        private string GetEnglishChannelName(string channel) => channel switch
+        {
+            "orderbook_delta" => "Order Book",
+            "ticker" => "Market Ticker",
+            "trade" => "Trade Data",
+            "fill" => "Fill Data",
+            "market_lifecycle_v2" => "Market Lifecycle",
+            "event_lifecycle" => "Event Lifecycle",
+            _ => channel // Fallback to original name if unknown
+        };
+
+        /// <summary>
         /// Calculates the exponential backoff delay for subscription retries.
         /// Uses exponential backoff with jitter to avoid thundering herd problems.
         /// </summary>
@@ -1405,7 +1421,8 @@ namespace KalshiBotAPI.Websockets
                         else
                         {
                             // Gap not filled after 1 second - this is a true missing message
-                            // Process the out-of-order message without logging a warning
+                            // Process the out-of-order message and log a warning
+                            _logger.LogWarning("Sequence gap detected: expected {ExpectedSeq}, received {GapSeq}. Processing out-of-order message.", expectedSeq, gapSeq);
                             _orderBookUpdateQueue.TryDequeue(out _, out _);
                             _latestProcessedSequenceNumber = gapSeq;
 
@@ -1458,14 +1475,27 @@ namespace KalshiBotAPI.Websockets
                             if (sid != 0)
                             {
                                 // Check if this subscription has received messages recently
-                                // If we receive any events from one of the channels, we consider that an active channel for all markets
-                                var hasRecentActivity = _channelLastActivity.TryGetValue(channel, out var lastActivity) &&
+                                // For lifecycle channels, check the normalized "lifecycle" activity key
+                                // since both market_lifecycle_v2 and event_lifecycle are recorded as "lifecycle"
+                                bool hasRecentActivity;
+                                if (channel == "market_lifecycle_v2" || channel == "event_lifecycle")
+                                {
+                                    // Check activity on the normalized lifecycle channel
+                                    hasRecentActivity = _channelLastActivity.TryGetValue("lifecycle", out var lifecycleActivity) &&
+                                                       (now - lifecycleActivity) < staleThreshold;
+                                }
+                                else
+                                {
+                                    // For non-lifecycle channels, check the specific channel
+                                    hasRecentActivity = _channelLastActivity.TryGetValue(channel, out var lastActivity) &&
                                                        (now - lastActivity) < staleThreshold;
+                                }
 
                                 if (!hasRecentActivity)
                                 {
-                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid} (no messages received in {ThresholdMinutes} minutes), will resubscribe all",
-                                        channel, sid, staleThreshold.TotalMinutes);
+                                    var englishChannelName = GetEnglishChannelName(channel);
+                                    _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), will resubscribe all",
+                                        englishChannelName, channel, sid, staleThreshold.TotalMinutes);
                                     hasStaleSubscriptions = true;
                                     break; // No need to check further, we'll resubscribe all
                                 }

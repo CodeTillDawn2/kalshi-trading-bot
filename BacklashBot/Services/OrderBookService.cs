@@ -843,7 +843,7 @@ namespace BacklashBot.Services
                 else if (offerType == "DEL")
                 {
                     _logger.LogDebug("Processing delta for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
-                    updatedOrderbook = ProcessOrderBookDeltaAsync(message, marketTicker);
+                    updatedOrderbook = await ProcessOrderBookDeltaAsync(message, marketTicker);
 
                     lock (lockObj)
                     {
@@ -969,9 +969,10 @@ namespace BacklashBot.Services
             return updatedOrderbook;
         }
 
-        private List<OrderbookData> ProcessOrderBookDeltaAsync(OrderbookMessage message, string marketTicker)
+        private async Task<List<OrderbookData>> ProcessOrderBookDeltaAsync(OrderbookMessage message, string marketTicker)
         {
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return new List<OrderbookData>();
+            if (_serviceFactory.GetDataCache().RecentlyRemovedMarkets.Contains(marketTicker)) return new List<OrderbookData>();
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
             var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
@@ -1009,16 +1010,15 @@ namespace BacklashBot.Services
                         _logger.LogWarning("Market {MarketTicker} not found in cache for delta update", marketTicker);
                     }
 
-                    if (message.Delta.Value <= 0 && orderData == null)
+                    if (message.Delta.Value <= 0 && orderData == null && orderbook.Count > 0)
                     {
                         _logger.LogWarning(new OrderbookTransientFailureException(marketTicker, "DELTA-Received non-positive delta for non-existent level"),
-                            "DELTA-Received non-positive delta for non-existent level: {MarketTicker}, Price: {message.Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}",
+                            "DELTA-Received non-positive delta for non-existent level: {MarketTicker}, Price: {message.Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}. Unsubscribing and resubscribing to orderbook channel.",
                             marketTicker, message.Price, message.Side, message.Delta.Value, orderbook.Count);
-                        // Trigger snapshot refresh due to invalid orderbook change
-                        if (!_serviceFactory.GetMarketDataService().MarketsToRefresh.Contains(marketTicker))
-                        {
-                            _serviceFactory.GetMarketDataService().MarketsToRefresh.Add(marketTicker);
-                        }
+                        // Queue the resubscription to happen outside the lock
+                        _ = ResubscribeOrderBookChannelAsync(marketTicker);
+                        // Reset the first snapshot received flag so it waits for a new snapshot
+                        _serviceFactory.GetMarketDataService().ResetReceivedFirstSnapshot(marketTicker);
                         return orderbook;
                     }
 
@@ -1124,6 +1124,20 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to generate ticker for {MarketTicker}", marketTicker);
+            }
+        }
+
+        private async Task ResubscribeOrderBookChannelAsync(string marketTicker)
+        {
+            try
+            {
+                await _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionAsync("delete_markets", new string[] { marketTicker }, "orderbook");
+                await Task.Delay(100, _statusTrackerService.GetCancellationToken()); // Brief delay before resubscribe
+                await _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionAsync("add_markets", new string[] { marketTicker }, "orderbook");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to unsubscribe/resubscribe orderbook channel for {MarketTicker} after invalid delta", marketTicker);
             }
         }
 

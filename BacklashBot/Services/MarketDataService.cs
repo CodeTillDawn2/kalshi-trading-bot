@@ -1100,6 +1100,25 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Resets the ReceivedFirstSnapshot flag for the specified market ticker.
+        /// This forces the market to wait for a new snapshot before processing updates.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to reset the snapshot flag for.</param>
+        public void ResetReceivedFirstSnapshot(string marketTicker)
+        {
+            if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+            {
+                marketData.ReceivedFirstSnapshot = false;
+                _logger.LogInformation("Reset ReceivedFirstSnapshot flag for market {MarketTicker}", marketTicker);
+            }
+            else
+            {
+                _logger.LogWarning("MarketData instance for {MarketTicker} not found in cache, cannot reset ReceivedFirstSnapshot flag", marketTicker);
+            }
+        }
+    
+
+        /// <summary>
         /// Ensures market data is loaded and up-to-date, fetching from API if necessary with retry logic using Polly.
         /// </summary>
         public async Task<MarketDTO?> EnsureMarketDataAsync(string marketTicker)
@@ -1245,8 +1264,12 @@ namespace BacklashBot.Services
 
                 foreach (var market in removedMarkets)
                 {
-                    _serviceFactory.GetDataCache().Markets.TryRemove(market, out var _);
+                    _serviceFactory.GetDataCache().Markets.TryRemove(market, out var marketData);
                     _serviceFactory.GetDataCache().RecentlyRemovedMarkets.Add(market);
+                    if (marketData != null)
+                    {
+                        marketData.CancelOperations();
+                    }
                     _logger.LogInformation("Removed market {MarketTicker} from cache", market);
                 }
 

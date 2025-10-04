@@ -57,6 +57,7 @@ namespace BacklashBot.State
         private readonly ILogger<IMarketData> _logger;
         private readonly IOrderbookChangeTracker _changeTracker;
         private readonly ITradingCalculator _tradingCalculator;
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private string _marketTicker = "";
         private MarketDTO _marketInfo = null!;
         private readonly Dictionary<string, List<CandlestickData>> _candlesticks;
@@ -195,6 +196,7 @@ namespace BacklashBot.State
             _tradingCalculator = tradingCalculator ?? throw new ArgumentNullException(nameof(tradingCalculator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _changeTracker = changeTracker ?? throw new ArgumentNullException(nameof(changeTracker));
+            _cancellationTokenSource = new CancellationTokenSource();
             _candlesticks = new Dictionary<string, List<CandlestickData>>
             {
                 ["minute"] = new List<CandlestickData>(),
@@ -208,6 +210,16 @@ namespace BacklashBot.State
 
             _logger.LogDebug("MarketData initialized for ticker {MarketTicker}", _marketTicker);
         }
+
+        /// <summary>
+        /// Cancels all ongoing operations for this market data instance.
+        /// Used when the market is being removed from watch list to prevent further processing.
+        /// </summary>
+        public void CancelOperations()
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
         /// <summary>
         /// Validates candlestick data for integrity before processing.
         /// Checks for non-negative prices within valid range (0-100), non-negative volume, and reasonable timestamps.
@@ -771,6 +783,7 @@ namespace BacklashBot.State
         /// <param name="source">The source of the price update (e.g., "Candlestick", "Ticker").</param>
         public void UpdateCurrentPrice(int yesAsk, int yesBid, DateTime timestamp, string source)
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
 
             if (timestamp >= _tickerPrice.When && (yesAsk != _tickerPrice.Ask || yesBid != _tickerPrice.Bid))
             {
@@ -807,6 +820,8 @@ namespace BacklashBot.State
         /// </summary>
         public void RefreshCandlestickMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate candlestick data integrity
             ValidateCandlesticks(_candlesticks["minute"]);
 
@@ -863,6 +878,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task RefreshTickerMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate ticker data integrity
             ValidateTickers(_tickers.ToList());
 
@@ -969,6 +986,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task UpdateTradingMetrics()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             _logger.LogDebug("**Started updating trading metrics for {marketTicker}**", _marketTicker);
             _minutePseudoCandlesticks = await BuildPseudoCandlesticks("minute", _marketDataConfig.PseudoCandlestickLookbackPeriods);
             _hourPseudoCandlesticks = await BuildPseudoCandlesticks("hour", _marketDataConfig.PseudoCandlestickLookbackPeriods);
@@ -1292,6 +1311,8 @@ namespace BacklashBot.State
         /// </summary>
         public void RefreshPositionMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate position and orderbook data integrity
             if (_positions != null)
             {
@@ -1544,6 +1565,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation, containing the list of pseudo candlesticks.</returns>
         public async Task<List<PseudoCandlestick>> BuildPseudoCandlesticks(string period, int lookbackPeriods = 0)
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return new List<PseudoCandlestick>();
+
             _logger.LogDebug("Starting BuildPseudoCandlesticks: period={Period}, lookbackPeriods={Lookback}", period, lookbackPeriods);
             return await Task.Run(() =>
             {
@@ -1780,7 +1803,14 @@ namespace BacklashBot.State
                     }
                 }
 
-                _logger.LogDebug("Produced {Count} candlesticks", result.Count);
+                if (result.Count == 0)
+                {
+                    _logger.LogInformation("BuildPseudoCandlesticks produced empty list for {MarketTicker}, period={Period}, lookbackPeriods={Lookback}", _marketTicker, period, lookbackPeriods);
+                }
+                else
+                {
+                    _logger.LogDebug("Produced {Count} candlesticks", result.Count);
+                }
                 return result;
             });
         }

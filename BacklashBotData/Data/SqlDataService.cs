@@ -499,6 +499,15 @@ namespace BacklashBotData.Data
             }
 
             var marketTicker = marketTickerProp.GetString()!;
+            var yesPrice = msg.GetProperty("yes_price").GetInt32();
+            var noPrice = msg.GetProperty("no_price").GetInt32();
+            var count = msg.GetProperty("count").GetInt32();
+            var takerSide = msg.GetProperty("taker_side").GetString();
+            var ts = msg.GetProperty("ts").GetInt64();
+
+            // Log trade details for duplicate detection
+            _logger.LogInformation("Enqueuing trade for {MarketTicker}: yes_price={YesPrice}, no_price={NoPrice}, count={Count}, taker_side={TakerSide}, ts={Ts}",
+                marketTicker, yesPrice, noPrice, count, takerSide, ts);
 
             // Queue size check
             if (_tradeQueue.Count >= _maxQueueSize)
@@ -515,11 +524,11 @@ namespace BacklashBotData.Data
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
-                    cmd.Parameters.AddWithValue("@yes_price", msg.GetProperty("yes_price").GetInt32());
-                    cmd.Parameters.AddWithValue("@no_price", msg.GetProperty("no_price").GetInt32());
-                    cmd.Parameters.AddWithValue("@count", msg.GetProperty("count").GetInt32());
-                    cmd.Parameters.AddWithValue("@taker_side", msg.GetProperty("taker_side").GetString());
-                    cmd.Parameters.AddWithValue("@ts", msg.GetProperty("ts").GetInt64());
+                    cmd.Parameters.AddWithValue("@yes_price", yesPrice);
+                    cmd.Parameters.AddWithValue("@no_price", noPrice);
+                    cmd.Parameters.AddWithValue("@count", count);
+                    cmd.Parameters.AddWithValue("@taker_side", takerSide);
+                    cmd.Parameters.AddWithValue("@ts", ts);
                     cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
                 }
             });
@@ -946,7 +955,14 @@ namespace BacklashBotData.Data
                             }
                             catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                if (operationName == "trade")
+                                {
+                                    _logger.LogWarning(ex, "Duplicate trade insert attempted for {MarketTicker}: {Identifier}. This indicates a trade was processed multiple times.", operation.Identifier, operation.Identifier);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                }
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))

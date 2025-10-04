@@ -519,50 +519,8 @@ namespace KalshiBotAPI.Websockets
                 var data = JsonSerializer.Deserialize<JsonElement>(message);
                 var msgType = data.GetProperty("type").GetString() ?? "unknown";
 
-                // Check for message deduplication based on sequence number per channel
-                long sequenceNumber = 0;
-                string channelKey = msgType; // Default to message type as channel identifier
-                if (data.TryGetProperty("seq", out var seqProp) && seqProp.TryGetInt64(out sequenceNumber))
-                {
-                    // For messages with sid, use sid as the channel identifier since seq is per sid
-                    if (data.TryGetProperty("sid", out var sidProp) && sidProp.TryGetInt32(out int sid))
-                    {
-                        channelKey = sid.ToString();
-                    }
-
-                    lock (_sequenceNumberSynchronizationLock)
-                    {
-                        // Get or create sequence number set for this channel
-                        var channelSequences = _processedSequenceNumbersByChannel.GetOrAdd(channelKey, _ => new HashSet<long>());
-
-                        if (channelSequences.Contains(sequenceNumber))
-                        {
-                            if (_enablePerformanceMonitoring)
-                            {
-                                _duplicateMessageCount++;
-                                _duplicateMessagesInWindow++;
-                                CheckDuplicateMessageWarnings();
-                            }
-                            _logger.LogWarning("DUP-Duplicate message detected with sequence number {SequenceNumber} for channel {Channel}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, channelKey, _duplicateMessageCount);
-                            return; // Skip processing duplicate messages
-                        }
-                        channelSequences.Add(sequenceNumber);
-
-                        // Update latest processed sequence number
-                        if (sequenceNumber > _latestProcessedSequenceNumber)
-                        {
-                            _latestProcessedSequenceNumber = sequenceNumber;
-                        }
-
-                        // Periodic cleanup of old sequence numbers to prevent memory leaks
-                        if (channelSequences.Count > _config.MaxSequenceNumbersToKeep)
-                        {
-                            var oldestToKeep = _latestProcessedSequenceNumber - (_config.MaxSequenceNumbersToKeep / 2);
-                            channelSequences.RemoveWhere(seq => seq < oldestToKeep);
-                        }
-                    }
-                }
-
+                // Extract sequence number for logging if available
+                var sequenceNumber = data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : (long?)null;
                 _logger.LogDebug("Received WebSocket message type: {MsgType}, Seq: {SequenceNumber}", msgType, sequenceNumber);
 
                 if (MessageReceived != null)
@@ -576,8 +534,8 @@ namespace KalshiBotAPI.Websockets
                     "ticker" => "ticker",
                     "trade" => "trade",
                     "fill" => "fill",
-                    "market_lifecycle_v2" => "market_lifecycle_v2",
-                    "event_lifecycle" => "event_lifecycle",
+                    "market_lifecycle_v2" => "lifecycle", 
+                    "event_lifecycle" => "lifecycle", 
                     _ => null
                 };
 
@@ -942,6 +900,13 @@ namespace KalshiBotAPI.Websockets
         {
             _logger.LogDebug("Processing trade update, DataPersistence: {IsEnabled}", _isDataPersistenceEnabled);
             _messageTypeCounts.AddOrUpdate("Trade", 1, (_, count) => count + 1);
+
+            // Extract market ticker for logging
+            if (data.TryGetProperty("msg", out var msg) && msg.TryGetProperty("market_ticker", out var tickerProp))
+            {
+                var marketTicker = tickerProp.GetString();
+                _logger.LogInformation("Processing trade for market: {MarketTicker}", marketTicker);
+            }
 
             try
             {

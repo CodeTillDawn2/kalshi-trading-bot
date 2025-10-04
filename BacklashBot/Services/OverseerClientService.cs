@@ -588,7 +588,7 @@ namespace BacklashBot.Services
                 var mostRecentOverseer = activeOverseers.First();
 
                 // Check if we're still connected to the most recent overseer
-                if (_currentOverseer.Id != mostRecentOverseer.Id)
+                if (_currentOverseer == null || _currentOverseer.Id != mostRecentOverseer.Id)
                 {
                     _logger.LogInformation("OVERSEER- Found newer overseer available. Current: {CurrentHost} ({CurrentHeartbeat}), Available: {RecentHost} ({RecentHeartbeat})",
                         _currentOverseer.HostName,
