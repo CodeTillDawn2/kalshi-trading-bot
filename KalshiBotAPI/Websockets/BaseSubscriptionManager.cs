@@ -1646,6 +1646,8 @@ namespace KalshiBotAPI.Websockets
                     var now = DateTime.UtcNow;
                     var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
 
+                    // Collect stale subscriptions first
+                    var staleSubscriptions = new List<(string Channel, HashSet<string> Markets)>();
                     _subscriptionLock.EnterReadLock();
                     try
                     {
@@ -1674,10 +1676,7 @@ namespace KalshiBotAPI.Websockets
 
                                 if (!hasRecentActivity)
                                 {
-                                    var englishChannelName = GetEnglishChannelName(channel);
-                                    _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel",
-                                        englishChannelName, channel, sid, staleThreshold.TotalMinutes);
-                                    await ResubscribeChannelAsync(channel, subscription.Value.Markets);
+                                    staleSubscriptions.Add((channel, subscription.Value.Markets));
                                 }
                             }
                         }
@@ -1685,6 +1684,15 @@ namespace KalshiBotAPI.Websockets
                     finally
                     {
                         _subscriptionLock.ExitReadLock();
+                    }
+
+                    // Now resubscribe outside the lock
+                    foreach (var (channel, markets) in staleSubscriptions)
+                    {
+                        var englishChannelName = GetEnglishChannelName(channel);
+                        _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel",
+                            englishChannelName, channel, _channelSubscriptions.TryGetValue(channel, out var sub) ? sub.Sid : 0, staleThreshold.TotalMinutes);
+                        await ResubscribeChannelAsync(channel, markets);
                     }
                 }
                 catch (OperationCanceledException)
