@@ -1502,8 +1502,9 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogWarning("Pending confirmation expired for ID {Id}, channel {Channel}, markets {Markets} after {_confirmationTimeoutSeconds} seconds. Retry {RetryCount}/{MaxRetries} with exponential backoff (total retry time: {TotalTime:F1}min).",
                             confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), _confirmationTimeoutSeconds, currentRetryCount + 1, _maxSubscriptionRetries, totalRetryTime.TotalMinutes);
 
-                        // Raise unhealthy event for affected markets
+                        _logger.LogWarning("BSM: Raising MarketWebSocketUnhealthy for expired confirmation ID {Id}, channel {Channel}, markets {Markets}", confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
                         RaiseMarketWebSocketUnhealthy(confirm.Value.MarketTickers);
+
 
                         // Clean up the expired subscription state
                         await CleanupExpiredSubscriptionAsync(confirm.Value.Channel, confirm.Value.MarketTickers);
@@ -1690,8 +1691,8 @@ namespace KalshiBotAPI.Websockets
                     foreach (var (channel, markets) in staleSubscriptions)
                     {
                         var englishChannelName = GetEnglishChannelName(channel);
-                        _logger.LogWarning("Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel",
-                            englishChannelName, channel, _channelSubscriptions.TryGetValue(channel, out var sub) ? sub.Sid : 0, staleThreshold.TotalMinutes);
+                        _logger.LogWarning("BSM: Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel with markets: {Markets}",
+                            englishChannelName, channel, _channelSubscriptions.TryGetValue(channel, out var sub) ? sub.Sid : 0, staleThreshold.TotalMinutes, string.Join(", ", markets));
                         await ResubscribeChannelAsync(channel, markets);
                     }
                 }
@@ -2038,6 +2039,19 @@ namespace KalshiBotAPI.Websockets
         public int GetChannelSid(string channel)
         {
             return _channelSubscriptions.TryGetValue(channel, out var subscription) ? subscription.Sid : 0;
+        }
+
+        /// <summary>
+        /// Removes a single channel subscription from local state.
+        /// Used when processing unsubscribe confirmations.
+        /// </summary>
+        /// <param name="channel">The channel name to remove.</param>
+        public void RemoveChannelSubscription(string channel)
+        {
+            if (_channelSubscriptions.TryRemove(channel, out var subscription))
+            {
+                _logger.LogInformation("Removed subscription for channel {Channel}, SID {Sid}", channel, subscription.Sid);
+            }
         }
 
         /// <summary>

@@ -37,6 +37,7 @@ namespace BacklashCommon.Services
         private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceConfig;
         private readonly IPerformanceMonitor _performanceMonitor;
         private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
+        private DateTime? _lastAttemptedSnapshotTimestamp; // Timestamp of the last snapshot attempt
 
         /// <summary>
         /// Gets or sets the timestamp when the next snapshot is ideally expected based on the configured decision frequency.
@@ -46,7 +47,6 @@ namespace BacklashCommon.Services
         /// snapshot save and reset when snapshot tracking is cleared. Null indicates no expected timing has been established.
         /// </remarks>
         public DateTime? NextExpectedSnapshotTimestamp { get; set; } // The timestamp when the next snapshot is ideally expected
-        private bool _isFirstSnapshotTaken = true;
         private readonly TimeSpan _decisionFrequencyInterval;
         private readonly TimeSpan _snapshotTimingTolerance;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -151,15 +151,18 @@ namespace BacklashCommon.Services
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
 
+                DateTime? previousAttemptTimestamp = _lastAttemptedSnapshotTimestamp;
+                _lastAttemptedSnapshotTimestamp = timestamp;
+
                 var discardThreshold = _decisionFrequencyInterval + TimeSpan.FromSeconds(_tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds * 2);
 
-                if (_isFirstSnapshotTaken)
+                if (NextExpectedSnapshotTimestamp == null)
                 {
                     NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
                 }
-                else if (_lastSavedSnapshotTimestamp.HasValue)
+                else
                 {
-                    if (NextExpectedSnapshotTimestamp.HasValue && timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
+                    if (timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
                     {
                         _logger.LogWarning(
                             "BRAIN: Skipping extremely late snapshot: {CurrentTimestamp} is {TimeSinceExpected} seconds " +
@@ -169,17 +172,20 @@ namespace BacklashCommon.Services
                         return new List<string>();
                     }
 
-                    var actualTimeSinceLastSnapshot = timestamp - _lastSavedSnapshotTimestamp.Value;
-                    var minInterval = _decisionFrequencyInterval - _snapshotTimingTolerance;
-                    var maxInterval = _decisionFrequencyInterval + _snapshotTimingTolerance;
-
-                    if (actualTimeSinceLastSnapshot < minInterval || actualTimeSinceLastSnapshot > maxInterval)
+                    if (previousAttemptTimestamp.HasValue)
                     {
-                        _logger.LogWarning(
-                            "Snapshot timing irregularity detected: {CurrentTimestamp} is {TimeSinceLastSnapshot} seconds " +
-                            "after {LastTimestamp}, expected approximately {ExpectedInterval} seconds",
-                            timestampString, actualTimeSinceLastSnapshot.TotalSeconds,
-                            _lastSavedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _decisionFrequencyInterval.TotalSeconds);
+                        var actualTimeSinceLastAttempt = timestamp - previousAttemptTimestamp.Value;
+                        var minInterval = _decisionFrequencyInterval - _snapshotTimingTolerance;
+                        var maxInterval = _decisionFrequencyInterval + _snapshotTimingTolerance;
+
+                        if (actualTimeSinceLastAttempt < minInterval || actualTimeSinceLastAttempt > maxInterval)
+                        {
+                            _logger.LogWarning(
+                                "Snapshot timing irregularity detected: {CurrentTimestamp} is {TimeSinceLastAttempt} seconds " +
+                                "after {LastAttemptTimestamp}, expected approximately {ExpectedInterval} seconds",
+                                timestampString, actualTimeSinceLastAttempt.TotalSeconds,
+                                previousAttemptTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _decisionFrequencyInterval.TotalSeconds);
+                        }
                     }
                 }
 
@@ -269,7 +275,6 @@ namespace BacklashCommon.Services
 
                     _lastSavedSnapshotTimestamp = timestamp;
                     NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
-                    _isFirstSnapshotTaken = false;
                 }
 
                 Interlocked.Decrement(ref _concurrentOperations);
@@ -528,6 +533,7 @@ namespace BacklashCommon.Services
         public void ResetSnapshotTracking()
         {
             _lastSavedSnapshotTimestamp = null;
+            _lastAttemptedSnapshotTimestamp = null;
             NextExpectedSnapshotTimestamp = null; // Reset the expected timestamp as well
         }
 

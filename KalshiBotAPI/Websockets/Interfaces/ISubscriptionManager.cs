@@ -244,6 +244,13 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         int GetChannelSid(string channel);
 
         /// <summary>
+        /// Removes a single channel subscription from local state.
+        /// Used when processing unsubscribe confirmations.
+        /// </summary>
+        /// <param name="channel">The channel name to remove.</param>
+        void RemoveChannelSubscription(string channel);
+
+        /// <summary>
         /// Handles WebSocket disconnection by clearing local subscription state.
         /// This ensures clean reconnection without stale state assumptions.
         /// </summary>

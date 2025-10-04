@@ -114,9 +114,10 @@ namespace BacklashBot.Services
                 _logger.LogInformation("SF: Wiring up MarketWebSocketUnhealthy event from SubscriptionManager to MarketDataService");
                 subscriptionManager.MarketWebSocketUnhealthy += async (sender, markets) =>
                 {
-                    _logger.LogInformation("SF: MarketWebSocketUnhealthy event received for markets: {Markets}", string.Join(", ", markets));
+                    _logger.LogWarning("SF: MarketWebSocketUnhealthy event received for markets: {Markets} - this will mark them unhealthy and unsubscribe", string.Join(", ", markets));
                     foreach (var market in markets)
                     {
+                        _logger.LogWarning("SF: Marking market {Market} as unhealthy due to WebSocket issues", market);
                         await marketDataService.MarkMarketAsUnhealthyAsync(market);
                     }
                 };

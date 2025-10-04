@@ -576,6 +576,20 @@ namespace KalshiBotAPI.Websockets
                         int id = data.GetProperty("id").GetInt32();
                         int sid = data.GetProperty("sid").GetInt32();
 
+                        // Record channel activity for "ok" messages with sid
+                        if (sid != 0)
+                        {
+                            // Find channel by sid
+                            string channelForOk = null;
+                            // Since _subscriptionManager is ISubscriptionManager, need to access BaseSubscriptionManager
+                            // For now, assume it's the channel that has this sid
+                            // Actually, since we have the subscriptionManager, and it has GetChannelSid, but to get channel from sid, need to iterate
+                            // But to keep simple, perhaps record activity for known channels, but since it's confirmation, the channel is active
+                            // For now, skip specific channel, but since "ok" indicates activity, perhaps record for all channels or find a way
+                            // Actually, since the pending confirmation has the channel, but here we don't have it yet.
+                            // Perhaps move the activity recording after processing.
+                        }
+
                         // Existing: Synchronous confirmation handling
                         await ProcessOkConfirmationAsync(data);
 
@@ -589,7 +603,7 @@ namespace KalshiBotAPI.Websockets
                         {
                             _logger.LogDebug("Skipped enqueuing non-sequenced 'ok' or non-orderbook sid for id {Id}, sid {Sid}", id, sid);
                         }
-                        break; 
+                        break;
                     case "error":
                         await ProcessErrorMessageAsync(data);
                         break;
@@ -1199,6 +1213,17 @@ namespace KalshiBotAPI.Websockets
                     }
 
                     _logger.LogInformation("Unsubscription confirmed for SID: {Sid} from channel '{Channel}'{MarketInfo} | Source: {Source}", sid, channel, marketInfo, "MessageProcessor");
+
+                    // Remove from pending confirmations if this ID was pending
+                    if (data.TryGetProperty("id", out var idProp))
+                    {
+                        var id = idProp.GetInt32();
+                        _subscriptionManager.RemovePendingConfirmation(id);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unsubscription confirmation message missing id property");
+                    }
                 }
             }
             catch (Exception ex)
@@ -1228,7 +1253,7 @@ namespace KalshiBotAPI.Websockets
                 {
                     var id = idProp.GetInt32();
                     var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    _logger.LogInformation("[{Timestamp}] RECEIVED confirmation for ID: {Id}", timestamp, id);
+                    _logger.LogWarning("MP: RECEIVED 'ok' confirmation for ID: {Id} at {Timestamp}", id, timestamp);
 
                     // Check if this is a subscribe confirmation with sid
                     if (data.TryGetProperty("sid", out var sidProp))
@@ -1248,13 +1273,28 @@ namespace KalshiBotAPI.Websockets
                             {
                                 var markets = string.Join(", ", pending.Value.MarketTickers);
                                 marketInfo = $" for markets: {markets}";
+                                // This is a subscribe or update confirmation
+                                await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+                                // Record channel activity since "ok" indicates the channel is active
+                                _subscriptionManager.RecordChannelActivity(channel);
                             }
-
-                            await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+                            else
+                            {
+                                // Empty market tickers means this is an unsubscribe confirmation
+                                marketInfo = " (unsubscribe from all)";
+                                _logger.LogInformation("MP: Processing unsubscribe confirmation for channel {Channel}, SID {Sid}", channel, sid);
+                                // For unsubscribe, remove the subscription
+                                if (_subscriptionManager.GetChannelSid(channel) == sid)
+                                {
+                                    _subscriptionManager.RemoveChannelSubscription(channel);
+                                }
+                                // Record channel activity even for unsubscribe
+                                _subscriptionManager.RecordChannelActivity(channel);
+                            }
                         }
                         else
                         {
-                            _logger.LogWarning("No pending confirmation found for subscribe confirmation ID: {Id}", id);
+                            _logger.LogWarning("No pending confirmation found for confirmation ID: {Id}", id);
                         }
 
                         _logger.LogInformation("[{Timestamp}] RECEIVED subscribe confirmed with SID: {Sid} for ID: {Id} on channel '{Channel}'{MarketInfo} | Source: {Source}", timestamp, sid, id, channel, marketInfo, "MessageProcessor");

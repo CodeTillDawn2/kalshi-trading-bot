@@ -764,7 +764,7 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task MarkMarketAsUnhealthyAsync(string marketTicker)
         {
-            _logger.LogInformation("Marking market {MarketTicker} as unhealthy by setting interest score to zero and WebSocket health to false", marketTicker);
+            _logger.LogWarning("MDS: Marking market {MarketTicker} as unhealthy - this will unsubscribe and potentially remove from cache", marketTicker);
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -773,11 +773,11 @@ namespace BacklashBot.Services
                 if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 {
                     marketData.WebSocketHealthy = false;
-                    _logger.LogDebug("Set WebSocketHealthy=false for market {MarketTicker}", marketTicker);
+                    _logger.LogDebug("MDS: Set WebSocketHealthy=false for market {MarketTicker}", marketTicker);
                 }
                 else
                 {
-                    _logger.LogWarning("MarketData instance for {MarketTicker} not found in cache, cannot set WebSocket health", marketTicker);
+                    _logger.LogWarning("MDS: MarketData instance for {MarketTicker} not found in cache, cannot set WebSocket health", marketTicker);
                 }
 
                 using var scope = _scopeFactory.CreateScope();
@@ -789,15 +789,16 @@ namespace BacklashBot.Services
                     marketWatch.InterestScore = 0;
                     marketWatch.InterestScoreDate = DateTime.Now;
                     await context.AddOrUpdateMarketWatch(marketWatch);
-                    _logger.LogInformation("Successfully marked market {MarketTicker} as unhealthy (interest score = 0)", marketTicker);
+                    _logger.LogInformation("MDS: Successfully marked market {MarketTicker} as unhealthy (interest score = 0)", marketTicker);
 
-                    // Proper unsubscription
-                    await UpdateMarketSubscriptionAsync("delete_markets", new[] { marketTicker });
+                    // Don't unsubscribe unhealthy markets to prevent cache removal during resubscribe
+                    // Just mark them unhealthy - resubscribe will handle re-subscription
+                    _logger.LogWarning("MDS: Not unsubscribing {MarketTicker} to prevent cache removal - resubscribe will handle re-subscription", marketTicker);
 
                     // Add to refresh for recovery
                     if (!MarketsToRefresh.Contains(marketTicker)) {
                         MarketsToRefresh.Add(marketTicker);
-                        _logger.LogDebug("Added {MarketTicker} to MarketsToRefresh for recovery", marketTicker);
+                        _logger.LogDebug("MDS: Added {MarketTicker} to MarketsToRefresh for recovery", marketTicker);
                     }
 
                     // Shutdown change tracker if in cache
@@ -807,16 +808,16 @@ namespace BacklashBot.Services
                 }
                 else
                 {
-                    _logger.LogWarning("Market watch for {MarketTicker} not found in database, cannot mark as unhealthy", marketTicker);
+                    _logger.LogWarning("MDS: Market watch for {MarketTicker} not found in database, cannot mark as unhealthy", marketTicker);
                 }
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("MarkMarketAsUnhealthyAsync was cancelled for {MarketTicker}", marketTicker);
+                _logger.LogDebug("MDS: MarkMarketAsUnhealthyAsync was cancelled for {MarketTicker}", marketTicker);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to mark market {MarketTicker} as unhealthy", marketTicker);
+                _logger.LogError(ex, "MDS: Failed to mark market {MarketTicker} as unhealthy", marketTicker);
             }
         }
 
@@ -1270,7 +1271,7 @@ namespace BacklashBot.Services
                     {
                         marketData.CancelOperations();
                     }
-                    _logger.LogInformation("Removed market {MarketTicker} from cache", market);
+                    _logger.LogWarning("MDS: Removed market {MarketTicker} from cache due to no longer in WatchedMarkets", market);
                 }
 
                 foreach (var market in newMarkets)
