@@ -35,37 +35,109 @@ namespace KalshiBotAPI.Websockets
         /// Optional service for posting performance metrics.
         /// </summary>
         protected readonly IPerformanceMonitor _performanceMetrics;
-        private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
-        private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
-        private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
-        private readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates = new();
-        private readonly SemaphoreSlim _subscriptionUpdateSynchronizationSemaphore = new SemaphoreSlim(1, 1);
-        private readonly SemaphoreSlim _channelSubscriptionSynchronizationSemaphore = new SemaphoreSlim(1, 1);
-        private readonly ConcurrentQueue<(string Action, string[] MarketTickers, string ChannelAction)> _queuedSubscriptionUpdateRequests = new();
-        private int _nextMessageId = 1;
-        private Task _subscriptionQueueProcessorTask = null!;
-        private Task _pendingConfirmationMonitorTask = null!;
-        private readonly object _sequenceNumberSynchronizationLock = new object();
-        private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
-        private long _latestProcessedSequenceNumber = 0;
+        /// <summary>
+        /// Tracks active WebSocket channel subscriptions with their subscription IDs and associated markets.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
+        /// <summary>
+        /// Tracks pending market subscriptions that are awaiting confirmation.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
+        /// <summary>
+        /// Stores pending subscription confirmations with timestamps and message details.
+        /// </summary>
+        protected readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
+        /// <summary>
+        /// Tracks retry information for failed subscription attempts.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
+        /// <summary>
+        /// Maintains subscription states for each market on each channel.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates = new();
+        /// <summary>
+        /// Synchronizes subscription update operations to prevent concurrent modifications.
+        /// </summary>
+        protected readonly SemaphoreSlim _subscriptionUpdateSynchronizationSemaphore = new SemaphoreSlim(1, 1);
+        /// <summary>
+        /// Synchronizes channel subscription operations to prevent concurrent modifications.
+        /// </summary>
+        protected readonly SemaphoreSlim _channelSubscriptionSynchronizationSemaphore = new SemaphoreSlim(1, 1);
+        /// <summary>
+        /// Queues subscription update requests for processing when the connection is restored.
+        /// </summary>
+        protected readonly ConcurrentQueue<(string Action, string[] MarketTickers, string ChannelAction)> _queuedSubscriptionUpdateRequests = new();
+        /// <summary>
+        /// Generates unique message IDs for WebSocket communication.
+        /// </summary>
+        protected int _nextMessageId = 1;
+        /// <summary>
+        /// Background task that processes queued subscription updates.
+        /// </summary>
+        protected Task _subscriptionQueueProcessorTask = null!;
+        /// <summary>
+        /// Background task that monitors pending subscription confirmations.
+        /// </summary>
+        protected Task _pendingConfirmationMonitorTask = null!;
+        /// <summary>
+        /// Synchronizes access to sequence number tracking for order book processing.
+        /// </summary>
+        protected readonly object _sequenceNumberSynchronizationLock = new object();
+        /// <summary>
+        /// Priority queue for order book update messages, ordered by sequence number.
+        /// </summary>
+        protected readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
+        /// <summary>
+        /// Tracks the latest processed sequence number for order book messages.
+        /// </summary>
+        protected long _latestProcessedSequenceNumber = 0;
         // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
-        private readonly object _orderBookQueueSynchronizationLock = new object();
-        private readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
-        private Task _orderBookQueueProcessorTask = null!;
+        /// <summary>
+        /// Synchronizes access to the order book update queue.
+        /// </summary>
+        protected readonly object _orderBookQueueSynchronizationLock = new object();
+        /// <summary>
+        /// Counts of different message types processed by the subscription manager.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
+        /// <summary>
+        /// Background task that processes the order book update queue.
+        /// </summary>
+        protected Task _orderBookQueueProcessorTask = null!;
         /// <summary>
         /// Cancellation token used to coordinate graceful shutdown of background processing tasks.
         /// </summary>
         protected CancellationToken _processingCancellationToken;
 
         // Configuration options
-        private readonly int _subscriptionTimeoutMs;
-        private readonly int _confirmationTimeoutSeconds;
-        private readonly int _retryDelayMs;
-        private readonly int _maxQueueSize;
-        private readonly int _batchSize;
-        private readonly int _healthCheckIntervalMs;
-        private readonly bool _enableMetrics;
+        /// <summary>
+        /// Timeout in milliseconds for subscription operations.
+        /// </summary>
+        protected readonly int _subscriptionTimeoutMs;
+        /// <summary>
+        /// Timeout in seconds for waiting subscription confirmations.
+        /// </summary>
+        protected readonly int _confirmationTimeoutSeconds;
+        /// <summary>
+        /// Delay in milliseconds between subscription retry attempts.
+        /// </summary>
+        protected readonly int _retryDelayMs;
+        /// <summary>
+        /// Maximum size of the subscription update request queue.
+        /// </summary>
+        protected readonly int _maxQueueSize;
+        /// <summary>
+        /// Number of subscription requests to batch together for processing.
+        /// </summary>
+        protected readonly int _batchSize;
+        /// <summary>
+        /// Interval in milliseconds between health check operations.
+        /// </summary>
+        protected readonly int _healthCheckIntervalMs;
+        /// <summary>
+        /// Whether performance metrics collection is enabled.
+        /// </summary>
+        protected readonly bool _enableMetrics;
 
         // Exponential backoff configuration for subscription retries
         private readonly int _maxSubscriptionRetries = 5;
@@ -73,20 +145,44 @@ namespace KalshiBotAPI.Websockets
         private readonly int _maxRetryDelayMs = 30000;
 
         // Performance metrics
-        private readonly ConcurrentDictionary<string, long> _operationTimings = new();
-        private readonly ConcurrentDictionary<string, long> _operationCounts = new();
-        private readonly ConcurrentDictionary<string, long> _successCounts = new();
+        /// <summary>
+        /// Tracks timing information for different operation types.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _operationTimings = new();
+        /// <summary>
+        /// Counts the number of operations performed for each type.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _operationCounts = new();
+        /// <summary>
+        /// Counts successful operations for each type.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _successCounts = new();
 
         // Lock contention metrics
-        private readonly ConcurrentDictionary<string, long> _lockAcquisitionTimes = new();
-        private readonly ConcurrentDictionary<string, long> _lockContentionCounts = new();
-        private readonly ConcurrentDictionary<string, long> _lockWaitTimes = new();
+        /// <summary>
+        /// Tracks the number of times locks are acquired.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockAcquisitionTimes = new();
+        /// <summary>
+        /// Counts lock contention events.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockContentionCounts = new();
+        /// <summary>
+        /// Tracks wait times for lock acquisitions.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockWaitTimes = new();
 
         // Subscription deduplication
-        private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
+        /// <summary>
+        /// Tracks recent subscription attempts to prevent duplicates.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
 
         // Channel activity tracking for health monitoring
-        private readonly ConcurrentDictionary<string, DateTime> _channelLastActivity = new();
+        /// <summary>
+        /// Tracks the last activity time for each channel.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, DateTime> _channelLastActivity = new();
 
         /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
@@ -128,9 +224,18 @@ namespace KalshiBotAPI.Websockets
         }
 
         // Health monitoring
-        private Task _healthMonitorTask = null!;
-        private readonly ReaderWriterLockSlim _subscriptionLock = new();
-        private readonly ReaderWriterLockSlim _queueLock = new();
+        /// <summary>
+        /// Background task that monitors subscription health.
+        /// </summary>
+        protected Task _healthMonitorTask = null!;
+        /// <summary>
+        /// Lock for synchronizing subscription operations.
+        /// </summary>
+        protected readonly ReaderWriterLockSlim _subscriptionLock = new();
+        /// <summary>
+        /// Lock for synchronizing queue operations.
+        /// </summary>
+        protected readonly ReaderWriterLockSlim _queueLock = new();
 
         /// <summary>
         /// Initializes a new instance of the BaseSubscriptionManager with required dependencies.
@@ -1590,10 +1695,10 @@ namespace KalshiBotAPI.Websockets
             {
                 string operation = kvp.Key;
                 var (avgTicks, totalOps, successOps) = kvp.Value;
-                string id = $"SubscriptionManager_Operation_{operation}";
+                string id = $"BaseSubscriptionManager_Operation_{operation}";
                 string name = $"{operation} Operations";
                 string description = $"Performance metrics for {operation} operations";
-                string category = "SubscriptionManager";
+                string category = "BaseSubscriptionManager";
 
                 if (!_enableMetrics)
                 {
@@ -1626,10 +1731,10 @@ namespace KalshiBotAPI.Websockets
             {
                 string lockName = kvp.Key;
                 var (acqCount, avgWaitTicks, contCount) = kvp.Value;
-                string id = $"SubscriptionManager_Lock_{lockName}";
+                string id = $"BaseSubscriptionManager_Lock_{lockName}";
                 string name = $"{lockName} Lock";
                 string description = $"Lock contention metrics for {lockName}";
-                string category = "SubscriptionManager";
+                string category = "BaseSubscriptionManager";
 
                 if (!_enableMetrics)
                 {
