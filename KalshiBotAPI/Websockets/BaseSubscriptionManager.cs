@@ -1359,81 +1359,25 @@ namespace KalshiBotAPI.Websockets
             while (!_processingCancellationToken.IsCancellationRequested)
             {
                 bool processedAny = false;
-                var expectedSeq = _latestProcessedSequenceNumber + 1;
 
                 lock (_orderBookQueueSynchronizationLock)
                 {
-                    while (_orderBookUpdateQueue.TryPeek(out var message, out var seq))
+                    while (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
                     {
-                        if (seq == expectedSeq)
+                        var expectedSeq = _latestProcessedSequenceNumber + 1;
+                        if (seq != expectedSeq)
                         {
-                            // Process the message (either orderbook or ok)
-                            _orderBookUpdateQueue.TryDequeue(out _, out _);
-                            _latestProcessedSequenceNumber = seq;
-
-                            // Only raise OrderBookProcessed event for actual orderbook messages
-                            if (message.OfferType != "ok")
-                            {
-                                var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                                OnOrderBookProcessed(eventArgs);
-                            }
-                            processedAny = true;
+                            _logger.LogWarning("Sequence gap detected: expected {ExpectedSeq}, received {Seq}", expectedSeq, seq);
                         }
-                        else if (seq > expectedSeq)
+                        _latestProcessedSequenceNumber = seq;
+
+                        // Only raise OrderBookProcessed event for actual orderbook messages
+                        if (message.OfferType != "ok")
                         {
-                            // Gap detected, handle outside lock to avoid await in lock
-                            break;
+                            var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
+                            OnOrderBookProcessed(eventArgs);
                         }
-                        else
-                        {
-                            // seq < expected, duplicate or old, skip
-                            _orderBookUpdateQueue.TryDequeue(out _, out _);
-                            _logger.LogDebug("Skipping old or duplicate seq {Seq}", seq);
-                        }
-                    }
-                }
-
-                // Handle gap outside lock
-                if (_orderBookUpdateQueue.TryPeek(out var gapMessage, out var gapSeq) && gapSeq > expectedSeq)
-                {
-                    // Gap detected, wait up to 1 second for the missing sequence
-                    var waitStart = DateTime.UtcNow;
-                    bool gapFilled = false;
-
-                    while ((DateTime.UtcNow - waitStart).TotalSeconds < 1 && !gapFilled)
-                    {
-                        await Task.Delay(10, _processingCancellationToken);
-
-                        // Check if the expected sequence is now anywhere in the queue
-                        lock (_orderBookQueueSynchronizationLock)
-                        {
-                            gapFilled = _orderBookUpdateQueue.UnorderedItems.Any(item => item.Priority == expectedSeq);
-                        }
-                    }
-
-                    lock (_orderBookQueueSynchronizationLock)
-                    {
-                        if (gapFilled)
-                        {
-                            // The gap was filled, continue processing from the expected sequence
-                            continue;
-                        }
-                        else
-                        {
-                            // Gap not filled after 1 second - this is a true missing message
-                            // Process the out-of-order message and log a warning
-                            _logger.LogWarning("Sequence gap detected: expected {ExpectedSeq}, received {GapSeq}. Processing out-of-order message.", expectedSeq, gapSeq);
-                            _orderBookUpdateQueue.TryDequeue(out _, out _);
-                            _latestProcessedSequenceNumber = gapSeq;
-
-                            // Process the out-of-order message
-                            if (gapMessage.OfferType != "ok")
-                            {
-                                var eventArgs = new OrderBookEventArgs(gapMessage.OfferType, gapMessage.Data);
-                                OnOrderBookProcessed(eventArgs);
-                            }
-                            processedAny = true;
-                        }
+                        processedAny = true;
                     }
                 }
 
