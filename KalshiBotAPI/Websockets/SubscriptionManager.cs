@@ -515,13 +515,7 @@ namespace KalshiBotAPI.Websockets
                     else
                     {
                         updatedMarkets.Remove(ticker);
-                        // Check if market is still subscribed to other channels
-                        bool stillSubscribed = base._channelSubscriptions.Any(s => s.Key != channel && s.Value.Markets.Contains(ticker));
-                        if (!stillSubscribed && WatchedMarkets.Contains(ticker))
-                        {
-                            WatchedMarkets.Remove(ticker);
-                            _logger.LogDebug("Removed {MarketTicker} from WatchedMarkets in DataCache as no longer subscribed to any channels", ticker);
-                        }
+                        // Note: WatchedMarkets removal is handled at application level in MarketDataService.UnwatchMarket
                     }
                     base._pendingMarketSubscriptions.TryRemove($"{channelAction}:{ticker}", out bool _);
                 }
