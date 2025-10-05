@@ -728,29 +728,29 @@ namespace BacklashBotData.Data
         #endregion
 
         #region Tickers
-        public async Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null)
+        public async Task<List<TickerDTO>> GetTickers(string? marketTicker = null, long? ts = null)
         {
             IQueryable<Ticker> query = Tickers.AsNoTracking();
             if (marketTicker != null)
                 query = query.Where(x => x.market_ticker == marketTicker);
-            if (loggedDate != null)
-                query = query.Where(x => x.LoggedDate == loggedDate);
+            if (ts != null)
+                query = query.Where(x => x.ts == ts);
             return await query.Select(x => x.ToTickerDTO()).ToListAsync();
         }
 
 
         public async Task AddOrUpdateTickers(List<TickerDTO> dtos)
         {
-            var tickerKeys = dtos.Select(dto => new { dto.market_ticker, dto.LoggedDate, dto.price }).ToList();
+            var tickerKeys = dtos.Select(dto => new { dto.market_ticker, dto.ts, dto.price }).ToList();
             var tickers = await Tickers
                 .ToListAsync();
             var tickerDict = tickers
-                .Where(t => tickerKeys.Any(k => k.market_ticker == t.market_ticker && k.LoggedDate == t.LoggedDate && k.price == t.price))
-                .ToDictionary(t => (t.market_ticker, t.LoggedDate, t.price), t => t);
+                .Where(t => tickerKeys.Any(k => k.market_ticker == t.market_ticker && k.ts == t.ts && k.price == t.price))
+                .ToDictionary(t => (t.market_ticker, t.ts, t.price), t => t);
 
             foreach (var dto in dtos)
             {
-                var key = (dto.market_ticker, dto.LoggedDate, dto.price);
+                var key = (dto.market_ticker, dto.ts, dto.price);
                 if (!tickerDict.TryGetValue(key, out var ticker))
                 {
                     Tickers.Add(dto.ToTicker());
@@ -765,7 +765,7 @@ namespace BacklashBotData.Data
 
         public async Task AddOrUpdateTicker(TickerDTO dto)
         {
-            Ticker? ticker = await Tickers.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker && x.LoggedDate == dto.LoggedDate && x.price == dto.price);
+            Ticker? ticker = await Tickers.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker && x.ts == dto.ts && x.price == dto.price);
             if (ticker == null)
             {
                 ticker = dto.ToTicker();
@@ -2359,7 +2359,7 @@ namespace BacklashBotData.Data
 
             modelBuilder.Entity<Ticker>()
                 .ToTable("t_feed_ticker")
-                .HasKey(ff => new { ff.market_ticker, ff.LoggedDate, ff.price });
+                .HasKey(ff => new { ff.market_ticker, ff.ts, ff.price });
 
             modelBuilder.Entity<Ticker>()
                 .HasIndex(ff => ff.market_ticker);

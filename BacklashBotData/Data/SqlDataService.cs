@@ -54,6 +54,11 @@ namespace BacklashBotData.Data
         private readonly ConcurrentQueue<DatabaseOperation> _tradeQueue;
 
         /// <summary>
+        /// Thread-safe queue for ticker data operations awaiting database persistence.
+        /// </summary>
+        private readonly ConcurrentQueue<DatabaseOperation> _tickerQueue;
+
+        /// <summary>
         /// Thread-safe queue for fill data operations awaiting database persistence.
         /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _fillQueue;
@@ -171,6 +176,7 @@ namespace BacklashBotData.Data
 
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();
+            _tickerQueue = new ConcurrentQueue<DatabaseOperation>();
             _fillQueue = new ConcurrentQueue<DatabaseOperation>();
             _eventLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
             _marketLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
@@ -182,6 +188,7 @@ namespace BacklashBotData.Data
             {
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_orderBookQueue, "order_book", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_tradeQueue, "trade", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_tickerQueue, "ticker", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_fillQueue, "fill", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_eventLifecycleQueue, "event_lifecycle", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_marketLifecycleQueue, "market_lifecycle", _cts.Token)));
@@ -439,13 +446,13 @@ namespace BacklashBotData.Data
             var marketTicker = marketTickerProp.GetString()!;
 
             // Queue size check
-            if (_tradeQueue.Count >= _maxQueueSize)
+            if (_tickerQueue.Count >= _maxQueueSize)
             {
-                _logger.LogWarning("Trade queue at max capacity ({MaxSize}), dropping ticker operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                _logger.LogWarning("Ticker queue at max capacity ({MaxSize}), dropping ticker operation for {MarketTicker}", _maxQueueSize, marketTicker);
                 return Task.CompletedTask;
             }
 
-            _tradeQueue.Enqueue(new DatabaseOperation
+            _tickerQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Ticker",
                 Identifier = marketTicker,
@@ -763,6 +770,11 @@ namespace BacklashBotData.Data
         public int TradeQueueDepth => _tradeQueue.Count;
 
         /// <summary>
+        /// Gets the current depth of the ticker queue.
+        /// </summary>
+        public int TickerQueueDepth => _tickerQueue.Count;
+
+        /// <summary>
         /// Gets the current depth of the fill queue.
         /// </summary>
         public int FillQueueDepth => _fillQueue.Count;
@@ -793,7 +805,7 @@ namespace BacklashBotData.Data
         /// Gets the total number of queued operations across all queues.
         /// </summary>
         public int TotalQueuedOperations =>
-            _orderBookQueue.Count + _tradeQueue.Count + _fillQueue.Count +
+            _orderBookQueue.Count + _tradeQueue.Count + _tickerQueue.Count + _fillQueue.Count +
             _eventLifecycleQueue.Count + _marketLifecycleQueue.Count;
 
         /// <summary>
@@ -959,6 +971,10 @@ namespace BacklashBotData.Data
                                 {
                                     _logger.LogWarning(ex, "Duplicate trade insert attempted for {MarketTicker}: {Identifier}. This indicates a trade was processed multiple times.", operation.Identifier, operation.Identifier);
                                 }
+                                else if (operationName == "ticker")
+                                {
+                                    _logger.LogWarning(ex, "Duplicate ticker insert attempted for {MarketTicker}: {Identifier}. This indicates a ticker was processed multiple times.", operation.Identifier, operation.Identifier);
+                                }
                                 else
                                 {
                                     _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
@@ -1112,6 +1128,16 @@ namespace BacklashBotData.Data
                                 name: "Trade Queue",
                                 description: "Number of trade operations queued",
                                 value: TradeQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "TickerQueueDepth",
+                                name: "Ticker Queue",
+                                description: "Number of ticker operations queued",
+                                value: TickerQueueDepth,
                                 unit: "count",
                                 category: "Queues"
                             );

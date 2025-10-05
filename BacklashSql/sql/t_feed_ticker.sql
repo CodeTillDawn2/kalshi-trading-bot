@@ -17,11 +17,11 @@ CREATE TABLE [dbo].[t_feed_ticker](
 	[ts] [bigint] NOT NULL,
 	[LoggedDate] [datetime2](7) NOT NULL,
 	[ProcessedDate] [datetime2](7) NULL,
- CONSTRAINT [PK_Feed_Ticker] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Feed_Ticker] PRIMARY KEY CLUSTERED
 (
-	[market_ticker] ASC,
-	[LoggedDate] ASC,
-			[price] [int] ASC
+ [market_ticker] ASC,
+ [ts] ASC,
+ [price] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

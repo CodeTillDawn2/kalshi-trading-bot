@@ -215,12 +215,12 @@ namespace BacklashBotData.Data.Interfaces
 
         #region Tickers
         /// <summary>
-        /// Gets tickers filtered by market ticker and logged date.
+        /// Gets tickers filtered by market ticker and timestamp.
         /// </summary>
         /// <param name="marketTicker">Optional market ticker to filter by.</param>
-        /// <param name="loggedDate">Optional logged date for filtering.</param>
+        /// <param name="ts">Optional Unix timestamp for filtering.</param>
         /// <returns>A list of filtered ticker DTOs.</returns>
-        Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null);
+        Task<List<TickerDTO>> GetTickers(string? marketTicker = null, long? ts = null);
 
         /// <summary>
         /// Adds or updates multiple tickers in the database.
