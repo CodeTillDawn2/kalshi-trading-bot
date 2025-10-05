@@ -591,8 +591,8 @@ namespace BacklashBot.Services
                 if (_currentOverseer == null || _currentOverseer.Id != mostRecentOverseer.Id)
                 {
                     _logger.LogInformation("OVERSEER- Found newer overseer available. Current: {CurrentHost} ({CurrentHeartbeat}), Available: {RecentHost} ({RecentHeartbeat})",
-                        _currentOverseer.HostName,
-                        _currentOverseer.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never",
+                        _currentOverseer?.HostName ?? "N/A",
+                        _currentOverseer?.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never",
                         mostRecentOverseer.HostName,
                         mostRecentOverseer.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never");
 

@@ -972,8 +972,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resubscribes to existing channel subscriptions, either selectively or forcefully.
         /// Used to restore subscriptions after connection recovery or when forcing a complete resubscription.
-        /// For market-specific channels, removes markets then adds them back to avoid "already subscribed" errors.
-        /// For non-market-specific channels, unsubscribes then resubscribes.
+        /// Always uses unsubscribe-then-resubscribe to refresh the socket without affecting WatchedMarkets.
         /// </summary>
         /// <param name="force">If true, resubscribes to all channels regardless of current state. If false, only resubscribes to channels without active subscriptions.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
@@ -1009,31 +1008,14 @@ namespace KalshiBotAPI.Websockets
                 {
                     _logger.LogDebug("Resubscribing to {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
 
-                    // For market-specific channels, remove markets then add them back to avoid "already subscribed" errors
-                    if (KalshiConstants.MarketChannelsDelta.Contains(channel) && markets.Any())
-                    {
-                        _logger.LogDebug("Using remove-then-add approach for market-specific channel {Channel}", channel);
+                    // Always use unsubscribe-then-resubscribe approach to refresh the socket without affecting WatchedMarkets
+                    _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
+                    await UnsubscribeFromChannelAsync(action);
 
-                        // First remove all markets from the subscription
-                        await UpdateSubscriptionAsync("delete_markets", markets, action);
+                    // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                    await Task.Delay(1000, _processingCancellationToken);
 
-                        // Delay to ensure the unsubscribe is processed and prevent duplicate messages
-                        await Task.Delay(1000, _processingCancellationToken);
-
-                        // Then add them back
-                        await UpdateSubscriptionAsync("add_markets", markets, action);
-                    }
-                    else
-                    {
-                        // For non-market-specific channels, unsubscribe then resubscribe
-                        _logger.LogDebug("Using unsubscribe-then-resubscribe approach for non-market-specific channel {Channel}", channel);
-                        await UnsubscribeFromChannelAsync(action);
-
-                        // Delay to ensure the unsubscribe is processed and prevent duplicate messages
-                        await Task.Delay(1000, _processingCancellationToken);
-
-                        await SubscribeToChannelAsync(action, markets);
-                    }
+                    await SubscribeToChannelAsync(action, markets);
                 }
             }
 
@@ -1057,22 +1039,12 @@ namespace KalshiBotAPI.Websockets
             }
 
             var action = GetActionFromChannel(channel);
-            if (KalshiConstants.MarketChannelsDelta.Contains(channel) && markets.Any())
-            {
-                // Market-specific channel: delete then add markets
-                _logger.LogDebug("Using delete-then-add approach for market-specific channel {Channel}", channel);
-                await UpdateSubscriptionAsync("delete_markets", markets.ToArray(), action);
-                await Task.Delay(1000, _processingCancellationToken);
-                await UpdateSubscriptionAsync("add_markets", markets.ToArray(), action);
-            }
-            else
-            {
-                // Non-market-specific or no markets: unsubscribe then subscribe
-                _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
-                await UnsubscribeFromChannelAsync(action);
-                await Task.Delay(1000, _processingCancellationToken);
-                await SubscribeToChannelAsync(action, markets.ToArray());
-            }
+
+            // Always use unsubscribe-then-resubscribe approach to refresh the socket without affecting WatchedMarkets
+            _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
+            await UnsubscribeFromChannelAsync(action);
+            await Task.Delay(1000, _processingCancellationToken);
+            await SubscribeToChannelAsync(action, markets.ToArray());
 
             _logger.LogInformation("Resubscription completed for channel {Channel}", channel);
         }
@@ -1105,14 +1077,10 @@ namespace KalshiBotAPI.Websockets
                     // Reset FirstSnapshotReceived for all markets
                     FirstSnapshotReceivedReset?.Invoke(this, markets);
 
-                    // Remove markets then add them back to avoid "already subscribed" errors
-                    await UpdateSubscriptionAsync("delete_markets", markets, action);
-
-                    // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                    // Unsubscribe then resubscribe to refresh the socket without affecting WatchedMarkets
+                    await UnsubscribeFromChannelAsync(action);
                     await Task.Delay(1000, _processingCancellationToken);
-
-                    // Then add them back
-                    await UpdateSubscriptionAsync("add_markets", markets, action);
+                    await SubscribeToChannelAsync(action, markets);
                 }
             }
             else
@@ -1640,9 +1608,7 @@ namespace KalshiBotAPI.Websockets
             {
                 try
                 {
-                    // Only check health every 10 minutes instead of every 30 seconds
-                    // The API doesn't require frequent health checks for active subscriptions
-                    await Task.Delay(TimeSpan.FromMinutes(10), _processingCancellationToken);
+                    await Task.Delay(_healthCheckIntervalMs, _processingCancellationToken);
 
                     var now = DateTime.UtcNow;
                     var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
