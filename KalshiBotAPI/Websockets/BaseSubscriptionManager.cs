@@ -1630,6 +1630,13 @@ namespace KalshiBotAPI.Websockets
                             var sid = subscription.Value.Sid;
                             if (sid != 0)
                             {
+                                // Skip stale detection for channels not subscribed when SubscribeToGeneralChannels is false
+                                if (!SubscribeToGeneralChannels &&
+                                    (channel == "fill" || channel == "market_lifecycle_v2"))
+                                {
+                                    continue;
+                                }
+
                                 // Check if this subscription has received messages recently
                                 // For lifecycle channels, check the normalized "lifecycle" activity key
                                 // since both market_lifecycle_v2 and event_lifecycle are recorded as "lifecycle"
@@ -2061,6 +2068,34 @@ namespace KalshiBotAPI.Websockets
             }
 
             _logger.LogInformation("Local subscription state cleared due to disconnection");
+        }
+
+        private bool _subscribeToGeneralChannels = true;
+
+        /// <summary>
+        /// Gets or sets whether to subscribe to general (non-market-specific) channels like fill and lifecycle.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        public bool SubscribeToGeneralChannels
+        {
+            get => _subscribeToGeneralChannels;
+            set
+            {
+                if (_subscribeToGeneralChannels != value)
+                {
+                    _subscribeToGeneralChannels = value;
+                    OnSubscribeToGeneralChannelsChanged(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when SubscribeToGeneralChannels changes. Can be overridden to handle subscription updates.
+        /// </summary>
+        /// <param name="newValue">The new value of SubscribeToGeneralChannels.</param>
+        protected virtual void OnSubscribeToGeneralChannelsChanged(bool newValue)
+        {
+            // Default implementation does nothing - derived classes can override
         }
     }
 }

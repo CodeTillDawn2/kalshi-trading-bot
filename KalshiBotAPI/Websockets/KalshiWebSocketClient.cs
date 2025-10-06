@@ -409,6 +409,11 @@ namespace KalshiBotAPI.Websockets
             {
                 // Subscribe to enabled non-market-specific channels
                 var enabledChannels = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle }.Where(IsChannelEnabled);
+                if (!_subscriptionManager.SubscribeToGeneralChannels)
+                {
+                    _logger.LogInformation("SubscribeToGeneralChannels is false, skipping subscription to non-market-specific channels");
+                    enabledChannels = Array.Empty<string>();
+                }
                 foreach (var channel in enabledChannels)
                 {
                     _globalCancellationToken.ThrowIfCancellationRequested();
@@ -783,7 +788,6 @@ namespace KalshiBotAPI.Websockets
 
             await Task.CompletedTask;
         }
-
 
     }
 

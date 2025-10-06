@@ -23,6 +23,29 @@ namespace BacklashBot.State
     public class KalshiBotStatusTracker : IStatusTrackerService, IAsyncDisposable
     {
         /// <summary>
+        /// Enum representing the brain mode of the bot.
+        /// </summary>
+        public enum BrainMode
+        {
+            /// <summary>
+            /// Autonomous mode: bot operates independently and subscribes to all channels.
+            /// </summary>
+            Autonomous,
+            /// <summary>
+            /// Servant mode: bot is controlled by an overseer and skips non-market-specific channels.
+            /// </summary>
+            Servant
+        }
+        /// <summary>
+        /// Gets the current brain mode of the bot.
+        /// </summary>
+        public BrainMode CurrentBrainMode { get; private set; } = BrainMode.Autonomous;
+
+        /// <summary>
+        /// Event raised when the brain mode changes.
+        /// </summary>
+        public event Action<BrainMode>? BrainModeChanged;
+        /// <summary>
         /// The global CancellationTokenSource used to coordinate cancellation across all bot components.
         /// </summary>
         private CancellationTokenSource _globalCancellationTokenSource = new();
@@ -59,6 +82,20 @@ namespace BacklashBot.State
             _enablePerformanceMetrics = _config.Value.EnablePerformanceMetrics;
 
             _logger.LogInformation("KalshiBotStatusTracker initialized with EnablePerformanceMetrics={EnablePerformanceMetrics}", _enablePerformanceMetrics);
+        }
+        /// <summary>
+        /// Sets the brain mode based on overseer connection status.
+        /// </summary>
+        /// <param name="connected">True if connected to overseer, false otherwise.</param>
+        public void SetOverseerConnected(bool connected)
+        {
+            var oldMode = CurrentBrainMode;
+            CurrentBrainMode = connected ? BrainMode.Servant : BrainMode.Autonomous;
+            _logger.LogInformation("BrainMode updated to {Mode} due to overseer connection change: {Connected}", CurrentBrainMode, connected);
+            if (oldMode != CurrentBrainMode)
+            {
+                BrainModeChanged?.Invoke(CurrentBrainMode);
+            }
         }
 
         /// <summary>

@@ -1375,5 +1375,43 @@ namespace KalshiBotAPI.Websockets
             base._subscriptionRetryInfo.Clear();
             base._marketChannelSubscriptionStates.Clear();
         }
+
+        /// <summary>
+        /// Called when SubscribeToGeneralChannels changes. Handles subscription updates for general channels.
+        /// </summary>
+        /// <param name="newValue">The new value of SubscribeToGeneralChannels.</param>
+        protected override async void OnSubscribeToGeneralChannelsChanged(bool newValue)
+        {
+            if (!_connectionManager.IsConnected()) return;
+
+            if (!newValue)
+            {
+                // Unsubscribe from general channels if subscribed
+                if (IsSubscribed("", "fill"))
+                {
+                    _logger.LogInformation("Unsubscribing from fill channel due to SubscribeToGeneralChannels=false");
+                    await UnsubscribeFromChannelAsync("fill");
+                }
+                if (IsSubscribed("", "lifecycle"))
+                {
+                    _logger.LogInformation("Unsubscribing from lifecycle channel due to SubscribeToGeneralChannels=false");
+                    await UnsubscribeFromChannelAsync("lifecycle");
+                }
+            }
+            else
+            {
+                // Subscribe to general channels if not subscribed
+                if (!IsSubscribed("", "fill"))
+                {
+                    _logger.LogInformation("Subscribing to fill channel due to SubscribeToGeneralChannels=true");
+                    await SubscribeToChannelAsync("fill", Array.Empty<string>());
+                }
+                if (!IsSubscribed("", "lifecycle"))
+                {
+                    _logger.LogInformation("Subscribing to lifecycle channel due to SubscribeToGeneralChannels=true");
+                    await SubscribeToChannelAsync("lifecycle", Array.Empty<string>());
+                }
+            }
+        }
     }
 }

@@ -255,5 +255,11 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// This ensures clean reconnection without stale state assumptions.
         /// </summary>
         void HandleDisconnection();
+
+        /// <summary>
+        /// Gets or sets whether to subscribe to general (non-market-specific) channels like fill and lifecycle.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        bool SubscribeToGeneralChannels { get; set; }
     }
 }
