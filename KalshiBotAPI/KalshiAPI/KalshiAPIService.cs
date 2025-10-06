@@ -224,7 +224,7 @@ namespace KalshiBotAPI.KalshiAPI
                         catch (JsonException ex)
                         {
                             responseWasSuccessful = false;
-                            _logger.LogWarning(ex, "Failed to deserialize response for {Url}, json={0}", url, jsonString);
+                            _logger.LogWarning("Failed to deserialize response for {Url}, json={0}", url, jsonString);
                             RecordError(nameof(FetchMarketsAsync));
                         }
                         catch (HttpRequestException ex)
@@ -326,7 +326,7 @@ namespace KalshiBotAPI.KalshiAPI
                             {
                                 stopwatch.Stop();
                             }
-                            _logger.LogWarning(ex, "Duplicate market encountered while saving market data");
+                            _logger.LogWarning("Duplicate market encountered while saving market data");
                             return (0, 1);
                         }
                         catch (OperationCanceledException)
@@ -530,7 +530,7 @@ namespace KalshiBotAPI.KalshiAPI
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogWarning(ex, "HTTP error creating order for {MarketTicker}", marketTicker);
+                _logger.LogWarning("HTTP error creating order for {MarketTicker}", marketTicker);
                 throw;
             }
             catch (Exception ex)
@@ -587,7 +587,7 @@ namespace KalshiBotAPI.KalshiAPI
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogWarning(ex, "HTTP error canceling order {OrderId}", orderId);
+                _logger.LogWarning("HTTP error canceling order {OrderId}", orderId);
                 throw;
             }
             catch (Exception ex)
@@ -1051,7 +1051,7 @@ namespace KalshiBotAPI.KalshiAPI
             catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
             {
                 stopwatch.Stop();
-                _logger.LogWarning(ex, "Duplicate event ticker {EventTicker} encountered while saving event data", eventTicker);
+                _logger.LogWarning("Duplicate event ticker {EventTicker} encountered while saving event data", eventTicker);
                 return null;
             }
             catch (OperationCanceledException)

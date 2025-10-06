@@ -931,7 +931,7 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Attempt {Attempt} failed to save Parquet file: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
+                    _logger.LogWarning("Attempt {Attempt} failed to save Parquet file: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                     if (attempt < maxAttempts && File.Exists(filePath))
                     {
                         await Task.Run(() => File.Delete(filePath));
@@ -1017,7 +1017,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error reading Parquet file {FilePath}: {Message}, Inner: {Inner}", filePath, ex.Message, ex.InnerException?.Message ?? "None");
+                _logger.LogWarning("Error reading Parquet file {FilePath}: {Message}, Inner: {Inner}", filePath, ex.Message, ex.InnerException?.Message ?? "None");
                 try
                 {
                     if (File.Exists(filePath))

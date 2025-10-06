@@ -269,7 +269,7 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Failed to process check-in from EventLifecycle event");
+                _logger?.LogWarning("Failed to process check-in from EventLifecycle event");
             }
         }
 
@@ -443,7 +443,7 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Failed to log system info to database");
+                _logger?.LogWarning("Failed to log system info to database");
             }
         }
 

@@ -153,6 +153,11 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         protected readonly int _subscriptionBatchIntervalMs;
 
+        /// <summary>
+        /// Stale subscription threshold in minutes.
+        /// </summary>
+        protected readonly int _staleSubscriptionThresholdMinutes;
+
         // Exponential backoff configuration for subscription retries
         private readonly int _maxSubscriptionRetries = 5;
         private readonly int _baseRetryDelayMs = 1000;
@@ -290,6 +295,7 @@ namespace KalshiBotAPI.Websockets
             _enableMetrics = subscriptionConfig.EnableSubscriptionManagerMetrics;
             _sequenceGapTimeoutSeconds = subscriptionConfig.SequenceGapTimeoutSeconds;
             _subscriptionBatchIntervalMs = subscriptionConfig.SubscriptionBatchIntervalMs;
+            _staleSubscriptionThresholdMinutes = subscriptionConfig.StaleSubscriptionThresholdMinutes;
 
             // Initialize message type counts
             _messageTypeCounts.TryAdd("OrderBook", 0);
@@ -1611,7 +1617,7 @@ namespace KalshiBotAPI.Websockets
                     await Task.Delay(_healthCheckIntervalMs, _processingCancellationToken);
 
                     var now = DateTime.UtcNow;
-                    var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
+                    var staleThreshold = TimeSpan.FromMinutes(_staleSubscriptionThresholdMinutes);
 
                     // Collect stale subscriptions first
                     var staleSubscriptions = new List<(string Channel, HashSet<string> Markets)>();

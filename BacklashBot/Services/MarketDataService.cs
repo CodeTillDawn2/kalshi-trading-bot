@@ -142,7 +142,7 @@ namespace BacklashBot.Services
             _retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, retryCount, context) =>
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                _logger.LogWarning(exception, "Retry {RetryCount} for market data fetch after {TimeSpan}", retryCount, timeSpan);
+                _logger.LogWarning("Retry {RetryCount} for market data fetch after {TimeSpan}", retryCount, timeSpan);
             });
             _performanceMonitor = performanceMonitor;
 
@@ -1519,7 +1519,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error saving batch of tickers");
+                _logger.LogWarning("Error saving batch of tickers. Error: {ex}", ex.Message);
             }
         }
 

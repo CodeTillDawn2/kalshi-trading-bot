@@ -121,7 +121,7 @@ public partial class Form1 : Form
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogWarning(ex, "Failed to fetch milestones for event {EventTicker}", apiEvent.EventTicker);
+                    _logger?.LogWarning("Failed to fetch milestones for event {EventTicker}. {ex}", apiEvent.EventTicker, ex.Message);
                 }
 
                 eventDTOs.Add(eventDTO);

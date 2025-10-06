@@ -348,7 +348,7 @@ namespace BacklashCommon.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Failed to calculate interest score for market {Ticker}. Using default score of 0.", ticker);
+                        _logger.LogWarning("Failed to calculate interest score for market {Ticker}. Using default score of 0. {ex}", ticker, ex.Message);
                         score = 0.0;
                     }
                     marketScores.Add((ticker, score));

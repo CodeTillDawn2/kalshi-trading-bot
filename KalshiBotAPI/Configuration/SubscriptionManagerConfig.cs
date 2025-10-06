@@ -65,4 +65,10 @@ public class SubscriptionManagerConfig
     /// </summary>
     [Required(ErrorMessage = "The 'SubscriptionBatchIntervalMs' is missing in the configuration.")]
     public int SubscriptionBatchIntervalMs { get; set; }
+
+    /// <summary>
+    /// Gets or sets the stale subscription threshold in minutes.
+    /// </summary>
+    [Required(ErrorMessage = "The 'StaleSubscriptionThresholdMinutes' is missing in the configuration.")]
+    public int StaleSubscriptionThresholdMinutes { get; set; }
 }

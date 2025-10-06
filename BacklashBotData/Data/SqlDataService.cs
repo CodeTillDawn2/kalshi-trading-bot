@@ -969,21 +969,21 @@ namespace BacklashBotData.Data
                             {
                                 if (operationName == "trade")
                                 {
-                                    _logger.LogWarning(ex, "Duplicate trade insert attempted for {MarketTicker}: {Identifier}. This indicates a trade was processed multiple times.", operation.Identifier, operation.Identifier);
+                                    _logger.LogWarning("Duplicate trade insert attempted for {MarketTicker}: {Identifier}. This indicates a trade was processed multiple times.", operation.Identifier, operation.Identifier);
                                 }
                                 else if (operationName == "ticker")
                                 {
-                                    _logger.LogWarning(ex, "Duplicate ticker insert attempted for {MarketTicker}: {Identifier}. This indicates a ticker was processed multiple times.", operation.Identifier, operation.Identifier);
+                                    _logger.LogWarning("Duplicate ticker insert attempted for {MarketTicker}: {Identifier}. This indicates a ticker was processed multiple times.", operation.Identifier, operation.Identifier);
                                 }
                                 else
                                 {
-                                    _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                    _logger.LogWarning("Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
                                 }
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(ex, "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {SqlError}", operationName, operation.Identifier, ex.Message);
+                                _logger.LogWarning("Deadlock occurred for {OperationName}: {Identifier}. SQL error: {SqlError}", operationName, operation.Identifier, ex.Message);
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (Exception ex)

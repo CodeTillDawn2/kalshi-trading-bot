@@ -188,7 +188,7 @@ namespace BacklashBot.Management
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "BRAIN: Health check threw exception. Continuing startup anyway.");
+                    _logger.LogWarning("BRAIN: Health check threw exception. Continuing startup anyway.");
                 }
 
                 _logger.LogInformation("BRAIN: Ensuring brain status initialized...");

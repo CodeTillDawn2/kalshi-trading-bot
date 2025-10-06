@@ -784,7 +784,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error clearing market {MarketTicker} from queue", marketTicker);
+                _logger.LogWarning("Error clearing market {MarketTicker} from queue", marketTicker);
             }
         }
 
@@ -900,7 +900,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to update orderbook for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
+                _logger.LogWarning("Failed to update orderbook for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                 throw;
             }
             finally
