@@ -203,6 +203,12 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         protected readonly ConcurrentDictionary<string, DateTime> _channelLastActivity = new();
 
+        // Exchange outage flag to prevent unhealthy events during exchange-wide outages
+        /// <summary>
+        /// Flag indicating if we're currently in an exchange-wide outage to avoid repeated unhealthy events.
+        /// </summary>
+        private bool _isExchangeOutageMode = false;
+
         /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
         /// </summary>
@@ -1954,11 +1960,30 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        public void SetExchangeOutageMode(bool isOutage)
+        {
+            _isExchangeOutageMode = isOutage;
+            _logger.LogInformation("Exchange outage mode set to {Mode}", isOutage);
+        }
+
+        /// <summary>
         /// Raises the MarketWebSocketUnhealthy event for the specified markets.
+        /// Only raises the event if the connection issues are not due to exchange-wide outages.
         /// </summary>
         /// <param name="markets">Array of market tickers that have unhealthy WebSocket connections.</param>
         public void RaiseMarketWebSocketUnhealthy(string[] markets)
         {
+            // Don't raise unhealthy events during exchange-wide outages
+            // Exchange outages affect all markets, not individual market issues
+            if (_isExchangeOutageMode)
+            {
+                _logger.LogDebug("Skipping MarketWebSocketUnhealthy event for markets {Markets} due to exchange-wide outage", string.Join(", ", markets));
+                return;
+            }
+
             MarketWebSocketUnhealthy?.Invoke(this, markets);
         }
 

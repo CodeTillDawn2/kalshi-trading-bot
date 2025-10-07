@@ -1448,19 +1448,39 @@ namespace BacklashBot.Management
                 await ShutdownDashboardAsync();
                 _logger.LogInformation("BRAIN: Delaying 5 seconds before attempting restart.");
                 await Task.Delay(5000);
-                _logger.LogInformation("BRAIN: Attempting restart.");
-                try
+
+                int retryCount = 0;
+                int maxRetries = 3;
+                int delayMs = 5000;
+                bool restartSuccessful = false;
+
+                while (retryCount < maxRetries && !restartSuccessful)
                 {
-                    // Reset all services before restart to ensure fresh instances and clear cancelled tokens
-                    _serviceFactory.ResetAll();
-                    _statusTrackerService.ResetAll();
-                    await StartDashboard();
-                    _logger.LogInformation("BRAIN: Restarted.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogCritical(ex, "BRAIN: Failed to restart after catastrophic error. Application will exit.");
-                    Environment.Exit(1);
+                    try
+                    {
+                        _logger.LogInformation("BRAIN: Attempting restart (attempt {Attempt}/{Max})", retryCount + 1, maxRetries);
+                        // Reset all services before restart to ensure fresh instances and clear cancelled tokens
+                        _serviceFactory.ResetAll();
+                        _statusTrackerService.ResetAll();
+                        await StartDashboard();
+                        _logger.LogInformation("BRAIN: Restarted successfully.");
+                        restartSuccessful = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        retryCount++;
+                        if (retryCount >= maxRetries)
+                        {
+                            _logger.LogCritical(ex, "BRAIN: Failed to restart after {Retries} attempts. Application will exit.", maxRetries);
+                            Environment.Exit(1);
+                        }
+                        else
+                        {
+                            _logger.LogWarning(ex, "BRAIN: Restart attempt {Attempt} failed. Retrying in {Delay}ms.", retryCount, delayMs);
+                            await Task.Delay(delayMs);
+                            delayMs = Math.Min(delayMs * 2, 30000); // exponential backoff, max 30s
+                        }
+                    }
                 }
             }
         }

@@ -1,12 +1,16 @@
 using BacklashDTOs.Exceptions;
+using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashBot.KalshiAPI.Interfaces;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -52,11 +56,13 @@ namespace KalshiBotAPI.Websockets
         private readonly WebSocketConnectionManagerConfig _websocketConfig;
         private readonly RSA _privateKey;
         private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly IKalshiAPIService _kalshiApiService;
         private ClientWebSocket? _webSocket = null!;
         private readonly object _webSocketLock = new object();
         private bool _isConnected = false;
         private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private bool _allowReconnect = true;
+        private bool _isExchangeOutage = false;
 
         // Performance metrics
         private int _connectionAttempts = 0;
@@ -141,6 +147,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="websocketConfig">Configuration options for WebSocket operations.</param>
         /// <param name="logger">Logger instance for recording connection operations and errors.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording WebSocket metrics.</param>
+        /// <param name="kalshiApiService">API service for checking exchange status and connectivity.</param>
         /// <remarks>
         /// The constructor sets up the RSA private key for authentication by loading it from the
         /// configured key file. This key is used to generate signatures for WebSocket connection
@@ -151,12 +158,14 @@ namespace KalshiBotAPI.Websockets
             IOptions<KalshiConfig> kalshiConfig,
             IOptions<WebSocketConnectionManagerConfig> websocketConfig,
             ILogger<WebSocketConnectionManager> logger,
-            IPerformanceMonitor performanceMonitor)
+            IPerformanceMonitor performanceMonitor,
+            IKalshiAPIService kalshiApiService)
         {
             _kalshiConfig = kalshiConfig.Value;
             _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
+            _kalshiApiService = kalshiApiService;
 
             _logger.LogInformation("WebSocketConnectionManager: Constructor called");
             _managerStartTime = DateTime.UtcNow;
@@ -285,6 +294,7 @@ namespace KalshiBotAPI.Websockets
                 PostPerformanceMetric("Connect", stopwatch.ElapsedMilliseconds);
                 _logger.LogInformation("WebSocket connection established to {Uri}", uri);
                 _isConnected = true;
+                _isExchangeOutage = false; // Clear exchange outage flag on successful connection
 
                 lock (_webSocketLock)
                 {
@@ -340,6 +350,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resets the current WebSocket connection and establishes a new one.
         /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
         /// <returns>A task representing the asynchronous reset operation.</returns>
         /// <remarks>
         /// <para>
@@ -354,8 +365,12 @@ namespace KalshiBotAPI.Websockets
         /// during the connection reset process. If reconnection is disabled, the method
         /// will only clean up the existing connection without establishing a new one.
         /// </para>
+        /// <para>
+        /// When isExchangeOutage is true, this indicates the reset is due to exchange-wide issues
+        /// rather than individual market problems, which affects how subscription health is monitored.
+        /// </para>
         /// </remarks>
-        public async Task ResetConnectionAsync()
+        public async Task ResetConnectionAsync(bool isExchangeOutage = false)
         {
             if (_isReconnecting)
             {
@@ -364,7 +379,8 @@ namespace KalshiBotAPI.Websockets
             }
 
             _isReconnecting = true;
-            _logger.LogInformation("Resetting WebSocket connection");
+            _isExchangeOutage = isExchangeOutage;
+            _logger.LogInformation("Resetting WebSocket connection (ExchangeOutage: {IsExchangeOutage})", isExchangeOutage);
             try
             {
                 ClientWebSocket? oldSocket = null;
@@ -388,9 +404,17 @@ namespace KalshiBotAPI.Websockets
 
                 if (_allowReconnect)
                 {
-                    _logger.LogDebug("Waiting {Delay}ms before reconnecting", _resetDelayMs);
-                    await Task.Delay(_resetDelayMs);
-                    await ConnectAsync();
+                    _logger.LogInformation("Waiting for internet connectivity and exchange availability before reconnecting");
+                    bool connectivityReady = await WaitForConnectivityAndExchangeAsync();
+                    if (connectivityReady)
+                    {
+                        _logger.LogInformation("Connectivity and exchange ready, attempting to reconnect WebSocket");
+                        await ConnectAsync();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to establish connectivity and exchange availability within timeout. Skipping reconnection attempt.");
+                    }
                 }
                 else
                 {
@@ -729,6 +753,16 @@ namespace KalshiBotAPI.Websockets
         public int ConnectSemaphoreCount => _connectSemaphore.CurrentCount;
 
         /// <summary>
+        /// Gets whether the WebSocket connection is currently experiencing an exchange-wide outage.
+        /// When true, connection issues are due to exchange problems rather than individual market issues.
+        /// </summary>
+        /// <remarks>
+        /// This flag is used to prevent marking individual markets as unhealthy during exchange-wide outages.
+        /// Markets should only be marked unhealthy for individual market-specific issues, not exchange-wide problems.
+        /// </remarks>
+        public bool IsExchangeOutage => _isExchangeOutage;
+
+        /// <summary>
         /// Gets the total number of connection attempts made.
         /// </summary>
         public int ConnectionAttempts => _connectionAttempts;
@@ -921,6 +955,79 @@ namespace KalshiBotAPI.Websockets
         }
 
         private bool _isReconnecting = false;
+
+        /// <summary>
+        /// Checks if the internet connection is available by attempting to ping a reliable host.
+        /// </summary>
+        /// <returns>True if internet connectivity is detected, false otherwise.</returns>
+        private async Task<bool> CheckInternetConnectivityAsync()
+        {
+            try
+            {
+                using var ping = new Ping();
+                var reply = await ping.SendPingAsync("8.8.8.8", 5000); // Google DNS with 5 second timeout
+                return reply.Status == IPStatus.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to check internet connectivity");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the Kalshi exchange is active and available for trading.
+        /// </summary>
+        /// <returns>True if the exchange is active, false otherwise.</returns>
+        private async Task<bool> CheckExchangeAvailabilityAsync()
+        {
+            try
+            {
+                var status = await _kalshiApiService.GetExchangeStatusAsync();
+                return status.exchange_active;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to check exchange availability");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Waits for both internet connectivity and exchange availability before allowing reconnection.
+        /// </summary>
+        /// <param name="maxWaitTimeMinutes">Maximum time to wait in minutes before giving up.</param>
+        /// <returns>True if both conditions are met within the timeout, false otherwise.</returns>
+        private async Task<bool> WaitForConnectivityAndExchangeAsync(int maxWaitTimeMinutes = 30)
+        {
+            var startTime = DateTime.UtcNow;
+            var maxWaitTime = TimeSpan.FromMinutes(maxWaitTimeMinutes);
+
+            _logger.LogInformation("Waiting for internet connectivity and exchange availability before reconnecting (max wait: {MaxWait} minutes)", maxWaitTimeMinutes);
+
+            while (DateTime.UtcNow - startTime < maxWaitTime)
+            {
+                bool internetOk = await CheckInternetConnectivityAsync();
+                bool exchangeOk = false;
+
+                if (internetOk)
+                {
+                    exchangeOk = await CheckExchangeAvailabilityAsync();
+                }
+
+                if (internetOk && exchangeOk)
+                {
+                    _logger.LogInformation("Internet connectivity and exchange availability confirmed. Proceeding with reconnection.");
+                    return true;
+                }
+
+                _logger.LogDebug("Connectivity check: Internet={Internet}, Exchange={Exchange}. Waiting 30 seconds before retry.", internetOk, exchangeOk);
+                await Task.Delay(TimeSpan.FromSeconds(30));
+            }
+
+            _logger.LogWarning("Timeout waiting for connectivity and exchange availability after {Elapsed} minutes", (DateTime.UtcNow - startTime).TotalMinutes);
+            return false;
+        }
 
         /// <summary>
         /// Tracks connection failure reasons for monitoring and diagnostics.

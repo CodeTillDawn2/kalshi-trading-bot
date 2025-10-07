@@ -21,5 +21,6 @@ namespace BacklashBot.State.Interfaces
         /// Resets all status tracking to initial state.
         /// </summary>
         void ResetAll();
+
     }
 }

@@ -91,6 +91,12 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         HashSet<string> WatchedMarkets { get; set; }
 
         /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        void SetExchangeOutageMode(bool isOutage);
+
+        /// <summary>
         /// Connects to the WebSocket asynchronously with optional retry count.
         /// </summary>
         /// <param name="retryCount">The number of retry attempts (default 0).</param>
@@ -135,8 +141,9 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// <summary>
         /// Resets the WebSocket connection.
         /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
         /// <returns>A task representing the asynchronous reset operation.</returns>
-        Task ResetConnectionAsync();
+        Task ResetConnectionAsync(bool isExchangeOutage = false);
 
         /// <summary>
         /// Shuts down the WebSocket client and all associated services gracefully.
@@ -236,5 +243,12 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// <param name="marketTicker">The market ticker to get event counts for.</param>
         /// <returns>A tuple containing the counts of orderbook events, trade events, and ticker events.</returns>
         (int orderbookEvents, int tradeEvents, int tickerEvents) GetEventCountsByMarket(string marketTicker);
+
+        /// <summary>
+        /// Sets whether to subscribe to general (non-market-specific) channels.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        /// <param name="subscribeToGeneralChannels">True to subscribe to general channels, false otherwise.</param>
+        void SetSubscribeToGeneralChannels(bool subscribeToGeneralChannels);
     }
 }

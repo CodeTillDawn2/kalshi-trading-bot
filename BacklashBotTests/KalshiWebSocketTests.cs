@@ -141,7 +141,7 @@ namespace BacklashBotTests
             _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.StopAsync()).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.GetWebSocket()).Returns((ClientWebSocket)null);
-            _connectionManagerMock.Setup(cm => cm.ResetConnectionAsync()).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.ResetConnectionAsync(It.IsAny<bool>())).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.SendMessageAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.ReceiveAsync()).Returns(Task.CompletedTask);
             _connectionManagerMock.Setup(cm => cm.DisableReconnect());

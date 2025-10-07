@@ -44,7 +44,7 @@ namespace BacklashBot.State
         /// <summary>
         /// Event raised when the brain mode changes.
         /// </summary>
-        public event Action<BrainMode>? BrainModeChanged;
+        public event EventHandler<BrainMode>? BrainModeChanged;
         /// <summary>
         /// The global CancellationTokenSource used to coordinate cancellation across all bot components.
         /// </summary>
@@ -94,7 +94,7 @@ namespace BacklashBot.State
             _logger.LogInformation("BrainMode updated to {Mode} due to overseer connection change: {Connected}", CurrentBrainMode, connected);
             if (oldMode != CurrentBrainMode)
             {
-                BrainModeChanged?.Invoke(CurrentBrainMode);
+                BrainModeChanged?.Invoke(this, CurrentBrainMode);
             }
         }
 

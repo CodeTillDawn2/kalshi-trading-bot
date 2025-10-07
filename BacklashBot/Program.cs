@@ -476,6 +476,7 @@ builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorS
 builder.Services.AddSingleton<IOverseerClientService>(sp => new OverseerClientService(
     sp.GetRequiredService<ILogger<OverseerClientService>>(),
     sp.GetRequiredService<IServiceFactory>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<OverseerClientServiceConfig>>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IPerformanceMonitor>(),
@@ -484,7 +485,8 @@ builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConne
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
     sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
-    sp.GetRequiredService<IPerformanceMonitor>()
+    sp.GetRequiredService<IPerformanceMonitor>(),
+    sp.GetRequiredService<IKalshiAPIService>()
 ));
 builder.Services.AddScoped<IDataCache, DataCache>();
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(

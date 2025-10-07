@@ -257,6 +257,12 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         void HandleDisconnection();
 
         /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        void SetExchangeOutageMode(bool isOutage);
+
+        /// <summary>
         /// Gets or sets whether to subscribe to general (non-market-specific) channels like fill and lifecycle.
         /// When false, only market-specific channels will be subscribed to.
         /// </summary>

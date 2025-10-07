@@ -501,6 +501,13 @@ namespace BacklashBot.Services
 
                             if (status.exchange_active && !currentConnectionState)
                             {
+                                // Clear exchange outage mode when exchange becomes active
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    webSocketClient.SetExchangeOutageMode(false);
+                                }
+
                                 // Only connect if market data initialization is complete
                                 if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                                 {
@@ -525,9 +532,16 @@ namespace BacklashBot.Services
                             }
                             else if (!status.exchange_active && currentConnectionState)
                             {
+                                // Set exchange outage mode when exchange becomes inactive
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    webSocketClient.SetExchangeOutageMode(true);
+                                }
+
                                 _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
                                 _serviceFactory.GetDataCache().LastWebSocketTimestamp = DateTime.UtcNow;
-                                await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
+                                await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync(isExchangeOutage: true);
                                 if (_enableMetrics)
                                 {
                                     RecordConnectionFailure();
@@ -608,6 +622,13 @@ namespace BacklashBot.Services
 
                         if (status.exchange_active && !currentConnectionState)
                         {
+                            // Clear exchange outage mode when exchange becomes active
+                            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                            if (webSocketClient != null)
+                            {
+                                webSocketClient.SetExchangeOutageMode(false);
+                            }
+
                             // Only connect if market data initialization is complete
                             if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                             {
@@ -632,8 +653,15 @@ namespace BacklashBot.Services
                         }
                         else if (!status.exchange_active && currentConnectionState)
                         {
+                            // Set exchange outage mode when exchange becomes inactive
+                            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                            if (webSocketClient != null)
+                            {
+                                webSocketClient.SetExchangeOutageMode(true);
+                            }
+
                             _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
-                            await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
+                            await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync(isExchangeOutage: true);
                             if (_enableMetrics)
                             {
                                 RecordConnectionFailure();

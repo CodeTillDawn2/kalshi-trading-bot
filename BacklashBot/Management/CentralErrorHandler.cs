@@ -318,6 +318,26 @@ namespace BacklashBot.Management
                             LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
                         }
+                        else if (exception is WebSocketException wsEx && wsEx.Message.Contains("401"))
+                        {
+                            _logger.LogWarning("WebSocket authentication failed (401). Attempting connection reset. Not marking as catastrophic. Message: {ErrorMessage}", wsEx.Message);
+                            ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
+                            // Attempt to reset connection
+                            try
+                            {
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    await webSocketClient.ResetConnectionAsync();
+                                }
+                            }
+                            catch (Exception resetEx)
+                            {
+                                _logger.LogError(resetEx, "Failed to reset WebSocket connection after 401 error.");
+                            }
+                            // Don't set isCatastrophicLocal = true;
+                        }
                         else if (exception is TradeMissedException tmEx)
                         {
                             _marketManagerService.TriggerMarketReset(tmEx.MarketId);

@@ -122,6 +122,15 @@ namespace KalshiBotAPI.Websockets
         public int ConnectSemaphoreCount => _connectionManager.ConnectSemaphoreCount;
 
         /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        public void SetExchangeOutageMode(bool isOutage)
+        {
+            _subscriptionManager.SetExchangeOutageMode(isOutage);
+        }
+
+        /// <summary>
         /// Gets the current count of the subscription update semaphore.
         /// </summary>
         public int SubscriptionUpdateSemaphoreCount => _subscriptionManager.SubscriptionUpdateSemaphoreCount;
@@ -249,6 +258,18 @@ namespace KalshiBotAPI.Websockets
         /// Used for tracking message ordering and detecting missed messages.
         /// </summary>
         public long LastSequenceNumber => _messageProcessor.LastSequenceNumber;
+
+
+        /// <summary>
+        /// Sets whether to subscribe to general (non-market-specific) channels.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        /// <param name="subscribeToGeneralChannels">True to subscribe to general channels, false otherwise.</param>
+        public void SetSubscribeToGeneralChannels(bool subscribeToGeneralChannels)
+        {
+            _subscriptionManager.SubscribeToGeneralChannels = subscribeToGeneralChannels;
+            _logger.LogInformation("Set SubscribeToGeneralChannels to {SubscribeToGeneralChannels}", subscribeToGeneralChannels);
+        }
 
         /// <summary>
         /// Shuts down the WebSocket client and all associated services gracefully.
@@ -407,18 +428,20 @@ namespace KalshiBotAPI.Websockets
             }
             if (_connectionManager.IsConnected())
             {
-                // Subscribe to enabled non-market-specific channels
-                var enabledChannels = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle }.Where(IsChannelEnabled);
-                if (!_subscriptionManager.SubscribeToGeneralChannels)
+                // Subscribe to general channels if SubscribeToGeneralChannels is true
+                if (_subscriptionManager.SubscribeToGeneralChannels)
+                {
+                    var channelsToSubscribe = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle };
+                    foreach (var channel in channelsToSubscribe)
+                    {
+                        _globalCancellationToken.ThrowIfCancellationRequested();
+                        await _subscriptionManager.SubscribeToChannelAsync(channel, Array.Empty<string>());
+                        _logger.LogDebug("Subscribed to general channel {Channel}", channel);
+                    }
+                }
+                else
                 {
                     _logger.LogInformation("SubscribeToGeneralChannels is false, skipping subscription to non-market-specific channels");
-                    enabledChannels = Array.Empty<string>();
-                }
-                foreach (var channel in enabledChannels)
-                {
-                    _globalCancellationToken.ThrowIfCancellationRequested();
-                    await _subscriptionManager.SubscribeToChannelAsync(channel, Array.Empty<string>());
-                    _logger.LogDebug("Subscribed to enabled channel {Channel}", channel);
                 }
 
                 // Market-specific channels will be subscribed individually as each market completes initialization
@@ -514,10 +537,11 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resets the WebSocket connection.
         /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
         /// <returns>A task representing the asynchronous reset operation.</returns>
-        public async Task ResetConnectionAsync()
+        public async Task ResetConnectionAsync(bool isExchangeOutage = false)
         {
-            await _connectionManager.ResetConnectionAsync();
+            await _connectionManager.ResetConnectionAsync(isExchangeOutage);
         }
 
         /// <summary>

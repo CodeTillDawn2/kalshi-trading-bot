@@ -440,8 +440,16 @@ namespace KalshiBotAPI.Websockets
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
-                        throw new InvalidOperationException($"WebSocket closed: {result.CloseStatusDescription}");
+                        if (result.CloseStatus == WebSocketCloseStatus.NormalClosure)
+                        {
+                            _logger.LogInformation("WebSocket closed normally by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                            break; // Exit the receive loop gracefully
+                        }
+                        else
+                        {
+                            _logger.LogError("WebSocket closed abnormally by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                            throw new InvalidOperationException($"WebSocket closed: {result.CloseStatusDescription}");
+                        }
                     }
 
                     if (result.MessageType == WebSocketMessageType.Text)

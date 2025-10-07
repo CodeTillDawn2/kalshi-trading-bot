@@ -791,10 +791,6 @@ namespace BacklashBot.Services
                     await context.AddOrUpdateMarketWatch(marketWatch);
                     _logger.LogInformation("MDS: Successfully marked market {MarketTicker} as unhealthy (interest score = 0)", marketTicker);
 
-                    // Don't unsubscribe unhealthy markets to prevent cache removal during resubscribe
-                    // Just mark them unhealthy - resubscribe will handle re-subscription
-                    _logger.LogWarning("MDS: Not unsubscribing {MarketTicker} to prevent cache removal - resubscribe will handle re-subscription", marketTicker);
-
                     // Add to refresh for recovery
                     if (!MarketsToRefresh.Contains(marketTicker)) {
                         MarketsToRefresh.Add(marketTicker);

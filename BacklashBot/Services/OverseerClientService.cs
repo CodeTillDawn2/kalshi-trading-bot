@@ -1,6 +1,8 @@
 using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.State;
+using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.SmokehouseBot.Services;
@@ -28,6 +30,7 @@ namespace BacklashBot.Services
 
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
+        private readonly IStatusTrackerService _statusTrackerService;
         private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
         private HubConnection? _hubConnection;
@@ -40,6 +43,37 @@ namespace BacklashBot.Services
         /// Gets a value indicating whether the service is currently connected to an Overseer.
         /// </summary>
         public bool IsConnected => _isConnected;
+
+        /// <summary>
+        /// Updates the connection state and notifies the status tracker of overseer connection changes.
+        /// </summary>
+        /// <param name="connected">True if connected, false if disconnected.</param>
+        private void UpdateConnectionState(bool connected)
+        {
+            bool stateChanged = _isConnected != connected;
+            _isConnected = connected;
+
+            if (stateChanged)
+            {
+                // Notify status tracker of overseer connection change
+                var statusTracker = _statusTrackerService as KalshiBotStatusTracker;
+                statusTracker?.SetOverseerConnected(connected);
+            }
+        }
+
+        /// <summary>
+        /// Handles BrainMode changes by updating WebSocket subscription settings.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="mode">The new brain mode.</param>
+        private void OnBrainModeChanged(object? sender, KalshiBotStatusTracker.BrainMode mode)
+        {
+            bool subscribeToGeneral = mode == KalshiBotStatusTracker.BrainMode.Autonomous;
+            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+            webSocketClient?.SetSubscribeToGeneralChannels(subscribeToGeneral);
+            _logger.LogInformation("OVERSEER- Updated WebSocket general channel subscription to {Subscribe} based on BrainMode {Mode}",
+                subscribeToGeneral, mode);
+        }
         private string _clientId;
         private string _clientName = "BacklashBot";
         private string _clientType = "TradingBot";
@@ -91,6 +125,7 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
+        /// <param name="statusTrackerService">Status tracker service for managing bot state.</param>
         /// <param name="overseerConfig">Configuration options for the overseer.</param>
         /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
         /// <param name="performanceMonitor">Performance monitor for recording metrics.</param>
@@ -98,6 +133,7 @@ namespace BacklashBot.Services
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
+            IStatusTrackerService statusTrackerService,
             IOptions<OverseerClientServiceConfig> overseerConfig,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IPerformanceMonitor performanceMonitor,
@@ -105,9 +141,17 @@ namespace BacklashBot.Services
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
+            _statusTrackerService = statusTrackerService;
             _performanceMonitor = performanceMonitor;
             _clientId = Guid.NewGuid().ToString();
             _centralPerformanceMonitor = centralPerformanceMonitor;
+
+            // Subscribe to BrainMode changes to update WebSocket subscriptions
+            var statusTracker = _statusTrackerService as KalshiBotStatusTracker;
+            if (statusTracker != null)
+            {
+                statusTracker.BrainModeChanged += OnBrainModeChanged;
+            }
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
             _clientName = instanceNameConfig.Value.Name;
@@ -139,8 +183,8 @@ namespace BacklashBot.Services
             {
                 _logger.LogInformation("OVERSEER- Starting OverseerClientService...");
 
-                // Start Overseer Discovery timer first - this ensures we keep trying to find overseer
-                _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.Zero, _overseerDiscoveryInterval);
+                // Start Overseer Discovery timer - wait for initial connection attempt to complete before starting discovery
+                _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, _overseerDiscoveryInterval, _overseerDiscoveryInterval);
                 _logger.LogInformation("OVERSEER- Overseer discovery timer started (every {Interval} minutes)", _overseerDiscoveryInterval.TotalMinutes);
 
                 // Start CheckIn timer - it will only send if connected
@@ -204,7 +248,7 @@ namespace BacklashBot.Services
                 // Use lock to safely clean up connection
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                     _currentOverseer = null;
                     _currentOverseerUrl = null;
                 }
@@ -418,7 +462,7 @@ namespace BacklashBot.Services
                 // Reset connection state
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                     _currentOverseerUrl = null;
                 }
                 _logger.LogDebug("OVERSEER- Connection state reset");
@@ -490,7 +534,7 @@ namespace BacklashBot.Services
 
                 lock (_connectionStateLock)
                 {
-                    _isConnected = true;
+                    UpdateConnectionState(true);
                     _currentOverseerUrl = overseerUrl;
                 }
                 _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
@@ -518,7 +562,7 @@ namespace BacklashBot.Services
                 _logger.LogInformation("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                 }
                 if (_enablePerformanceMetrics)
                 {
@@ -534,7 +578,7 @@ namespace BacklashBot.Services
                 _logger.LogInformation("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                 }
                 if (_enablePerformanceMetrics)
                 {
@@ -1038,7 +1082,7 @@ namespace BacklashBot.Services
                 _logger.LogInformation("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                 }
             }
             catch (Exception ex)
@@ -1146,7 +1190,7 @@ namespace BacklashBot.Services
                 _logger.LogWarning("OVERSEER- Connection became inactive during CheckIn attempt. Will mark as disconnected and retry. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                    UpdateConnectionState(false); // Mark as disconnected so discovery can try to reconnect
                 }
             }
             catch (Exception ex)
@@ -1154,7 +1198,7 @@ namespace BacklashBot.Services
                 _logger.LogWarning("OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                    UpdateConnectionState(false); // Mark as disconnected so discovery can try to reconnect
                 }
             }
         }
@@ -1209,7 +1253,7 @@ namespace BacklashBot.Services
         {
             lock (_connectionStateLock)
             {
-                _isConnected = false;
+                UpdateConnectionState(false);
             }
 
             if (exception != null)
@@ -1228,7 +1272,7 @@ namespace BacklashBot.Services
         {
             lock (_connectionStateLock)
             {
-                _isConnected = true;
+                UpdateConnectionState(true);
             }
 
             // Reset handshake completed flag on reconnection
@@ -1248,7 +1292,7 @@ namespace BacklashBot.Services
                 // If handshake fails, mark as not connected
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                 }
             }
         }

@@ -18,8 +18,9 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// <summary>
         /// Resets the current WebSocket connection, forcing a reconnection.
         /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
         /// <returns>A task representing the asynchronous reset operation.</returns>
-        Task ResetConnectionAsync();
+        Task ResetConnectionAsync(bool isExchangeOutage = false);
 
         /// <summary>
         /// Sends a message through the WebSocket connection.
@@ -67,5 +68,11 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         /// Gets the current count of the connection semaphore, indicating connection operation status.
         /// </summary>
         int ConnectSemaphoreCount { get; }
+
+        /// <summary>
+        /// Gets whether the WebSocket connection is currently experiencing an exchange-wide outage.
+        /// When true, connection issues are due to exchange problems rather than individual market issues.
+        /// </summary>
+        bool IsExchangeOutage { get; }
     }
 }
