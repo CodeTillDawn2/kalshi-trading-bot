@@ -30,7 +30,7 @@ namespace KalshiBotAPI.Websockets
     /// - IStatusTrackerService: Provides cancellation tokens and status tracking
     /// - IBotReadyStatus: Tracks bot readiness state
     /// </remarks>
-    public class KalshiWebSocketClient : IKalshiWebSocketClient, IWebSocketPerformanceMetrics
+    public class KalshiWebSocketClient : IKalshiWebSocketClient
     {
         private readonly ISqlDataService _sqlDataService;
         private readonly IStatusTrackerService _statusTrackerService;
@@ -42,7 +42,7 @@ namespace KalshiBotAPI.Websockets
         private readonly ISubscriptionManager _subscriptionManager;
         private readonly IMessageProcessor _messageProcessor;
         private readonly IDataCache _dataCache;
-        private readonly IWebSocketPerformanceMetrics? _performanceMetrics;
+        private readonly IPerformanceMonitor? _performanceMonitor;
         private bool _allowReconnect = true;
 
         /// <summary>
@@ -122,6 +122,15 @@ namespace KalshiBotAPI.Websockets
         public int ConnectSemaphoreCount => _connectionManager.ConnectSemaphoreCount;
 
         /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        public void SetExchangeOutageMode(bool isOutage)
+        {
+            _subscriptionManager.SetExchangeOutageMode(isOutage);
+        }
+
+        /// <summary>
         /// Gets the current count of the subscription update semaphore.
         /// </summary>
         public int SubscriptionUpdateSemaphoreCount => _subscriptionManager.SubscriptionUpdateSemaphoreCount;
@@ -195,7 +204,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="connectionManager">Manager for WebSocket connection lifecycle.</param>
         /// <param name="subscriptionManager">Manager for channel subscriptions and states.</param>
         /// <param name="messageProcessor">Processor for incoming WebSocket messages.</param>
-        /// <param name="performanceMetrics">Optional performance metrics service for recording WebSocket metrics.</param>
+        /// <param name="performanceMonitor">Optional performance monitor service for recording WebSocket metrics.</param>
         /// <param name="writeToSql">Whether to write market data to SQL database.</param>
         /// <param name="webSocketBufferSize">Size of the WebSocket buffer in bytes. Default is 16KB.</param>
         /// <param name="enablePerformanceMetrics">Whether to enable performance metrics collection. Default is true.</param>
@@ -209,7 +218,7 @@ namespace KalshiBotAPI.Websockets
             IWebSocketConnectionManager connectionManager,
             ISubscriptionManager subscriptionManager,
             IMessageProcessor messageProcessor,
-            IWebSocketPerformanceMetrics? performanceMetrics = null,
+            IPerformanceMonitor? performanceMonitor = null,
             bool writeToSql = false,
             int webSocketBufferSize = 16384,
             bool? enablePerformanceMetrics = null)
@@ -223,7 +232,7 @@ namespace KalshiBotAPI.Websockets
             _connectionManager = connectionManager;
             _subscriptionManager = subscriptionManager;
             _messageProcessor = messageProcessor;
-            _performanceMetrics = performanceMetrics;
+            _performanceMonitor = performanceMonitor;
             WriteToSQL = writeToSql;
             _webSocketBufferSize = webSocketBufferSize;
             EnablePerformanceMetrics = enablePerformanceMetrics ?? _websocketConfig.EnablePerformanceMetrics;
@@ -249,6 +258,18 @@ namespace KalshiBotAPI.Websockets
         /// Used for tracking message ordering and detecting missed messages.
         /// </summary>
         public long LastSequenceNumber => _messageProcessor.LastSequenceNumber;
+
+
+        /// <summary>
+        /// Sets whether to subscribe to general (non-market-specific) channels.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        /// <param name="subscribeToGeneralChannels">True to subscribe to general channels, false otherwise.</param>
+        public void SetSubscribeToGeneralChannels(bool subscribeToGeneralChannels)
+        {
+            _subscriptionManager.SubscribeToGeneralChannels = subscribeToGeneralChannels;
+            _logger.LogInformation("Set SubscribeToGeneralChannels to {SubscribeToGeneralChannels}", subscribeToGeneralChannels);
+        }
 
         /// <summary>
         /// Shuts down the WebSocket client and all associated services gracefully.
@@ -279,7 +300,11 @@ namespace KalshiBotAPI.Websockets
                 if (EnablePerformanceMetrics)
                 {
                     _asyncOperationTimes["Shutdown"] = stopwatch.Elapsed;
-                    _performanceMetrics?.RecordWebSocketOperation("Shutdown", stopwatch.Elapsed);
+                    _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+                }
+                else
+                {
+                    _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Shutdown", "Shutdown Operation Time", "Time taken to shutdown WebSocket client", 0, "ms", "WebSocket");
                 }
                 _logger.LogDebug("KalshiWebSocketClient.ShutdownAsync completed at {Timestamp}", DateTime.UtcNow);
             }
@@ -331,6 +356,13 @@ namespace KalshiBotAPI.Websockets
         /// <param name="state">The new subscription state.</param>
         public void SetSubscriptionState(string marketTicker, string channel, SubscriptionState state) => _subscriptionManager.SetSubscriptionState(marketTicker, channel, state);
 
+        /// <summary>
+        /// Updates the subscription for a specific action with the given market tickers and channel action.
+        /// </summary>
+        /// <param name="action">The subscription action to update.</param>
+        /// <param name="marketTickers">Array of market tickers to subscribe to.</param>
+        /// <param name="channelAction">The channel action for the subscription.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -340,22 +372,38 @@ namespace KalshiBotAPI.Websockets
             {
                 _asyncOperationTimes[$"UpdateSubscription_{action}"] = stopwatch.Elapsed;
                 _semaphoreWaitCount.AddOrUpdate($"UpdateSubscription_{action}", 0, (k, v) => v + 1); // Assuming one wait per call
-                _performanceMetrics?.RecordWebSocketOperation($"UpdateSubscription_{action}", stopwatch.Elapsed);
-                _performanceMetrics?.RecordSemaphoreWait($"UpdateSubscription_{action}", 1);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+                _performanceMonitor?.RecordCounterMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", _semaphoreWaitCount[$"UpdateSubscription_{action}"], "count", "WebSocket");
+            }
+            else
+            {
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}", "Update Subscription Time", $"Time taken to update subscription for {action}", 0, "ms", "WebSocket");
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"UpdateSubscription_{action}_SemaphoreWait", "Semaphore Wait Count", $"Number of semaphore waits for update subscription {action}", 0, "count", "WebSocket");
             }
         }
 
+        /// <summary>
+        /// Resets all event counts to zero.
+        /// </summary>
         public void ResetEventCounts()
         {
             _messageProcessor.ResetEventCounts();
         }
 
+        /// <summary>
+        /// Clears the order book queue for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to clear the queue for.</param>
         public void ClearOrderBookQueue(string marketTicker)
         {
             _messageProcessor.ClearOrderBookQueue(marketTicker);
         }
 
-
+        /// <summary>
+        /// Connects to the WebSocket with optional retry count.
+        /// </summary>
+        /// <param name="retryCount">The number of retry attempts (default is 0).</param>
+        /// <returns>A task representing the asynchronous connection operation.</returns>
         public async Task ConnectAsync(int retryCount = 0)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -372,17 +420,28 @@ namespace KalshiBotAPI.Websockets
             if (EnablePerformanceMetrics)
             {
                 _asyncOperationTimes["Connect"] = stopwatch.Elapsed;
-                _performanceMetrics?.RecordWebSocketOperation("Connect", stopwatch.Elapsed);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+            }
+            else
+            {
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "Connect", "Connect Operation Time", "Time taken to connect WebSocket", 0, "ms", "WebSocket");
             }
             if (_connectionManager.IsConnected())
             {
-                // Subscribe to enabled non-market-specific channels
-                var enabledChannels = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle }.Where(IsChannelEnabled);
-                foreach (var channel in enabledChannels)
+                // Subscribe to general channels if SubscribeToGeneralChannels is true
+                if (_subscriptionManager.SubscribeToGeneralChannels)
                 {
-                    _globalCancellationToken.ThrowIfCancellationRequested();
-                    await _subscriptionManager.SubscribeToChannelAsync(channel, Array.Empty<string>());
-                    _logger.LogDebug("Subscribed to enabled channel {Channel}", channel);
+                    var channelsToSubscribe = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle };
+                    foreach (var channel in channelsToSubscribe)
+                    {
+                        _globalCancellationToken.ThrowIfCancellationRequested();
+                        await _subscriptionManager.SubscribeToChannelAsync(channel, Array.Empty<string>());
+                        _logger.LogDebug("Subscribed to general channel {Channel}", channel);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("SubscribeToGeneralChannels is false, skipping subscription to non-market-specific channels");
                 }
 
                 // Market-specific channels will be subscribed individually as each market completes initialization
@@ -395,11 +454,20 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Gets the event counts (orderbook, trade, ticker) for a specific market ticker.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get event counts for.</param>
+        /// <returns>A tuple containing the counts of orderbook events, trade events, and ticker events.</returns>
         public (int orderbookEvents, int tradeEvents, int tickerEvents) GetEventCountsByMarket(string marketTicker)
         {
             return _messageProcessor.GetEventCountsByMarket(marketTicker);
         }
 
+        /// <summary>
+        /// Subscribes to all watched markets for enabled channels.
+        /// </summary>
+        /// <returns>A task representing the asynchronous subscription operation.</returns>
         public async Task SubscribeToWatchedMarketsAsync()
         {
             if (!_connectionManager.IsConnected())
@@ -437,42 +505,82 @@ namespace KalshiBotAPI.Websockets
             }
         }
 
+        /// <summary>
+        /// Disables automatic WebSocket reconnection.
+        /// </summary>
         public void DisableReconnect()
         {
             _logger.LogDebug("Disabling WebSocket reconnection.");
             _allowReconnect = false;
         }
 
+        /// <summary>
+        /// Enables automatic WebSocket reconnection.
+        /// </summary>
         public void EnableReconnect()
         {
             _logger.LogDebug("Enabling WebSocket reconnection.");
             _allowReconnect = true;
         }
 
+        /// <summary>
+        /// Waits for the order book queue to be empty for a specific market ticker within the specified timeout.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to wait for.</param>
+        /// <param name="timeout">The maximum time to wait.</param>
+        /// <returns>A task representing the asynchronous wait operation.</returns>
         public async Task WaitForEmptyOrderBookQueueAsync(string marketTicker, TimeSpan timeout)
         {
             await _messageProcessor.WaitForEmptyOrderBookQueueAsync(marketTicker, timeout);
         }
 
-        public async Task ResetConnectionAsync()
+        /// <summary>
+        /// Resets the WebSocket connection.
+        /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
+        /// <returns>A task representing the asynchronous reset operation.</returns>
+        public async Task ResetConnectionAsync(bool isExchangeOutage = false)
         {
-            await _connectionManager.ResetConnectionAsync();
+            await _connectionManager.ResetConnectionAsync(isExchangeOutage);
         }
 
+        /// <summary>
+        /// Checks if the WebSocket is currently connected.
+        /// </summary>
+        /// <returns>True if connected, false otherwise.</returns>
         public bool IsConnected() => _connectionManager.IsConnected();
 
+        /// <summary>
+        /// Resubscribes to all channels, optionally forcing the resubscription.
+        /// </summary>
+        /// <param name="force">Whether to force the resubscription even if already subscribed.</param>
+        /// <returns>A task representing the asynchronous resubscription operation.</returns>
         public async Task ResubscribeAsync(bool force = false)
         {
             await _subscriptionManager.ResubscribeAsync(force);
         }
 
+        /// <summary>
+        /// Gets the channel name for a given action.
+        /// </summary>
+        /// <param name="action">The action to get the channel name for.</param>
+        /// <returns>The channel name corresponding to the action.</returns>
         public string GetChannelName(string action) => _subscriptionManager.GetChannelName(action);
 
+        /// <summary>
+        /// Sends a message through the WebSocket connection.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <returns>A task representing the asynchronous send operation.</returns>
         public async Task SendMessageAsync(string message)
         {
             await _connectionManager.SendMessageAsync(message);
         }
 
+        /// <summary>
+        /// Unsubscribes from all channels.
+        /// </summary>
+        /// <returns>A task representing the asynchronous unsubscription operation.</returns>
         public async Task UnsubscribeFromAllAsync()
         {
             await _subscriptionManager.UnsubscribeFromAllAsync();
@@ -487,6 +595,12 @@ namespace KalshiBotAPI.Websockets
 
 
 
+        /// <summary>
+        /// Subscribes to a specific channel for the given market tickers.
+        /// </summary>
+        /// <param name="action">The channel action to subscribe to.</param>
+        /// <param name="marketTickers">Array of market tickers to subscribe for this channel.</param>
+        /// <returns>A task representing the asynchronous subscription operation.</returns>
         public async Task SubscribeToChannelAsync(string action, string[] marketTickers)
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -495,10 +609,18 @@ namespace KalshiBotAPI.Websockets
             if (EnablePerformanceMetrics)
             {
                 _asyncOperationTimes[$"SubscribeToChannel_{action}"] = stopwatch.Elapsed;
-                _performanceMetrics?.RecordWebSocketOperation($"SubscribeToChannel_{action}", stopwatch.Elapsed);
+                _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+            }
+            else
+            {
+                _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", $"SubscribeToChannel_{action}", "Subscribe to Channel Time", $"Time taken to subscribe to channel {action}", 0, "ms", "WebSocket");
             }
         }
 
+        /// <summary>
+        /// Generates the next unique message ID for WebSocket messages.
+        /// </summary>
+        /// <returns>The next message ID.</returns>
         public int GenerateNextMessageId()
         {
             return _subscriptionManager.GenerateNextMessageId();
@@ -593,6 +715,11 @@ namespace KalshiBotAPI.Websockets
             _enabledChannels[KalshiConstants.ScriptType_Feed_Trade] = false;
         }
 
+        /// <summary>
+        /// Starts the asynchronous WebSocket message receiving loop.
+        /// This method runs in the background and continuously receives messages from the WebSocket connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StartReceivingAsync()
         {
             _logger.LogInformation("Starting WebSocket message receiving loop");
@@ -609,7 +736,7 @@ namespace KalshiBotAPI.Websockets
                         try
                         {
                             var webSocket = _connectionManager.GetWebSocket();
-                            if (webSocket == null || webSocket.State != WebSocketState.Open)
+                            if (webSocket == null)
                             {
                                 await Task.Delay(1000, _globalCancellationToken);
                                 continue;
@@ -619,6 +746,7 @@ namespace KalshiBotAPI.Websockets
                             if (result.MessageType == WebSocketMessageType.Close)
                             {
                                 _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                                _subscriptionManager.HandleDisconnection();
                                 break;
                             }
 
@@ -643,7 +771,11 @@ namespace KalshiBotAPI.Websockets
                                         _bufferUsageBytes.AddOrUpdate("WebSocketMessage", 0, (k, v) => v + fullMessage.Length);
 
                                         // Post to performance service
-                                        _performanceMetrics?.RecordWebSocketMessageProcessing("WebSocketMessage", stopwatch.ElapsedTicks, 1, fullMessage.Length, EnablePerformanceMetrics);
+                                        _performanceMonitor?.RecordSpeedDialMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", stopwatch.Elapsed.TotalMilliseconds, "ms", "WebSocket", minThreshold: null, warningThreshold: null, criticalThreshold: null);
+                                    }
+                                    else
+                                    {
+                                        _performanceMonitor?.RecordDisabledMetric("KalshiWebSocketClient", "WebSocketMessageProcessing", "Message Processing Time", "Time taken to process WebSocket messages", 0, "ms", "WebSocket");
                                     }
 
                                     messageBuilder.Clear();
@@ -662,6 +794,7 @@ namespace KalshiBotAPI.Websockets
                         catch (WebSocketException ex) when (ex.Message.Contains("without completing the close handshake"))
                         {
                             _logger.LogWarning("WebSocket connection lost, will attempt to reconnect. Exception: {Message}, Inner: {Inner}", ex.Message, ex.InnerException?.Message ?? "None");
+                            _subscriptionManager.HandleDisconnection();
                             break;
                         }
                         catch (Exception ex)
@@ -679,98 +812,6 @@ namespace KalshiBotAPI.Websockets
 
             await Task.CompletedTask;
         }
-
-        #region IWebSocketPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Records WebSocket message processing performance with enablement status.
-        /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
-        {
-            if (!EnablePerformanceMetrics || !metricsEnabled) return;
-
-            _messageProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
-            _messageProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
-            _bufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
-        }
-
-        /// <summary>
-        /// Records WebSocket connection performance.
-        /// </summary>
-        public void RecordWebSocketOperation(string operation, TimeSpan duration)
-        {
-            if (!EnablePerformanceMetrics) return;
-
-            _asyncOperationTimes[operation] = duration;
-        }
-
-        /// <summary>
-        /// Records semaphore wait counts for WebSocket operations.
-        /// </summary>
-        public void RecordSemaphoreWait(string operation, int waitCount)
-        {
-            if (!EnablePerformanceMetrics) return;
-
-            _semaphoreWaitCount.AddOrUpdate(operation, 0, (k, v) => v + waitCount);
-        }
-
-        /// <summary>
-        /// Gets the average processing times for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAverageProcessingTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>(
-                _messageProcessingTimeTicks.ToDictionary(
-                    kv => kv.Key,
-                    kv => _messageProcessingCount.TryGetValue(kv.Key, out var count) && count > 0
-                        ? TimeSpan.FromTicks(kv.Value / count).TotalMilliseconds
-                        : 0.0
-                )
-            );
-        }
-
-        /// <summary>
-        /// Gets the total buffer usage for WebSocket messages.
-        /// </summary>
-        public ConcurrentDictionary<string, long> GetBufferUsageBytes()
-        {
-            return new ConcurrentDictionary<string, long>(_bufferUsageBytes);
-        }
-
-        /// <summary>
-        /// Gets the average times for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, double> GetAsyncOperationTimesMs()
-        {
-            return new ConcurrentDictionary<string, double>(
-                _asyncOperationTimes.ToDictionary(
-                    kv => kv.Key,
-                    kv => kv.Value.TotalMilliseconds
-                )
-            );
-        }
-
-        /// <summary>
-        /// Gets the semaphore wait counts for WebSocket operations.
-        /// </summary>
-        public ConcurrentDictionary<string, int> GetSemaphoreWaitCounts()
-        {
-            return new ConcurrentDictionary<string, int>(_semaphoreWaitCount);
-        }
-
-        /// <summary>
-        /// Resets all WebSocket performance metrics.
-        /// </summary>
-        public void ResetWebSocketMetrics()
-        {
-            _messageProcessingTimeTicks.Clear();
-            _messageProcessingCount.Clear();
-            _bufferUsageBytes.Clear();
-            _asyncOperationTimes.Clear();
-            _semaphoreWaitCount.Clear();
-        }
-
-        #endregion
 
     }
 

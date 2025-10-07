@@ -1,6 +1,8 @@
 using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
 using KalshiBotAPI.WebSockets.Interfaces;
@@ -32,12 +34,17 @@ namespace BacklashOverseer
     /// </summary>
     public class Overseer : IDisposable
     {
+        /// <summary>
+        /// Current version of the BacklashOverseer application.
+        /// </summary>
+        public const string Version = "1.0.0";
+
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
         private readonly IHubContext<OverseerHub> _hubContext;
         private readonly OverseerConfig _config;
-        private readonly PerformanceMetricsService _performanceMetrics;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private Timer? _systemInfoLogTimer;
@@ -65,7 +72,7 @@ namespace BacklashOverseer
         /// <param name="logger">Logger for recording system events and diagnostics.</param>
         /// <param name="hubContext">SignalR hub context for real-time client communication.</param>
         /// <param name="config">Configuration options for the overseer system.</param>
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config, PerformanceMetricsService performanceMetrics)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
@@ -79,7 +86,7 @@ namespace BacklashOverseer
                 BrainBatchSize = 50,
                 EnableOverseerPerformanceMetrics = true
             };
-            _performanceMetrics = performanceMetrics;
+            _performanceMonitor = performanceMonitor;
 
             // Initialize configuration-based intervals
             _apiFetchInterval = TimeSpan.FromMinutes(_config.ApiFetchIntervalMinutes);
@@ -96,6 +103,9 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Start()
         {
+            // Log version information
+            _logger?.LogInformation("BacklashOverseer v{Version} starting up", Version);
+
             // Log system information to database for monitoring
             await LogSystemInfoAsync();
 
@@ -103,7 +113,14 @@ namespace BacklashOverseer
             await LogBrainPersistenceStateAsync();
 
             // Send initial metrics update regardless of performance metrics flag
-            _performanceMetrics.RecordWebSocketEvent(); // Record one event to indicate initialization
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket");
 
             // Subscribe to WebSocket events for real-time market data processing
             _webSocketClient.FillReceived += HandleFillEvent;
@@ -150,10 +167,14 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket");
             _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
@@ -171,10 +192,14 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket");
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
         }
 
@@ -192,10 +217,14 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_enableOverseerPerformanceMetrics)
-            {
-                _performanceMetrics.RecordWebSocketEvent();
-            }
+            _performanceMonitor.RecordCounterMetric(
+                className: "Overseer",
+                id: "WebSocketEvent",
+                name: "WebSocket Event",
+                description: "WebSocket event received",
+                value: 1,
+                unit: "count",
+                category: "WebSocket");
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
             // Process check-in data from brain instances
@@ -240,7 +269,7 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Failed to process check-in from EventLifecycle event");
+                _logger?.LogWarning("Failed to process check-in from EventLifecycle event");
             }
         }
 
@@ -352,11 +381,24 @@ namespace BacklashOverseer
                 _logger?.LogInformation("Exchange schedule fetch completed: {ProcessedCount} processed, {ErrorCount} errors",
                     exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
 
-                stopwatch.Stop();
-                if (_enableOverseerPerformanceMetrics)
+                // Update CurrentSchedule table with flattened schedule data
+                _logger?.LogInformation("Updating CurrentSchedule table with flattened schedule data...");
+                var dbContext = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                if (dbContext is BacklashBotContext backlashContext)
                 {
-                    _performanceMetrics.RecordApiFetch(stopwatch.Elapsed);
+                    await backlashContext.PopulateCurrentScheduleFromStandardHours();
+                    _logger?.LogInformation("CurrentSchedule table updated successfully");
                 }
+
+                stopwatch.Stop();
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "Overseer",
+                    id: "ApiFetchDuration",
+                    name: "API Fetch Duration",
+                    description: "Time taken to fetch API data",
+                    value: stopwatch.Elapsed.TotalMilliseconds,
+                    unit: "ms",
+                    category: "API");
 
                 _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp} in {Duration}ms", DateTime.UtcNow, stopwatch.ElapsedMilliseconds);
             }
@@ -401,7 +443,7 @@ namespace BacklashOverseer
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Failed to log system info to database");
+                _logger?.LogWarning("Failed to log system info to database");
             }
         }
 

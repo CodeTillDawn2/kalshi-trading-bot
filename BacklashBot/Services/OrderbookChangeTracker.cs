@@ -1,9 +1,9 @@
 using BacklashBot.Configuration;
-using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -38,10 +38,13 @@ namespace BacklashBot.Services
         private readonly IScopeManagerService _scopeManagerService;
 
         private IStatusTrackerService _statusTrackerService;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         private readonly bool _enablePerformanceMetrics;
 
+        /// <summary>
+        /// Occurs when the market is determined to be invalid during event validation.
+        /// </summary>
         public event EventHandler<string> MarketInvalid;
 
         private readonly ConcurrentQueue<OrderbookChange> _orderbookChanges = new ConcurrentQueue<OrderbookChange>();
@@ -154,7 +157,7 @@ namespace BacklashBot.Services
         /// <param name="trackerConfig">Orderbook change tracker configuration containing time windows and thresholds</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording metrics</param>
         /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, trackerConfig, or statusTrackerService is null</exception>
         public OrderbookChangeTracker(
             string marketTicker,
@@ -163,7 +166,7 @@ namespace BacklashBot.Services
             IOptions<OrderbookChangeTrackerConfig> trackerConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
+            IPerformanceMonitor performanceMonitor)
         {
             _marketTicker = marketTicker ?? throw new ArgumentNullException(nameof(marketTicker));
             _scopeManagerService = scopeManagerService;
@@ -171,7 +174,7 @@ namespace BacklashBot.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _trackerConfig = trackerConfig ?? throw new ArgumentNullException(nameof(trackerConfig));
             _statusTrackerService = statusTrackerService;
-            _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
 
             _enablePerformanceMetrics = _trackerConfig.Value.EnablePerformanceMetrics;
 
@@ -891,25 +894,51 @@ namespace BacklashBot.Services
             }
 
             // Post metrics to central performance monitor
-            if (_enablePerformanceMetrics)
+            if (_eventProcessingCount > 0)
             {
-                if (_eventProcessingCount > 0)
-                {
-                    long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
-                }
-
-                if (_timerCallbackCount > 1)
-                {
-                    long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
-                }
-                if (_timerCallbackCount > 0)
-                {
-                    long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
-                }
+                long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
             }
+
+            if (_timerCallbackCount > 1)
+            {
+                long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
+            }
+            if (_timerCallbackCount > 0)
+            {
+                long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
+                RecordExecutionTimePrivate($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
+            }
+
+            // Record additional performance metrics
+            var uptime = DateTime.UtcNow - _lastMetricsReset;
+            var matchSuccessRate = _totalMatchingOperations > 0 ? (double)_successfulMatches / _totalMatchingOperations : 0.0;
+            var avgProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalProcessingTimeMs / _totalMatchingOperations : 0.0;
+            var avgQueueProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalQueueProcessingTimeMs / _totalMatchingOperations : 0.0;
+            var avgEventProcessingTimeMs = _eventProcessingCount > 0 ? (double)_totalEventProcessingTimeMs / _eventProcessingCount : 0.0;
+            var avgTimerDriftMs = _timerCallbackCount > 1 ? (double)_totalTimerDriftMs / (_timerCallbackCount - 1) : 0.0;
+            var avgTimerExecutionTimeMs = _timerCallbackCount > 0 ? (double)_totalTimerExecutionTimeMs / _timerCallbackCount : 0.0;
+            var operationsPerSecond = uptime.TotalSeconds > 0 ? _totalMatchingOperations / uptime.TotalSeconds : 0.0;
+
+            RecordMetric($"TotalMatchingOperations_{_marketTicker}", "Total Matching Operations", "Total number of matching operations performed", _totalMatchingOperations, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"SuccessfulMatches_{_marketTicker}", "Successful Matches", "Number of successful matches", _successfulMatches, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"MatchSuccessRate_{_marketTicker}", "Match Success Rate", "Percentage of successful matches", Math.Round(matchSuccessRate * 100, 2), "%", "OrderbookTracking", isProgressBar: true);
+            RecordMetric($"AverageProcessingTimeMs_{_marketTicker}", "Average Processing Time", "Average time per matching operation", Math.Round(avgProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"AverageQueueProcessingTimeMs_{_marketTicker}", "Average Queue Processing Time", "Average time for queue processing", Math.Round(avgQueueProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"MaxQueueDepth_{_marketTicker}", "Max Queue Depth", "Maximum depth of the orderbook changes queue", _maxQueueDepth, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"CurrentQueueDepth_{_marketTicker}", "Current Queue Depth", "Current depth of the orderbook changes queue", _orderbookChanges.Count, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"CurrentTradeQueueDepth_{_marketTicker}", "Current Trade Queue Depth", "Current depth of the trade events queue", _tradeEvents.Count, "count", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"UptimeSeconds_{_marketTicker}", "Uptime", "Time since last metrics reset", Math.Round(uptime.TotalSeconds, 2), "seconds", "OrderbookTracking", isNumeric: true);
+            RecordMetric($"OperationsPerSecond_{_marketTicker}", "Operations Per Second", "Rate of matching operations", Math.Round(operationsPerSecond, 2), "ops/sec", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalEventProcessingTimeMs_{_marketTicker}", "Total Event Processing Time", "Total time spent processing events", _totalEventProcessingTimeMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"EventProcessingCount_{_marketTicker}", "Event Processing Count", "Number of events processed", _eventProcessingCount, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"AverageEventProcessingTimeMs_{_marketTicker}", "Average Event Processing Time", "Average time per event processing", Math.Round(avgEventProcessingTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalTimerDriftMs_{_marketTicker}", "Total Timer Drift", "Total timer drift accumulated", _totalTimerDriftMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TimerCallbackCount_{_marketTicker}", "Timer Callback Count", "Number of timer callbacks", _timerCallbackCount, "count", "OrderbookTracking", isCounter: true);
+            RecordMetric($"AverageTimerDriftMs_{_marketTicker}", "Average Timer Drift", "Average timer drift per callback", Math.Round(avgTimerDriftMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"TotalTimerExecutionTimeMs_{_marketTicker}", "Total Timer Execution Time", "Total time spent in timer executions", _totalTimerExecutionTimeMs, "ms", "OrderbookTracking", isSpeedDial: true);
+            RecordMetric($"AverageTimerExecutionTimeMs_{_marketTicker}", "Average Timer Execution Time", "Average time per timer execution", Math.Round(avgTimerExecutionTimeMs, 2), "ms", "OrderbookTracking", isSpeedDial: true);
         }
 
         /// <summary>
@@ -1005,14 +1034,6 @@ namespace BacklashBot.Services
                 .ToList();
             _logger.LogDebug("Processing {YesChangeCount} Yes-side and {NoChangeCount} No-side order book changes for {MarketTicker}",
                 validYesChanges.Count, validNoChanges.Count, _marketTicker);
-
-            var (isValid, invalidCount) = ValidateEvents(validYesChanges.Concat(validNoChanges).ToList());
-            if (!isValid)
-            {
-                _logger.LogWarning("Event validation failed for {MarketTicker}: {InvalidCount} invalid events found, skipping metric recalculation", _marketTicker, invalidCount);
-                MarketInvalid?.Invoke(this, _marketTicker);
-                return;
-            }
 
             if (Market == null)
             {
@@ -1256,82 +1277,6 @@ namespace BacklashBot.Services
             }
         }
 
-        private (bool isValid, int invalidCount) ValidateEvents(List<OrderbookChange> orderbookChanges)
-        {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogDebug("Event validation cancelled for {MarketTicker}", _marketTicker);
-                return (false, 0);
-            }
-
-            bool isValid = true;
-            HashSet<string> changeIds = new HashSet<string>();
-            int invalidCount = 0;
-
-            foreach (var change in orderbookChanges)
-            {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogDebug("Event validation loop cancelled for {MarketTicker}", _marketTicker);
-                    return (false, invalidCount);
-                }
-
-                if (!changeIds.Add(change.Id))
-                {
-                    _logger.LogWarning("DUP-Duplicate ChangeID detected for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Side, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.Price < 0 || change.Price > 100)
-                {
-                    _logger.LogWarning("Invalid price for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.DeltaContracts == 0)
-                {
-                    _logger.LogWarning("Invalid DeltaContracts for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                        _marketTicker, change.Id, change.Price, change.DeltaContracts, change.Timestamp);
-                    isValid = false;
-                    invalidCount++;
-                    continue;
-                }
-
-                if (change.Timestamp > DateTime.UtcNow.AddMinutes(1) || change.Timestamp < DateTime.UtcNow.AddMinutes(-_trackerConfig.Value.EventCalculationPeriod))
-                {
-                    string reason;
-                    if (change.Timestamp > DateTime.UtcNow.AddMinutes(1))
-                    {
-                        reason = $"timestamp is more than 1 minute in the future (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
-                    }
-                    else
-                    {
-                        reason = $"timestamp is more than {_trackerConfig.Value.EventCalculationPeriod} minutes in the past (current UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss})";
-                    }
-                    _logger.LogWarning("Invalid timestamp for {MarketTicker}: ChangeID={ChangeID}, Timestamp={Timestamp}, Price={Price}, DeltaContracts={DeltaContracts}. Reason: {Reason}",
-                        _marketTicker, change.Id, change.Timestamp, change.Price, change.DeltaContracts, reason);
-                    isValid = false;
-                    invalidCount++;
-                }
-            }
-
-            if (invalidCount > 0)
-            {
-                _logger.LogWarning("Found {InvalidCount} invalid order book changes for {MarketTicker}", invalidCount, _marketTicker);
-            }
-            else
-            {
-                _logger.LogDebug("All order book changes validated successfully for {MarketTicker}", _marketTicker);
-            }
-
-            return (isValid, invalidCount);
-        }
 
         private void CleanupOldTrades()
         {
@@ -1437,7 +1382,14 @@ namespace BacklashBot.Services
         #endregion
 
         #region Velocity and Rate Calculations
-        // Revised GetBottomNoVelocityPerMinute (remove 5.0 parameter)
+        /// <summary>
+        /// Calculates the velocity per minute for bottom-level "no" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels below the threshold.
+        /// </summary>
+        /// <param name="noBids">The list of "no" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1490,6 +1442,13 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Gets the count of bid levels that are at or above the specified lower bound price.
+        /// Used for determining the number of "top" price levels in the orderbook.
+        /// </summary>
+        /// <param name="Bids">The list of orderbook bid data to analyze</param>
+        /// <param name="lowerBound">The minimum price threshold for counting levels</param>
+        /// <returns>The number of bid levels at or above the lower bound price</returns>
         public int GetTopLevels(List<OrderbookData> Bids, int lowerBound)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1500,6 +1459,13 @@ namespace BacklashBot.Services
             return Bids.Where(x => x.Price >= lowerBound).Count();
         }
 
+        /// <summary>
+        /// Gets the count of bid levels that are below the specified upper bound price.
+        /// Used for determining the number of "bottom" price levels in the orderbook.
+        /// </summary>
+        /// <param name="Bids">The list of orderbook bid data to analyze</param>
+        /// <param name="upperBound">The maximum price threshold for counting levels</param>
+        /// <returns>The number of bid levels below the upper bound price</returns>
         public int GetBottomLevels(List<OrderbookData> Bids, int upperBound)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1510,7 +1476,14 @@ namespace BacklashBot.Services
             return Bids.Where(x => x.Price < upperBound).Count();
         }
 
-        // Revised GetBottomYesVelocityPerMinute (remove 5.0 parameter)
+        /// <summary>
+        /// Calculates the velocity per minute for bottom-level "yes" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels below the threshold.
+        /// </summary>
+        /// <param name="yesBids">The list of "yes" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1563,6 +1536,14 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the velocity per minute for top-level "no" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels at or above the threshold.
+        /// </summary>
+        /// <param name="noBids">The list of "no" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1615,6 +1596,14 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the velocity per minute for top-level "yes" side bids.
+        /// Velocity is measured as dollar volume of orderbook changes per minute for price levels at or above the threshold.
+        /// </summary>
+        /// <param name="yesBids">The list of "yes" side bid data</param>
+        /// <param name="orderbookChanges">The list of orderbook changes to analyze</param>
+        /// <param name="threshold">The price threshold separating top and bottom levels</param>
+        /// <returns>A tuple containing the volume per minute and the number of levels analyzed</returns>
         public (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1667,6 +1656,12 @@ namespace BacklashBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
+        /// <summary>
+        /// Calculates the net order volume per minute for "yes" side bids.
+        /// This measures the dollar volume of non-trade-related orderbook changes (market making activity).
+        /// </summary>
+        /// <param name="yesBidChanges">The list of "yes" side orderbook changes to analyze</param>
+        /// <returns>A tuple containing the volume per minute and the count of orders</returns>
         public (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1695,6 +1690,12 @@ namespace BacklashBot.Services
             return (volume, orderCount);
         }
 
+        /// <summary>
+        /// Calculates the net order volume per minute for "no" side bids.
+        /// This measures the dollar volume of non-trade-related orderbook changes (market making activity).
+        /// </summary>
+        /// <param name="noBidChanges">The list of "no" side orderbook changes to analyze</param>
+        /// <returns>A tuple containing the volume per minute and the count of orders</returns>
         public (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1723,6 +1724,12 @@ namespace BacklashBot.Services
             return (volume, orderCount);
         }
 
+        /// <summary>
+        /// Calculates the trade rate and volume per minute for "yes" side maker trades.
+        /// This measures actual trading activity where the maker was on the "yes" side.
+        /// </summary>
+        /// <param name="yesTradeRelatedChanges">The list of trade-related "yes" side orderbook changes</param>
+        /// <returns>A tuple containing the trade rate per minute and volume per minute</returns>
         public (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1759,6 +1766,12 @@ namespace BacklashBot.Services
             return (Math.Round(rate, 2), volume);
         }
 
+        /// <summary>
+        /// Calculates the trade rate and volume per minute for "no" side maker trades.
+        /// This measures actual trading activity where the maker was on the "no" side.
+        /// </summary>
+        /// <param name="noTradeRelatedChanges">The list of trade-related "no" side orderbook changes</param>
+        /// <returns>A tuple containing the trade rate per minute and volume per minute</returns>
         public (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1795,6 +1808,12 @@ namespace BacklashBot.Services
             return (Math.Round(rate, 2), volume);
         }
 
+        /// <summary>
+        /// Calculates the average trade size in dollars for "yes" side maker trades.
+        /// This measures the typical dollar value of trades where the maker was on the "yes" side.
+        /// </summary>
+        /// <param name="tradeEvents">The list of trade-related orderbook changes to analyze</param>
+        /// <returns>The average trade size in dollars, rounded to 2 decimal places</returns>
         public double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1823,6 +1842,12 @@ namespace BacklashBot.Services
             return Math.Round(averageDollar, 2);
         }
 
+        /// <summary>
+        /// Calculates the average trade size in dollars for "no" side maker trades.
+        /// This measures the typical dollar value of trades where the maker was on the "no" side.
+        /// </summary>
+        /// <param name="tradeEvents">The list of trade-related orderbook changes to analyze</param>
+        /// <returns>The average trade size in dollars, rounded to 2 decimal places</returns>
         public double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1851,6 +1876,11 @@ namespace BacklashBot.Services
             return Math.Round(averageDollar, 2);
         }
 
+        /// <summary>
+        /// Gets the total count of trades where the maker was on the "yes" side.
+        /// This represents trades where the taker was on the "no" side.
+        /// </summary>
+        /// <returns>The number of trades where the maker was on the "yes" side</returns>
         public int GetTradeCount_MakerYes()
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1875,6 +1905,11 @@ namespace BacklashBot.Services
             return tradeCount;
         }
 
+        /// <summary>
+        /// Gets the total count of trades where the maker was on the "no" side.
+        /// This represents trades where the taker was on the "yes" side.
+        /// </summary>
+        /// <returns>The number of trades where the maker was on the "no" side</returns>
         public int GetTradeCount_MakerNo()
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -2006,7 +2041,53 @@ namespace BacklashBot.Services
 
         #endregion
 
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "OrderbookChangeTracker";
+            string category = "OrderbookTracking";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category);
+            }
+            else
+            {
+                // Record actual metric
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null);
+            }
+        }
+
+        private void RecordMetric(string id, string name, string description, double value, string unit, string category, bool isSpeedDial = false, bool isCounter = false, bool isNumeric = false, bool isProgressBar = false)
+        {
+            if (_enablePerformanceMetrics)
+            {
+                if (isSpeedDial)
+                    _performanceMonitor.RecordSpeedDialMetric("OrderbookChangeTracker", id, name, description, value, unit, category, null, null, null);
+                else if (isCounter)
+                    _performanceMonitor.RecordCounterMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
+                else if (isNumeric)
+                    _performanceMonitor.RecordNumericDisplayMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
+                else if (isProgressBar)
+                    _performanceMonitor.RecordProgressBarMetric("OrderbookChangeTracker", id, name, description, value, unit, category, 0, 100, null);
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("OrderbookChangeTracker", id, name, description, value, unit, category);
+            }
+        }
+
         #region Dispose
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Stops and disposes of all timers and releases resources used by the tracker.
+        /// </summary>
         public void Dispose()
         {
             _recalculationTimer?.Stop();

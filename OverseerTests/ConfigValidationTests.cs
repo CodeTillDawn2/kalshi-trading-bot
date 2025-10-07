@@ -1,4 +1,3 @@
-using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
 using BacklashOverseer.Config;
 using KalshiBotAPI.Configuration;
@@ -8,11 +7,19 @@ using System.Reflection;
 
 namespace OverseerTests
 {
+    /// <summary>
+    /// Test fixture for validating configuration settings in the Overseer application.
+    /// Tests ensure that all configuration classes are properly bound from appsettings.json,
+    /// no unused configuration sections exist, and secrets interpolation works correctly.
+    /// </summary>
     [TestFixture]
     public class ConfigValidationTests
     {
         private IConfiguration _configuration;
 
+        /// <summary>
+        /// Sets up the test fixture by loading the configuration from appsettings.json.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -24,6 +31,10 @@ namespace OverseerTests
             _configuration = builder.Build();
         }
 
+        /// <summary>
+        /// Validates that all configuration classes can be successfully bound from appsettings.json
+        /// using reflection to discover config types with SectionName fields.
+        /// </summary>
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
@@ -54,6 +65,10 @@ namespace OverseerTests
             }
         }
 
+        /// <summary>
+        /// Validates that there are no unused configuration sections in appsettings.json
+        /// by comparing all configuration keys against known SectionName values from config classes.
+        /// </summary>
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
@@ -98,6 +113,11 @@ namespace OverseerTests
             Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
         }
 
+        /// <summary>
+        /// Validates that secrets interpolation works correctly and that the interpolated key file exists.
+        /// Tests the ConfigurationHelper.InterpolateConfigurationValue method and verifies
+        /// that secrets are properly loaded and interpolated from configuration placeholders.
+        /// </summary>
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {
@@ -184,7 +204,7 @@ namespace OverseerTests
             TestContext.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
         }
 
-     
+
 
         private void ValidateConfig(object config, IConfigurationSection section)
         {

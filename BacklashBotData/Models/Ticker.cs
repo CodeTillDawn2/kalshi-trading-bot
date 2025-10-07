@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents real-time ticker data for a Kalshi market, capturing price and volume information at a specific point in time.

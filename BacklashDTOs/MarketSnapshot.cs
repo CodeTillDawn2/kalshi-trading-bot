@@ -2051,6 +2051,12 @@ namespace BacklashDTOs
             throw new JsonException();
         }
 
+        /// <summary>
+        /// Writes the Bollinger Bands tuple to JSON.
+        /// </summary>
+        /// <param name="writer">The JSON writer.</param>
+        /// <param name="value">The Bollinger Bands tuple to write.</param>
+        /// <param name="options">The serialization options.</param>
         public override void Write(
             Utf8JsonWriter writer,
             (double? Lower, double? Middle, double? Upper) value,
@@ -2105,6 +2111,12 @@ namespace BacklashDTOs
             throw new JsonException();
         }
 
+        /// <summary>
+        /// Writes the Stochastic Oscillator tuple to JSON.
+        /// </summary>
+        /// <param name="writer">The JSON writer.</param>
+        /// <param name="value">The Stochastic Oscillator tuple to write.</param>
+        /// <param name="options">The serialization options.</param>
         public override void Write(
             Utf8JsonWriter writer,
             (double? K, double? D) value,

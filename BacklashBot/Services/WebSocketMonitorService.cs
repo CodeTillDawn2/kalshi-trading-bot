@@ -1,12 +1,9 @@
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Services
@@ -41,7 +38,6 @@ namespace BacklashBot.Services
 
         // Configuration and dependencies
         private readonly bool _enableMetrics;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
 
         // Performance metrics
         private int _exchangeStatusCheckCount = 0;
@@ -52,6 +48,7 @@ namespace BacklashBot.Services
 
         // Enhanced metrics for granularity
         private readonly List<long> _responseTimesMs = new List<long>();
+        private readonly object _responseTimesLock = new object();
         private long _minResponseTimeMs = long.MaxValue;
         private long _maxResponseTimeMs = 0;
         private double _averageResponseTimeMs = 0;
@@ -87,7 +84,7 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="readyStatus">Status tracker for bot initialization completion.</param>
         /// <param name="statusTrackerService">Service for managing cancellation tokens and operation status.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitoring service for posting metrics.</param>
+        /// <param name="performanceMonitor">Central performance monitoring service for posting metrics.</param>
         public WebSocketMonitorService(
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
@@ -96,23 +93,22 @@ namespace BacklashBot.Services
             IScopeManagerService scopeManagerService,
             IBotReadyStatus readyStatus,
             IStatusTrackerService statusTrackerService,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
-            : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, centralPerformanceMonitor, readyStatus)
+            IPerformanceMonitor performanceMonitor)
+            : base(logger, serviceFactory.GetKalshiWebSocketClient(), scopeFactory, performanceMonitor, readyStatus)
         {
             _scopeFactory = scopeFactory;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
             _config = config.Value;
 
             // Load configuration values from injected options
             _monitoringIntervalMinutes = _config.MonitoringIntervalMinutes;
             _retryDelayMinutes = _config.RetryDelayMinutes;
-            _enableMetrics = _config.EnableWebSocketMonitorMetrics;
+            _enableMetrics = _config.EnablePerformanceMetrics;
 
-            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableWebSocketMonitorMetrics={EnableWebSocketMonitorMetrics}",
+            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnablePerformanceMetrics={EnablePerformanceMetrics}",
                 _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
         }
 
@@ -275,22 +271,25 @@ namespace BacklashBot.Services
         {
             if (_enableMetrics)
             {
-                _responseTimesMs.Add(responseTimeMs);
-                _minResponseTimeMs = Math.Min(_minResponseTimeMs, responseTimeMs);
-                _maxResponseTimeMs = Math.Max(_maxResponseTimeMs, responseTimeMs);
-
-                // Calculate average
-                _averageResponseTimeMs = _responseTimesMs.Average();
-
-                // Calculate standard deviation
-                if (_responseTimesMs.Count > 1)
+                lock (_responseTimesLock)
                 {
-                    double sumOfSquares = _responseTimesMs.Sum(rt => Math.Pow(rt - _averageResponseTimeMs, 2));
-                    _responseTimeStdDev = Math.Sqrt(sumOfSquares / (_responseTimesMs.Count - 1));
+                    _responseTimesMs.Add(responseTimeMs);
+                    _minResponseTimeMs = Math.Min(_minResponseTimeMs, responseTimeMs);
+                    _maxResponseTimeMs = Math.Max(_maxResponseTimeMs, responseTimeMs);
+
+                    // Calculate average
+                    _averageResponseTimeMs = _responseTimesMs.Average();
+
+                    // Calculate standard deviation
+                    if (_responseTimesMs.Count > 1)
+                    {
+                        double sumOfSquares = _responseTimesMs.Sum(rt => Math.Pow(rt - _averageResponseTimeMs, 2));
+                        _responseTimeStdDev = Math.Sqrt(sumOfSquares / (_responseTimesMs.Count - 1));
+                    }
                 }
 
                 // Post to central performance monitor
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs, _enableMetrics);
+                RecordExecutionTimePrivate("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs, _enableMetrics);
             }
         }
 
@@ -353,7 +352,7 @@ namespace BacklashBot.Services
             if (_enableMetrics)
             {
                 _websocketLatenciesMs.Add(latencyMs);
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketLatency", latencyMs, _enableMetrics);
+                RecordExecutionTimePrivate("WebSocketMonitor.WebSocketLatency", latencyMs, _enableMetrics);
             }
         }
 
@@ -502,6 +501,13 @@ namespace BacklashBot.Services
 
                             if (status.exchange_active && !currentConnectionState)
                             {
+                                // Clear exchange outage mode when exchange becomes active
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    webSocketClient.SetExchangeOutageMode(false);
+                                }
+
                                 // Only connect if market data initialization is complete
                                 if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                                 {
@@ -515,7 +521,7 @@ namespace BacklashBot.Services
                                         _connectionSuccessCount++;
                                         RecordConnectionRecovery();
                                         UpdateUptime(true);
-                                        _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
+                                        RecordExecutionTimePrivate("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                     }
                                     _logger.LogDebug("WebSocket connected successfully in {Duration}ms", connectionDuration);
                                 }
@@ -526,9 +532,16 @@ namespace BacklashBot.Services
                             }
                             else if (!status.exchange_active && currentConnectionState)
                             {
+                                // Set exchange outage mode when exchange becomes inactive
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    webSocketClient.SetExchangeOutageMode(true);
+                                }
+
                                 _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
                                 _serviceFactory.GetDataCache().LastWebSocketTimestamp = DateTime.UtcNow;
-                                await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
+                                await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync(isExchangeOutage: true);
                                 if (_enableMetrics)
                                 {
                                     RecordConnectionFailure();
@@ -609,6 +622,13 @@ namespace BacklashBot.Services
 
                         if (status.exchange_active && !currentConnectionState)
                         {
+                            // Clear exchange outage mode when exchange becomes active
+                            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                            if (webSocketClient != null)
+                            {
+                                webSocketClient.SetExchangeOutageMode(false);
+                            }
+
                             // Only connect if market data initialization is complete
                             if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                             {
@@ -622,7 +642,7 @@ namespace BacklashBot.Services
                                     _connectionSuccessCount++;
                                     RecordConnectionRecovery();
                                     UpdateUptime(true);
-                                    _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
+                                    RecordExecutionTimePrivate("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                 }
                                 _logger.LogInformation("WebSocket connected successfully in {Duration}ms", connectionDuration);
                             }
@@ -633,8 +653,15 @@ namespace BacklashBot.Services
                         }
                         else if (!status.exchange_active && currentConnectionState)
                         {
+                            // Set exchange outage mode when exchange becomes inactive
+                            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                            if (webSocketClient != null)
+                            {
+                                webSocketClient.SetExchangeOutageMode(true);
+                            }
+
                             _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
-                            await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
+                            await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync(isExchangeOutage: true);
                             if (_enableMetrics)
                             {
                                 RecordConnectionFailure();
@@ -688,6 +715,29 @@ namespace BacklashBot.Services
             finally
             {
                 _logger.LogDebug("MonitorAndManageWebSocketConnectionAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
+            }
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "WebSocketMonitorService";
+            string category = "WebSocketMonitoring";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category);
+            }
+            else
+            {
+                // Record actual metric
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null);
             }
         }
     }

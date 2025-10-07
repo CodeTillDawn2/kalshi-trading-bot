@@ -52,52 +52,31 @@
             background: rgb(38, 71, 59);
         }
 
-        .toggle-btn {
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-dropdown {
             background: rgb(28, 51, 39);
             color: rgb(225, 221, 206);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            border: 2px solid rgb(28, 51, 39);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
-            transition: background-color 0.3s;
+            min-width: 180px;
         }
 
-        .toggle-btn:hover {
-            background: rgb(38, 71, 59);
+        .category-dropdown:focus {
+            outline: none;
+            border-color: rgb(40, 167, 69);
         }
 
-        .toggle-btn.active {
-            background: rgb(40, 167, 69);
-        }
-
-        .control-title, .control-description {
-            transition: opacity 0.3s ease;
-        }
-
-        /* Per-element label visibility control */
-        .control-title.hide-label, .control-description.hide-label {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Data attribute approach for more granular control */
-        [data-show-labels="false"] .control-title,
-        [data-show-labels="false"] .control-description {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Individual control overrides */
-        .speed-dial-control.hide-labels .control-title,
-        .speed-dial-control.hide-labels .control-description,
-        .progress-control.hide-labels .control-title,
-        .progress-control.hide-labels .control-description,
-        .counter-control.hide-labels .control-title,
-        .counter-control.hide-labels .control-description {
-            opacity: 0;
-            pointer-events: none;
+        .category-dropdown option {
+            background: rgb(16, 16, 13);
+            color: rgb(225, 221, 206);
         }
 
         .controls-grid {
@@ -117,19 +96,6 @@
             align-items: center;
             min-height: 220px;
             position: relative;
-        }
-
-        .control-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgb(225, 221, 206);
-            font-weight: bold;
-            text-align: center;
-            z-index: 10;
-            pointer-events: none;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .control-title {
@@ -215,14 +181,6 @@
             box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
         }
 
-        .progress-value {
-            color: rgb(225, 221, 206);
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 12px;
-            text-shadow: 0 0 5px rgba(225, 221, 206, 0.3);
-        }
-
         /* Counter Styles */
         .counter {
             font-size: 64px;
@@ -257,43 +215,6 @@
         .traffic-light-bulb.red { background: #dc3545; color: #dc3545; }
         .traffic-light-bulb.yellow { background: #ffc107; color: #ffc107; }
         .traffic-light-bulb.green { background: #28a745; color: #28a745; }
-
-        /* Pie Chart Styles */
-        .pie-chart-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-        }
-
-        .pie-chart {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                #28a745 0% 40%,
-                #20c997 40% 70%,
-                #17a2b8 70% 100%
-            );
-            border: 3px solid rgba(28, 51, 39, 0.6);
-        }
-
-        .pie-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(16, 16, 13, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgb(225, 221, 206);
-            font-size: 16px;
-            font-weight: bold;
-            border: 2px solid rgba(28, 51, 39, 0.5);
-        }
 
         /* Numeric Display Styles */
         .numeric-display {
@@ -332,40 +253,13 @@
             border: 2px solid rgba(28, 51, 39, 0.4);
         }
 
-        .line-chart-line {
+        .trend-bar {
             position: absolute;
             bottom: 15px;
-            left: 15px;
-            right: 15px;
-            height: 24px;
-            background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
-        }
-
-        /* Data Grid Styles */
-        .data-grid {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(28, 51, 39, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid rgba(28, 51, 39, 0.5);
-        }
-
-        .data-grid th,
-        .data-grid td {
-            padding: 12px 16px;
-            text-align: left;
-            color: rgb(225, 221, 206);
-            font-size: 14px;
-            border-bottom: 2px solid rgba(28, 51, 39, 0.4);
-        }
-
-        .data-grid th {
-            background: rgba(28, 51, 39, 0.9);
-            font-weight: 700;
-            font-size: 16px;
+            width: 8px;
+            background: linear-gradient(to top, #28a745, #20c997);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
         }
     </style>
 </head>
@@ -374,158 +268,581 @@
         <div class="details-container">
             <div class="details-header">
                 <h1 class="details-title">Brain Details: <span id="brainName">Loading...</span></h1>
-                <button class="back-btn" onclick="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Dashboard
-                </button>
+                <div class="header-controls">
+                    <select id="metricCategory" class="category-dropdown">
+                        <option value="All">All Categories</option>
+                    </select>
+                    <button class="back-btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                </div>
             </div>
 
-            <div class="controls-grid">
-                <!-- Speed Dial -->
-                <div class="control-card speed-dial-control hide-labels">
-                    <div class="control-title">CPU Usage</div>
-                    <div class="control-description">Circular gauge for CPU utilization</div>
-                    <div class="speed-dial">
-                        <div class="speed-dial-circle">
-                            <div class="speed-dial-center"></div>
-                            <div class="speed-dial-indicator"></div>
-                        </div>
-                    </div>
-                    <div class="control-overlay" style="font-size: 32px; opacity: 0.9; top: 65%;">75%</div>
-                </div>
-
-                <!-- Progress Bar -->
-                <div class="control-card">
-                    <div class="control-title">Memory Usage</div>
-                    <div class="control-description">Linear progress for memory consumption</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" style="width: 65%"></div>
-                    </div>
-                    <div class="control-overlay" style="font-size: 28px; opacity: 0.8;">65%</div>
-                </div>
-
-                <!-- Counter -->
-                <div class="control-card">
-                    <div class="counter"></div>
-                    <div class="control-overlay" style="font-size: 42px; opacity: 0.9; top: 20%;">1,234</div>
-                    <div class="counter-info" style="position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); text-align: center;">
-                        <div style="color: rgb(225, 221, 206); font-size: 12px; font-weight: 600; margin-bottom: 1px;">Active Markets</div>
-                        <div style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">Count of currently watched markets</div>
-                    </div>
-                </div>
-
-                <!-- Traffic Light -->
-                <div class="control-card">
-                    <div class="control-title">Brain Status</div>
-                    <div class="control-description">Overall health indicator</div>
-                    <div class="traffic-light">
-                        <div class="traffic-light-bulb red"></div>
-                        <div class="traffic-light-bulb yellow"></div>
-                        <div class="traffic-light-bulb green active"></div>
-                    </div>
-                </div>
-
-                <!-- Pie Chart -->
-                <div class="control-card">
-                    <div class="control-title">Resource Allocation</div>
-                    <div class="control-description">Distribution of system resources</div>
-                    <div class="pie-chart-container">
-                        <div class="pie-chart"></div>
-                        <div class="pie-center"></div>
-                    </div>
-                    <div class="pie-legend" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; font-size: 12px;">
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <div style="width: 12px; height: 12px; background: #28a745; border-radius: 3px;"></div>
-                            <span style="color: rgb(225, 221, 206); opacity: 0.9; font-weight: 500;">CPU</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <div style="width: 12px; height: 12px; background: #20c997; border-radius: 3px;"></div>
-                            <span style="color: rgb(225, 221, 206); opacity: 0.9; font-weight: 500;">Mem</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <div style="width: 12px; height: 12px; background: #17a2b8; border-radius: 3px;"></div>
-                            <span style="color: rgb(225, 221, 206); opacity: 0.9; font-weight: 500;">Disk</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Numeric Display -->
-                <div class="control-card">
-                    <div class="control-title">Response Time</div>
-                    <div class="control-description">Average response time in milliseconds</div>
-                    <div class="numeric-display" style="position: relative;">
-                        <div class="response-bar" style="position: absolute; bottom: 12px; left: 15px; right: 15px; height: 12px; background: rgba(28, 51, 39, 0.3); border-radius: 6px;">
-                            <div class="response-fill" style="height: 100%; width: 60%; background: linear-gradient(90deg, #28a745, #ffc107); border-radius: 6px; transition: all 0.5s ease;"></div>
-                        </div>
-                    </div>
-                    <div class="control-overlay" style="font-size: 32px; opacity: 0.9;">42.7 ms</div>
-                </div>
-
-                <!-- Badge -->
-                <div class="control-card">
-                    <div class="control-title">Error Count</div>
-                    <div class="control-description">Number of recent errors</div>
-                    <div class="badge" style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto; width: 80px; height: 35px; background: linear-gradient(45deg, #28a745, #20c997);">
-                        <span style="color: white; font-size: 16px; font-weight: bold;">3</span>
-                    </div>
-                </div>
-
-                <!-- Line Chart -->
-                <div class="control-card">
-                    <div class="control-title">Performance Trend</div>
-                    <div class="control-description">Recent CPU usage history</div>
-                    <div class="trend-chart" style="display: flex; align-items: end; justify-content: space-between; height: 80px; padding: 10px 15px; background: rgba(28, 51, 39, 0.1); border-radius: 8px; margin-top: 10px;">
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #28a745, #20c997); border-radius: 4px 4px 0 0; height: 35%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #28a745, #20c997); border-radius: 4px 4px 0 0; height: 42%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #ffc107, #fd7e14); border-radius: 4px 4px 0 0; height: 58%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #ffc107, #fd7e14); border-radius: 4px 4px 0 0; height: 61%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #dc3545, #c82333); border-radius: 4px 4px 0 0; height: 75%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #dc3545, #c82333); border-radius: 4px 4px 0 0; height: 68%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #ffc107, #fd7e14); border-radius: 4px 4px 0 0; height: 52%; transition: height 0.5s ease;"></div>
-                        <div class="trend-bar" style="width: 8px; background: linear-gradient(to top, #28a745, #20c997); border-radius: 4px 4px 0 0; height: 38%; transition: height 0.5s ease;"></div>
-                    </div>
-                    <div class="trend-labels" style="display: flex; justify-content: space-between; padding: 0 15px; margin-top: 5px;">
-                        <span style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">-10m</span>
-                        <span style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">Now</span>
-                    </div>
-                </div>
-
-                <!-- Data Grid -->
-                <div class="control-card">
-                    <div class="control-title">System Metrics</div>
-                    <div class="control-description">Resource usage summary</div>
-                    <table class="data-grid">
-                        <thead>
-                            <tr>
-                                <th>Resource</th>
-                                <th>Usage</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="color: rgb(225, 221, 206); font-weight: 600;">CPU</td>
-                                <td style="color: rgb(225, 221, 206);">45%</td>
-                                <td style="color: #28a745; font-weight: 600;">Normal</td>
-                            </tr>
-                            <tr>
-                                <td style="color: rgb(225, 221, 206); font-weight: 600;">Memory</td>
-                                <td style="color: rgb(225, 221, 206);">2.1 GB</td>
-                                <td style="color: #ffc107; font-weight: 600;">Warning</td>
-                            </tr>
-                            <tr>
-                                <td style="color: rgb(225, 221, 206); font-weight: 600;">Disk</td>
-                                <td style="color: rgb(225, 221, 206);">78%</td>
-                                <td style="color: #dc3545; font-weight: 600;">High</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="controls-grid" id="controlsGrid">
+                <!-- Dynamic controls will be inserted here -->
             </div>
         </div>
     </div>
 
     <script>
+        // Global variables
+        let connection = null;
+        let currentBrainData = null;
+        let currentCategory = 'All';
+        let currentMetrics = [];
+
+        // Initialize SignalR connection
+        async function initSignalR() {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl('/overseerHub')
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('PerformanceMetricsUpdate', handlePerformanceMetricsUpdate);
+            connection.on('BrainStatusUpdate', handleBrainStatusUpdate);
+
+            try {
+                await connection.start();
+                console.log('SignalR connected');
+            } catch (err) {
+                console.error('SignalR connection failed:', err);
+            }
+        }
+
+        // Handle performance metrics updates
+        function handlePerformanceMetricsUpdate(data) {
+            if (data.BrainInstanceName === getBrainName()) {
+                updateBrainData(data);
+                createMetricsFromData();
+                updateCategoryDropdown();
+                renderControls();
+            }
+        }
+
+        // Handle brain status updates
+        function handleBrainStatusUpdate(data) {
+            if (data.BrainInstanceName === getBrainName()) {
+                updateBrainData(data);
+                createMetricsFromData();
+                updateCategoryDropdown();
+                renderControls();
+            }
+        }
+
+        // Update brain data from incoming updates
+        function updateBrainData(newData) {
+            if (!currentBrainData) {
+                currentBrainData = {};
+            }
+            Object.assign(currentBrainData, newData);
+        }
+
+        // Create GeneralPerformanceMetric objects from brain data
+        function createMetricsFromData() {
+            currentMetrics = [];
+
+            if (!currentBrainData) return;
+
+            // CPU Metrics
+            if (currentBrainData.currentCpuUsage !== undefined) {
+                currentMetrics.push({
+                    id: 'cpu-current',
+                    name: 'Current CPU Usage',
+                    description: 'Current CPU utilization percentage',
+                    category: 'System',
+                    visualType: 'SpeedDial',
+                    value: currentBrainData.currentCpuUsage,
+                    unit: '%',
+                    timestamp: new Date(),
+                    minThreshold: 0,
+                    warningThreshold: 70,
+                    criticalThreshold: 90
+                });
+            }
+
+            if (currentBrainData.cpuUsageHistory && currentBrainData.cpuUsageHistory.length > 0) {
+                const latestCpu = currentBrainData.cpuUsageHistory[currentBrainData.cpuUsageHistory.length - 1];
+                currentMetrics.push({
+                    id: 'cpu-trend',
+                    name: 'CPU Usage Trend',
+                    description: 'Historical CPU usage over time',
+                    category: 'System',
+                    visualType: 'LineChart',
+                    value: latestCpu.value,
+                    unit: '%',
+                    timestamp: new Date(latestCpu.timestamp),
+                    history: currentBrainData.cpuUsageHistory,
+                    minThreshold: 0,
+                    warningThreshold: 70,
+                    criticalThreshold: 90
+                });
+            }
+
+            // Queue Metrics
+            const queues = [
+                { key: 'eventQueueAvg', history: 'eventQueueHistory', name: 'Event Queue', desc: 'Event processing queue depth' },
+                { key: 'tickerQueueAvg', history: 'tickerQueueHistory', name: 'Ticker Queue', desc: 'Market ticker processing queue depth' },
+                { key: 'notificationQueueAvg', history: 'notificationQueueHistory', name: 'Notification Queue', desc: 'Notification processing queue depth' },
+                { key: 'orderbookQueueAvg', history: 'orderbookQueueHistory', name: 'Orderbook Queue', desc: 'Orderbook processing queue depth' }
+            ];
+
+            queues.forEach(queue => {
+                if (currentBrainData[queue.key] !== undefined) {
+                    currentMetrics.push({
+                        id: `queue-${queue.key}`,
+                        name: queue.name,
+                        description: queue.desc,
+                        category: 'Queues',
+                        visualType: 'ProgressBar',
+                        value: currentBrainData[queue.key],
+                        unit: 'count',
+                        timestamp: new Date(),
+                        minThreshold: 0,
+                        warningThreshold: 50,
+                        criticalThreshold: 200
+                    });
+                }
+
+                if (currentBrainData[queue.history] && currentBrainData[queue.history].length > 0) {
+                    const latest = currentBrainData[queue.history][currentBrainData[queue.history].length - 1];
+                    currentMetrics.push({
+                        id: `queue-trend-${queue.key}`,
+                        name: `${queue.name} Trend`,
+                        description: `Historical ${queue.name.toLowerCase()} depth over time`,
+                        category: 'Queues',
+                        visualType: 'LineChart',
+                        value: latest.value,
+                        unit: 'count',
+                        timestamp: new Date(latest.timestamp),
+                        history: currentBrainData[queue.history],
+                        minThreshold: 0,
+                        warningThreshold: 50,
+                        criticalThreshold: 200
+                    });
+                }
+            });
+
+            // Market Metrics
+            if (currentBrainData.watchedMarkets) {
+                currentMetrics.push({
+                    id: 'markets-count',
+                    name: 'Active Markets',
+                    description: 'Number of markets currently being watched',
+                    category: 'Markets',
+                    visualType: 'Counter',
+                    value: currentBrainData.watchedMarkets.length,
+                    unit: 'count',
+                    timestamp: new Date()
+                });
+            }
+
+            if (currentBrainData.marketCountHistory && currentBrainData.marketCountHistory.length > 0) {
+                const latest = currentBrainData.marketCountHistory[currentBrainData.marketCountHistory.length - 1];
+                currentMetrics.push({
+                    id: 'markets-trend',
+                    name: 'Market Count Trend',
+                    description: 'Historical market watch count over time',
+                    category: 'Markets',
+                    visualType: 'LineChart',
+                    value: latest.value,
+                    unit: 'count',
+                    timestamp: new Date(latest.timestamp),
+                    history: currentBrainData.marketCountHistory
+                });
+            }
+
+            // Error Metrics
+            if (currentBrainData.errorCount !== undefined) {
+                currentMetrics.push({
+                    id: 'errors-count',
+                    name: 'Error Count',
+                    description: 'Total number of errors encountered',
+                    category: 'Errors',
+                    visualType: 'Badge',
+                    value: currentBrainData.errorCount,
+                    unit: 'count',
+                    timestamp: new Date(),
+                    minThreshold: 0,
+                    warningThreshold: 5,
+                    criticalThreshold: 20
+                });
+            }
+
+            if (currentBrainData.errorHistory && currentBrainData.errorHistory.length > 0) {
+                const latest = currentBrainData.errorHistory[currentBrainData.errorHistory.length - 1];
+                currentMetrics.push({
+                    id: 'errors-trend',
+                    name: 'Error Trend',
+                    description: 'Historical error count over time',
+                    category: 'Errors',
+                    visualType: 'LineChart',
+                    value: latest.value,
+                    unit: 'count',
+                    timestamp: new Date(latest.timestamp),
+                    history: currentBrainData.errorHistory,
+                    minThreshold: 0,
+                    warningThreshold: 5,
+                    criticalThreshold: 20
+                });
+            }
+
+            // Refresh Metrics
+            if (currentBrainData.lastRefreshCycleSeconds !== undefined) {
+                currentMetrics.push({
+                    id: 'refresh-time',
+                    name: 'Refresh Cycle Time',
+                    description: 'Time taken for last refresh cycle',
+                    category: 'Performance',
+                    visualType: 'NumericDisplay',
+                    value: currentBrainData.lastRefreshCycleSeconds,
+                    unit: 's',
+                    timestamp: new Date(),
+                    minThreshold: 0,
+                    warningThreshold: 30,
+                    criticalThreshold: 60
+                });
+            }
+
+            if (currentBrainData.lastRefreshUsagePercentage !== undefined) {
+                currentMetrics.push({
+                    id: 'refresh-usage',
+                    name: 'Refresh CPU Usage',
+                    description: 'CPU usage during refresh cycle',
+                    category: 'Performance',
+                    visualType: 'ProgressBar',
+                    value: currentBrainData.lastRefreshUsagePercentage,
+                    unit: '%',
+                    timestamp: new Date(),
+                    minThreshold: 0,
+                    warningThreshold: 70,
+                    criticalThreshold: 90
+                });
+            }
+
+            if (currentBrainData.lastRefreshMarketCount !== undefined) {
+                currentMetrics.push({
+                    id: 'refresh-markets',
+                    name: 'Markets Refreshed',
+                    description: 'Number of markets refreshed in last cycle',
+                    category: 'Performance',
+                    visualType: 'Counter',
+                    value: currentBrainData.lastRefreshMarketCount,
+                    unit: 'count',
+                    timestamp: new Date()
+                });
+            }
+
+            // Status Metrics
+            if (currentBrainData.isWebSocketConnected !== undefined) {
+                currentMetrics.push({
+                    id: 'websocket-status',
+                    name: 'WebSocket Status',
+                    description: 'WebSocket connection status',
+                    category: 'Status',
+                    visualType: 'TrafficLight',
+                    value: currentBrainData.isWebSocketConnected ? 1 : 0,
+                    unit: '',
+                    timestamp: new Date()
+                });
+            }
+
+            if (currentBrainData.lastRefreshTimeAcceptable !== undefined) {
+                currentMetrics.push({
+                    id: 'refresh-status',
+                    name: 'Refresh Performance',
+                    description: 'Whether last refresh completed within acceptable time',
+                    category: 'Status',
+                    visualType: 'TrafficLight',
+                    value: currentBrainData.lastRefreshTimeAcceptable ? 1 : 0,
+                    unit: '',
+                    timestamp: new Date()
+                });
+            }
+        }
+
+        // Update category dropdown with available categories
+        function updateCategoryDropdown() {
+            const dropdown = document.getElementById('metricCategory');
+            const currentSelection = dropdown.value;
+
+            // Get unique categories from current metrics
+            const categories = new Set(currentMetrics.map(m => m.category));
+            categories.add('All'); // Always include 'All' option
+
+            // Clear existing options except the first one
+            dropdown.innerHTML = '';
+
+            // Add 'All' first
+            const allOption = document.createElement('option');
+            allOption.value = 'All';
+            allOption.textContent = 'All Categories';
+            dropdown.appendChild(allOption);
+
+            // Add category options
+            Array.from(categories).sort().forEach(category => {
+                if (category !== 'All') {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    dropdown.appendChild(option);
+                }
+            });
+
+            // Restore previous selection if it still exists
+            if (Array.from(categories).includes(currentSelection)) {
+                dropdown.value = currentSelection;
+            } else {
+                dropdown.value = 'All';
+                currentCategory = 'All';
+            }
+        }
+
+        // Render controls for current category
+        function renderControls() {
+            const grid = document.getElementById('controlsGrid');
+            grid.innerHTML = '';
+
+            if (!currentMetrics || currentMetrics.length === 0) return;
+
+            const filteredMetrics = currentCategory === 'All'
+                ? currentMetrics
+                : currentMetrics.filter(m => m.category === currentCategory);
+
+            filteredMetrics.forEach(metric => {
+                const control = createControlFromMetric(metric);
+                if (control) {
+                    grid.appendChild(control);
+                }
+            });
+        }
+
+        // Create a control element based on metric
+        function createControlFromMetric(metric) {
+            const card = document.createElement('div');
+            card.className = 'control-card';
+
+            const title = document.createElement('div');
+            title.className = 'control-title';
+            title.textContent = metric.name;
+
+            const description = document.createElement('div');
+            description.className = 'control-description';
+            description.textContent = metric.description;
+
+            card.appendChild(title);
+            card.appendChild(description);
+
+            const visual = createVisualElementFromMetric(metric);
+            if (visual) {
+                card.appendChild(visual);
+            }
+
+            return card;
+        }
+
+        // Create visual element based on type
+        function createVisualElementFromMetric(metric) {
+            switch (metric.visualType) {
+                case 'SpeedDial':
+                    return createSpeedDial(metric);
+                case 'ProgressBar':
+                    return createProgressBar(metric);
+                case 'Counter':
+                    return createCounter(metric);
+                case 'TrafficLight':
+                    return createTrafficLight(metric);
+                case 'LineChart':
+                    return createLineChart(metric);
+                case 'Badge':
+                    return createBadge(metric);
+                case 'NumericDisplay':
+                    return createNumericDisplay(metric);
+                default:
+                    return null;
+            }
+        }
+
+        // Create speed dial
+        function createSpeedDial(metric) {
+            const container = document.createElement('div');
+            container.className = 'speed-dial';
+
+            const circle = document.createElement('div');
+            circle.className = 'speed-dial-circle';
+
+            const center = document.createElement('div');
+            center.className = 'speed-dial-center';
+            center.textContent = `${getValue(metric)}${metric.unit}`;
+
+            const indicator = document.createElement('div');
+            indicator.className = 'speed-dial-indicator';
+            const value = getNumericValue(metric);
+            const angle = (Math.min(value, 100) / 100) * 360 - 90;
+            indicator.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+
+            // Update color based on thresholds
+            let gradient;
+            if (metric.criticalThreshold && value >= metric.criticalThreshold) {
+                gradient = 'conic-gradient(#dc3545 0% 100%)';
+            } else if (metric.warningThreshold && value >= metric.warningThreshold) {
+                gradient = 'conic-gradient(#ffc107 0% 100%)';
+            } else {
+                gradient = 'conic-gradient(#28a745 0% 100%)';
+            }
+            circle.style.background = gradient;
+
+            circle.appendChild(center);
+            circle.appendChild(indicator);
+            container.appendChild(circle);
+
+            return container;
+        }
+
+        // Create progress bar
+        function createProgressBar(metric) {
+            const container = document.createElement('div');
+            container.className = 'progress-bar-container';
+
+            const fill = document.createElement('div');
+            fill.className = 'progress-bar-fill';
+            const value = getNumericValue(metric);
+            const percentage = metric.unit === '%' ? Math.min(value, 100) : Math.min((value / 100) * 100, 100);
+            fill.style.width = `${percentage}%`;
+
+            // Update color based on thresholds
+            if (metric.criticalThreshold && value >= metric.criticalThreshold) {
+                fill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)';
+            } else if (metric.warningThreshold && value >= metric.warningThreshold) {
+                fill.style.background = 'linear-gradient(90deg, #ffc107, #fd7e14)';
+            } else {
+                fill.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+            }
+
+            container.appendChild(fill);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'control-overlay';
+            overlay.textContent = `${value}${metric.unit}`;
+            container.appendChild(overlay);
+
+            return container;
+        }
+
+        // Create counter
+        function createCounter(metric) {
+            const counter = document.createElement('div');
+            counter.className = 'counter';
+            counter.textContent = getValue(metric);
+
+            return counter;
+        }
+
+        // Create traffic light
+        function createTrafficLight(metric) {
+            const light = document.createElement('div');
+            light.className = 'traffic-light';
+
+            const state = getTrafficLightState(metric);
+            const bulbs = ['red', 'yellow', 'green'];
+
+            bulbs.forEach(color => {
+                const bulb = document.createElement('div');
+                bulb.className = `traffic-light-bulb ${color}`;
+                if (state === color) {
+                    bulb.classList.add('active');
+                }
+                light.appendChild(bulb);
+            });
+
+            return light;
+        }
+
+        // Create line chart placeholder
+        function createLineChart(metric) {
+            const container = document.createElement('div');
+            container.className = 'line-chart-container';
+
+            // Simple bar chart representation
+            const history = getHistory(metric);
+            if (history && history.length > 0) {
+                const bars = history.slice(-8); // Last 8 points
+                const maxValue = Math.max(...bars.map(h => h.value));
+
+                bars.forEach((point, index) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'trend-bar';
+                    const height = maxValue > 0 ? (point.value / maxValue) * 100 : 0;
+                    bar.style.height = `${height}%`;
+                    bar.style.left = `${index * 12.5}%`;
+
+                    // Color based on thresholds
+                    if (metric.criticalThreshold && point.value >= metric.criticalThreshold) {
+                        bar.style.background = 'linear-gradient(to top, #dc3545, #c82333)';
+                    } else if (metric.warningThreshold && point.value >= metric.warningThreshold) {
+                        bar.style.background = 'linear-gradient(to top, #ffc107, #fd7e14)';
+                    } else {
+                        bar.style.background = 'linear-gradient(to top, #28a745, #20c997)';
+                    }
+
+                    container.appendChild(bar);
+                });
+            }
+
+            return container;
+        }
+
+        // Create badge
+        function createBadge(metric) {
+            const badge = document.createElement('div');
+            badge.className = 'badge';
+
+            const value = getNumericValue(metric);
+            badge.textContent = value;
+
+            // Update color based on thresholds
+            if (metric.criticalThreshold && value >= metric.criticalThreshold) {
+                badge.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
+            } else if (metric.warningThreshold && value >= metric.warningThreshold) {
+                badge.style.background = 'linear-gradient(45deg, #ffc107, #fd7e14)';
+            } else {
+                badge.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+            }
+
+            return badge;
+        }
+
+        // Create numeric display
+        function createNumericDisplay(metric) {
+            const display = document.createElement('div');
+            display.className = 'numeric-display';
+            display.textContent = `${getValue(metric)} ${metric.unit}`;
+
+            return display;
+        }
+
+        // Helper functions
+        function getValue(metric) {
+            return metric.value;
+        }
+
+        function getNumericValue(metric) {
+            const value = getValue(metric);
+            return typeof value === 'number' ? value : parseFloat(value) || 0;
+        }
+
+        function getHistory(metric) {
+            return metric.history || null;
+        }
+
+        function getTrafficLightState(metric) {
+            const value = getValue(metric);
+            if (metric.id.includes('status') || metric.id.includes('websocket') || metric.id.includes('refresh-status')) {
+                return value > 0 ? 'green' : 'red';
+            }
+            return 'yellow'; // Default
+        }
+
         // Get brain name from URL parameters
         function getBrainName() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -537,9 +854,6 @@
             const brainName = getBrainName();
             document.getElementById('brainName').textContent = brainName;
             document.title = `Brain Details: ${brainName} - Backlash Bot Dashboard`;
-
-            // Start dynamic updates
-            startDynamicUpdates();
         }
 
         // Go back to dashboard
@@ -547,283 +861,37 @@
             window.location.href = 'marketwatch.html';
         }
 
+        // Category change handler
+        function onCategoryChange() {
+            currentCategory = document.getElementById('metricCategory').value;
+            renderControls();
+        }
 
-        // Dynamic update functions
-        function updateSpeedDial() {
-            const percentage = Math.floor(Math.random() * 100);
-            const overlay = document.querySelector('.control-card:nth-child(1) .control-overlay');
-            const indicator = document.querySelector('.speed-dial-indicator');
-
-            if (overlay) {
-                overlay.textContent = percentage + '%';
-            }
-
-            // Position indicator based on percentage (rotate around the circle)
-            if (indicator) {
-                const angle = (percentage / 100) * 360 - 90; // -90 to start at top
-                indicator.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-            }
-
-            // Update color based on percentage with smooth transitions
-            const dialCircle = document.querySelector('.speed-dial-circle');
-            if (dialCircle) {
-                let gradient;
-                if (percentage < 50) {
-                    // Green to yellow transition
-                    gradient = `conic-gradient(#28a745 0% ${percentage}%, #ffc107 ${percentage}% 75%, #dc3545 75% 100%)`;
-                } else if (percentage < 75) {
-                    // Yellow to red transition
-                    gradient = `conic-gradient(#28a745 0% 50%, #ffc107 50% ${percentage}%, #dc3545 ${percentage}% 100%)`;
-                } else {
-                    // Mostly red
-                    gradient = `conic-gradient(#28a745 0% 50%, #ffc107 50% 75%, #dc3545 75% ${percentage}%)`;
+        // Fetch initial brain data
+        async function fetchBrainData() {
+            try {
+                const response = await fetch('/MarketWatch/brains');
+                const brains = await response.json();
+                const brainName = getBrainName();
+                const brain = brains.find(b => b.brainInstanceName === brainName);
+                if (brain) {
+                    currentBrainData = brain;
+                    createMetricsFromData();
+                    updateCategoryDropdown();
+                    renderControls();
                 }
-                dialCircle.style.background = gradient;
+            } catch (error) {
+                console.error('Failed to fetch brain data:', error);
             }
-        }
-
-        function updateProgressBar() {
-            const percentage = Math.floor(Math.random() * 100);
-            const progressFill = document.querySelector('.progress-bar-fill');
-            const overlay = document.querySelector('.control-card:nth-child(2) .control-overlay');
-
-            if (progressFill) {
-                // Smooth transition
-                progressFill.style.transition = 'width 1s ease-in-out';
-                progressFill.style.width = percentage + '%';
-            }
-            if (overlay) {
-                overlay.textContent = percentage + '%';
-            }
-        }
-
-        function updateCounter() {
-            const count = Math.floor(Math.random() * 2000) + 100;
-            const overlay = document.querySelector('.control-card:nth-child(3) .control-overlay');
-            if (overlay) {
-                // Animate the counter
-                animateCounter(overlay, parseInt(overlay.textContent.replace(',', '')), count);
-            }
-        }
-
-        function animateCounter(element, from, to) {
-            const duration = 1000; // 1 second
-            const start = Date.now();
-            const step = () => {
-                const now = Date.now();
-                const progress = Math.min((now - start) / duration, 1);
-                const current = Math.floor(from + (to - from) * progress);
-                element.textContent = current.toLocaleString();
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                }
-            };
-            requestAnimationFrame(step);
-        }
-
-        function updateTrafficLight() {
-            const bulbs = document.querySelectorAll('.traffic-light-bulb');
-            const overlay = document.querySelector('.control-card:nth-child(4) .control-overlay');
-
-            bulbs.forEach(bulb => bulb.classList.remove('active'));
-
-            const randomIndex = Math.floor(Math.random() * bulbs.length);
-            bulbs[randomIndex].classList.add('active');
-
-            // Update overlay text based on active bulb
-            if (overlay) {
-                const statusText = randomIndex === 0 ? 'BAD' : randomIndex === 1 ? 'WARNING' : 'GOOD';
-                overlay.textContent = statusText;
-            }
-        }
-
-        function updatePieChart() {
-            const percentage1 = Math.floor(Math.random() * 40) + 20; // 20-60%
-            const percentage2 = Math.floor(Math.random() * 30) + 20; // 20-50%
-            const percentage3 = 100 - percentage1 - percentage2; // Remainder
-
-            const pieChart = document.querySelector('.pie-chart');
-            const overlay = document.querySelector('.control-card:nth-child(5) .control-overlay');
-
-            if (pieChart) {
-                const gradient = `conic-gradient(
-                    #28a745 0% ${percentage1}%,
-                    #20c997 ${percentage1}% ${percentage1 + percentage2}%,
-                    #17a2b8 ${percentage1 + percentage2}% 100%
-                )`;
-                pieChart.style.background = gradient;
-            }
-
-            if (overlay) {
-                overlay.textContent = `CPU\n${percentage1}%`;
-            }
-        }
-
-        function updateNumericDisplay() {
-            const value = (Math.random() * 100 + 10).toFixed(1);
-            const overlay = document.querySelector('.control-card:nth-child(6) .control-overlay');
-            const responseFill = document.querySelector('.control-card:nth-child(6) .response-fill');
-
-            if (overlay) {
-                overlay.textContent = value + ' ms';
-            }
-
-            // Update response bar based on value (lower is better)
-            if (responseFill) {
-                const percentage = Math.max(0, Math.min(100, (100 - value))); // Invert so lower values = higher fill
-                responseFill.style.width = percentage + '%';
-
-                // Change color based on performance
-                if (value < 30) {
-                    responseFill.style.background = 'linear-gradient(90deg, #28a745, #20c997)'; // Good
-                } else if (value < 60) {
-                    responseFill.style.background = 'linear-gradient(90deg, #ffc107, #fd7e14)'; // Warning
-                } else {
-                    responseFill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)'; // Bad
-                }
-            }
-        }
-
-        function updateBadge() {
-            const count = Math.floor(Math.random() * 15); // 0-14 errors
-            const badge = document.querySelector('.control-card:nth-child(7) .badge span');
-            const badgeElement = document.querySelector('.control-card:nth-child(7) .badge');
-
-            if (badge) {
-                badge.textContent = count;
-            }
-
-            // Update badge color based on error count threshold
-            if (badgeElement) {
-                if (count > 5) {
-                    // Red for high error count (>5)
-                    badgeElement.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
-                } else {
-                    // Green for low error count (0-5)
-                    badgeElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
-                }
-            }
-        }
-
-        function updateLineChart() {
-            const bars = document.querySelectorAll('.trend-bar');
-
-            bars.forEach((bar, index) => {
-                // Shift all bars left and add new value at the end
-                if (index < bars.length - 1) {
-                    const nextBar = bars[index + 1];
-                    const nextHeight = parseFloat(nextBar.style.height) || 50;
-                    bar.style.height = nextHeight + '%';
-
-                    // Update color based on the height value
-                    updateBarColor(bar, nextHeight);
-                } else {
-                    // Add new random value for the last bar
-                    const newValue = Math.floor(Math.random() * 80) + 20; // 20-100%
-                    bar.style.height = newValue + '%';
-
-                    // Update color based on the new value
-                    updateBarColor(bar, newValue);
-                }
-            });
-        }
-
-        function updateBarColor(bar, value) {
-            if (value < 50) {
-                bar.style.background = 'linear-gradient(to top, #28a745, #20c997)'; // Green for low usage
-            } else if (value < 75) {
-                bar.style.background = 'linear-gradient(to top, #ffc107, #fd7e14)'; // Yellow for medium usage
-            } else {
-                bar.style.background = 'linear-gradient(to top, #dc3545, #c82333)'; // Red for high usage
-            }
-        }
-
-        function updateDataGrid() {
-            const rows = document.querySelectorAll('.data-grid tbody tr');
-
-            rows.forEach((row, index) => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    if (index === 0) { // CPU
-                        const cpuValue = Math.floor(Math.random() * 100) + '%';
-                        cells[1].textContent = cpuValue;
-                        // Update status color
-                        if (parseInt(cpuValue) < 70) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseInt(cpuValue) < 90) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    } else if (index === 1) { // Memory
-                        const gb = (Math.random() * 4 + 1).toFixed(1);
-                        const memValue = gb + ' GB';
-                        cells[1].textContent = memValue;
-                        // Update status color
-                        if (parseFloat(gb) < 2.5) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseFloat(gb) < 3.5) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    } else if (index === 2) { // Disk
-                        const diskValue = Math.floor(Math.random() * 100) + '%';
-                        cells[1].textContent = diskValue;
-                        // Update status color
-                        if (parseInt(diskValue) < 70) {
-                            cells[2].textContent = 'Normal';
-                            cells[2].style.color = '#28a745';
-                        } else if (parseInt(diskValue) < 90) {
-                            cells[2].textContent = 'Warning';
-                            cells[2].style.color = '#ffc107';
-                        } else {
-                            cells[2].textContent = 'High';
-                            cells[2].style.color = '#dc3545';
-                        }
-                    }
-                }
-            });
-        }
-
-        // Start dynamic updates
-        function startDynamicUpdates() {
-            // Update all controls immediately
-            updateAllControls();
-
-            // Set up intervals for different update frequencies
-            setInterval(updateSpeedDial, 2000); // Every 2 seconds
-            setInterval(updateProgressBar, 3000); // Every 3 seconds
-            setInterval(updateCounter, 4000); // Every 4 seconds
-            setInterval(updateTrafficLight, 5000); // Every 5 seconds
-            setInterval(updatePieChart, 3500); // Every 3.5 seconds
-            setInterval(updateNumericDisplay, 2500); // Every 2.5 seconds
-            setInterval(updateBadge, 6000); // Every 6 seconds
-            setInterval(updateLineChart, 4500); // Every 4.5 seconds
-            setInterval(updateDataGrid, 5500); // Every 5.5 seconds
-        }
-
-        // Update all controls at once
-        function updateAllControls() {
-            updateSpeedDial();
-            updateProgressBar();
-            updateCounter();
-            updateTrafficLight();
-            updatePieChart();
-            updateNumericDisplay();
-            updateBadge();
-            updateLineChart();
-            updateDataGrid();
         }
 
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initPage);
+        document.addEventListener('DOMContentLoaded', async function() {
+            initPage();
+            await initSignalR();
+            await fetchBrainData();
+            document.getElementById('metricCategory').addEventListener('change', onCategoryChange);
+        });
     </script>
 </body>
 </html>

@@ -14,7 +14,7 @@ namespace TradingGUI.Configuration
         public const string SectionName = "GUI:SnapshotViewer";
 
         /// <summary>
-        /// Factor by which to zoom in when scrolling up (values < 1.0 zoom in).
+        /// Factor by which to zoom in when scrolling up (values less than 1.0 zoom in).
         /// Smaller values result in faster zooming.
         /// </summary>
         [Required(ErrorMessage = "The 'ZoomInFactor' is missing in the configuration.")]

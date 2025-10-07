@@ -1,10 +1,9 @@
 using BacklashBot.Configuration;
 using BacklashBot.Hubs;
-using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
-using BacklashCommon.Configuration;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.AspNetCore.SignalR;
@@ -24,20 +23,20 @@ namespace BacklashBot.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IScopeManagerService> _logger;
-        private IServiceScope? _scope;
+        private IServiceScope _scope;
 
         // Performance metrics fields
         private int _initializeScopeCallCount = 0;
         private int _createScopeCallCount = 0;
         private DateTime? _scopeCreationTime;
         private System.Timers.Timer? _metricsTimer;
-        private readonly ICentralPerformanceMonitor _monitor;
+        private readonly IPerformanceMonitor _monitor;
         private readonly bool _enableMetrics;
 
         /// <summary>
         /// Gets the current active service scope, or null if no scope has been initialized.
         /// </summary>
-        public IServiceScope? Scope => _scope;
+        public IServiceScope Scope => _scope;
 
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording service operations.</param>
         /// <param name="monitor">The central performance monitor for posting metrics.</param>
         /// <param name="configOptions">The configuration options for KalshiBotScopeManagerService settings.</param>
-        public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, ICentralPerformanceMonitor monitor, IOptions<KalshiBotScopeManagerServiceConfig> configOptions)
+        public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, IPerformanceMonitor monitor, IOptions<KalshiBotScopeManagerServiceConfig> configOptions)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -107,7 +106,7 @@ namespace BacklashBot.Services
             {
                 stopwatch?.Stop();
                 _logger.LogInformation($"InitializeScope execution time: {stopwatch?.ElapsedMilliseconds} ms");
-                _monitor.RecordExecutionTime("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0, _enableMetrics);
+                RecordExecutionTimePrivate("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0, _enableMetrics);
                 _initializeScopeCallCount++;
                 _scopeCreationTime = DateTime.UtcNow;
             }
@@ -149,7 +148,7 @@ namespace BacklashBot.Services
             {
                 var lifetime = DateTime.UtcNow - _scopeCreationTime.Value;
                 _logger.LogInformation($"Managed scope lifetime: {lifetime.TotalMilliseconds} ms");
-                _monitor.RecordExecutionTime("ScopeLifetime", (long)lifetime.TotalMilliseconds, _enableMetrics);
+                RecordExecutionTimePrivate("ScopeLifetime", (long)lifetime.TotalMilliseconds, _enableMetrics);
                 _scopeCreationTime = null;
             }
             _scope?.Dispose();
@@ -157,6 +156,29 @@ namespace BacklashBot.Services
             if (_enableMetrics)
             {
                 _metricsTimer?.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "KalshiBotScopeManagerService";
+            string category = "ScopeManagement";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _monitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category);
+            }
+            else
+            {
+                // Record actual metric
+                _monitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null);
             }
         }
 

@@ -1,5 +1,7 @@
+using BacklashBot.Configuration;
 using BacklashBot.State.Interfaces;
-using System.Diagnostics.Metrics;
+using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.State
 {
@@ -21,6 +23,29 @@ namespace BacklashBot.State
     public class KalshiBotStatusTracker : IStatusTrackerService, IAsyncDisposable
     {
         /// <summary>
+        /// Enum representing the brain mode of the bot.
+        /// </summary>
+        public enum BrainMode
+        {
+            /// <summary>
+            /// Autonomous mode: bot operates independently and subscribes to all channels.
+            /// </summary>
+            Autonomous,
+            /// <summary>
+            /// Servant mode: bot is controlled by an overseer and skips non-market-specific channels.
+            /// </summary>
+            Servant
+        }
+        /// <summary>
+        /// Gets the current brain mode of the bot.
+        /// </summary>
+        public BrainMode CurrentBrainMode { get; private set; } = BrainMode.Autonomous;
+
+        /// <summary>
+        /// Event raised when the brain mode changes.
+        /// </summary>
+        public event EventHandler<BrainMode>? BrainModeChanged;
+        /// <summary>
         /// The global CancellationTokenSource used to coordinate cancellation across all bot components.
         /// </summary>
         private CancellationTokenSource _globalCancellationTokenSource = new();
@@ -31,10 +56,9 @@ namespace BacklashBot.State
         private readonly object _lock = new();
 
         private readonly ILogger<KalshiBotStatusTracker> _logger;
-        private readonly Meter _meter;
-        private readonly Counter<long> _cancellationOperations;
-        private readonly Counter<long> _resetOperations;
-        private readonly Histogram<double> _operationTiming;
+        private IPerformanceMonitor? _performanceMonitor;
+        private readonly IOptions<KalshiBotStatusTrackerConfig> _config;
+        private readonly bool _enablePerformanceMetrics;
 
         private DateTime _lastCancellationTime = DateTime.MinValue;
         private int _cancellationCount = 0;
@@ -44,17 +68,43 @@ namespace BacklashBot.State
         /// Creates the initial CancellationTokenSource and sets up the cancellation state.
         /// </summary>
         /// <param name="logger">The logger for tracking cancellation operations.</param>
-        public KalshiBotStatusTracker(ILogger<KalshiBotStatusTracker> logger)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        /// <param name="config">Configuration options for the KalshiBotStatusTracker.</param>
+        public KalshiBotStatusTracker(
+            ILogger<KalshiBotStatusTracker> logger,
+            IPerformanceMonitor? performanceMonitor,
+            IOptions<KalshiBotStatusTrackerConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _performanceMonitor = performanceMonitor;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
 
-            // Initialize metrics
-            _meter = new Meter("KalshiBot.StatusTracker");
-            _cancellationOperations = _meter.CreateCounter<long>("cancellation_operations", "count", "Number of cancellation operations");
-            _resetOperations = _meter.CreateCounter<long>("reset_operations", "count", "Number of reset operations");
-            _operationTiming = _meter.CreateHistogram<double>("operation_timing", "ms", "Time taken for operations");
+            _enablePerformanceMetrics = _config.Value.EnablePerformanceMetrics;
 
-            _logger.LogInformation("KalshiBotStatusTracker initialized");
+            _logger.LogInformation("KalshiBotStatusTracker initialized with EnablePerformanceMetrics={EnablePerformanceMetrics}", _enablePerformanceMetrics);
+        }
+        /// <summary>
+        /// Sets the brain mode based on overseer connection status.
+        /// </summary>
+        /// <param name="connected">True if connected to overseer, false otherwise.</param>
+        public void SetOverseerConnected(bool connected)
+        {
+            var oldMode = CurrentBrainMode;
+            CurrentBrainMode = connected ? BrainMode.Servant : BrainMode.Autonomous;
+            _logger.LogInformation("BrainMode updated to {Mode} due to overseer connection change: {Connected}", CurrentBrainMode, connected);
+            if (oldMode != CurrentBrainMode)
+            {
+                BrainModeChanged?.Invoke(this, CurrentBrainMode);
+            }
+        }
+
+        /// <summary>
+        /// Sets the performance monitor for recording metrics.
+        /// </summary>
+        /// <param name="performanceMonitor">The performance monitor instance.</param>
+        public void SetPerformanceMonitor(IPerformanceMonitor performanceMonitor)
+        {
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -102,8 +152,26 @@ namespace BacklashBot.State
                     _cancellationCount++;
 
                     var timing = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    _operationTiming.Record(timing, new KeyValuePair<string, object?>("operation", "cancel"));
-                    _cancellationOperations.Add(1);
+
+                    // Record cancellation timing metric
+                    if (!_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker");
+                    }
+                    else
+                    {
+                        _performanceMonitor?.RecordSpeedDialMetric("KalshiBotStatusTracker", "CancellationTiming", "Cancellation Timing", "Time taken for cancellation operation", timing, "ms", "StatusTracker", null, 1000, 5000);
+                    }
+
+                    // Record cancellation operations metric
+                    if (!_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker");
+                    }
+                    else
+                    {
+                        _performanceMonitor?.RecordCounterMetric("KalshiBotStatusTracker", "CancellationOperations", "Cancellation Operations", "Number of cancellation operations", 1, "count", "StatusTracker");
+                    }
 
                     _logger.LogInformation("All operations cancelled successfully. Total cancellations: {Count}, timing: {Timing}ms",
                         _cancellationCount, timing);
@@ -148,8 +216,26 @@ namespace BacklashBot.State
                     _cancellationCount = 0;
 
                     var timing = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    _operationTiming.Record(timing, new KeyValuePair<string, object?>("operation", "reset"));
-                    _resetOperations.Add(1);
+
+                    // Record reset timing metric
+                    if (!_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker");
+                    }
+                    else
+                    {
+                        _performanceMonitor?.RecordSpeedDialMetric("KalshiBotStatusTracker", "ResetTiming", "Reset Timing", "Time taken for reset operation", timing, "ms", "StatusTracker", null, 500, 2000);
+                    }
+
+                    // Record reset operations metric
+                    if (!_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor?.RecordDisabledMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker");
+                    }
+                    else
+                    {
+                        _performanceMonitor?.RecordCounterMetric("KalshiBotStatusTracker", "ResetOperations", "Reset Operations", "Number of reset operations", 1, "count", "StatusTracker");
+                    }
 
                     _logger.LogInformation("Cancellation state reset successfully, timing: {Timing}ms", timing);
                 }
@@ -192,7 +278,6 @@ namespace BacklashBot.State
                 }
             }
 
-            _meter.Dispose();
             _logger.LogInformation("KalshiBotStatusTracker disposed successfully");
         }
 

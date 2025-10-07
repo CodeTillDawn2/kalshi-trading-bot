@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
-namespace KalshiBotData.Data
+namespace BacklashBotData.Data
 {
     /// <summary>
     /// Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
@@ -39,9 +39,9 @@ namespace KalshiBotData.Data
         private readonly ILogger<ISqlDataService> _logger;
 
         /// <summary>
-        /// Collection of performance metrics receivers that will receive metrics automatically.
+        /// Performance monitor for recording metrics.
         /// </summary>
-        private readonly IEnumerable<ISqlDataServicePerformanceMetrics> _performanceMetricsReceivers;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Thread-safe queue for order book data operations awaiting database persistence.
@@ -52,6 +52,11 @@ namespace KalshiBotData.Data
         /// Thread-safe queue for trade data operations awaiting database persistence.
         /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _tradeQueue;
+
+        /// <summary>
+        /// Thread-safe queue for ticker data operations awaiting database persistence.
+        /// </summary>
+        private readonly ConcurrentQueue<DatabaseOperation> _tickerQueue;
 
         /// <summary>
         /// Thread-safe queue for fill data operations awaiting database persistence.
@@ -140,9 +145,9 @@ namespace KalshiBotData.Data
         /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
         /// <param name="dataConfig">Configuration options for data service operations.</param>
-        /// <param name="performanceMetricsReceivers">Collection of services that will receive performance metrics automatically.</param>
+        /// <param name="performanceMonitor">Performance monitor for recording metrics.</param>
         public SqlDataService(string connectionString, ILogger<ISqlDataService> logger, BacklashBotDataConfig dataConfig,
-                              IEnumerable<ISqlDataServicePerformanceMetrics> performanceMetricsReceivers)
+                              IPerformanceMonitor performanceMonitor)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
@@ -159,8 +164,8 @@ namespace KalshiBotData.Data
             }
 
             _logger = logger;
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _startTime = DateTime.UtcNow;
-            _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
             _retryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
@@ -171,6 +176,7 @@ namespace KalshiBotData.Data
 
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();
+            _tickerQueue = new ConcurrentQueue<DatabaseOperation>();
             _fillQueue = new ConcurrentQueue<DatabaseOperation>();
             _eventLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
             _marketLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
@@ -182,6 +188,7 @@ namespace KalshiBotData.Data
             {
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_orderBookQueue, "order_book", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_tradeQueue, "trade", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_tickerQueue, "ticker", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_fillQueue, "fill", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_eventLifecycleQueue, "event_lifecycle", _cts.Token)));
                 workerTasks.Add(Task.Run(() => ProcessQueueAsync(_marketLifecycleQueue, "market_lifecycle", _cts.Token)));
@@ -439,13 +446,13 @@ namespace KalshiBotData.Data
             var marketTicker = marketTickerProp.GetString()!;
 
             // Queue size check
-            if (_tradeQueue.Count >= _maxQueueSize)
+            if (_tickerQueue.Count >= _maxQueueSize)
             {
-                _logger.LogWarning("Trade queue at max capacity ({MaxSize}), dropping ticker operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                _logger.LogWarning("Ticker queue at max capacity ({MaxSize}), dropping ticker operation for {MarketTicker}", _maxQueueSize, marketTicker);
                 return Task.CompletedTask;
             }
 
-            _tradeQueue.Enqueue(new DatabaseOperation
+            _tickerQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Ticker",
                 Identifier = marketTicker,
@@ -499,6 +506,15 @@ namespace KalshiBotData.Data
             }
 
             var marketTicker = marketTickerProp.GetString()!;
+            var yesPrice = msg.GetProperty("yes_price").GetInt32();
+            var noPrice = msg.GetProperty("no_price").GetInt32();
+            var count = msg.GetProperty("count").GetInt32();
+            var takerSide = msg.GetProperty("taker_side").GetString();
+            var ts = msg.GetProperty("ts").GetInt64();
+
+            // Log trade details for duplicate detection
+            _logger.LogInformation("Enqueuing trade for {MarketTicker}: yes_price={YesPrice}, no_price={NoPrice}, count={Count}, taker_side={TakerSide}, ts={Ts}",
+                marketTicker, yesPrice, noPrice, count, takerSide, ts);
 
             // Queue size check
             if (_tradeQueue.Count >= _maxQueueSize)
@@ -515,11 +531,11 @@ namespace KalshiBotData.Data
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
-                    cmd.Parameters.AddWithValue("@yes_price", msg.GetProperty("yes_price").GetInt32());
-                    cmd.Parameters.AddWithValue("@no_price", msg.GetProperty("no_price").GetInt32());
-                    cmd.Parameters.AddWithValue("@count", msg.GetProperty("count").GetInt32());
-                    cmd.Parameters.AddWithValue("@taker_side", msg.GetProperty("taker_side").GetString());
-                    cmd.Parameters.AddWithValue("@ts", msg.GetProperty("ts").GetInt64());
+                    cmd.Parameters.AddWithValue("@yes_price", yesPrice);
+                    cmd.Parameters.AddWithValue("@no_price", noPrice);
+                    cmd.Parameters.AddWithValue("@count", count);
+                    cmd.Parameters.AddWithValue("@taker_side", takerSide);
+                    cmd.Parameters.AddWithValue("@ts", ts);
                     cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
                 }
             });
@@ -754,6 +770,11 @@ namespace KalshiBotData.Data
         public int TradeQueueDepth => _tradeQueue.Count;
 
         /// <summary>
+        /// Gets the current depth of the ticker queue.
+        /// </summary>
+        public int TickerQueueDepth => _tickerQueue.Count;
+
+        /// <summary>
         /// Gets the current depth of the fill queue.
         /// </summary>
         public int FillQueueDepth => _fillQueue.Count;
@@ -784,7 +805,7 @@ namespace KalshiBotData.Data
         /// Gets the total number of queued operations across all queues.
         /// </summary>
         public int TotalQueuedOperations =>
-            _orderBookQueue.Count + _tradeQueue.Count + _fillQueue.Count +
+            _orderBookQueue.Count + _tradeQueue.Count + _tickerQueue.Count + _fillQueue.Count +
             _eventLifecycleQueue.Count + _marketLifecycleQueue.Count;
 
         /// <summary>
@@ -853,41 +874,6 @@ namespace KalshiBotData.Data
                 {
                     return 0;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Broadcasts current performance metrics to all registered receivers.
-        /// Only sends metrics if performance monitoring is enabled.
-        /// </summary>
-        private void BroadcastPerformanceMetrics()
-        {
-            if (!_enablePerformanceMetrics || !_performanceMetricsReceivers.Any())
-                return;
-
-            try
-            {
-                foreach (var receiver in _performanceMetricsReceivers)
-                {
-                    try
-                    {
-                        receiver.ReceiveThroughputMetrics(OperationsPerSecond, _totalProcessed, _totalFailed);
-                        receiver.ReceiveLatencyMetrics(AverageLatencyMs, _latencySampleCount);
-                        receiver.ReceiveResourceMetrics(CpuUsage, MemoryUsageMB);
-                        receiver.ReceiveQueueMetrics(OrderBookQueueDepth, TradeQueueDepth, FillQueueDepth,
-                                                   EventLifecycleQueueDepth, MarketLifecycleQueueDepth, TotalQueuedOperations);
-                        receiver.ReceiveSuccessRateMetrics(SuccessRate);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to send performance metrics to receiver {ReceiverType}",
-                            receiver.GetType().Name);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error broadcasting performance metrics");
             }
         }
 
@@ -981,12 +967,23 @@ namespace KalshiBotData.Data
                             }
                             catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                if (operationName == "trade")
+                                {
+                                    _logger.LogWarning("Duplicate trade insert attempted for {MarketTicker}: {Identifier}. This indicates a trade was processed multiple times.", operation.Identifier, operation.Identifier);
+                                }
+                                else if (operationName == "ticker")
+                                {
+                                    _logger.LogWarning("Duplicate ticker insert attempted for {MarketTicker}: {Identifier}. This indicates a ticker was processed multiple times.", operation.Identifier, operation.Identifier);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                }
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(ex, "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {SqlError}", operationName, operation.Identifier, ex.Message);
+                                _logger.LogWarning("Deadlock occurred for {OperationName}: {Identifier}. SQL error: {SqlError}", operationName, operation.Identifier, ex.Message);
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (Exception ex)
@@ -999,15 +996,182 @@ namespace KalshiBotData.Data
                     stopwatch.Stop();
                     _logger.LogInformation("Processed batch of {Count} {OperationName} operations in {ElapsedMs}ms", operations.Count, operationName, stopwatch.ElapsedMilliseconds);
 
-                    // Log metrics periodically
+                    // Transmit performance metrics to the injected monitor
+                    if (_enablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric(
+                            className: "SqlDataService",
+                            id: $"{operationName}_BatchProcessingTime",
+                            name: $"{operationName} Batch Processing Time",
+                            description: $"Time to process a batch of {operations.Count} {operationName} operations",
+                            value: stopwatch.ElapsedMilliseconds,
+                            unit: "ms",
+                            category: "Database"
+                        );
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric(
+                            className: "SqlDataService",
+                            id: $"{operationName}_Batch",
+                            name: $"{operationName} Batch",
+                            description: $"Disabled metric for {operationName} batch processing",
+                            value: stopwatch.ElapsedMilliseconds,
+                            unit: "ms",
+                            category: "Database"
+                        );
+                    }
+
+                    // Log metrics periodically and record to performance monitor
                     if ((DateTime.UtcNow - lastMetricsLog).TotalMinutes >= 1)
                     {
                         _logger.LogInformation("Metrics - {OperationName}: Processed: {Processed}, Failed: {Failed}, Queue Depth: {Depth}",
                             operationName, Interlocked.Read(ref _totalProcessed), Interlocked.Read(ref _totalFailed), queue.Count);
                         lastMetricsLog = DateTime.UtcNow;
 
-                        // Broadcast performance metrics to registered receivers
-                        BroadcastPerformanceMetrics();
+                        // Record comprehensive metrics to performance monitor
+                        if (_enablePerformanceMetrics)
+                        {
+                            // Counters for processed/failed operations
+                            _performanceMonitor.RecordCounterMetric(
+                                className: "SqlDataService",
+                                id: "TotalProcessed",
+                                name: "Total Operations Processed",
+                                description: "Total number of database operations processed successfully",
+                                value: _totalProcessed,
+                                unit: "count",
+                                category: "Database"
+                            );
+
+                            _performanceMonitor.RecordCounterMetric(
+                                className: "SqlDataService",
+                                id: "TotalFailed",
+                                name: "Total Operations Failed",
+                                description: "Total number of database operations that failed",
+                                value: _totalFailed,
+                                unit: "count",
+                                category: "Database"
+                            );
+
+                            // Progress bar for success rate
+                            _performanceMonitor.RecordProgressBarMetric(
+                                className: "SqlDataService",
+                                id: "SuccessRate",
+                                name: "Success Rate",
+                                description: "Percentage of operations that completed successfully",
+                                value: SuccessRate,
+                                unit: "%",
+                                category: "Database",
+                                minThreshold: 95,
+                                warningThreshold: 90,
+                                criticalThreshold: 80
+                            );
+
+                            // Speed dials for throughput and latency
+                            _performanceMonitor.RecordSpeedDialMetric(
+                                className: "SqlDataService",
+                                id: "OperationsPerSecond",
+                                name: "Operations Per Second",
+                                description: "Database operations processed per second",
+                                value: OperationsPerSecond,
+                                unit: "ops/sec",
+                                category: "Database"
+                            );
+
+                            _performanceMonitor.RecordSpeedDialMetric(
+                                className: "SqlDataService",
+                                id: "AverageLatencyMs",
+                                name: "Average Latency",
+                                description: "Average processing latency in milliseconds",
+                                value: AverageLatencyMs,
+                                unit: "ms",
+                                category: "Database",
+                                warningThreshold: 100,
+                                criticalThreshold: 500
+                            );
+
+                            // Numeric displays for system resources
+                            _performanceMonitor.RecordNumericDisplayMetric(
+                                className: "SqlDataService",
+                                id: "CpuUsage",
+                                name: "CPU Usage",
+                                description: "Current CPU usage percentage",
+                                value: CpuUsage,
+                                unit: "%",
+                                category: "System"
+                            );
+
+                            _performanceMonitor.RecordNumericDisplayMetric(
+                                className: "SqlDataService",
+                                id: "MemoryUsageMB",
+                                name: "Memory Usage",
+                                description: "Current memory usage in MB",
+                                value: MemoryUsageMB,
+                                unit: "MB",
+                                category: "System"
+                            );
+
+                            // Badges for queue depths
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "OrderBookQueueDepth",
+                                name: "Order Book Queue",
+                                description: "Number of order book operations queued",
+                                value: OrderBookQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "TradeQueueDepth",
+                                name: "Trade Queue",
+                                description: "Number of trade operations queued",
+                                value: TradeQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "TickerQueueDepth",
+                                name: "Ticker Queue",
+                                description: "Number of ticker operations queued",
+                                value: TickerQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "FillQueueDepth",
+                                name: "Fill Queue",
+                                description: "Number of fill operations queued",
+                                value: FillQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "EventLifecycleQueueDepth",
+                                name: "Event Lifecycle Queue",
+                                description: "Number of event lifecycle operations queued",
+                                value: EventLifecycleQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+
+                            _performanceMonitor.RecordBadgeMetric(
+                                className: "SqlDataService",
+                                id: "MarketLifecycleQueueDepth",
+                                name: "Market Lifecycle Queue",
+                                description: "Number of market lifecycle operations queued",
+                                value: MarketLifecycleQueueDepth,
+                                unit: "count",
+                                category: "Queues"
+                            );
+                        }
                     }
                 }
                 else

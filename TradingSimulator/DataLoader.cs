@@ -84,6 +84,9 @@ namespace TradingSimulator
                 .OrderBy(ms => ms.Timestamp)
                 .ToList();
 
+            // Validate snapshots to filter out invalid data
+            marketSnapshots = ValidateSnapshots(marketSnapshots, marketName);
+
             return marketSnapshots;
         }
 
@@ -156,7 +159,8 @@ namespace TradingSimulator
                 }
                 else
                 {
-                    Console.WriteLine($"Warning: Invalid snapshot detected for market {marketName} at {snapshot.Timestamp}. Skipping.");
+                    var errorDetails = GetSnapshotValidationError(snapshot);
+                    Console.WriteLine($"Warning: Invalid snapshot for market '{marketName}' at {snapshot.Timestamp}: {errorDetails}. Skipping.");
                 }
             }
 
@@ -169,13 +173,56 @@ namespace TradingSimulator
             if (snapshot == null) return false;
             if (string.IsNullOrWhiteSpace(snapshot.MarketTicker)) return false;
             if (snapshot.Timestamp == DateTime.MinValue || snapshot.Timestamp > DateTime.UtcNow.AddMinutes(1)) return false;
-            if (snapshot.BestYesBid < 0 || snapshot.BestNoBid < 0) return false;
+            if (snapshot.BestYesBid <= 0 || snapshot.BestYesAsk <= 0) return false;
+            if (snapshot.BestNoBid < 0 || snapshot.BestNoAsk < 0) return false;
+            if (snapshot.BestYesBid >= snapshot.BestYesAsk) return false;
             if (snapshot.SnapshotSchemaVersion < 1) return false;
 
             // Additional integrity checks
             if (snapshot.OrderbookData == null || !snapshot.OrderbookData.Any()) return false;
 
             return true;
+        }
+
+        private string GetSnapshotValidationError(MarketSnapshot snapshot)
+        {
+            if (snapshot == null)
+                return "Snapshot is null";
+
+            if (string.IsNullOrWhiteSpace(snapshot.MarketTicker))
+                return "Market ticker is null or empty";
+
+            if (snapshot.Timestamp == DateTime.MinValue)
+                return "Timestamp is default/min value";
+
+            if (snapshot.Timestamp > DateTime.UtcNow.AddMinutes(1))
+                return $"Timestamp is in the future: {snapshot.Timestamp} (current: {DateTime.UtcNow})";
+
+            if (snapshot.BestYesBid <= 0)
+                return $"BestYesBid is invalid: {snapshot.BestYesBid} (must be > 0)";
+
+            if (snapshot.BestYesAsk <= 0)
+                return $"BestYesAsk is invalid: {snapshot.BestYesAsk} (must be > 0)";
+
+            if (snapshot.BestNoBid < 0)
+                return $"BestNoBid is invalid: {snapshot.BestNoBid} (must be >= 0)";
+
+            if (snapshot.BestNoAsk < 0)
+                return $"BestNoAsk is invalid: {snapshot.BestNoAsk} (must be >= 0)";
+
+            if (snapshot.BestYesBid >= snapshot.BestYesAsk)
+                return $"Bid >= Ask: BestYesBid={snapshot.BestYesBid}, BestYesAsk={snapshot.BestYesAsk}";
+
+            if (snapshot.SnapshotSchemaVersion < 1)
+                return $"Invalid schema version: {snapshot.SnapshotSchemaVersion} (must be >= 1)";
+
+            if (snapshot.OrderbookData == null)
+                return "OrderbookData is null";
+
+            if (!snapshot.OrderbookData.Any())
+                return "OrderbookData is empty";
+
+            return "Unknown validation error";
         }
     }
 }

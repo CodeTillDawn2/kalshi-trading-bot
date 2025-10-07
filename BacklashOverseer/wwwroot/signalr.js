@@ -121,6 +121,17 @@ async function initializeSignalR() {
         // For example, you could call renderMarkets() or similar functions
     });
 
+    /**
+     * Handle portfolio value updates from server
+     */
+    connection.on('PortfolioUpdate', (data) => {
+        console.log('[BrainCards] Portfolio update received:', data);
+        const portfolioValueElement = document.getElementById('portfolioValue');
+        if (portfolioValueElement && data.TotalPortfolio !== undefined) {
+            portfolioValueElement.textContent = '$' + data.TotalPortfolio.toFixed(2);
+        }
+    });
+
     // CONNECTION LIFECYCLE MANAGEMENT
 
     /**

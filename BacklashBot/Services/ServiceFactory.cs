@@ -40,11 +40,23 @@ namespace BacklashBot.Services
         /// Services are cached per scope to avoid repeated resolution calls.
         /// </summary>
         /// <typeparam name="T">The type of service to retrieve.</typeparam>
-        /// <returns>The service instance, or null if the service scope is not initialized.</returns>
+        /// <returns>The service instance, or null if the service scope is not initialized or disposed.</returns>
         private T? GetService<T>() where T : class
         {
             if (_scopeManager.Scope?.ServiceProvider == null)
                 return null;
+
+            // Check if the service provider is disposed
+            try
+            {
+                // Try to access a property that would fail if disposed
+                var _ = _scopeManager.Scope.ServiceProvider.GetHashCode();
+            }
+            catch (ObjectDisposedException)
+            {
+                _logger.LogDebug("SF: ServiceProvider is disposed, returning null for {ServiceType}", typeof(T).Name);
+                return null;
+            }
 
             try
             {
@@ -56,6 +68,11 @@ namespace BacklashBot.Services
                 });
                 _logger.LogDebug("SF: Successfully resolved service: {ServiceType}", typeof(T).Name);
                 return service;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _logger.LogDebug(ex, "SF: ServiceProvider disposed during service resolution for {ServiceType}", typeof(T).Name);
+                return null;
             }
             catch (Exception ex)
             {
@@ -97,9 +114,10 @@ namespace BacklashBot.Services
                 _logger.LogInformation("SF: Wiring up MarketWebSocketUnhealthy event from SubscriptionManager to MarketDataService");
                 subscriptionManager.MarketWebSocketUnhealthy += async (sender, markets) =>
                 {
-                    _logger.LogInformation("SF: MarketWebSocketUnhealthy event received for markets: {Markets}", string.Join(", ", markets));
+                    _logger.LogWarning("SF: MarketWebSocketUnhealthy event received for markets: {Markets} - this will mark them unhealthy and unsubscribe", string.Join(", ", markets));
                     foreach (var market in markets)
                     {
+                        _logger.LogWarning("SF: Marking market {Market} as unhealthy due to WebSocket issues", market);
                         await marketDataService.MarkMarketAsUnhealthyAsync(market);
                     }
                 };
@@ -133,6 +151,17 @@ namespace BacklashBot.Services
                     }
                 };
                 _logger.LogInformation("SF: MarketWebSocketHealthy event wired up successfully");
+
+                _logger.LogInformation("SF: Wiring up FirstSnapshotReceivedReset event from SubscriptionManager to MarketDataService");
+                subscriptionManager.FirstSnapshotReceivedReset += (sender, markets) =>
+                {
+                    _logger.LogInformation("SF: FirstSnapshotReceivedReset event received for markets: {Markets}", string.Join(", ", markets));
+                    foreach (var market in markets)
+                    {
+                        marketDataService.ResetReceivedFirstSnapshot(market);
+                    }
+                };
+                _logger.LogInformation("SF: FirstSnapshotReceivedReset event wired up successfully");
             }
         }
 
@@ -177,12 +206,6 @@ namespace BacklashBot.Services
         /// </summary>
         /// <returns>The order book service instance, or null if the service scope is not initialized.</returns>
         public IOrderBookService? GetOrderBookService() => GetService<IOrderBookService>();
-
-        /// <summary>
-        /// Retrieves the central performance monitor for tracking system performance metrics.
-        /// </summary>
-        /// <returns>The performance monitor instance, or null if the service scope is not initialized.</returns>
-        public ICentralPerformanceMonitor? GetPerformanceMonitor() => GetService<ICentralPerformanceMonitor>();
 
         /// <summary>
         /// Retrieves the data cache service for caching frequently accessed data.

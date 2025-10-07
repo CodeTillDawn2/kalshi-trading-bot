@@ -1,4 +1,3 @@
-using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
@@ -8,6 +7,7 @@ using BacklashDTOs.Converters;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,8 +35,9 @@ namespace BacklashCommon.Services
     {
         private readonly ILogger<ITradingSnapshotService> _logger;
         private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceConfig;
-        private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
+        private DateTime? _lastAttemptedSnapshotTimestamp; // Timestamp of the last snapshot attempt
 
         /// <summary>
         /// Gets or sets the timestamp when the next snapshot is ideally expected based on the configured decision frequency.
@@ -46,7 +47,6 @@ namespace BacklashCommon.Services
         /// snapshot save and reset when snapshot tracking is cleared. Null indicates no expected timing has been established.
         /// </remarks>
         public DateTime? NextExpectedSnapshotTimestamp { get; set; } // The timestamp when the next snapshot is ideally expected
-        private bool _isFirstSnapshotTaken = true;
         private readonly TimeSpan _decisionFrequencyInterval;
         private readonly TimeSpan _snapshotTimingTolerance;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -67,17 +67,17 @@ namespace BacklashCommon.Services
         /// <param name="logger">Logger for recording snapshot operations, warnings, and errors.</param>
         /// <param name="tradingSnapshotServiceConfig">Configuration options for trading snapshot service behavior including tolerance settings.</param>
         /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording execution times.</param>
+        /// <param name="performanceMonitor">Central performance monitor for recording execution times.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor? centralPerformanceMonitor = null)
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig;
             _serviceScopeFactory = scopeFactory;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
             _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingSnapshotServiceConfig.Value.DecisionFrequencySeconds);
             _snapshotTimingTolerance = TimeSpan.FromSeconds(tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds);
 
@@ -151,15 +151,18 @@ namespace BacklashCommon.Services
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
 
+                DateTime? previousAttemptTimestamp = _lastAttemptedSnapshotTimestamp;
+                _lastAttemptedSnapshotTimestamp = timestamp;
+
                 var discardThreshold = _decisionFrequencyInterval + TimeSpan.FromSeconds(_tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds * 2);
 
-                if (_isFirstSnapshotTaken)
+                if (NextExpectedSnapshotTimestamp == null)
                 {
                     NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
                 }
-                else if (_lastSavedSnapshotTimestamp.HasValue)
+                else
                 {
-                    if (NextExpectedSnapshotTimestamp.HasValue && timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
+                    if (timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
                     {
                         _logger.LogWarning(
                             "BRAIN: Skipping extremely late snapshot: {CurrentTimestamp} is {TimeSinceExpected} seconds " +
@@ -169,17 +172,20 @@ namespace BacklashCommon.Services
                         return new List<string>();
                     }
 
-                    var actualTimeSinceLastSnapshot = timestamp - _lastSavedSnapshotTimestamp.Value;
-                    var minInterval = _decisionFrequencyInterval - _snapshotTimingTolerance;
-                    var maxInterval = _decisionFrequencyInterval + _snapshotTimingTolerance;
-
-                    if (actualTimeSinceLastSnapshot < minInterval || actualTimeSinceLastSnapshot > maxInterval)
+                    if (previousAttemptTimestamp.HasValue)
                     {
-                        _logger.LogWarning(
-                            "Snapshot timing irregularity detected: {CurrentTimestamp} is {TimeSinceLastSnapshot} seconds " +
-                            "after {LastTimestamp}, expected approximately {ExpectedInterval} seconds",
-                            timestampString, actualTimeSinceLastSnapshot.TotalSeconds,
-                            _lastSavedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _decisionFrequencyInterval.TotalSeconds);
+                        var actualTimeSinceLastAttempt = timestamp - previousAttemptTimestamp.Value;
+                        var minInterval = _decisionFrequencyInterval - _snapshotTimingTolerance;
+                        var maxInterval = _decisionFrequencyInterval + _snapshotTimingTolerance;
+
+                        if (actualTimeSinceLastAttempt < minInterval || actualTimeSinceLastAttempt > maxInterval)
+                        {
+                            _logger.LogWarning(
+                                "Snapshot timing irregularity detected: {CurrentTimestamp} is {TimeSinceLastAttempt} seconds " +
+                                "after {LastAttemptTimestamp}, expected approximately {ExpectedInterval} seconds",
+                                timestampString, actualTimeSinceLastAttempt.TotalSeconds,
+                                previousAttemptTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _decisionFrequencyInterval.TotalSeconds);
+                        }
                     }
                 }
 
@@ -269,15 +275,14 @@ namespace BacklashCommon.Services
 
                     _lastSavedSnapshotTimestamp = timestamp;
                     NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
-                    _isFirstSnapshotTaken = false;
                 }
 
                 Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
 
-                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.SaveSnapshotAsync", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "SaveSnapshotAsync", "Save Snapshot Execution Time", "Time taken to save a snapshot", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 1000, 5000);
                 }
 
                 if (_enablePerformanceMetrics)
@@ -407,9 +412,9 @@ namespace BacklashCommon.Services
                 Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
 
-                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                if (_enablePerformanceMetrics && _performanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.LoadManySnapshots", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("TradingSnapshotService", "LoadManySnapshots", "Load Many Snapshots Execution Time", "Time taken to load multiple snapshots", stopwatch.ElapsedMilliseconds, "ms", "Performance", 0, 10000, 50000);
                 }
 
                 if (_enablePerformanceMetrics)
@@ -528,6 +533,7 @@ namespace BacklashCommon.Services
         public void ResetSnapshotTracking()
         {
             _lastSavedSnapshotTimestamp = null;
+            _lastAttemptedSnapshotTimestamp = null;
             NextExpectedSnapshotTimestamp = null; // Reset the expected timestamp as well
         }
 

@@ -3,11 +3,12 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotLogging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.WebSockets;
-using System.Text.RegularExpressions;
 
 namespace BacklashBot.Management
 {
@@ -44,6 +45,7 @@ namespace BacklashBot.Management
         private readonly IServiceFactory _serviceFactory;
         private readonly DatabaseLoggingQueue _loggingQueue;
         private readonly CentralErrorHandlerConfig _errorHandlerConfig;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ConcurrentQueue<(DateTime Timestamp, ErrorHandlerTaskInfo Error)> _nonCatastrophicErrors = new();
         private readonly TimeSpan _errorWindow; // Configurable window
         private readonly int _errorThreshold; // Configurable threshold
@@ -108,12 +110,14 @@ namespace BacklashBot.Management
         /// <param name="serviceFactory">Factory for creating and accessing various system services.</param>
         /// <param name="loggingQueue">Queue containing logged errors and warnings to be processed.</param>
         /// <param name="errorHandlerConfig">Configuration settings for error handling.</param>
+        /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
         /// <param name="logger">Logger instance for recording error handler operations.</param>
         public CentralErrorHandler(
             IMarketManagerService marketManagerService,
             IServiceFactory serviceFactory,
             DatabaseLoggingQueue loggingQueue,
             IOptions<CentralErrorHandlerConfig> errorHandlerConfig,
+            IPerformanceMonitor performanceMonitor,
             ILogger<ICentralErrorHandler> logger)
         {
             _logger = logger;
@@ -121,6 +125,7 @@ namespace BacklashBot.Management
             _serviceFactory = serviceFactory;
             _loggingQueue = loggingQueue;
             _errorHandlerConfig = errorHandlerConfig.Value;
+            _performanceMonitor = performanceMonitor;
             _errorWindow = TimeSpan.FromMinutes(_errorHandlerConfig.ErrorWindowMinutes);
             _errorThreshold = _errorHandlerConfig.ErrorThreshold;
             LastSuccessfulSnapshot = DateTime.MinValue;
@@ -151,6 +156,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public async Task<bool> HandleErrors()
         {
+            var stopwatch = Stopwatch.StartNew();
             bool isCatastrophic = false;
 
             while (_loggingQueue.Errors.TryDequeue(out var errorTask))
@@ -195,6 +201,16 @@ namespace BacklashBot.Management
                         WarningCount++;
                     }
                 }
+            }
+
+            // Record warnings processed metric
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "WarningsProcessed", "Warnings Processed", "Total warnings processed in this cycle", WarningCount, "count", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "WarningsProcessed", "Warnings Processed", "Total warnings processed in this cycle", WarningCount, "count", "ErrorHandling");
             }
 
             if (!Errors.IsEmpty)
@@ -302,6 +318,26 @@ namespace BacklashBot.Management
                             LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
                         }
+                        else if (exception is WebSocketException wsEx && wsEx.Message.Contains("401"))
+                        {
+                            _logger.LogWarning("WebSocket authentication failed (401). Attempting connection reset. Not marking as catastrophic. Message: {ErrorMessage}", wsEx.Message);
+                            ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
+                            // Attempt to reset connection
+                            try
+                            {
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    await webSocketClient.ResetConnectionAsync();
+                                }
+                            }
+                            catch (Exception resetEx)
+                            {
+                                _logger.LogError(resetEx, "Failed to reset WebSocket connection after 401 error.");
+                            }
+                            // Don't set isCatastrophicLocal = true;
+                        }
                         else if (exception is TradeMissedException tmEx)
                         {
                             _marketManagerService.TriggerMarketReset(tmEx.MarketId);
@@ -346,6 +382,10 @@ namespace BacklashBot.Management
                             _logger.LogInformation("OVERSEER- Overseer connection failed: {Message}. This is optional and not catastrophic.", exception.Message);
                             // Don't increment error count or mark as catastrophic
                         }
+                        else if (exception is Microsoft.Data.SqlClient.SqlException sqlEx && sqlEx.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _logger.LogInformation("HANDLED ERROR: (SqlException - Duplicate Key): {ErrorMessage} ... not catastrophic.", sqlEx.Message);
+                        }
                         else
                         {
                             _logger.LogCritical(exception, "UNHANDLED ERROR: from {Identifier}. Original Message: '{OriginalMessage}', Type: {ExceptionType}, Inner exception: {InnerExceptionMessage}",
@@ -385,94 +425,37 @@ namespace BacklashBot.Management
                 }
             }
 
+            // Record errors processed metrics
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "ErrorsProcessed", "Errors Processed", "Total errors processed in this cycle", ErrorCount, "count", "ErrorHandling");
+                _performanceMonitor.RecordCounterMetric(nameof(CentralErrorHandler), "NonCatastrophicErrors", "Non-Catastrophic Errors", "Current count of non-catastrophic errors in window", NonCatastrophicErrorCount, "count", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "ErrorsProcessed", "Errors Processed", "Total errors processed in this cycle", ErrorCount, "count", "ErrorHandling");
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "NonCatastrophicErrors", "Non-Catastrophic Errors", "Current count of non-catastrophic errors in window", NonCatastrophicErrorCount, "count", "ErrorHandling");
+            }
+
             Errors.Clear();
             Warnings.Clear();
+
+            stopwatch.Stop();
+
+            // Record processing time metric
+            if (_errorHandlerConfig.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(nameof(CentralErrorHandler), "HandleErrorsProcessingTime", "Handle Errors Processing Time", "Time taken to process errors and warnings", stopwatch.ElapsedMilliseconds, "ms", "ErrorHandling");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(nameof(CentralErrorHandler), "HandleErrorsProcessingTime", "Handle Errors Processing Time", "Time taken to process errors and warnings", stopwatch.ElapsedMilliseconds, "ms", "ErrorHandling");
+            }
+
             return isCatastrophic;
         }
 
-        /// <summary>
-        /// Adds a warning to the processing queue for later handling.
-        /// </summary>
-        /// <param name="ex">The exception associated with the warning, if any.</param>
-        /// <param name="identifier">Identifier for the source of the warning (e.g., service or component name).</param>
-        /// <param name="message">Optional custom message to use instead of the exception message.</param>
-        /// <remarks>
-        /// Warnings are processed during the next HandleErrors() call. If an exception is provided,
-        /// it may be converted to an error if it matches certain criteria during processing.
-        /// </remarks>
-        public void AddWarning(Exception ex, string identifier, string? message = null)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
-            }
-            if (ex == null && string.IsNullOrWhiteSpace(message))
-            {
-                throw new ArgumentException("Either an exception or a message must be provided.");
-            }
-
-            var cts = new CancellationTokenSource();
-            Warnings.Enqueue(new ErrorHandlerTaskInfo
-            {
-                OriginalException = ex,
-                FormattedMessage = message ?? ex?.Message ?? "Warning added directly.",
-                LogSourceCategory = identifier,
-                Severity = LogLevel.Warning,
-                Timestamp = DateTime.Now
-            });
-            WarningCount++;
-        }
-
-        /// <summary>
-        /// Adds an error to the processing queue for immediate handling.
-        /// </summary>
-        /// <param name="ex">The exception associated with the error. If null, a default exception is created.</param>
-        /// <param name="identifier">Identifier for the source of the error (e.g., service or component name).</param>
-        /// <param name="message">Optional custom message to use instead of the exception message.</param>
-        /// <remarks>
-        /// Errors are processed during the next HandleErrors() call. This method increments
-        /// the error count and updates the last error timestamp.
-        /// </remarks>
-        public void AddError(Exception ex, string identifier, string? message = null)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
-            }
-            if (ex == null && string.IsNullOrWhiteSpace(message))
-            {
-                throw new ArgumentException("Either an exception or a message must be provided.");
-            }
-
-            var cts = new CancellationTokenSource();
-            var timestamp = DateTime.Now;
-            Errors.Enqueue(new ErrorHandlerTaskInfo
-            {
-                OriginalException = ex ?? new UnhandledSmokehouseException(message ?? "Error added directly with no original exception."),
-                FormattedMessage = message ?? ex?.Message ?? "Error added directly.",
-                LogSourceCategory = identifier,
-                Severity = LogLevel.Error,
-                Timestamp = timestamp
-            });
-            ErrorCount++;
-            LastErrorDate = timestamp;
-        }
-
-        private string ExtractValueFromLogMessage(string logMessage, string variableName)
-        {
-            string pattern = $@"{variableName}\s*:\s*""([^""]+)""";
-            var match = Regex.Match(logMessage, pattern);
-            if (match.Success && match.Groups.Count > 1) return match.Groups[1].Value;
-            _logger.LogTrace("ExtractValueFromLogMessage called for '{VariableName}' in message '{LogMessage}', returning empty. Consider using custom exceptions.", variableName, logMessage);
-            return string.Empty;
-        }
-
-        private bool MatchesLogMessageTemplate(string logMessage, string template)
-        {
-            string pattern = Regex.Escape(template).Replace(@"\{\w+\}", ".*?");
-            return Regex.IsMatch(logMessage, $"^{pattern}$");
-        }
-
+      
         /// <summary>
         /// Performs a series of internet connectivity checks with exponential backoff retry logic.
         /// </summary>

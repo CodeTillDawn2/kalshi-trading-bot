@@ -82,27 +82,55 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A candle with a very small body relative to its total range and long wicks, indicating high market volatility and indecision. Can signal potential reversal or continuation depending on context.";
+
         /// <summary>
         /// Gets the direction of the pattern.
         /// </summary>
         public override PatternDirection Direction => PatternDirection.Neutral;
+
         /// <summary>
+        /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName;
+
         /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
         /// </summary>
         public override double Strength { get; protected set; }
-        public override double Certainty { get; protected set; }
+
         /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
+        public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
         /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the HighWaveCandlePattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (single candle).</param>
+        /// <summary>
+        /// Initializes a new instance of the HighWaveCandlePattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (single candle).</param>
         public HighWaveCandlePattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if a High Wave Candle pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the candle to evaluate.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+        /// <param name="prices">Array of candle price data.</param>
+        /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+        /// <returns>A HighWaveCandlePattern instance if detected, otherwise null.</returns>
         public static async Task<HighWaveCandlePattern?> IsPatternAsync(int index, int trendLookback, CandleMids[] prices, Dictionary<int, CandleMetrics> metricsCache)
         {
 

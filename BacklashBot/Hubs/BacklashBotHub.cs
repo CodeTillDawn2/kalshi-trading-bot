@@ -1,8 +1,12 @@
 // ChartHub.cs
+using BacklashBot.Configuration;
 using BacklashBot.Services.Interfaces;
-using BacklashBotData.Data.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using OverseerBotShared;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace BacklashBot.Hubs
 {
@@ -14,19 +18,99 @@ namespace BacklashBot.Hubs
     public class BacklashBotHub : Hub
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
+        private static readonly ConcurrentDictionary<string, long> _eventCounts = new();
+        private static readonly ConcurrentDictionary<string, List<long>> _durations = new();
+        private static readonly ConcurrentDictionary<string, double> _gauges = new();
+        private static Timer? _aggregationTimer;
+        private static IPerformanceMonitor? _staticPerformanceMonitor;
+        private static bool _metricsEnabled;
+        private static int _aggregationIntervalMinutes;
         private readonly ILogger<BacklashBotHub> _logger;
         private readonly IServiceFactory _serviceFactory;
+        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly IOptions<BacklashBotHubConfig> _config;
 
+        /// <summary>
+        /// Initializes a new instance of the BacklashBotHub class.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for creating service instances.</param>
+        /// <param name="logger">Logger for recording hub operations.</param>
+        /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
+        /// <param name="config">Configuration for BacklashBotHub settings.</param>
         public BacklashBotHub(
             IServiceFactory serviceFactory,
-            ILogger<BacklashBotHub> logger)
+            ILogger<BacklashBotHub> logger,
+            IPerformanceMonitor performanceMonitor,
+            IOptions<BacklashBotHubConfig> config)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
+            _performanceMonitor = performanceMonitor;
+            _config = config;
+
+            if (_staticPerformanceMonitor == null)
+            {
+                _staticPerformanceMonitor = performanceMonitor;
+                _metricsEnabled = config.Value.EnablePerformanceMetrics;
+                _aggregationIntervalMinutes = config.Value.AggregationIntervalMinutes;
+                _aggregationTimer ??= new Timer(AggregateAndPostMetrics, null, TimeSpan.Zero, TimeSpan.FromMinutes(_aggregationIntervalMinutes));
+            }
         }
 
+        private static void AggregateAndPostMetrics(object? state)
+        {
+            if (_staticPerformanceMonitor == null) return;
+
+            if (_metricsEnabled)
+            {
+                foreach (var kvp in _eventCounts)
+                {
+                    _staticPerformanceMonitor.RecordCounterMetric("BacklashBotHub", kvp.Key + "_per_minute", "Aggregated " + kvp.Key, "Total count per minute", kvp.Value, "count", "Hub");
+                }
+                foreach (var kvp in _durations)
+                {
+                    var list = kvp.Value;
+                    if (list.Any())
+                    {
+                        double avg = list.Average();
+                        _staticPerformanceMonitor.RecordSpeedDialMetric("BacklashBotHub", kvp.Key + "_avg_per_minute", "Average " + kvp.Key, "Average duration per minute", avg, "ms", "Hub");
+                    }
+                }
+                foreach (var kvp in _gauges)
+                {
+                    _staticPerformanceMonitor.RecordNumericDisplayMetric("BacklashBotHub", kvp.Key, kvp.Key, "Current " + kvp.Key, kvp.Value, "count", "Hub");
+                }
+            }
+            else
+            {
+                foreach (var kvp in _eventCounts)
+                {
+                    _staticPerformanceMonitor.RecordDisabledMetric("BacklashBotHub", kvp.Key + "_per_minute", "Aggregated " + kvp.Key, "Total count per minute", 0, "", "Hub");
+                }
+                foreach (var kvp in _durations)
+                {
+                    _staticPerformanceMonitor.RecordDisabledMetric("BacklashBotHub", kvp.Key + "_avg_per_minute", "Average " + kvp.Key, "Average duration per minute", 0, "", "Hub");
+                }
+                foreach (var kvp in _gauges)
+                {
+                    _staticPerformanceMonitor.RecordDisabledMetric("BacklashBotHub", kvp.Key, kvp.Key, "Current " + kvp.Key, 0, "", "Hub");
+                }
+            }
+
+            _eventCounts.Clear();
+            _durations.Clear();
+            // gauges persist as current values
+        }
+
+        /// <summary>
+        /// Called when a client connects to the hub.
+        /// Adds the client to the connected clients collection and logs the connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnConnectedAsync()
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             if (_serviceFactory.GetBroadcastService() != null)
             {
                 lock (_connectedClients)
@@ -37,24 +121,69 @@ namespace BacklashBot.Hubs
                 {
                     _logger.LogInformation("Client connected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
                     await base.OnConnectedAsync();
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("onconnected_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("client_connected", 1, (_, v) => v + 1);
+                        _gauges["connected_clients"] = _connectedClients.Count;
+                    }
                 }
                 catch (Exception ex)
                 {
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("onconnected_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("client_connected_error", 1, (_, v) => v + 1);
+                    }
                     _logger.LogError(ex, "Error during OnConnectedAsync for client: {ConnectionId}", Context.ConnectionId);
                 }
             }
         }
 
+        /// <summary>
+        /// Called when a client disconnects from the hub.
+        /// Removes the client from the connected clients collection and logs the disconnection.
+        /// </summary>
+        /// <param name="exception">Exception that caused the disconnection, if any.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             lock (_connectedClients)
             {
                 _connectedClients.Remove(Context.ConnectionId);
             }
-            _logger.LogInformation("Client disconnected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
-            await base.OnDisconnectedAsync(exception);
+            try
+            {
+                _logger.LogInformation("Client disconnected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
+                await base.OnDisconnectedAsync(exception);
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("ondisconnected_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("client_disconnected", 1, (_, v) => v + 1);
+                    _gauges["connected_clients"] = _connectedClients.Count;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("ondisconnected_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("client_disconnected_error", 1, (_, v) => v + 1);
+                }
+                _logger.LogError(ex, "Error during OnDisconnectedAsync for client: {ConnectionId}", Context.ConnectionId);
+            }
         }
 
+        /// <summary>
+        /// Checks if there are any connected clients.
+        /// </summary>
+        /// <returns>True if there are connected clients, otherwise false.</returns>
         public static bool HasConnectedClients()
         {
             lock (_connectedClients)
@@ -63,6 +192,10 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Clears all connected clients from the collection.
+        /// Used for resetting the client state.
+        /// </summary>
         public static void ClearConnectedClients()
         {
             lock (_connectedClients)
@@ -71,77 +204,6 @@ namespace BacklashBot.Hubs
             }
         }
 
-        /// <summary>
-        /// Performs handshake with a connecting client, registers them in the database, and generates an authentication token.
-        /// Updates existing client information or creates new client records as needed.
-        /// </summary>
-        /// <param name="clientId">Unique identifier for the client</param>
-        /// <param name="clientName">Name of the client (typically brain instance name)</param>
-        /// <param name="clientType">Type of client (e.g., "brain", "dashboard")</param>
-        public async Task Handshake(string clientId, string clientName, string clientType)
-        {
-            _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
-                clientId, clientName, clientType);
-
-            try
-            {
-                using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-
-                // Get client IP address
-                var httpContext = Context.GetHttpContext();
-                var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-
-                // Check if client already exists
-                var existingClient = await context.GetSignalRClient(clientId);
-                if (existingClient == null)
-                {
-                    // Register new client
-                    var newClient = new BacklashDTOs.SignalRClient
-                    {
-                        ClientId = clientId,
-                        ClientName = clientName,
-                        IPAddress = ipAddress,
-                        ClientType = clientType,
-                        AuthToken = GenerateAuthToken(clientId, clientName),
-                        IsActive = true,
-                        ConnectionId = Context.ConnectionId,
-                        LastSeen = DateTime.UtcNow
-                    };
-
-                    await context.AddOrUpdateSignalRClient(newClient);
-                    _logger.LogInformation("New client registered: {ClientId}", clientId);
-                }
-                else
-                {
-                    // Update existing client
-                    existingClient.ConnectionId = Context.ConnectionId;
-                    existingClient.LastSeen = DateTime.UtcNow;
-                    existingClient.IsActive = true;
-                    await context.AddOrUpdateSignalRClient(existingClient);
-                    _logger.LogInformation("Existing client updated: {ClientId}", clientId);
-                }
-
-                // Send handshake response with auth token
-                var response = new
-                {
-                    Success = true,
-                    AuthToken = existingClient?.AuthToken ?? GenerateAuthToken(clientId, clientName),
-                    Message = "Handshake successful"
-                };
-
-                await Clients.Caller.SendAsync("HandshakeResponse", response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during handshake for client: {ClientId}", clientId);
-                await Clients.Caller.SendAsync("HandshakeResponse", new
-                {
-                    Success = false,
-                    Message = $"Handshake failed: {ex.Message}"
-                });
-            }
-        }
 
         private string GenerateAuthToken(string clientId, string clientName)
         {
@@ -159,34 +221,67 @@ namespace BacklashBot.Hubs
         /// <param name="checkInData">Comprehensive data about the brain's current state including markets and configuration</param>
         public async Task CheckIn(CheckInData checkInData)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             _logger.LogInformation("Sending CheckIn to Overseer");
 
             try
             {
                 // Send CheckIn data to overseer
                 await Clients.All.SendAsync("CheckIn", checkInData);
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("checkin_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("checkin_success", 1, (_, v) => v + 1);
+                }
                 _logger.LogInformation("CheckIn sent to Overseer successfully");
             }
             catch (Exception ex)
             {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("checkin_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("checkin_failure", 1, (_, v) => v + 1);
+                }
                 _logger.LogError(ex, "Error sending CheckIn to Overseer");
             }
         }
 
 
 
+        /// <summary>
+        /// Confirms to the Overseer that target tickers have been received and processed by a brain instance.
+        /// Used to acknowledge successful receipt of ticker assignments from the Overseer system.
+        /// </summary>
+        /// <param name="brainInstanceName">Name of the brain instance that received the target tickers.</param>
         public async Task ConfirmTargetTickersReceived(string brainInstanceName)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             _logger.LogInformation("Confirming target tickers received for brain: {BrainInstanceName}", brainInstanceName);
 
             try
             {
                 // Send confirmation to overseer
                 await Clients.All.SendAsync("ConfirmTargetTickersReceived", brainInstanceName);
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("confirm_tickers_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("confirm_tickers_success", 1, (_, v) => v + 1);
+                }
                 _logger.LogInformation("Target tickers confirmation sent to Overseer for brain: {BrainInstanceName}", brainInstanceName);
             }
             catch (Exception ex)
             {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("confirm_tickers_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("confirm_tickers_failure", 1, (_, v) => v + 1);
+                }
                 _logger.LogError(ex, "Error sending target tickers confirmation to Overseer for brain: {BrainInstanceName}", brainInstanceName);
             }
         }
@@ -198,6 +293,8 @@ namespace BacklashBot.Hubs
         /// <param name="response">Response data from the Overseer containing success status and target tickers</param>
         public async Task HandleCheckInResponse(CheckInResponse response)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             _logger.LogInformation("Received CheckInResponse from Overseer");
 
             try
@@ -215,14 +312,32 @@ namespace BacklashBot.Hubs
                         // For now, just confirm receipt
                         await ConfirmTargetTickersReceived("BacklashBot"); // Use appropriate brain instance name
                     }
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("handle_checkin_response_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("checkin_response_success", 1, (_, v) => v + 1);
+                    }
                 }
                 else
                 {
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("handle_checkin_response_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("checkin_response_failure", 1, (_, v) => v + 1);
+                    }
                     _logger.LogWarning("CheckIn failed: {Message}", response.Message);
                 }
             }
             catch (Exception ex)
             {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("handle_checkin_response_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("checkin_response_error", 1, (_, v) => v + 1);
+                }
                 _logger.LogError(ex, "Error handling CheckInResponse");
             }
         }
@@ -235,6 +350,8 @@ namespace BacklashBot.Hubs
         /// <param name="message">Message content or payload</param>
         public async Task SendOverseerMessage(string messageType, string message)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
 
             try
@@ -266,9 +383,21 @@ namespace BacklashBot.Hubs
                     Timestamp = DateTime.UtcNow,
                     Message = "Message processed successfully"
                 });
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("send_overseer_message_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("send_overseer_message_success", 1, (_, v) => v + 1);
+                }
             }
             catch (Exception ex)
             {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("send_overseer_message_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("send_overseer_message_failure", 1, (_, v) => v + 1);
+                }
                 _logger.LogError(ex, "Error processing SendOverseerMessage: {MessageType}", messageType);
                 await Clients.Caller.SendAsync("OverseerMessageReceived", new
                 {
@@ -279,23 +408,49 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Handles the response from the Overseer confirming receipt of target tickers confirmation.
+        /// Processes success/failure status and logs appropriate messages.
+        /// </summary>
+        /// <param name="response">Response data from the Overseer containing success status and brain instance information.</param>
+        /// <returns>A completed task.</returns>
         public Task HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse response)
         {
+            bool enabled = _config.Value.EnablePerformanceMetrics;
+            Stopwatch? stopwatch = enabled ? Stopwatch.StartNew() : null;
             _logger.LogInformation("Received TargetTickersConfirmationResponse from Overseer");
 
             try
             {
                 if (response.Success)
                 {
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("handle_tickers_confirmation_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("tickers_confirmation_success", 1, (_, v) => v + 1);
+                    }
                     _logger.LogInformation("Target tickers confirmation acknowledged by Overseer for brain: {BrainInstanceName}", response.BrainInstanceName);
                 }
                 else
                 {
+                    if (enabled)
+                    {
+                        stopwatch!.Stop();
+                        _durations.GetOrAdd("handle_tickers_confirmation_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                        _eventCounts.AddOrUpdate("tickers_confirmation_failure", 1, (_, v) => v + 1);
+                    }
                     _logger.LogWarning("Target tickers confirmation failed: {Message}", response.Message);
                 }
             }
             catch (Exception ex)
             {
+                if (enabled)
+                {
+                    stopwatch!.Stop();
+                    _durations.GetOrAdd("handle_tickers_confirmation_duration", _ => new List<long>()).Add(stopwatch.ElapsedMilliseconds);
+                    _eventCounts.AddOrUpdate("tickers_confirmation_error", 1, (_, v) => v + 1);
+                }
                 _logger.LogError(ex, "Error handling TargetTickersConfirmationResponse");
             }
 

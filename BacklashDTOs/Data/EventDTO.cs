@@ -54,5 +54,10 @@ namespace BacklashDTOs.Data
         /// Gets or sets the associated series data.
         /// </summary>
         public SeriesDTO? Series { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start date of the next milestone.
+        /// </summary>
+        public DateTime? NextMilestoneStart { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 using BacklashBot.Configuration;
 using BacklashBot.Hubs;
-using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using OverseerBotShared;
@@ -24,11 +24,10 @@ namespace BacklashBot.Services
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IBroadcastService> _logger;
         private Task? _statusBroadcastTask;
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IScopeManagerService _scopeManagerService;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IConfiguration _configuration;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _centralPerformanceMonitor;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitorInterface;
 
         /// <summary>
         /// The interval in seconds between broadcast operations.
@@ -116,30 +115,28 @@ namespace BacklashBot.Services
         /// <param name="hubContext">SignalR hub context for broadcasting messages to connected clients</param>
         /// <param name="serviceFactory">Factory for accessing other system services</param>
         /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
-        /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="logger">Logger for recording service operations and errors</param>
-        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="configuration">Configuration instance for reading settings</param>
+        /// <param name="centralPerformanceMonitor">The performance monitor to send metrics to</param>
+        /// <param name="centralPerformanceMonitorInterface">The central performance monitor interface</param>
         /// <param name="broadcastServiceConfig">Configuration options for broadcast service settings</param>
         public BroadcastService(
             IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
             IStatusTrackerService statusTracker,
-            IServiceScopeFactory scopeFactory,
             ILogger<IBroadcastService> logger,
-            IScopeManagerService scopeManagerService,
             IConfiguration configuration,
-            ICentralPerformanceMonitor centralPerformanceMonitor,
+            IPerformanceMonitor centralPerformanceMonitor,
+            ICentralPerformanceMonitor centralPerformanceMonitorInterface,
             IOptions<BroadcastServiceConfig> broadcastServiceConfig)
         {
-            _scopeManagerService = scopeManagerService;
             _hubContext = hubContext;
             _statusTracker = statusTracker;
             _serviceFactory = serviceFactory;
-            _scopeFactory = scopeFactory;
             _logger = logger;
             _configuration = configuration;
             _centralPerformanceMonitor = centralPerformanceMonitor;
+            _centralPerformanceMonitorInterface = centralPerformanceMonitorInterface;
             _serviceStartTime = DateTime.Now;
 
             // Configure broadcast settings from BroadcastServiceConfig
@@ -243,7 +240,7 @@ namespace BacklashBot.Services
             {
                 var markets = await GetWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
-                var performanceTracker = _serviceFactory.GetPerformanceMonitor();
+                var performanceTracker = _centralPerformanceMonitorInterface;
                 if (errorHandler == null || performanceTracker == null) return;
 
                 var lastSnapshot = errorHandler.LastSuccessfulSnapshot;
@@ -267,29 +264,7 @@ namespace BacklashBot.Services
                     BrainInstanceName = brainInstanceName,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
-                    LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot,
-                    IsStartingUp = isStartingUp,
-                    IsShuttingDown = isShuttingDown,
-                    WatchPositions = false,
-                    WatchOrders = false,
-                    ManagedWatchList = false,
-                    CaptureSnapshots = false,
-                    TargetWatches = 0,
-                    MinimumInterest = 0.0,
-                    UsageMin = 0.0,
-                    UsageMax = 0.0,
-                    CurrentCpuUsage = currentCpuUsage,
-                    EventQueueAvg = eventQueueAvg,
-                    TickerQueueAvg = tickerQueueAvg,
-                    NotificationQueueAvg = notificationQueueAvg,
-                    OrderbookQueueAvg = orderBookQueueAvg,
-                    IsWebSocketConnected = isWebSocketConnected,
-                    LastRefreshCycleSeconds = performanceTracker.LastRefreshCycleSeconds,
-                    LastRefreshCycleInterval = performanceTracker.LastRefreshCycleInterval,
-                    LastRefreshMarketCount = performanceTracker.LastRefreshMarketCount,
-                    LastRefreshUsagePercentage = performanceTracker.LastRefreshUsagePercentage,
-                    LastRefreshTimeAcceptable = performanceTracker.LastRefreshTimeAcceptable,
-                    LastPerformanceSampleDate = performanceTracker.LastPerformanceSampleDate
+                    LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot
                 };
 
                 // Track data payload size
@@ -316,14 +291,14 @@ namespace BacklashBot.Services
                     {
                         await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
                         broadcastSuccessful = true;
-                        var perfMonitor = _serviceFactory.GetPerformanceMonitor();
+                        var perfMonitor = _centralPerformanceMonitorInterface;
                         _logger.LogInformation("Status broadcast completed from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}",
                             perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
+                        _logger.LogWarning("Broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                         if (attempt < _maxRetryAttempts)
                         {
                             await Task.Delay(_retryDelay, cancellationToken);
@@ -372,45 +347,22 @@ namespace BacklashBot.Services
                 }
 
                 // Post metrics to central performance monitor
-                if (_centralPerformanceMonitor is CentralPerformanceMonitor monitor)
-                {
-                    double avgTime = _successfulBroadcasts + _failedBroadcasts > 0 ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts) : 0;
-                    double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
-                    double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
+                double avgTime = _successfulBroadcasts + _failedBroadcasts > 0 ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
 
-                    monitor.RecordBroadcastMetrics(
-                        _successfulBroadcasts,
-                        _failedBroadcasts,
-                        _totalBroadcastTime,
-                        avgTime,
-                        successRate,
-                        _totalDataSize,
-                        _broadcastsPerMinute,
-                        _totalMemoryUsed,
-                        avgDeviation,
-                        _enablePerformanceMetrics
-                    );
-                }
-                else
-                {
-                    // Use interface method with enablement status
-                    double avgTime = _successfulBroadcasts + _failedBroadcasts > 0 ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts) : 0;
-                    double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
-                    double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
-
-                    _centralPerformanceMonitor.RecordBroadcastMetrics(
-                        _successfulBroadcasts,
-                        _failedBroadcasts,
-                        _totalBroadcastTime,
-                        avgTime,
-                        successRate,
-                        _totalDataSize,
-                        _broadcastsPerMinute,
-                        _totalMemoryUsed,
-                        avgDeviation,
-                        _enablePerformanceMetrics
-                    );
-                }
+                RecordBroadcastMetricsPrivate(
+                    _successfulBroadcasts,
+                    _failedBroadcasts,
+                    _totalBroadcastTime,
+                    avgTime,
+                    successRate,
+                    _totalDataSize,
+                    _broadcastsPerMinute,
+                    _totalMemoryUsed,
+                    avgDeviation,
+                    _enablePerformanceMetrics
+                );
             }
         }
 
@@ -661,7 +613,7 @@ namespace BacklashBot.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Performance metrics broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
+                        _logger.LogWarning("Performance metrics broadcast attempt {Attempt} failed. Exception: {Message}, Inner: {Inner}", attempt, ex.Message, ex.InnerException?.Message ?? "None");
                         if (attempt < _maxRetryAttempts)
                         {
                             await Task.Delay(_retryDelay, cancellationToken);
@@ -703,6 +655,62 @@ namespace BacklashBot.Services
                         _failedBroadcasts++;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Records broadcast performance metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="successfulBroadcasts">Number of successful broadcasts</param>
+        /// <param name="failedBroadcasts">Number of failed broadcasts</param>
+        /// <param name="totalBroadcastTime">Total time spent on broadcasts in milliseconds</param>
+        /// <param name="avgTime">Average time per broadcast in milliseconds</param>
+        /// <param name="successRate">Success rate as percentage</param>
+        /// <param name="totalDataSize">Total data size in bytes</param>
+        /// <param name="broadcastsPerMinute">Broadcasts per minute</param>
+        /// <param name="totalMemoryUsed">Total memory used in bytes</param>
+        /// <param name="avgDeviation">Average interval deviation in milliseconds</param>
+        /// <param name="enablePerformanceMetrics">Whether performance metrics are enabled</param>
+        private void RecordBroadcastMetricsPrivate(
+            long successfulBroadcasts,
+            long failedBroadcasts,
+            double totalBroadcastTime,
+            double avgTime,
+            double successRate,
+            long totalDataSize,
+            double broadcastsPerMinute,
+            long totalMemoryUsed,
+            double avgDeviation,
+            bool enablePerformanceMetrics)
+        {
+            string className = nameof(BroadcastService);
+            string category = "Broadcast";
+
+            if (!enablePerformanceMetrics)
+            {
+                // Send disabled metrics
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "SuccessfulBroadcasts", "Successful Broadcasts", "Number of successful broadcasts", successfulBroadcasts, "count", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "FailedBroadcasts", "Failed Broadcasts", "Number of failed broadcasts", failedBroadcasts, "count", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalBroadcastTime", "Total Broadcast Time", "Cumulative time spent on broadcasts", totalBroadcastTime, "ms", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageBroadcastTime", "Average Broadcast Time", "Average time per broadcast", avgTime, "ms", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "SuccessRate", "Broadcast Success Rate", "Percentage of successful broadcasts", successRate, "%", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalDataSize", "Total Data Size", "Total size of broadcast payloads", totalDataSize, "bytes", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "BroadcastsPerMinute", "Broadcasts Per Minute", "Average broadcasts per minute", broadcastsPerMinute, "bpm", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "TotalMemoryUsed", "Total Memory Used", "Total memory used during broadcasts", totalMemoryUsed, "bytes", category);
+                _centralPerformanceMonitor.RecordDisabledMetric(className, "AverageIntervalDeviation", "Average Interval Deviation", "Average deviation from broadcast intervals", avgDeviation, "ms", category);
+            }
+            else
+            {
+                // Record actual metrics
+                _centralPerformanceMonitor.RecordCounterMetric(className, "SuccessfulBroadcasts", "Successful Broadcasts", "Number of successful broadcasts", successfulBroadcasts, "count", category);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "FailedBroadcasts", "Failed Broadcasts", "Number of failed broadcasts", failedBroadcasts, "count", category);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "TotalBroadcastTime", "Total Broadcast Time", "Cumulative time spent on broadcasts", totalBroadcastTime, "ms", category, null, null, null);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "AverageBroadcastTime", "Average Broadcast Time", "Average time per broadcast", avgTime, "ms", category, null, null, null);
+                _centralPerformanceMonitor.RecordProgressBarMetric(className, "SuccessRate", "Broadcast Success Rate", "Percentage of successful broadcasts", successRate, "%", category, null, null, null);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "TotalDataSize", "Total Data Size", "Total size of broadcast payloads", totalDataSize, "bytes", category);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "BroadcastsPerMinute", "Broadcasts Per Minute", "Average broadcasts per minute", broadcastsPerMinute, "bpm", category, null, null, null);
+                _centralPerformanceMonitor.RecordCounterMetric(className, "TotalMemoryUsed", "Total Memory Used", "Total memory used during broadcasts", totalMemoryUsed, "bytes", category);
+                _centralPerformanceMonitor.RecordSpeedDialMetric(className, "AverageIntervalDeviation", "Average Interval Deviation", "Average deviation from broadcast intervals", avgDeviation, "ms", category, null, null, null);
             }
         }
 

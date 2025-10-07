@@ -11,7 +11,7 @@ using static BacklashPatterns.PatternUtils;
 /// - Second candle: Bearish, opens at/near first close, closes into first candle�s body.
 /// Optimized for ML: Uses relative scaling based on lookback average range, maximally loosened for detection.
 /// </summary>
-public class DarkCloudCoverPattern2 : PatternDefinition
+public class DarkCloudCoverPattern : PatternDefinition
 {
     /// <summary>
     /// Number of candles required to form the pattern.
@@ -84,7 +84,7 @@ public class DarkCloudCoverPattern2 : PatternDefinition
     /// Initializes a new instance of the DarkCloudCoverPattern2 class.
     /// </summary>
     /// <param name="candles">The list of candle indices.</param>
-    public DarkCloudCoverPattern2(List<int> candles) : base(candles)
+    public DarkCloudCoverPattern(List<int> candles) : base(candles)
     {
     }
 

@@ -1,5 +1,7 @@
+using BacklashBot.Configuration;
 using BacklashBot.State.Interfaces;
-using System.Diagnostics.Metrics;
+using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.State
 {
@@ -22,9 +24,9 @@ namespace BacklashBot.State
     public class KalshiBotReadyStatus : IBotReadyStatus
     {
         private readonly ILogger<KalshiBotReadyStatus> _logger;
-        private readonly Meter _meter;
-        private readonly Counter<long> _readinessStateChanges;
-        private readonly Histogram<double> _readinessTiming;
+        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly IOptions<KalshiBotReadyStatusConfig> _config;
+        private readonly bool _enablePerformanceMetrics;
 
         private DateTime _initializationStartTime = DateTime.UtcNow;
         private DateTime _browserStartTime = DateTime.UtcNow;
@@ -48,16 +50,20 @@ namespace BacklashBot.State
         /// Creates the initial TaskCompletionSource objects and sets up the default state.
         /// </summary>
         /// <param name="logger">The logger for tracking state changes and operations.</param>
-        public KalshiBotReadyStatus(ILogger<KalshiBotReadyStatus> logger)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        /// <param name="config">Configuration options for the KalshiBotReadyStatus.</param>
+        public KalshiBotReadyStatus(
+            ILogger<KalshiBotReadyStatus> logger,
+            IPerformanceMonitor performanceMonitor,
+            IOptions<KalshiBotReadyStatusConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
 
-            // Initialize metrics
-            _meter = new Meter("KalshiBot.ReadyStatus");
-            _readinessStateChanges = _meter.CreateCounter<long>("readiness_state_changes", "count", "Number of readiness state changes");
-            _readinessTiming = _meter.CreateHistogram<double>("readiness_timing", "ms", "Time taken for readiness operations");
+            _enablePerformanceMetrics = _config.Value.EnablePerformanceMetrics;
 
-            _logger.LogInformation("KalshiBotReadyStatus initialized");
+            _logger.LogInformation("KalshiBotReadyStatus initialized with EnablePerformanceMetrics={EnablePerformanceMetrics}", _enablePerformanceMetrics);
         }
 
         /// <summary>
@@ -92,7 +98,15 @@ namespace BacklashBot.State
             _initializationStartTime = DateTime.UtcNow;
             _browserStartTime = DateTime.UtcNow;
 
-            _readinessStateChanges.Add(1, new KeyValuePair<string, object?>("operation", "reset"));
+            // Record readiness state change metric
+            if (!_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
+            else
+            {
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
             _logger.LogInformation("All readiness status indicators reset to initial state");
         }
 
@@ -117,10 +131,28 @@ namespace BacklashBot.State
             }
 
             var timing = (DateTime.UtcNow - _initializationStartTime).TotalMilliseconds;
-            _readinessTiming.Record(timing, new KeyValuePair<string, object?>("operation", "initialization"));
+
+            // Record initialization timing metric
+            if (!_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness");
+            }
+            else
+            {
+                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "InitializationTiming", "Initialization Timing", "Time taken for initialization", timing, "ms", "BotReadiness", null, 10000, 30000);
+            }
 
             InitializationCompleted.SetResult(result);
-            _readinessStateChanges.Add(1, new KeyValuePair<string, object?>("operation", "initialization_completed"));
+
+            // Record readiness state change metric
+            if (!_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
+            else
+            {
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
             _logger.LogInformation("Initialization completed with result: {Result}, timing: {Timing}ms", result, timing);
         }
 
@@ -145,10 +177,28 @@ namespace BacklashBot.State
             }
 
             var timing = (DateTime.UtcNow - _browserStartTime).TotalMilliseconds;
-            _readinessTiming.Record(timing, new KeyValuePair<string, object?>("operation", "browser_ready"));
+
+            // Record browser ready timing metric
+            if (!_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness");
+            }
+            else
+            {
+                _performanceMonitor.RecordSpeedDialMetric("KalshiBotReadyStatus", "BrowserReadyTiming", "Browser Ready Timing", "Time taken for browser readiness", timing, "ms", "BotReadiness", null, 5000, 15000);
+            }
 
             BrowserReady.SetResult(result);
-            _readinessStateChanges.Add(1, new KeyValuePair<string, object?>("operation", "browser_ready"));
+
+            // Record readiness state change metric
+            if (!_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
+            else
+            {
+                _performanceMonitor.RecordCounterMetric("KalshiBotReadyStatus", "ReadinessStateChanges", "Readiness State Changes", "Number of readiness state changes", 1, "count", "BotReadiness");
+            }
             _logger.LogInformation("Browser ready with result: {Result}, timing: {Timing}ms", result, timing);
         }
     }

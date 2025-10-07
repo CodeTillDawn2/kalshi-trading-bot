@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -19,20 +18,10 @@ namespace OverseerBotShared
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
         public DateTime? LastSnapshot { get; set; }
+
+        // Status fields
         public bool IsStartingUp { get; set; }
         public bool IsShuttingDown { get; set; }
-
-        // Brain configuration
-        public bool WatchPositions { get; set; }
-        public bool WatchOrders { get; set; }
-        public bool ManagedWatchList { get; set; }
-        public bool CaptureSnapshots { get; set; }
-        public int TargetWatches { get; set; }
-        public double MinimumInterest { get; set; }
-        public double UsageMin { get; set; }
-        public double UsageMax { get; set; }
-
-        // Performance metrics
         public double CurrentCpuUsage { get; set; }
         public double EventQueueAvg { get; set; }
         public double TickerQueueAvg { get; set; }
@@ -44,13 +33,8 @@ namespace OverseerBotShared
         public double LastRefreshUsagePercentage { get; set; }
         public bool LastRefreshTimeAcceptable { get; set; }
         public DateTime? LastPerformanceSampleDate { get; set; }
-
-        // Connection status
         public bool IsWebSocketConnected { get; set; }
-
-        // Market watch data
-        [JsonPropertyName("watchedMarkets")]
-        public List<MarketWatchData>? WatchedMarkets { get; set; }
+        public double PortfolioValue { get; set; }
     }
 
     /// <summary>
@@ -78,6 +62,23 @@ namespace OverseerBotShared
     }
 
     /// <summary>
+    /// Represents a single performance metric entry with its source class name.
+    /// Used to associate metrics with the class that recorded them.
+    /// </summary>
+    public class PerformanceMetricEntry
+    {
+        /// <summary>
+        /// Gets or sets the name of the class that recorded this metric.
+        /// </summary>
+        public string ClassName { get; set; } = "";
+
+        /// <summary>
+        /// Gets or sets the performance metric data.
+        /// </summary>
+        public BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric Metric { get; set; } = null!;
+    }
+
+    /// <summary>
     /// Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.
     /// Used for detailed performance monitoring and analytics, including database operations,
     /// WebSocket metrics, queue depths, and system resource utilization.
@@ -96,104 +97,11 @@ namespace OverseerBotShared
         public DateTime Timestamp { get; set; }
 
         /// <summary>
-        /// Gets or sets the database performance metrics.
+        /// Gets or sets all performance metrics collected by the system.
+        /// This unified collection contains all metrics from all sources (database, API, WebSocket, etc.)
+        /// as GeneralPerformanceMetric objects with their source class names.
         /// </summary>
-        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the OverseerClientService performance metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket processing time metrics in ticks.
-        /// </summary>
-        public ConcurrentDictionary<string, long>? WebSocketProcessingTimeTicks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket processing count metrics.
-        /// </summary>
-        public ConcurrentDictionary<string, int>? WebSocketProcessingCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket buffer usage metrics in bytes.
-        /// </summary>
-        public ConcurrentDictionary<string, long>? WebSocketBufferUsageBytes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket operation times.
-        /// </summary>
-        public ConcurrentDictionary<string, TimeSpan>? WebSocketOperationTimes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket semaphore wait counts.
-        /// </summary>
-        public ConcurrentDictionary<string, int>? WebSocketSemaphoreWaitCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SubscriptionManager operation metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? SubscriptionManagerOperationMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SubscriptionManager lock contention metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? SubscriptionManagerLockMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor total messages processed.
-        /// </summary>
-        public long MessageProcessorTotalMessagesProcessed { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor total processing time in milliseconds.
-        /// </summary>
-        public long MessageProcessorTotalProcessingTimeMs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor average processing time in milliseconds.
-        /// </summary>
-        public double MessageProcessorAverageProcessingTimeMs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor messages per second rate.
-        /// </summary>
-        public double MessageProcessorMessagesPerSecond { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor order book queue depth.
-        /// </summary>
-        public int MessageProcessorOrderBookQueueDepth { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor duplicate message count.
-        /// </summary>
-        public int MessageProcessorDuplicateMessageCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor duplicates in window.
-        /// </summary>
-        public int MessageProcessorDuplicatesInWindow { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor last duplicate warning time.
-        /// </summary>
-        public DateTime MessageProcessorLastDuplicateWarningTime { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor message type counts.
-        /// </summary>
-        public IReadOnlyDictionary<string, long>? MessageProcessorMessageTypeCounts { get; set; }
-
-        /// <summary>
-        /// Gets or sets the API execution times.
-        /// </summary>
-        public ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>? ApiExecutionTimes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the configurable metrics for GUI consumption.
-        /// </summary>
-        public Dictionary<string, object> ConfigurableMetrics { get; set; } = new();
+        public IReadOnlyList<PerformanceMetricEntry>? AllMetrics { get; set; }
     }
 
     /// <summary>
@@ -389,6 +297,7 @@ namespace OverseerBotShared
         public object? LatestPerformanceMetrics { get; set; }
     }
 
+
     /// <summary>
     /// Contains detailed information about a market being watched by a brain instance.
     /// Includes interest scoring data, watch history, and performance metrics for the specific market.
@@ -432,6 +341,33 @@ namespace OverseerBotShared
         /// Indicates market activity level and data stream density for performance monitoring.
         /// </summary>
         public double? AverageWebsocketEventsPerMinute { get; set; }
+    }
+
+    /// <summary>
+    /// Request structure for handshake operations.
+    /// Contains client identification and authentication information.
+    /// </summary>
+    public class HandshakeRequest
+    {
+        /// <summary>
+        /// Gets or sets the unique identifier for the client.
+        /// </summary>
+        public string? ClientId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the client (typically the brain instance name).
+        /// </summary>
+        public string? ClientName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of client (e.g., brain, dashboard).
+        /// </summary>
+        public string? ClientType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authentication token provided by the client.
+        /// </summary>
+        public string? AuthToken { get; set; }
     }
 
     /// <summary>

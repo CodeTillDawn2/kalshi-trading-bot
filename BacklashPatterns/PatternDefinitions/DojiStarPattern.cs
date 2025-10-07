@@ -3,6 +3,13 @@ using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
+/// <summary>
+/// Represents a Doji Star candlestick pattern, a two-candle reversal pattern.
+/// Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+/// Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+/// Requirements: A strong first candle followed by a Doji with a gap, signaling indecision after a trend.
+/// Optimized for: Loose thresholds to maximize detection in a 0-100 fixed-range market.
+/// </summary>
 public class DojiStarPattern : PatternDefinition
 {
     /// <summary>
@@ -34,7 +41,15 @@ public class DojiStarPattern : PatternDefinition
     /// Strictest: 1.0 (moderate body), Loosest: 3.0 (very strong trend).
     /// </summary>
     public static double FirstCandleMinBodySize { get; set; } = 2.0;
+
+    /// <summary>
+    /// Gets the base name for the Doji Star pattern.
+    /// </summary>
     public const string BaseName = "DojiStar";
+
+    /// <summary>
+    /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
+    /// </summary>
     public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
     /// <summary>
     /// Gets the description of the pattern.
@@ -44,15 +59,45 @@ public class DojiStarPattern : PatternDefinition
     /// Gets the direction of the pattern.
     /// </summary>
     public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
+
     private readonly bool IsBullish;
+
+    /// <summary>
+    /// Gets the calculated strength of the pattern.
+    /// Note: Not calculated in this implementation; reserved for future use.
+    /// </summary>
     public override double Strength { get; protected set; }
+
+    /// <summary>
+    /// Gets the calculated certainty of the pattern.
+    /// Note: Not calculated in this implementation; reserved for future use.
+    /// </summary>
     public override double Certainty { get; protected set; }
+
+    /// <summary>
+    /// Gets the calculated uncertainty of the pattern.
+    /// Note: Not calculated in this implementation; reserved for future use.
+    /// </summary>
     public override double Uncertainty { get; protected set; }
+
+    /// <summary>
+    /// Initializes a new instance of the DojiStarPattern class.
+    /// </summary>
+    /// <param name="candles">List of candle indices forming the pattern (two candles).</param>
+    /// <param name="isBullish">True if the pattern is bullish, false if bearish.</param>
     public DojiStarPattern(List<int> candles, bool isBullish) : base(candles)
     {
         IsBullish = isBullish;
     }
 
+    /// <summary>
+    /// Determines if a Doji Star pattern exists at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the second candle (Doji) in the pattern.</param>
+    /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+    /// <param name="prices">Array of candle price data.</param>
+    /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+    /// <returns>A DojiStarPattern instance if detected, otherwise null.</returns>
     public static async Task<DojiStarPattern?> IsPatternAsync(
         int index,
         int trendLookback,

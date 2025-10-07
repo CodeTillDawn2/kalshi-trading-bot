@@ -1,12 +1,16 @@
-using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Exceptions;
+using BacklashDTOs.KalshiAPI;
+using BacklashInterfaces.PerformanceMetrics;
+using BacklashBot.KalshiAPI.Interfaces;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -51,12 +55,14 @@ namespace KalshiBotAPI.Websockets
         private readonly KalshiConfig _kalshiConfig;
         private readonly WebSocketConnectionManagerConfig _websocketConfig;
         private readonly RSA _privateKey;
-        private readonly ICentralPerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly IKalshiAPIService _kalshiApiService;
         private ClientWebSocket? _webSocket = null!;
         private readonly object _webSocketLock = new object();
         private bool _isConnected = false;
         private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private bool _allowReconnect = true;
+        private bool _isExchangeOutage = false;
 
         // Performance metrics
         private int _connectionAttempts = 0;
@@ -86,6 +92,18 @@ namespace KalshiBotAPI.Websockets
         private double _errorRate = 0; // messages with errors / total messages
         private int _queueDepth = 0; // current queue depth if implemented
 
+        // Additional performance metrics
+        private double _signatureGenerationTime = 0;
+        private int _signatureGenerationCount = 0;
+        private double _averageSignatureGenerationTime = 0;
+        private int _cacheSize = 0;
+        private double _currentSessionUptime = 0;
+        private double _averageMessageSize = 0;
+        private double _peakThroughput = 0;
+        private long _minConnectionLatency = long.MaxValue;
+        private long _maxConnectionLatency = 0;
+        private DateTime _managerStartTime;
+
         // Performance monitoring
         private DateTime _lastMetricsPost = DateTime.MinValue;
         private readonly TimeSpan _metricsPostInterval = TimeSpan.FromMinutes(1); // Post metrics every minute
@@ -113,7 +131,6 @@ namespace KalshiBotAPI.Websockets
                 if (_enableMetrics != value)
                 {
                     _enableMetrics = value;
-                    _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(_enableMetrics);
                     if (_enableMetrics && _performanceMonitor == null)
                     {
                         _logger.LogWarning("Performance metrics enabled but no ICentralPerformanceMonitor was provided. Metrics will be collected locally but not posted to central monitoring.");
@@ -130,6 +147,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="websocketConfig">Configuration options for WebSocket operations.</param>
         /// <param name="logger">Logger instance for recording connection operations and errors.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording WebSocket metrics.</param>
+        /// <param name="kalshiApiService">API service for checking exchange status and connectivity.</param>
         /// <remarks>
         /// The constructor sets up the RSA private key for authentication by loading it from the
         /// configured key file. This key is used to generate signatures for WebSocket connection
@@ -140,14 +158,17 @@ namespace KalshiBotAPI.Websockets
             IOptions<KalshiConfig> kalshiConfig,
             IOptions<WebSocketConnectionManagerConfig> websocketConfig,
             ILogger<WebSocketConnectionManager> logger,
-            ICentralPerformanceMonitor? performanceMonitor = null)
+            IPerformanceMonitor performanceMonitor,
+            IKalshiAPIService kalshiApiService)
         {
             _kalshiConfig = kalshiConfig.Value;
             _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
+            _kalshiApiService = kalshiApiService;
 
             _logger.LogInformation("WebSocketConnectionManager: Constructor called");
+            _managerStartTime = DateTime.UtcNow;
 
             _logger.LogInformation("WebSocketConnectionManager: Creating RSA key");
             _privateKey = RSA.Create();
@@ -181,9 +202,6 @@ namespace KalshiBotAPI.Websockets
 
             // Initialize metrics configuration (defaults to true if not specified)
             EnableMetrics = _websocketConfig.EnablePerformanceMetrics;
-
-            // Notify performance monitor of initial metrics status
-            _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(EnableMetrics);
         }
 
         /// <summary>
@@ -267,6 +285,8 @@ namespace KalshiBotAPI.Websockets
                 if (_enableMetrics)
                 {
                     _connectionLatencies.Add(stopwatch.ElapsedMilliseconds);
+                    _minConnectionLatency = Math.Min(_minConnectionLatency, stopwatch.ElapsedMilliseconds);
+                    _maxConnectionLatency = Math.Max(_maxConnectionLatency, stopwatch.ElapsedMilliseconds);
                     _connectionSuccesses++;
                     if (retryCount > 0) _reconnectionCount++;
                     _lastConnectionStart = DateTime.UtcNow; // Start tracking uptime
@@ -274,6 +294,7 @@ namespace KalshiBotAPI.Websockets
                 PostPerformanceMetric("Connect", stopwatch.ElapsedMilliseconds);
                 _logger.LogInformation("WebSocket connection established to {Uri}", uri);
                 _isConnected = true;
+                _isExchangeOutage = false; // Clear exchange outage flag on successful connection
 
                 lock (_webSocketLock)
                 {
@@ -329,6 +350,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resets the current WebSocket connection and establishes a new one.
         /// </summary>
+        /// <param name="isExchangeOutage">Whether this reset is due to an exchange-wide outage (default: false).</param>
         /// <returns>A task representing the asynchronous reset operation.</returns>
         /// <remarks>
         /// <para>
@@ -343,8 +365,12 @@ namespace KalshiBotAPI.Websockets
         /// during the connection reset process. If reconnection is disabled, the method
         /// will only clean up the existing connection without establishing a new one.
         /// </para>
+        /// <para>
+        /// When isExchangeOutage is true, this indicates the reset is due to exchange-wide issues
+        /// rather than individual market problems, which affects how subscription health is monitored.
+        /// </para>
         /// </remarks>
-        public async Task ResetConnectionAsync()
+        public async Task ResetConnectionAsync(bool isExchangeOutage = false)
         {
             if (_isReconnecting)
             {
@@ -353,7 +379,8 @@ namespace KalshiBotAPI.Websockets
             }
 
             _isReconnecting = true;
-            _logger.LogInformation("Resetting WebSocket connection");
+            _isExchangeOutage = isExchangeOutage;
+            _logger.LogInformation("Resetting WebSocket connection (ExchangeOutage: {IsExchangeOutage})", isExchangeOutage);
             try
             {
                 ClientWebSocket? oldSocket = null;
@@ -377,9 +404,17 @@ namespace KalshiBotAPI.Websockets
 
                 if (_allowReconnect)
                 {
-                    _logger.LogDebug("Waiting {Delay}ms before reconnecting", _resetDelayMs);
-                    await Task.Delay(_resetDelayMs);
-                    await ConnectAsync();
+                    _logger.LogInformation("Waiting for internet connectivity and exchange availability before reconnecting");
+                    bool connectivityReady = await WaitForConnectivityAndExchangeAsync();
+                    if (connectivityReady)
+                    {
+                        _logger.LogInformation("Connectivity and exchange ready, attempting to reconnect WebSocket");
+                        await ConnectAsync();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to establish connectivity and exchange availability within timeout. Skipping reconnection attempt.");
+                    }
                 }
                 else
                 {
@@ -585,6 +620,7 @@ namespace KalshiBotAPI.Websockets
                                     _throughputWindow.Dequeue();
                                 }
                                 _messageThroughput = _throughputWindow.Count / 60.0; // messages per second over last 60 seconds
+                                if (_messageThroughput > _peakThroughput) _peakThroughput = _messageThroughput;
 
                                 _lastMessageTime = now;
 
@@ -715,6 +751,16 @@ namespace KalshiBotAPI.Websockets
         /// </para>
         /// </remarks>
         public int ConnectSemaphoreCount => _connectSemaphore.CurrentCount;
+
+        /// <summary>
+        /// Gets whether the WebSocket connection is currently experiencing an exchange-wide outage.
+        /// When true, connection issues are due to exchange problems rather than individual market issues.
+        /// </summary>
+        /// <remarks>
+        /// This flag is used to prevent marking individual markets as unhealthy during exchange-wide outages.
+        /// Markets should only be marked unhealthy for individual market-specific issues, not exchange-wide problems.
+        /// </remarks>
+        public bool IsExchangeOutage => _isExchangeOutage;
 
         /// <summary>
         /// Gets the total number of connection attempts made.
@@ -888,18 +934,100 @@ namespace KalshiBotAPI.Websockets
             }
             if (_enableMetrics) _signatureCacheMisses++;
 
+            var sigStopwatch = Stopwatch.StartNew();
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var message = $"{timestamp}{method}{path.Split('?')[0]}";
             var signature = Convert.ToBase64String(_privateKey.SignData(
                 Encoding.UTF8.GetBytes(message),
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pss));
+            sigStopwatch.Stop();
+
+            if (_enableMetrics)
+            {
+                _signatureGenerationTime += sigStopwatch.Elapsed.TotalMilliseconds;
+                _signatureGenerationCount++;
+                _averageSignatureGenerationTime = _signatureGenerationTime / _signatureGenerationCount;
+            }
 
             _signatureCache[cacheKey] = (timestamp, signature, DateTime.UtcNow.Add(_signatureCacheDuration));
             return (timestamp, signature);
         }
 
         private bool _isReconnecting = false;
+
+        /// <summary>
+        /// Checks if the internet connection is available by attempting to ping a reliable host.
+        /// </summary>
+        /// <returns>True if internet connectivity is detected, false otherwise.</returns>
+        private async Task<bool> CheckInternetConnectivityAsync()
+        {
+            try
+            {
+                using var ping = new Ping();
+                var reply = await ping.SendPingAsync("8.8.8.8", 5000); // Google DNS with 5 second timeout
+                return reply.Status == IPStatus.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to check internet connectivity");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the Kalshi exchange is active and available for trading.
+        /// </summary>
+        /// <returns>True if the exchange is active, false otherwise.</returns>
+        private async Task<bool> CheckExchangeAvailabilityAsync()
+        {
+            try
+            {
+                var status = await _kalshiApiService.GetExchangeStatusAsync();
+                return status.exchange_active;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to check exchange availability");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Waits for both internet connectivity and exchange availability before allowing reconnection.
+        /// </summary>
+        /// <param name="maxWaitTimeMinutes">Maximum time to wait in minutes before giving up.</param>
+        /// <returns>True if both conditions are met within the timeout, false otherwise.</returns>
+        private async Task<bool> WaitForConnectivityAndExchangeAsync(int maxWaitTimeMinutes = 30)
+        {
+            var startTime = DateTime.UtcNow;
+            var maxWaitTime = TimeSpan.FromMinutes(maxWaitTimeMinutes);
+
+            _logger.LogInformation("Waiting for internet connectivity and exchange availability before reconnecting (max wait: {MaxWait} minutes)", maxWaitTimeMinutes);
+
+            while (DateTime.UtcNow - startTime < maxWaitTime)
+            {
+                bool internetOk = await CheckInternetConnectivityAsync();
+                bool exchangeOk = false;
+
+                if (internetOk)
+                {
+                    exchangeOk = await CheckExchangeAvailabilityAsync();
+                }
+
+                if (internetOk && exchangeOk)
+                {
+                    _logger.LogInformation("Internet connectivity and exchange availability confirmed. Proceeding with reconnection.");
+                    return true;
+                }
+
+                _logger.LogDebug("Connectivity check: Internet={Internet}, Exchange={Exchange}. Waiting 30 seconds before retry.", internetOk, exchangeOk);
+                await Task.Delay(TimeSpan.FromSeconds(30));
+            }
+
+            _logger.LogWarning("Timeout waiting for connectivity and exchange availability after {Elapsed} minutes", (DateTime.UtcNow - startTime).TotalMinutes);
+            return false;
+        }
 
         /// <summary>
         /// Tracks connection failure reasons for monitoring and diagnostics.
@@ -938,7 +1066,7 @@ namespace KalshiBotAPI.Websockets
         {
             if (_performanceMonitor != null && _enableMetrics)
             {
-                _performanceMonitor.RecordExecutionTime($"WebSocketConnectionManager.{operation}", milliseconds, _enableMetrics);
+                _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", operation, $"WebSocket {operation} Time", $"Time taken for {operation}", (double)milliseconds, "ms", "WebSocket", 0, 10000, 1000);
             }
         }
 
@@ -951,23 +1079,38 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         private void PostMetricsSnapshot()
         {
-            if (_performanceMonitor == null || !_enableMetrics) return;
+            if (_performanceMonitor == null) return;
 
-            // Post connection success rate as execution time (using a fixed operation name)
-            var successRateMs = (long)(ConnectionSuccessRate * 1000); // Convert to milliseconds for consistency
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ConnectionSuccessRate", successRateMs, _enableMetrics);
+            // Calculate additional metrics
+            _cacheSize = _signatureCache.Count;
+            if (_isConnected && _lastConnectionStart != DateTime.MinValue)
+            {
+                _currentSessionUptime = (DateTime.UtcNow - _lastConnectionStart).TotalSeconds;
+            }
+            _averageMessageSize = _messagesReceived > 0 ? (double)_totalBytesReceived / _messagesReceived : 0;
+            double uptimePercentage = (DateTime.UtcNow - _managerStartTime).TotalMilliseconds > 0 ? TotalConnectedTimeMs / (DateTime.UtcNow - _managerStartTime).TotalMilliseconds * 100 : 0;
 
-            // Post throughput as execution time
-            var throughputMs = (long)(MessageThroughput * 1000); // Convert messages/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.MessageThroughput", throughputMs, _enableMetrics);
+            // Post connection success rate as progress bar
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "ConnectionSuccessRate", "WebSocket Connection Success Rate", "Percentage of successful connections", ConnectionSuccessRate * 100, "%", "WebSocket", 0, 100, 95);
 
-            // Post error rate
-            var errorRateMs = (long)(ErrorRate * 1000);
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ErrorRate", errorRateMs, _enableMetrics);
+            // Post throughput as speed dial
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "MessageThroughput", "WebSocket Message Throughput", "Messages received per second", MessageThroughput, "msg/sec", "WebSocket", 0, 1000, 100);
 
-            // Post bandwidth
-            var bandwidthMs = (long)(BandwidthBps * 1000); // Convert bytes/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.Bandwidth", bandwidthMs, _enableMetrics);
+            // Post error rate as traffic light
+            _performanceMonitor.RecordTrafficLightMetric("WebSocketConnectionManager", "ErrorRate", "WebSocket Error Rate", "Percentage of messages with errors", ErrorRate * 100, "%", "WebSocket", 0, 5, 1);
+
+            // Post bandwidth as speed dial
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "Bandwidth", "WebSocket Bandwidth", "Data received per second", BandwidthBps, "bytes/sec", "WebSocket", 0, 1000000, 100000);
+
+            // Post new metrics
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CacheSize", "Signature Cache Size", "Number of entries in signature cache", _cacheSize, "entries", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "CurrentSessionUptime", "Current Session Uptime", "Time since last connection", _currentSessionUptime, "seconds", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageMessageSize", "Average Message Size", "Average size of received messages", _averageMessageSize, "bytes", "WebSocket");
+            _performanceMonitor.RecordSpeedDialMetric("WebSocketConnectionManager", "PeakThroughput", "Peak Message Throughput", "Maximum messages per second achieved", _peakThroughput, "msg/sec", "WebSocket", 0, 1000, 100);
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MinConnectionLatency", "Min Connection Latency", "Minimum connection latency", _minConnectionLatency == long.MaxValue ? 0 : _minConnectionLatency, "ms", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "MaxConnectionLatency", "Max Connection Latency", "Maximum connection latency", _maxConnectionLatency, "ms", "WebSocket");
+            _performanceMonitor.RecordNumericDisplayMetric("WebSocketConnectionManager", "AverageSignatureGenerationTime", "Average Signature Generation Time", "Average time to generate RSA signature", _averageSignatureGenerationTime, "ms", "WebSocket");
+            _performanceMonitor.RecordProgressBarMetric("WebSocketConnectionManager", "UptimePercentage", "Uptime Percentage", "Percentage of time WebSocket has been connected", uptimePercentage, "%", "WebSocket", 0, 100, 99);
 
             _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }

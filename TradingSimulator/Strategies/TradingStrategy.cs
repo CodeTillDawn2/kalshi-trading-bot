@@ -3,7 +3,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using TradingStrategies.Classification.Interfaces;
 
 namespace TradingSimulator.Strategies

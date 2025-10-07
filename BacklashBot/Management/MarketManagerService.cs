@@ -5,6 +5,7 @@ using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
@@ -32,26 +33,34 @@ namespace BacklashBot.Management
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="instanceNameConfig">Configuration options for execution parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
+        /// <param name="marketManagerServiceConfig">Configuration options for market manager service parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="centralPerformanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         public MarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
+            IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService)
         {
-            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
-            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
+            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService);
+            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, instanceNameConfig, centralBrainConfig, marketManagerServiceConfig, scopeManagerService, statusTrackerService, brainStatus, centralPerformanceMonitor, targetCalculationService);
         }
 
+        /// <summary>
+        /// Clears the lists of markets to add after reset and markets to reset.
+        /// This method is thread-safe using a lock to prevent concurrent modifications.
+        /// </summary>
         public new void ClearMarketsToReset()
         {
             lock (_resetLock)
@@ -62,6 +71,11 @@ namespace BacklashBot.Management
         }
 
 
+        /// <summary>
+        /// Handles market resets by refreshing markets and resetting them asynchronously.
+        /// Catches and logs any exceptions that occur during the reset process.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation</returns>
         public new async Task HandleMarketResets()
         {
             try
@@ -79,6 +93,11 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Triggers a market reset for the specified market ticker by adding it to the reset list.
+        /// This method is thread-safe using a lock to prevent concurrent modifications.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market to reset</param>
         public new void TriggerMarketReset(string marketTicker)
         {
             lock (_resetLock)
@@ -96,7 +115,7 @@ namespace BacklashBot.Management
         /// <param name="brain">The brain instance configuration containing watch list settings</param>
         /// <param name="metrics">Current performance metrics for decision making</param>
         /// <returns>A task representing the asynchronous monitoring operation</returns>
-        public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
+        public override async Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics)
         {
             if (brain.ManagedWatchList)
             {

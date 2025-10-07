@@ -98,7 +98,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly List<TimeSpan> _decisionTimes = new List<TimeSpan>();
         private readonly List<TimeSpan> _applyTimes = new List<TimeSpan>();
         private readonly SimulationConfig _config;
-        private readonly IPerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private int _totalTradesExecuted = 0;
         private int _tradeCountThisSnapshot = 0;
 
@@ -111,7 +111,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="initialCash">The initial cash balance for the simulation (default is 100.0).</param>
         /// <param name="performanceMonitor">Optional performance monitor to automatically record metrics.</param>
         /// <exception cref="ArgumentNullException">Thrown when strategy or config is null.</exception>
-        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, double initialCash = 100.0, IPerformanceMonitor? performanceMonitor = null)
+        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, IPerformanceMonitor performanceMonitor, double initialCash = 100.0)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -168,7 +168,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Initialize book if first snapshot
-            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
+            if (SimulatedBook.YesBids.Count == 0 && SimulatedBook.NoBids.Count == 0)
             {
                 SimulatedBook.InitializeFromSnapshot(snapshot);
             }
@@ -265,11 +265,12 @@ namespace TradingStrategies.Trading.Overseer
             bool isPaying = longSide || (shortSide && action != ActionType.Exit);
             double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
-            for (int p = 100; p >= 0; p--)
+            foreach (var kvp in bookToReduce.Reverse()) // Highest prices first
             {
+                int p = kvp.Key;
                 if (remainingQuantity <= 0) break;
-                if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
-                int depth = bookToReduce[p].Sum(o => o.count);
+                if (!kvp.Value.Any()) continue;
+                int depth = kvp.Value.Sum(o => o.Count);
                 int fill = Math.Min(remainingQuantity, depth);
                 double levelPrice = LevelPriceFunc(p);
                 totalCost += fill * levelPrice;
@@ -356,7 +357,7 @@ namespace TradingStrategies.Trading.Overseer
                     bool isAskYes = o.action == "sell" && o.side == "yes";
                     bool isAskNo = o.action == "sell" && o.side == "no";
 
-                    List<(int count, DateTime timestamp)>[] book;
+                    SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book;
                     int bookPrice;
 
                     if (isBidYes) { book = SimulatedBook.YesBids; bookPrice = o.price; }
@@ -364,20 +365,7 @@ namespace TradingStrategies.Trading.Overseer
                     else if (isAskYes) { book = SimulatedBook.NoBids; bookPrice = 100 - o.price; }
                     else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
-                    int toCancel = o.count;
-                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    {
-                        var lst = book[bookPrice];
-                        for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
-                        {
-                            var e = lst[j];
-                            int take = Math.Min(toCancel, e.count);
-                            e.count -= take;
-                            toCancel -= take;
-                            if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
-                        }
-                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
-                    }
+                    SimulatedBook.ReduceDepth(book, bookPrice, o.count, fromFront: false);
                 }
                 SimulatedRestingOrders.Clear();
                 return;
@@ -393,17 +381,13 @@ namespace TradingStrategies.Trading.Overseer
 
             if (action == ActionType.PostYes)
             {
-                if (SimulatedBook.YesBids[limitPrice] == null)
-                    SimulatedBook.YesBids[limitPrice] = new List<(int count, DateTime timestamp)>();
-                SimulatedBook.YesBids[limitPrice].Add((qty, effectiveSnapshot.Timestamp));
+                SimulatedBook.AddToDepth(SimulatedBook.YesBids, limitPrice, qty, effectiveSnapshot.Timestamp, isOwn: true);
             }
             else // PostAsk (sell YES) => rests on NO bids at (100 - ask)
             {
                 int noBidPrice = 100 - limitPrice;
                 if (noBidPrice < 0 || noBidPrice > 100) return;
-                if (SimulatedBook.NoBids[noBidPrice] == null)
-                    SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
-                SimulatedBook.NoBids[noBidPrice].Add((qty, effectiveSnapshot.Timestamp));
+                SimulatedBook.AddToDepth(SimulatedBook.NoBids, noBidPrice, qty, effectiveSnapshot.Timestamp, isOwn: true);
             }
 
             SimulatedRestingOrders.Add((limitAction, limitSide, "limit", qty, limitPrice, exp));
@@ -470,78 +454,128 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         private void SimulateFillsFromDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime currentTime)
         {
-            for (int i = SimulatedRestingOrders.Count - 1; i >= 0; i--)
+            // Group resting orders by book and price
+            var ordersByBookPrice = new Dictionary<(SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book, int price), List<int>>();
+
+            for (int i = 0; i < SimulatedRestingOrders.Count; i++)
             {
                 var o = SimulatedRestingOrders[i];
-
-                bool isBidYes = o.action == "buy"  && o.side == "yes";
-                bool isBidNo = o.action == "buy"  && o.side == "no";
+                bool isBidYes = o.action == "buy" && o.side == "yes";
+                bool isBidNo = o.action == "buy" && o.side == "no";
                 bool isAskYes = o.action == "sell" && o.side == "yes";
                 bool isAskNo = o.action == "sell" && o.side == "no";
 
-                List<(int count, DateTime timestamp)>[] book;
-                Dictionary<int, int> deltas;
+                SortedDictionary<int, List<SimulatedOrderbook.OrderLevel>> book;
                 int bookPrice;
 
-                if (isBidYes) { book = SimulatedBook.YesBids; deltas = yesDeltas; bookPrice = o.price; }
-                else if (isBidNo) { book = SimulatedBook.NoBids; deltas = noDeltas; bookPrice = o.price; }
-                else if (isAskYes) { book = SimulatedBook.NoBids; deltas = noDeltas; bookPrice = 100 - o.price; }
-                else { book = SimulatedBook.YesBids; deltas = yesDeltas; bookPrice = 100 - o.price; }
+                if (isBidYes) { book = SimulatedBook.YesBids; bookPrice = o.price; }
+                else if (isBidNo) { book = SimulatedBook.NoBids; bookPrice = o.price; }
+                else if (isAskYes) { book = SimulatedBook.NoBids; bookPrice = 100 - o.price; }
+                else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
-                // Handle expiration: remove from the back (our own orders)
-                if (o.expiration.HasValue && o.expiration < currentTime)
-                {
-                    int toCancel = o.count;
-                    if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    {
-                        var lst = book[bookPrice];
-                        for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
-                        {
-                            var e = lst[j];
-                            int take = Math.Min(toCancel, e.count);
-                            e.count -= take;
-                            toCancel -= take;
-                            if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
-                        }
-                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
-                    }
-                    SimulatedRestingOrders.RemoveAt(i);
-                    continue;
-                }
+                var key = (book, bookPrice);
+                if (!ordersByBookPrice.ContainsKey(key)) ordersByBookPrice[key] = new List<int>();
+                ordersByBookPrice[key].Add(i);
+            }
 
-                if (deltas == null || !deltas.TryGetValue(bookPrice, out int deltaAtPrice) || deltaAtPrice >= 0)
-                    continue; // no reduction at our price -> no taker hit, or volume added
+            // Process each price level with negative delta
+            foreach (var kvp in ordersByBookPrice)
+            {
+                var (book, bookPrice) = kvp.Key;
+                var orderIndices = kvp.Value;
 
-                // Respect FIFO: your fill begins only after everything *ahead* of you has been consumed.
-                int totalDepth = 0;
-                if (bookPrice >= 0 && bookPrice <= 100 && book[bookPrice] != null)
-                    totalDepth = book[bookPrice].Sum(t => t.count);
+                Dictionary<int, int> deltas = (book == SimulatedBook.YesBids) ? yesDeltas : noDeltas;
+                if (!deltas.TryGetValue(bookPrice, out int deltaAtPrice) || deltaAtPrice >= 0) continue;
 
-                int depthAhead = Math.Max(0, totalDepth - o.count);
+                if (!book.TryGetValue(bookPrice, out var list)) continue;
+
                 int consumed = -deltaAtPrice;
 
-                int fillQuantity = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
-                if (fillQuantity <= 0) continue;
-
-                double px = o.price / 100.0;
-                if (isBidYes || isBidNo)
+                // Consume from front
+                int consumedSoFar = 0;
+                for (int j = 0; j < list.Count && consumedSoFar < consumed; j++)
                 {
-                    Cash     -= fillQuantity * px;
-                    Position += (o.side == "yes" ? fillQuantity : -fillQuantity);
-                }
-                else
-                {
-                    Cash     += fillQuantity * px;
-                    Position -= (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    var orderLevel = list[j];
+                    int take = Math.Min(consumed - consumedSoFar, orderLevel.Count);
+                    consumedSoFar += take;
+                    orderLevel.Count -= take;
                 }
 
-                o.count -= fillQuantity;
+                // Remove zero count orders
+                list.RemoveAll(ol => ol.Count <= 0);
 
-                // External taker consumed book from the *front* at this price
-                SimulatedBook.ReduceDepth(book, bookPrice, fillQuantity);
+                // Now, for our orders, calculate fills based on position in list
+                foreach (int orderIndex in orderIndices.OrderBy(i => i)) // Process in order added
+                {
+                    var o = SimulatedRestingOrders[orderIndex];
 
-                if (o.count <= 0) SimulatedRestingOrders.RemoveAt(i);
-                else SimulatedRestingOrders[i] = o;
+                    // Find this order's position in the list
+                    int orderPosition = -1;
+                    int depthAhead = 0;
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        if (list[j].IsOwnOrder)
+                        {
+                            orderPosition++;
+                            if (orderPosition == orderIndices.IndexOf(orderIndex)) // This is our order
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            depthAhead += list[j].Count;
+                        }
+                    }
+
+                    int fillQuantity = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
+                    if (fillQuantity <= 0) continue;
+
+                    double px = o.price / 100.0;
+                    bool isBid = o.action == "buy";
+                    if (isBid)
+                    {
+                        Cash -= fillQuantity * px;
+                        Position += (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    }
+                    else
+                    {
+                        Cash += fillQuantity * px;
+                        Position -= (o.side == "yes" ? fillQuantity : -fillQuantity);
+                    }
+
+                    o.count -= fillQuantity;
+                    if (o.count <= 0)
+                    {
+                        SimulatedRestingOrders.RemoveAt(orderIndex);
+                        // Remove from list
+                        for (int j = list.Count - 1; j >= 0; j--)
+                        {
+                            if (list[j].IsOwnOrder)
+                            {
+                                list[j].Count -= fillQuantity;
+                                if (list[j].Count <= 0)
+                                {
+                                    list.RemoveAt(j);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SimulatedRestingOrders[orderIndex] = o;
+                        // Update in list
+                        for (int j = list.Count - 1; j >= 0; j--)
+                        {
+                            if (list[j].IsOwnOrder)
+                            {
+                                list[j].Count -= fillQuantity;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -655,7 +689,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Initialize book if first snapshot
-            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
+            if (SimulatedBook.YesBids.Count == 0 && SimulatedBook.NoBids.Count == 0)
             {
                 SimulatedBook.InitializeFromSnapshot(snapshot);
             }
@@ -770,7 +804,7 @@ namespace TradingStrategies.Trading.Overseer
             };
 
             // Automatically record to performance monitor if provided
-            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics, _config.EnablePerformanceMetrics);
+            RecordSimulationMetrics(Strategy.Name, metrics, _config.EnablePerformanceMetrics);
 
             return metrics;
         }
@@ -789,6 +823,123 @@ namespace TradingStrategies.Trading.Overseer
             _applyTimes.Clear();
             _stopwatch.Reset();
             _totalTradesExecuted = 0;
+        }
+
+        private void RecordSimulationMetrics(string className, Dictionary<string, object> metrics, bool enabled)
+        {
+            string category = "Simulation";
+            if (!enabled)
+            {
+                foreach (var kvp in metrics)
+                {
+                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Key, $"Disabled metric: {kvp.Key}", 0.0, "", category);
+                }
+                return;
+            }
+            foreach (var kvp in metrics)
+            {
+                string id = kvp.Key;
+                string name = kvp.Key;
+                string description = GetDescriptionForMetric(id);
+                double value = GetValueAsDouble(kvp.Value);
+                string unit = GetUnitForMetric(id);
+                switch (id)
+                {
+                    case "TotalExecutionTime":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "AverageExecutionTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
+                        break;
+                    case "PeakMemoryUsage":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "TotalSnapshotsProcessed":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "PerformanceThresholdMs":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "SlowOperationsCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "RestingOrdersCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "CurrentPosition":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "CurrentCash":
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "TotalTradesExecuted":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
+                        break;
+                    case "AverageDecisionTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
+                        break;
+                    case "AverageApplyTimeMs":
+                        _performanceMonitor.RecordSpeedDialMetric(className, id, name, description, value, unit, category, null, null, null);
+                        break;
+                    case "SlowDecisionsCount":
+                        _performanceMonitor.RecordCounterMetric(className, id, name, description, value, unit, category);
+                        break;
+                    default:
+                        _performanceMonitor.RecordNumericDisplayMetric(className, id, name, description, value, unit, category);
+                        break;
+                }
+            }
+        }
+
+        private string GetDescriptionForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "Total time spent processing all snapshots";
+                case "AverageExecutionTimeMs": return "Average time to process one snapshot";
+                case "PeakMemoryUsage": return "Maximum memory usage during simulation";
+                case "TotalSnapshotsProcessed": return "Number of snapshots processed";
+                case "PerformanceThresholdMs": return "Threshold for slow operations";
+                case "SlowOperationsCount": return "Number of operations exceeding performance threshold";
+                case "RestingOrdersCount": return "Current number of resting orders";
+                case "CurrentPosition": return "Current position size";
+                case "CurrentCash": return "Current cash balance";
+                case "TotalTradesExecuted": return "Total number of trades executed";
+                case "AverageDecisionTimeMs": return "Average time for strategy decisions";
+                case "AverageApplyTimeMs": return "Average time to apply trading actions";
+                case "SlowDecisionsCount": return "Number of slow strategy decisions";
+                default: return $"Metric: {id}";
+            }
+        }
+
+        private string GetUnitForMetric(string id)
+        {
+            switch (id)
+            {
+                case "TotalExecutionTime": return "ms";
+                case "AverageExecutionTimeMs": return "ms";
+                case "PeakMemoryUsage": return "bytes";
+                case "TotalSnapshotsProcessed": return "count";
+                case "PerformanceThresholdMs": return "ms";
+                case "SlowOperationsCount": return "count";
+                case "RestingOrdersCount": return "count";
+                case "CurrentPosition": return "contracts";
+                case "CurrentCash": return "USD";
+                case "TotalTradesExecuted": return "count";
+                case "AverageDecisionTimeMs": return "ms";
+                case "AverageApplyTimeMs": return "ms";
+                case "SlowDecisionsCount": return "count";
+                default: return "";
+            }
+        }
+
+        private double GetValueAsDouble(object value)
+        {
+            if (value is TimeSpan ts) return ts.TotalMilliseconds;
+            if (value is double d) return d;
+            if (value is int i) return (double)i;
+            if (value is long l) return (double)l;
+            return 0.0;
         }
     }
 }

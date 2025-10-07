@@ -1,9 +1,9 @@
 using BacklashDTOs.Data;
-using KalshiBotData.Models;
+using BacklashBotData.Models;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace KalshiBotData.Extensions
+namespace BacklashBotData.Extensions
 {
     /// <summary>
     /// Provides extension methods for converting between Ticker model and TickerDTO,
@@ -95,13 +95,13 @@ namespace KalshiBotData.Extensions
 
         /// <summary>
         /// Updates an existing Ticker model with data from a TickerDTO,
-        /// validating market ticker and logged date match before updating price and volume data.
+        /// validating market ticker and timestamp match before updating price and volume data.
         /// </summary>
         /// <param name="ticker">The Ticker model to update.</param>
         /// <param name="tickerDTO">The TickerDTO containing updated data.</param>
         /// <returns>The updated Ticker model.</returns>
         /// <exception cref="ArgumentNullException">Thrown when ticker or tickerDTO is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when market tickers or logged dates do not match.</exception>
+        /// <exception cref="ArgumentException">Thrown when market tickers or timestamps do not match.</exception>
         public static Ticker UpdateTicker(this Ticker ticker, TickerDTO tickerDTO)
         {
             if (ticker == null)
@@ -109,9 +109,9 @@ namespace KalshiBotData.Extensions
             if (tickerDTO == null)
                 throw new ArgumentNullException(nameof(tickerDTO));
 
-            if (ticker.market_ticker != tickerDTO.market_ticker || ticker.LoggedDate != tickerDTO.LoggedDate)
+            if (ticker.market_ticker != tickerDTO.market_ticker || ticker.ts != tickerDTO.ts)
             {
-                throw new ArgumentException("Market ticker or logged dates don't match for Update Ticker", nameof(tickerDTO));
+                throw new ArgumentException("Market ticker or timestamps don't match for Update Ticker", nameof(tickerDTO));
             }
 
             var stopwatch = Stopwatch.StartNew();

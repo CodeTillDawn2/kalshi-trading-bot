@@ -29,7 +29,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for the candle relative to the lookback average range.
         /// Purpose: Ensures the candle indicates strong momentum compared to prior volatility.
         /// Default: 1.5 (1.5 times the average range)
-        /// Range: 1.0–2.0 (1.0 for moderate significance, 2.0 for very strong signals).
+        /// Range: 1.0ï¿½2.0 (1.0 for moderate significance, 2.0 for very strong signals).
         /// </summary>
         public static double MinBodyToAvgRangeRatio { get; set; } = 1.0;
 
@@ -37,39 +37,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend for continuation/reversal classification.
         /// Default: 0.6 (60% of candles in trend direction)
-        /// Range: 0.5–0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
+        /// Range: 0.5ï¿½0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
         /// </summary>
         public static double OptionalTrendDirectionRatioMin { get; set; } = 0.6;
 
-        /// <summary>Gets or sets the BaseName.</summary>
-        /// <summary>Gets or sets the BaseName.</summary>
         /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Gets the base name identifier for the Closing Marubozu pattern.
         /// </summary>
         public const string BaseName = "ClosingMarubozu";
         /// <summary>
@@ -79,14 +52,28 @@ namespace BacklashPatterns.PatternDefinitions
             ? "A bullish pattern with a single candle that opens at its low and closes at its high, showing strong buying momentum. Can indicate continuation or reversal depending on trend context."
             : "A bearish pattern with a single candle that opens at its high and closes at its low, showing strong selling momentum. Can indicate continuation or reversal depending on trend context.";
         /// <summary>
+        /// Gets the full name of the pattern including direction and continuation/reversal classification.
         /// </summary>
         public override string Name => $"{BaseName}_{Direction.ToString()}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
         /// <summary>
+        /// Gets the direction of the pattern (bullish or bearish).
         /// </summary>
         public override PatternDirection Direction { get; }
         private readonly bool? IsContinuation; // Nullable to allow unclassified cases
+
+        /// <summary>
+        /// Gets or sets the calculated strength of the pattern based on various factors.
+        /// </summary>
         public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the certainty level of the pattern recognition.
+        /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the uncertainty level of the pattern recognition.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
         /// <summary>

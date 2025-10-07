@@ -4,13 +4,14 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
+using BacklashBotData.Extensions;
+using BacklashBotData.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Polly;
 using System.Data;
+using BacklashBotData.Extensions;
 
 namespace BacklashBotData.Data
 {
@@ -47,6 +48,7 @@ namespace BacklashBotData.Data
         private DbSet<Order> Orders { get; set; }
         private DbSet<LogEntry> LogEntries { get; set; }
         private DbSet<OverseerLogEntry> OverseerLogEntries { get; set; }
+        private DbSet<BacktestingLogEntry> BacktestingLogEntries { get; set; }
         private DbSet<Snapshot> Snapshots { get; set; }
         private DbSet<SnapshotSchema> SnapshotSchemas { get; set; }
         private DbSet<BrainInstance> BrainInstances { get; set; }
@@ -61,16 +63,20 @@ namespace BacklashBotData.Data
         private DbSet<MaintenanceWindow> MaintenanceWindows { get; set; }
         private DbSet<StandardHours> StandardHours { get; set; }
         private DbSet<StandardHoursSession> StandardHoursSessions { get; set; }
+        private DbSet<CurrentSchedule> CurrentSchedules { get; set; }
         private DbSet<BacklashDTOs.SignalRClient> SignalRClients { get; set; }
         private DbSet<BacklashDTOs.Data.OverseerInfo> OverseerInfos { get; set; }
+        private DbSet<Milestone> Milestones { get; set; }
 
         private readonly string _connectionString;
         private readonly ILogger<BacklashBotContext>? _logger;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         // Configuration options
         private readonly int _maxRetryCount;
         private readonly TimeSpan _retryDelay;
         private readonly int _batchSize;
+        private readonly bool _enablePerformanceMetrics;
         private readonly Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> _performanceMetrics;
 
         /// <summary>
@@ -79,14 +85,17 @@ namespace BacklashBotData.Data
         /// <param name="connectionString">Database connection string.</param>
         /// <param name="logger">Optional logger for context operations. If null, logging is disabled.</param>
         /// <param name="dataConfig">Configuration options for database operations.</param>
-        /// <exception cref="ArgumentNullException">Thrown when connectionString or dataConfig is null.</exception>
-        public BacklashBotContext(string connectionString, ILogger<BacklashBotContext>? logger, BacklashBotDataConfig dataConfig)
+        /// <param name="performanceMonitor">Performance monitor for tracking metrics.</param>
+        /// <exception cref="ArgumentNullException">Thrown when connectionString, dataConfig, or performanceMonitor is null.</exception>
+        public BacklashBotContext(string connectionString, ILogger<BacklashBotContext>? logger, BacklashBotDataConfig dataConfig, IPerformanceMonitor performanceMonitor)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _logger = logger;
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _maxRetryCount = dataConfig.MaxRetryCount;
             _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
             _batchSize = dataConfig.BatchSize;
+            _enablePerformanceMetrics = dataConfig.EnablePerformanceMetrics;
             _performanceMetrics = new Dictionary<string, (int, int, TimeSpan)>();
         }
 
@@ -287,6 +296,10 @@ namespace BacklashBotData.Data
         }
 
 
+        /// <summary>
+        /// Adds or updates an event in the database.
+        /// </summary>
+        /// <param name="dto">The event DTO to add or update.</param>
         public async Task AddOrUpdateEvent(EventDTO dto)
         {
             Event? existingEvent = await Events.FirstOrDefaultAsync(x => x.event_ticker == dto.event_ticker);
@@ -318,6 +331,10 @@ namespace BacklashBotData.Data
             }
         }
 
+        /// <summary>
+        /// Adds or updates multiple events in the database.
+        /// </summary>
+        /// <param name="dtos">The list of event DTOs to add or update.</param>
         public async Task AddOrUpdateEvents(List<EventDTO> dtos)
         {
             foreach (EventDTO dto in dtos)
@@ -350,6 +367,24 @@ namespace BacklashBotData.Data
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Retrieves a list of events with optional wildcard search on ticker.
+        /// </summary>
+        /// <param name="tickerWildcard">Optional wildcard pattern to search in event ticker (e.g., "mention*").</param>
+        /// <returns>List of event data transfer objects matching the specified criteria.</returns>
+        public async Task<List<EventDTO>> GetEvents(string? tickerWildcard = null)
+        {
+            IQueryable<Event> query = Events.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(tickerWildcard))
+            {
+                // Use EF.Functions.Like for SQL LIKE pattern matching
+                query = query.Where(x => EF.Functions.Like(x.event_ticker, tickerWildcard));
+            }
+
+            return await query.Select(x => x.ToEventDTO()).ToListAsync();
         }
         #endregion
 
@@ -590,6 +625,7 @@ namespace BacklashBotData.Data
         /// <param name="excludedStatuses">Set of market statuses to exclude. If specified, markets with these statuses are filtered out.</param>
         /// <param name="includedMarkets">Set of specific market tickers to include. If specified, only these markets are returned.</param>
         /// <param name="excludedMarkets">Set of specific market tickers to exclude. If specified, these markets are filtered out.</param>
+        /// <param name="eventTicker">Filter for markets belonging to a specific event ticker.</param>
         /// <param name="hasMarketWatch">Filter for markets that have (true) or don't have (false) market watch data.</param>
         /// <param name="minimumInterestScore">Minimum interest score threshold for markets with market watch data.</param>
         /// <param name="maxInterestScoreDate">Maximum interest score date for filtering market watch data.</param>
@@ -602,6 +638,7 @@ namespace BacklashBotData.Data
         public async Task<List<MarketDTO>> GetMarkets(
             HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
             HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            string? eventTicker = null,
             bool? hasMarketWatch = null, double? minimumInterestScore = null,
             DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
         {
@@ -614,6 +651,8 @@ namespace BacklashBotData.Data
                 query = query.Where(x => includedStatuses.Contains(x.status));
             if (excludedStatuses != null && excludedStatuses.Count > 0)
                 query = query.Where(x => !excludedStatuses.Contains(x.status));
+            if (!string.IsNullOrWhiteSpace(eventTicker))
+                query = query.Where(x => x.event_ticker == eventTicker);
             if (maxAPILastFetchTime != null)
                 query = query.Where(x => x.APILastFetchedDate <= maxAPILastFetchTime.Value);
             if (hasMarketWatch != null)
@@ -689,29 +728,29 @@ namespace BacklashBotData.Data
         #endregion
 
         #region Tickers
-        public async Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null)
+        public async Task<List<TickerDTO>> GetTickers(string? marketTicker = null, long? ts = null)
         {
             IQueryable<Ticker> query = Tickers.AsNoTracking();
             if (marketTicker != null)
                 query = query.Where(x => x.market_ticker == marketTicker);
-            if (loggedDate != null)
-                query = query.Where(x => x.LoggedDate == loggedDate);
+            if (ts != null)
+                query = query.Where(x => x.ts == ts);
             return await query.Select(x => x.ToTickerDTO()).ToListAsync();
         }
 
 
         public async Task AddOrUpdateTickers(List<TickerDTO> dtos)
         {
-            var tickerKeys = dtos.Select(dto => new { dto.market_ticker, dto.LoggedDate }).ToList();
+            var tickerKeys = dtos.Select(dto => new { dto.market_ticker, dto.ts, dto.price }).ToList();
             var tickers = await Tickers
                 .ToListAsync();
             var tickerDict = tickers
-                .Where(t => tickerKeys.Any(k => k.market_ticker == t.market_ticker && k.LoggedDate == t.LoggedDate))
-                .ToDictionary(t => (t.market_ticker, t.LoggedDate), t => t);
+                .Where(t => tickerKeys.Any(k => k.market_ticker == t.market_ticker && k.ts == t.ts && k.price == t.price))
+                .ToDictionary(t => (t.market_ticker, t.ts, t.price), t => t);
 
             foreach (var dto in dtos)
             {
-                var key = (dto.market_ticker, dto.LoggedDate);
+                var key = (dto.market_ticker, dto.ts, dto.price);
                 if (!tickerDict.TryGetValue(key, out var ticker))
                 {
                     Tickers.Add(dto.ToTicker());
@@ -726,7 +765,7 @@ namespace BacklashBotData.Data
 
         public async Task AddOrUpdateTicker(TickerDTO dto)
         {
-            Ticker? ticker = await Tickers.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker && x.LoggedDate == dto.LoggedDate);
+            Ticker? ticker = await Tickers.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker && x.ts == dto.ts && x.price == dto.price);
             if (ticker == null)
             {
                 ticker = dto.ToTicker();
@@ -776,7 +815,7 @@ namespace BacklashBotData.Data
             bool? hasMarketWatch = null, double? minimumInterestScore = null,
             DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
         {
-            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
+            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, null, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
         }
 
         public async Task<HashSet<MarketWatchDTO>> GetMarketWatchesFiltered(HashSet<string>? marketTickers = null,
@@ -1466,56 +1505,64 @@ namespace BacklashBotData.Data
 
         public async Task AddOrUpdateWeightSet(WeightSetDTO dto)
         {
-            using var transaction = await Database.BeginTransactionAsync();
-            try
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var strategy = Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                WeightSet? weightSet = await WeightSets
-                    .Include(ws => ws.WeightSetMarkets)
-                    .FirstOrDefaultAsync(ws => ws.StrategyName == dto.StrategyName);
-
-                if (weightSet == null)
+                using var tx = await Database.BeginTransactionAsync();
+                try
                 {
-                    weightSet = dto.ToWeightSet();
-                    weightSet.WeightSetMarkets.Clear();
-                    await WeightSets.AddAsync(weightSet);
-                }
-                else
-                {
-                    weightSet.UpdateWeightSet(dto);
+                    WeightSet? weightSet = await WeightSets
+                        .Include(ws => ws.WeightSetMarkets)
+                        .FirstOrDefaultAsync(ws => ws.StrategyName == dto.StrategyName);
 
-                    var marketsToRemove = weightSet.WeightSetMarkets
-                        .Where(m => !dto.WeightSetMarkets.Any(dm => dm.WeightSetID == m.WeightSetID && dm.MarketTicker == m.MarketTicker))
-                        .ToList();
-                    foreach (var market in marketsToRemove)
+                    if (weightSet == null)
                     {
-                        weightSet.WeightSetMarkets.Remove(market);
-                    }
-                }
-
-                foreach (var marketDTO in dto.WeightSetMarkets)
-                {
-                    var existingMarket = weightSet.WeightSetMarkets
-                        .FirstOrDefault(m => m.MarketTicker == marketDTO.MarketTicker);
-
-                    if (existingMarket == null)
-                    {
-                        marketDTO.WeightSetID = weightSet.WeightSetID;
-                        weightSet.WeightSetMarkets.Add(marketDTO.ToWeightSetMarket());
+                        weightSet = dto.ToWeightSet();
+                        weightSet.WeightSetMarkets.Clear();
+                        await WeightSets.AddAsync(weightSet);
                     }
                     else
                     {
-                        existingMarket.UpdateWeightSetMarket(marketDTO);
-                    }
-                }
+                        weightSet.UpdateWeightSet(dto);
 
-                await SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                        var marketsToRemove = weightSet.WeightSetMarkets
+                            .Where(m => !dto.WeightSetMarkets.Any(dm => dm.WeightSetID == m.WeightSetID && dm.MarketTicker == m.MarketTicker))
+                            .ToList();
+                        foreach (var market in marketsToRemove)
+                        {
+                            weightSet.WeightSetMarkets.Remove(market);
+                        }
+                    }
+
+                    foreach (var marketDTO in dto.WeightSetMarkets)
+                    {
+                        var existingMarket = weightSet.WeightSetMarkets
+                            .FirstOrDefault(m => m.MarketTicker == marketDTO.MarketTicker);
+
+                        if (existingMarket == null)
+                        {
+                            marketDTO.WeightSetID = weightSet.WeightSetID;
+                            weightSet.WeightSetMarkets.Add(marketDTO.ToWeightSetMarket());
+                        }
+                        else
+                        {
+                            existingMarket.UpdateWeightSetMarket(marketDTO);
+                        }
+                    }
+
+                    await SaveChangesWithRetryAsync();
+                    await tx.CommitAsync();
+                    TrackPerformanceMetric("AddOrUpdateWeightSet", true, stopwatch.Elapsed);
+                }
+                catch (Exception ex)
+                {
+                    await tx.RollbackAsync();
+                    TrackPerformanceMetric("AddOrUpdateWeightSet", false, stopwatch.Elapsed);
+                    _logger?.LogError(ex, "Error adding or updating weight set {StrategyName}", dto.StrategyName);
+                    throw new Exception($"Failed to add or update weight set for strategy {dto.StrategyName}: {ex.Message}", ex);
+                }
+            });
         }
 
         public async Task AddOrUpdateWeightSets(List<WeightSetDTO> dtos)
@@ -1550,6 +1597,12 @@ namespace BacklashBotData.Data
         public async Task AddOverseerLogEntry(LogEntryDTO dto)
         {
             OverseerLogEntries.Add(dto.ToOverseerLogEntry());
+            await SaveChangesAsync();
+        }
+
+        public async Task AddBacktestingLogEntry(LogEntryDTO dto)
+        {
+            BacktestingLogEntries.Add(dto.ToBacktestingLogEntry());
             await SaveChangesAsync();
         }
 
@@ -1594,6 +1647,33 @@ namespace BacklashBotData.Data
             var announcementModels = announcements.Select(a => a.ToAnnouncement()).ToList();
             await Announcements.AddRangeAsync(announcementModels);
             await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Milestones
+        public async Task AddMilestones(List<MilestoneDTO> milestones)
+        {
+            foreach (var milestoneDTO in milestones)
+            {
+                var existing = await Milestones.FirstOrDefaultAsync(m => m.Id == milestoneDTO.Id);
+                if (existing != null)
+                {
+                    existing.UpdateMilestone(milestoneDTO);
+                }
+                else
+                {
+                    await Milestones.AddAsync(milestoneDTO.ToMilestone());
+                }
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task<List<MilestoneDTO>> GetMilestonesByEventTickerAsync(string eventTicker)
+        {
+            var milestones = await Milestones.AsNoTracking().ToListAsync();
+            return milestones.Where(m => (m.PrimaryEventTickers != null && m.PrimaryEventTickers.Contains(eventTicker)) ||
+                                          (m.RelatedEventTickers != null && m.RelatedEventTickers.Contains(eventTicker)))
+                             .Select(m => m.ToMilestoneDTO()).ToList();
         }
         #endregion
 
@@ -1701,6 +1781,86 @@ namespace BacklashBotData.Data
         }
         #endregion
 
+        #region Current Schedule
+        /// <summary>
+        /// Populates the CurrentSchedule table with the latest schedule data from StandardHoursSessions.
+        /// This creates a flattened view of the current weekly trading schedule.
+        /// Uses the most recent StandardHours data (max StandardHoursID).
+        /// For each day, takes the start time from the session with the latest start time,
+        /// and the end time from the maximum end time across all sessions for that day.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task PopulateCurrentScheduleFromStandardHours()
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                // Get the latest standard hours sessions (based on max StandardHoursID) and group by day of week
+                // For each day, take the start time from the session with the latest start time,
+                // and the end time from the maximum end time across all sessions
+                var maxStandardHoursId = await StandardHoursSessions
+                    .AsNoTracking()
+                    .MaxAsync(s => s.StandardHoursID);
+
+                var allLatestSessions = await StandardHoursSessions
+                    .AsNoTracking()
+                    .Where(s => s.StandardHoursID == maxStandardHoursId)
+                    .ToListAsync();
+
+                var sessionsByDay = allLatestSessions
+                    .GroupBy(s => s.DayOfWeek)
+                    .Select(g =>
+                    {
+                        var sessions = g.ToList();
+                        var latestStartSession = sessions.OrderByDescending(s => s.StartTime).First();
+                        var maxEndTime = sessions.Max(s => s.EndTime);
+                        return new
+                        {
+                            DayOfWeek = g.Key,
+                            StartTime = latestStartSession.StartTime,
+                            EndTime = maxEndTime
+                        };
+                    })
+                    .ToList();
+
+                // Clear existing current schedule
+                var existingSchedules = await CurrentSchedules.ToListAsync();
+                if (existingSchedules.Any())
+                {
+                    CurrentSchedules.RemoveRange(existingSchedules);
+                    await SaveChangesAsync();
+                }
+
+                // Add new current schedule entries
+                foreach (var daySchedule in sessionsByDay)
+                {
+                    // Use start time from latest session, end time from max end time
+                    var currentSchedule = new CurrentSchedule
+                    {
+                        DayOfWeek = daySchedule.DayOfWeek,
+                        StartTime = daySchedule.StartTime,
+                        EndTime = daySchedule.EndTime,
+                        LastModifiedDate = DateTime.UtcNow
+                    };
+                    CurrentSchedules.Add(currentSchedule);
+
+                    _logger?.LogDebug("Added CurrentSchedule for {DayOfWeek}: {StartTime} - {EndTime}",
+                        daySchedule.DayOfWeek, daySchedule.StartTime, daySchedule.EndTime);
+                }
+
+                await SaveChangesAsync();
+                TrackPerformanceMetric("PopulateCurrentScheduleFromStandardHours", true, stopwatch.Elapsed);
+                _logger?.LogInformation("Successfully populated CurrentSchedule table with {Count} entries", sessionsByDay.Count);
+            }
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("PopulateCurrentScheduleFromStandardHours", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error populating CurrentSchedule from StandardHours");
+                throw;
+            }
+        }
+        #endregion
+
         #region Overseer Info
         public async Task AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo overseerInfo)
         {
@@ -1728,6 +1888,11 @@ namespace BacklashBotData.Data
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Gets overseer info by host name.
+        /// </summary>
+        /// <param name="hostName">The host name to filter by.</param>
+        /// <returns>The overseer info DTO if found, null otherwise.</returns>
         public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName)
         {
             return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);
@@ -1756,6 +1921,32 @@ namespace BacklashBotData.Data
                 {
                     _performanceMetrics[operationName] = (current.SuccessCount, current.FailureCount + 1, current.TotalTime + duration);
                 }
+            }
+
+            // Transmit performance metrics to the injected monitor
+            if (_enablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "BacklashBotContext",
+                    id: operationName,
+                    name: operationName,
+                    description: $"Performance metric for {operationName}",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Database"
+                );
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric(
+                    className: "BacklashBotContext",
+                    id: operationName,
+                    name: operationName,
+                    description: $"Disabled performance metric for {operationName}",
+                    value: duration.TotalMilliseconds,
+                    unit: "ms",
+                    category: "Database"
+                );
             }
         }
 
@@ -2168,7 +2359,7 @@ namespace BacklashBotData.Data
 
             modelBuilder.Entity<Ticker>()
                 .ToTable("t_feed_ticker")
-                .HasKey(ff => new { ff.market_ticker, ff.LoggedDate });
+                .HasKey(ff => new { ff.market_ticker, ff.ts, ff.price });
 
             modelBuilder.Entity<Ticker>()
                 .HasIndex(ff => ff.market_ticker);
@@ -2313,6 +2504,39 @@ namespace BacklashBotData.Data
                 entity.Property(e => e.Source)
                       .IsRequired()
                       .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<BacktestingLogEntry>(entity =>
+            {
+                entity
+                    .HasKey(e => e.Id);
+
+                entity.Property(e => e.Timestamp)
+                      .IsRequired()
+                      .HasColumnType("datetime");
+
+                entity.Property(e => e.Level)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.SessionIdentifier)
+                      .IsRequired()
+                      .HasMaxLength(5);
+
+                entity.Property(e => e.Message)
+                      .IsRequired()
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Exception)
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Source)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.BrainInstance)
+                      .IsRequired()
+                      .HasMaxLength(50);
             });
 
             modelBuilder.Entity<StratData>()
@@ -2477,6 +2701,29 @@ namespace BacklashBotData.Data
                 .Property(s => s.LastModifiedDate)
                 .HasDefaultValueSql("GETDATE()");
 
+            modelBuilder.Entity<CurrentSchedule>()
+                .ToTable("t_CurrentSchedule")
+                .HasKey(cs => cs.DayOfWeek);
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.DayOfWeek)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.StartTime)
+                .HasColumnType("time(7)")
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.EndTime)
+                .HasColumnType("time(7)")
+                .IsRequired();
+
+            modelBuilder.Entity<CurrentSchedule>()
+                .Property(cs => cs.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
             modelBuilder.Entity<BacklashDTOs.SignalRClient>()
                 .ToTable("t_SignalRClients")
                 .HasKey(c => c.ClientId);
@@ -2559,6 +2806,93 @@ namespace BacklashBotData.Data
             modelBuilder.Entity<OverseerInfo>()
                 .HasIndex(oi => oi.LastHeartbeat)
                 .HasDatabaseName("IX_t_OverseerInfo_LastHeartbeat");
+
+            modelBuilder.Entity<Milestone>()
+                .ToTable("t_Milestones")
+                .HasKey(m => m.Id);
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Id)
+                .HasColumnName("id")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Category)
+                .HasColumnName("category")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Details)
+                .HasColumnName("details")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.EndDate)
+                .HasColumnName("end_date");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.LastUpdatedTs)
+                .HasColumnName("last_updated_ts");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.NotificationMessage)
+                .HasColumnName("notification_message")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.PrimaryEventTickers)
+                .HasColumnName("primary_event_tickers")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.RelatedEventTickers)
+                .HasColumnName("related_event_tickers")
+                .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.SourceId)
+                .HasColumnName("source_id")
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.StartDate)
+                .HasColumnName("start_date");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Title)
+                .HasColumnName("title")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.Type)
+                .HasColumnName("type")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.CreatedDate)
+                .HasColumnName("CreatedDate")
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Milestone>()
+                .Property(m => m.LastModifiedDate)
+                .HasColumnName("LastModifiedDate");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.Category)
+                .HasDatabaseName("IX_t_Milestones_category");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.Type)
+                .HasDatabaseName("IX_t_Milestones_type");
+
+            modelBuilder.Entity<Milestone>()
+                .HasIndex(m => m.StartDate)
+                .HasDatabaseName("IX_t_Milestones_start_date");
         }
     }
 }

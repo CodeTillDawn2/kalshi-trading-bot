@@ -9,128 +9,6 @@ using static BacklashPatterns.PatternUtils;
 namespace BacklashPatterns
 {
     /// <summary>
-    /// Configuration class for pattern detection thresholds and settings.
-    /// </summary>
-    public class PatternDetectionConfig
-    {
-        public const string SectionName = "Simulator:PatternDetectionService";
-
-        /// <summary>
-        /// Minimum price change threshold for significance check.
-        /// </summary>
-        public double SignificancePriceThreshold { get; set; }
-
-        /// <summary>
-        /// Minimum volume increase multiplier for context check.
-        /// </summary>
-        public double VolumeIncreaseMultiplier { get; set; }
-
-        /// <summary>
-        /// Initial capacity for patterns array per candle.
-        /// </summary>
-        public int InitialPatternCapacity { get; set; }
-
-        /// <summary>
-        /// Whether to enable parallel processing for pattern detection.
-        /// </summary>
-        public bool EnableParallelProcessing { get; set; }
-
-        /// <summary>
-        /// Maximum degree of parallelism for pattern checks.
-        /// </summary>
-        public int MaxDegreeOfParallelism { get; set; }
-    }
-
-    /// <summary>
-    /// Service for collecting performance metrics during pattern detection.
-    /// </summary>
-    public class PatternDetectionMetrics
-    {
-        private readonly Stopwatch _totalStopwatch = new Stopwatch();
-        private readonly Dictionary<string, long> _patternCheckTimes = new Dictionary<string, long>();
-        private readonly Dictionary<string, int> _patternCounts = new Dictionary<string, int>();
-        private int _totalCandlesProcessed;
-        private int _totalPatternsFound;
-
-        /// <summary>
-        /// Starts overall detection timing.
-        /// </summary>
-        public void StartDetection() => _totalStopwatch.Start();
-
-        /// <summary>
-        /// Stops overall detection timing.
-        /// </summary>
-        public void StopDetection() => _totalStopwatch.Stop();
-
-        /// <summary>
-        /// Records time taken for a specific pattern check.
-        /// </summary>
-        public void RecordPatternCheckTime(string patternName, long ticks)
-        {
-            if (!_patternCheckTimes.ContainsKey(patternName))
-                _patternCheckTimes[patternName] = 0;
-            _patternCheckTimes[patternName] += ticks;
-        }
-
-        /// <summary>
-        /// Records a pattern detection.
-        /// </summary>
-        public void RecordPatternFound(string patternName)
-        {
-            if (!_patternCounts.ContainsKey(patternName))
-                _patternCounts[patternName] = 0;
-            _patternCounts[patternName]++;
-            _totalPatternsFound++;
-        }
-
-        /// <summary>
-        /// Increments the candle processing count.
-        /// </summary>
-        public void IncrementCandlesProcessed() => _totalCandlesProcessed++;
-
-        /// <summary>
-        /// Gets the performance metrics summary.
-        /// </summary>
-        public PatternDetectionMetricsSummary GetSummary()
-        {
-            return new PatternDetectionMetricsSummary
-            {
-                TotalDetectionTimeMs = _totalStopwatch.ElapsedMilliseconds,
-                TotalCandlesProcessed = _totalCandlesProcessed,
-                TotalPatternsFound = _totalPatternsFound,
-                PatternCheckTimes = new Dictionary<string, long>(_patternCheckTimes),
-                PatternCounts = new Dictionary<string, int>(_patternCounts)
-            };
-        }
-    }
-
-    /// <summary>
-    /// Summary of pattern detection performance metrics.
-    /// </summary>
-    public class PatternDetectionMetricsSummary
-    {
-        /// <summary>
-        /// Gets or sets the total detection time in milliseconds.
-        /// </summary>
-        public long TotalDetectionTimeMs { get; set; }
-        /// <summary>
-        /// Gets or sets the total number of candles processed.
-        /// </summary>
-        public int TotalCandlesProcessed { get; set; }
-        /// <summary>
-        /// Gets or sets the total number of patterns found.
-        /// </summary>
-        public int TotalPatternsFound { get; set; }
-        /// <summary>
-        /// Gets or sets the dictionary of pattern check times.
-        /// </summary>
-        public Dictionary<string, long> PatternCheckTimes { get; set; } = new Dictionary<string, long>();
-        /// <summary>
-        /// Gets or sets the dictionary of pattern counts.
-        /// </summary>
-        public Dictionary<string, int> PatternCounts { get; set; } = new Dictionary<string, int>();
-    }
-    /// <summary>
     /// Provides functionality for detecting and filtering candlestick patterns in financial market data.
     /// This static class analyzes arrays of candle data to identify various technical analysis patterns,
     /// applying filtering rules to eliminate redundant or less significant patterns.
@@ -258,7 +136,7 @@ namespace BacklashPatterns
         /// <param name="prices">Array of candle data containing price and volume information.</param>
         /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
         /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
-        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
+        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback, IPerformanceMonitor performanceMonitor)
         {
             var config = new PatternDetectionConfig();
             var metrics = new PatternDetectionMetrics();
@@ -283,7 +161,7 @@ namespace BacklashPatterns
         /// </remarks>
         public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatternsAsync(CandleMids[] prices,
                 int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
-                IPerformanceMonitor? performanceMonitor = null)
+                IPerformanceMonitor performanceMonitor)
         {
             if (prices == null || prices.Length < 2)
                 return new Dictionary<int, List<PatternDefinition>>();
@@ -710,8 +588,8 @@ namespace BacklashPatterns
                             ["Timestamp"] = DateTime.UtcNow
                         };
 
-                        // Call the overloaded method with enablement status
-                        performanceMonitor.RecordSimulationMetrics("PatternSearch", metricsDict, _enablePerformanceMetrics);
+                        // Call the new method for speed dial metric
+                        performanceMonitor.RecordSpeedDialMetric("PatternSearch", "DetectPatternsAsync", "Pattern Detection Execution Time", "Time taken to detect patterns", (double)summary.TotalDetectionTimeMs, "ms", "Performance", 0, 10000, 5000);
                     }
                 }
 
@@ -1161,7 +1039,7 @@ namespace BacklashPatterns
         /// <param name="generateImages">Whether to generate and save pattern visualization images.</param>
         /// <param name="imageLookback">Number of candles to include in pattern images for context.</param>
         /// <returns>Dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
-        public static Dictionary<int, List<PatternVisualization>> DetectPatternsWithVisualization(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+        public static Dictionary<int, List<PatternVisualization>> DetectPatternsWithVisualization(CandleMids[] prices, int trendLookback, IPerformanceMonitor performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
         {
             var config = new PatternDetectionConfig();
             var metrics = new PatternDetectionMetrics();
@@ -1181,7 +1059,7 @@ namespace BacklashPatterns
         /// <returns>Task containing dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
         public static async Task<Dictionary<int, List<PatternVisualization>>> DetectPatternsWithVisualizationAsync(CandleMids[] prices,
                 int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
-                IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+                IPerformanceMonitor performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
         {
             // First detect patterns normally
             var patterns = await DetectPatternsAsync(prices, trendLookback, config, metrics, performanceMonitor);

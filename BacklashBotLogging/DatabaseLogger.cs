@@ -136,8 +136,8 @@ namespace KalshiBotLogging
             // Database logging for persistent storage - only for configured minimum level
             if (logLevel >= _minSqlLogLevel)
             {
-                // Async enqueue for high-throughput scenarios
-                _ = Task.Run(async () => await _loggingQueue.EnqueueDBLogsAsync(logEntry));
+                // Enqueue for database storage
+                _loggingQueue.EnqueueDBLogs(logEntry);
             }
 
             // Forward to error handler for warnings and errors

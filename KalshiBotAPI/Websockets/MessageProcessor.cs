@@ -36,7 +36,6 @@ namespace KalshiBotAPI.Websockets
         private readonly KalshiAPIServiceConfig _apiConfig;
         private bool _isDataPersistenceEnabled;
         private readonly bool _enablePerformanceMonitoring;
-        private readonly IMessageProcessorPerformanceMetrics _performanceMetrics;
         private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts;
         private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue;
@@ -61,6 +60,21 @@ namespace KalshiBotAPI.Websockets
         /// Count of duplicate messages detected within the current time window.
         /// </summary>
         private int _duplicateMessagesInWindow = 0;
+
+        /// <summary>
+        /// Total count of "Already subscribed" error messages detected.
+        /// </summary>
+        private int _alreadySubscribedErrorCount = 0;
+
+        /// <summary>
+        /// Timestamp of the last "Already subscribed" error warning log.
+        /// </summary>
+        private DateTime _lastAlreadySubscribedWarningTime = DateTime.UtcNow;
+
+        /// <summary>
+        /// Count of "Already subscribed" errors detected within the current time window.
+        /// </summary>
+        private int _alreadySubscribedErrorsInWindow = 0;
 
         // Message batching fields
         /// <summary>
@@ -133,49 +147,50 @@ namespace KalshiBotAPI.Websockets
         private DateTime _lastDelayedMetricsTime = DateTime.UtcNow;
         private readonly object _delayedMetricsLock = new object();
 
-        /// <summary>Gets or sets the OrderBookReceived.</summary>
-        /// <summary>Gets or sets the OrderBookReceived.</summary>
         /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Occurs when an order book update is received.
         /// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+
         /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Occurs when a ticker update is received.
         /// </summary>
         public event EventHandler<TickerEventArgs>? TickerReceived;
+
         /// <summary>
+        /// Occurs when a trade event is received.
         /// </summary>
         public event EventHandler<TradeEventArgs>? TradeReceived;
+
+        /// <summary>
+        /// Occurs when a fill event is received.
+        /// </summary>
         public event EventHandler<FillEventArgs>? FillReceived;
+
+        /// <summary>
+        /// Occurs when a market lifecycle event is received.
+        /// </summary>
         public event EventHandler<MarketLifecycleEventArgs>? MarketLifecycleReceived;
+
+        /// <summary>
+        /// Occurs when an event lifecycle event is received.
+        /// </summary>
         public event EventHandler<EventLifecycleEventArgs>? EventLifecycleReceived;
+
+        /// <summary>
+        /// Occurs when any WebSocket message is received, providing the timestamp.
+        /// </summary>
         public event EventHandler<DateTime>? MessageReceived;
+
+        /// <summary>
+        /// Handles order book processed events from the subscription manager and forwards them as OrderBookReceived events.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The order book event arguments.</param>
+        private void OnOrderBookProcessed(object? sender, OrderBookEventArgs e)
+        {
+            OrderBookReceived?.Invoke(this, e);
+        }
 
         /// <summary>
         /// Initializes a new instance of the MessageProcessor with required dependencies.
@@ -189,7 +204,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="kalshiAPIService">Provides access to Kalshi API for market data retrieval and updates.</param>
         /// <param name="config">Configuration settings for WebSocket operations.</param>
         /// <param name="apiConfig">Configuration settings for Kalshi API operations.</param>
-        /// <param name="performanceMetrics">Service for posting performance metrics to central monitoring.</param>
+        /// <param name="performanceMonitor">Service for recording performance metrics.</param>
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
             IWebSocketConnectionManager connectionManager,
@@ -199,7 +214,6 @@ namespace KalshiBotAPI.Websockets
             IKalshiAPIService kalshiAPIService,
             MessageProcessorConfig config,
             IOptions<KalshiAPIServiceConfig> apiConfig,
-            IMessageProcessorPerformanceMetrics performanceMetrics,
             IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
@@ -210,7 +224,6 @@ namespace KalshiBotAPI.Websockets
             _kalshiAPIService = kalshiAPIService;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _apiConfig = apiConfig?.Value ?? throw new ArgumentNullException(nameof(apiConfig));
-            _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
             _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
             _enablePerformanceMonitoring = _config.EnablePerformanceMetrics;
@@ -251,6 +264,9 @@ namespace KalshiBotAPI.Websockets
 
             _logger.LogInformation("MessageProcessor initialized with configuration: Batching={BatchingEnabled}, AdvancedLocking={AdvancedLockingEnabled}, Metrics={MetricsEnabled}",
                 _config.EnableMessageBatching, _config.UseAdvancedLocking, _enablePerformanceMonitoring);
+
+            // Subscribe to order book processed events from subscription manager
+            _subscriptionManager.OrderBookProcessed += OnOrderBookProcessed;
         }
 
         /// <summary>
@@ -424,8 +440,16 @@ namespace KalshiBotAPI.Websockets
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
-                        throw new InvalidOperationException($"WebSocket closed: {result.CloseStatusDescription}");
+                        if (result.CloseStatus == WebSocketCloseStatus.NormalClosure)
+                        {
+                            _logger.LogInformation("WebSocket closed normally by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                            break; // Exit the receive loop gracefully
+                        }
+                        else
+                        {
+                            _logger.LogError("WebSocket closed abnormally by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                            throw new InvalidOperationException($"WebSocket closed: {result.CloseStatusDescription}");
+                        }
                     }
 
                     if (result.MessageType == WebSocketMessageType.Text)
@@ -442,7 +466,16 @@ namespace KalshiBotAPI.Websockets
                             // Use batching or direct processing based on configuration
                             if (_config.EnableMessageBatching)
                             {
-                                _messageBatchQueue.Enqueue(fullMessage);
+                                // Process confirmation messages immediately to avoid timeout issues
+                                // when batching is enabled, as they are critical for subscription management
+                                if (IsConfirmationMessage(fullMessage))
+                                {
+                                    await ProcessMessageAsync(fullMessage);
+                                }
+                                else
+                                {
+                                    _messageBatchQueue.Enqueue(fullMessage);
+                                }
                             }
                             else
                             {
@@ -494,54 +527,30 @@ namespace KalshiBotAPI.Websockets
                 var data = JsonSerializer.Deserialize<JsonElement>(message);
                 var msgType = data.GetProperty("type").GetString() ?? "unknown";
 
-                // Check for message deduplication based on sequence number per channel
-                long sequenceNumber = 0;
-                string channelKey = msgType; // Default to message type as channel identifier
-                if (data.TryGetProperty("seq", out var seqProp) && seqProp.TryGetInt64(out sequenceNumber))
-                {
-                    // For messages with sid, use sid as the channel identifier since seq is per sid
-                    if (data.TryGetProperty("sid", out var sidProp) && sidProp.TryGetInt32(out int sid))
-                    {
-                        channelKey = sid.ToString();
-                    }
-
-                    lock (_sequenceNumberSynchronizationLock)
-                    {
-                        // Get or create sequence number set for this channel
-                        var channelSequences = _processedSequenceNumbersByChannel.GetOrAdd(channelKey, _ => new HashSet<long>());
-
-                        if (channelSequences.Contains(sequenceNumber))
-                        {
-                            if (_enablePerformanceMonitoring)
-                            {
-                                _duplicateMessageCount++;
-                                _duplicateMessagesInWindow++;
-                                CheckDuplicateMessageWarnings();
-                            }
-                            _logger.LogWarning("DUP-Duplicate message detected with sequence number {SequenceNumber} for channel {Channel}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, channelKey, _duplicateMessageCount);
-                            return; // Skip processing duplicate messages
-                        }
-                        channelSequences.Add(sequenceNumber);
-
-                        // Update latest processed sequence number
-                        if (sequenceNumber > _latestProcessedSequenceNumber)
-                        {
-                            _latestProcessedSequenceNumber = sequenceNumber;
-                        }
-
-                        // Periodic cleanup of old sequence numbers to prevent memory leaks
-                        if (channelSequences.Count > _config.MaxSequenceNumbersToKeep)
-                        {
-                            var oldestToKeep = _latestProcessedSequenceNumber - (_config.MaxSequenceNumbersToKeep / 2);
-                            channelSequences.RemoveWhere(seq => seq < oldestToKeep);
-                        }
-                    }
-                }
-
+                // Extract sequence number for logging if available
+                var sequenceNumber = data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : (long?)null;
                 _logger.LogDebug("Received WebSocket message type: {MsgType}, Seq: {SequenceNumber}", msgType, sequenceNumber);
 
                 if (MessageReceived != null)
                     MessageReceived?.Invoke(this, DateTime.UtcNow);
+
+                // Record channel activity for stale detection
+                string channelForActivity = msgType switch
+                {
+                    "orderbook_snapshot" => "orderbook_delta",
+                    "orderbook_delta" => "orderbook_delta",
+                    "ticker" => "ticker",
+                    "trade" => "trade",
+                    "fill" => "fill",
+                    "market_lifecycle_v2" => "lifecycle", 
+                    "event_lifecycle" => "lifecycle", 
+                    _ => null
+                };
+
+                if (channelForActivity != null)
+                {
+                    _subscriptionManager.RecordChannelActivity(channelForActivity);
+                }
 
                 switch (msgType)
                 {
@@ -571,7 +580,37 @@ namespace KalshiBotAPI.Websockets
                         await ProcessUnsubscriptionConfirmationAsync(data);
                         break;
                     case "ok":
+                        // Existing: Extract id and other properties
+                        int id = data.GetProperty("id").GetInt32();
+                        int sid = data.GetProperty("sid").GetInt32();
+
+                        // Record channel activity for "ok" messages with sid
+                        if (sid != 0)
+                        {
+                            // Find channel by sid
+                            string channelForOk = null;
+                            // Since _subscriptionManager is ISubscriptionManager, need to access BaseSubscriptionManager
+                            // For now, assume it's the channel that has this sid
+                            // Actually, since we have the subscriptionManager, and it has GetChannelSid, but to get channel from sid, need to iterate
+                            // But to keep simple, perhaps record activity for known channels, but since it's confirmation, the channel is active
+                            // For now, skip specific channel, but since "ok" indicates activity, perhaps record for all channels or find a way
+                            // Actually, since the pending confirmation has the channel, but here we don't have it yet.
+                            // Perhaps move the activity recording after processing.
+                        }
+
+                        // Existing: Synchronous confirmation handling
                         await ProcessOkConfirmationAsync(data);
+
+                        if (data.TryGetProperty("seq", out var seqElement) && _subscriptionManager.GetChannelSid("orderbook_delta") == sid)
+                        {
+                            long seq = seqElement.GetInt64();
+                            _subscriptionManager.EnqueueOkMessage(sid, data, seq);
+                            _logger.LogDebug("Enqueued sequenced 'ok' for sid {Sid}, seq {Seq}", sid, seq);
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Skipped enqueuing non-sequenced 'ok' or non-orderbook sid for id {Id}, sid {Sid}", id, sid);
+                        }
                         break;
                     case "error":
                         await ProcessErrorMessageAsync(data);
@@ -583,16 +622,21 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 // Update performance metrics
+                var processingTime = _processingStopwatch.ElapsedMilliseconds - processingStartTime;
                 if (_enablePerformanceMonitoring)
                 {
-                    var processingTime = _processingStopwatch.ElapsedMilliseconds - processingStartTime;
                     lock (_metricsLock)
                     {
                         _totalMessagesProcessed++;
                         _totalProcessingTimeMs += processingTime;
                     }
-                    LogPerformanceMetrics();
                 }
+                LogPerformanceMetrics();
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown when cancellation token is set
+                _logger.LogDebug("WebSocket message processing cancelled during shutdown");
             }
             catch (JsonException ex)
             {
@@ -771,7 +815,7 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
-        /// Processes order book snapshot and delta messages, updating event counts and triggering events.
+        /// Processes order book snapshot and delta messages, enqueuing them for ordered processing.
         /// Handles both full snapshots and incremental updates to maintain current order book state.
         /// </summary>
         /// <param name="data">The JSON data containing the order book message.</param>
@@ -784,18 +828,29 @@ namespace KalshiBotAPI.Websockets
 
             try
             {
-                var offerType = msgType == "orderbook_snapshot" ? "SNP" : "DEL";
-                var eventArgs = new OrderBookEventArgs(offerType == "SNP" ? "snapshot" : "delta", data);
-                OrderBookReceived?.Invoke(this, eventArgs);
-
-                if (_isDataPersistenceEnabled)
+                // Extract sid and seq for enqueuing
+                if (data.TryGetProperty("sid", out var sidProp) && data.TryGetProperty("seq", out var seqProp))
                 {
-                    _logger.LogDebug("Persisting order book data: {MsgType}, offerType: {OfferType}", msgType, offerType);
-                    await _sqlDataService.StoreOrderBookAsync(data, offerType);
+                    var sid = sidProp.GetInt32();
+                    var seq = seqProp.GetInt64();
+                    var offerType = msgType == "orderbook_snapshot" ? "SNP" : "DEL";
+
+                    // Enqueue the message for ordered processing
+                    _subscriptionManager.EnqueueOrderBookMessage(sid, data, offerType, seq);
+
+                    if (_isDataPersistenceEnabled)
+                    {
+                        _logger.LogDebug("Persisting order book data: {MsgType}, offerType: {OfferType}", msgType, offerType);
+                        await _sqlDataService.StoreOrderBookAsync(data, offerType);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Skipping data persistence for order book: DataPersistence is disabled");
+                    }
                 }
                 else
                 {
-                    _logger.LogDebug("Skipping data persistence for order book: DataPersistence is disabled");
+                    _logger.LogWarning("Order book message missing sid or seq properties, cannot enqueue for ordered processing");
                 }
             }
             catch (Exception ex)
@@ -883,6 +938,13 @@ namespace KalshiBotAPI.Websockets
         {
             _logger.LogDebug("Processing trade update, DataPersistence: {IsEnabled}", _isDataPersistenceEnabled);
             _messageTypeCounts.AddOrUpdate("Trade", 1, (_, count) => count + 1);
+
+            // Extract market ticker for logging
+            if (data.TryGetProperty("msg", out var msg) && msg.TryGetProperty("market_ticker", out var tickerProp))
+            {
+                var marketTicker = tickerProp.GetString();
+                _logger.LogInformation("Processing trade for market: {MarketTicker}", marketTicker);
+            }
 
             try
             {
@@ -1159,6 +1221,17 @@ namespace KalshiBotAPI.Websockets
                     }
 
                     _logger.LogInformation("Unsubscription confirmed for SID: {Sid} from channel '{Channel}'{MarketInfo} | Source: {Source}", sid, channel, marketInfo, "MessageProcessor");
+
+                    // Remove from pending confirmations if this ID was pending
+                    if (data.TryGetProperty("id", out var idProp))
+                    {
+                        var id = idProp.GetInt32();
+                        _subscriptionManager.RemovePendingConfirmation(id);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unsubscription confirmation message missing id property");
+                    }
                 }
             }
             catch (Exception ex)
@@ -1172,6 +1245,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Processes general confirmation messages for various operations (updates, subscriptions).
         /// Handles both subscription confirmations with SIDs and general operation confirmations.
+        /// Enqueues ok messages with seq for ordered processing.
         /// </summary>
         /// <param name="data">The JSON data containing the confirmation message.</param>
         /// <returns>A task representing the asynchronous processing operation.</returns>
@@ -1187,7 +1261,7 @@ namespace KalshiBotAPI.Websockets
                 {
                     var id = idProp.GetInt32();
                     var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    _logger.LogInformation("[{Timestamp}] RECEIVED confirmation for ID: {Id}", timestamp, id);
+                    _logger.LogWarning("MP: RECEIVED 'ok' confirmation for ID: {Id} at {Timestamp}", id, timestamp);
 
                     // Check if this is a subscribe confirmation with sid
                     if (data.TryGetProperty("sid", out var sidProp))
@@ -1207,13 +1281,28 @@ namespace KalshiBotAPI.Websockets
                             {
                                 var markets = string.Join(", ", pending.Value.MarketTickers);
                                 marketInfo = $" for markets: {markets}";
+                                // This is a subscribe or update confirmation
+                                await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+                                // Record channel activity since "ok" indicates the channel is active
+                                _subscriptionManager.RecordChannelActivity(channel);
                             }
-
-                            await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+                            else
+                            {
+                                // Empty market tickers means this is an unsubscribe confirmation
+                                marketInfo = " (unsubscribe from all)";
+                                _logger.LogInformation("MP: Processing unsubscribe confirmation for channel {Channel}, SID {Sid}", channel, sid);
+                                // For unsubscribe, remove the subscription
+                                if (_subscriptionManager.GetChannelSid(channel) == sid)
+                                {
+                                    _subscriptionManager.RemoveChannelSubscription(channel);
+                                }
+                                // Record channel activity even for unsubscribe
+                                _subscriptionManager.RecordChannelActivity(channel);
+                            }
                         }
                         else
                         {
-                            _logger.LogWarning("No pending confirmation found for subscribe confirmation ID: {Id}", id);
+                            _logger.LogWarning("No pending confirmation found for confirmation ID: {Id}", id);
                         }
 
                         _logger.LogInformation("[{Timestamp}] RECEIVED subscribe confirmed with SID: {Sid} for ID: {Id} on channel '{Channel}'{MarketInfo} | Source: {Source}", timestamp, sid, id, channel, marketInfo, "MessageProcessor");
@@ -1229,6 +1318,14 @@ namespace KalshiBotAPI.Websockets
                     // Remove from pending confirmations
                     _subscriptionManager.RemovePendingConfirmation(id);
                 }
+
+                //// Enqueue ALL ok messages with sid and seq for ordered processing
+                //if (data.TryGetProperty("sid", out var okSidProp) && data.TryGetProperty("seq", out var okSeqProp))
+                //{
+                //    var okSid = okSidProp.GetInt32();
+                //    var okSeq = okSeqProp.GetInt64();
+                //    _subscriptionManager.EnqueueOkMessage(okSid, data, okSeq);
+                //}
             }
             catch (Exception ex)
             {
@@ -1286,6 +1383,11 @@ namespace KalshiBotAPI.Websockets
                     // Handle specific error codes
                     if (errorCode == 6 && errorMsg.Contains("Already subscribed"))
                     {
+                        // Rate limit "Already subscribed" error logging
+                        _alreadySubscribedErrorCount++;
+                        _alreadySubscribedErrorsInWindow++;
+                        CheckAlreadySubscribedWarnings();
+
                         // If we get "Already subscribed", treat it as successful subscription
                         // Try to extract the ID and update subscription state
                         if (data.TryGetProperty("id", out var idProp))
@@ -1304,17 +1406,35 @@ namespace KalshiBotAPI.Websockets
                                     var markets = string.Join(", ", pending.Value.MarketTickers);
                                     marketInfo = $" for markets: {markets}";
                                 }
+
+                                // Get the current SID for this channel
+                                var currentSid = _subscriptionManager.GetChannelSid(channel);
+                                if (currentSid > 0)
+                                {
+                                    // Update subscription state to include the pending markets
+                                    await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(currentSid, channel);
+                                    _logger.LogDebug("Updated subscription state for 'Already subscribed' on channel '{Channel}' with SID {Sid}{MarketInfo}", channel, currentSid, marketInfo);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("No existing SID found for channel '{Channel}' when handling 'Already subscribed' error", channel);
+                                }
                             }
 
-                            _logger.LogInformation("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
+                            _logger.LogDebug("Received 'Already subscribed' for ID {Id} on channel '{Channel}'{MarketInfo}, treating as successful subscription | Source: {Source}", id, channel, marketInfo, "MessageProcessor");
 
                             // Remove from pending confirmations since it's already subscribed
                             _subscriptionManager.RemovePendingConfirmation(id);
-
-                            // Try to find the subscription and update its state
-                            // We need to look at the original message to determine what was being subscribed to
-                            // For now, just log that we handled it
-                            _logger.LogDebug("Handled 'Already subscribed' error for ID {Id}", id);
+                        }
+                        else
+                        {
+                            // No ID in the error message, treat as confirmation for the last pending subscribe
+                            var lastPending = _subscriptionManager.GetLastPendingConfirmation();
+                            if (lastPending.HasValue)
+                            {
+                                _subscriptionManager.RemovePendingConfirmation(lastPending.Value.Id);
+                                _logger.LogDebug("Treated 'Already subscribed' as confirmation for last pending ID {Id} on channel '{Channel}' | Source: {Source}", lastPending.Value.Id, lastPending.Value.Channel, "MessageProcessor");
+                            }
                         }
                     }
                 }
@@ -1329,6 +1449,31 @@ namespace KalshiBotAPI.Websockets
             }
 
             await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Checks if a WebSocket message is a confirmation message that should be processed immediately.
+        /// Used to prioritize processing of critical confirmation messages when batching is enabled.
+        /// </summary>
+        /// <param name="message">The raw JSON message string to check.</param>
+        /// <returns>True if the message is a confirmation type message, false otherwise.</returns>
+        private bool IsConfirmationMessage(string message)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(message);
+                if (doc.RootElement.TryGetProperty("type", out var typeProp))
+                {
+                    var type = typeProp.GetString();
+                    return type == "ok" || type == "subscribed" || type == "unsubscribed" || type == "error";
+                }
+                return false;
+            }
+            catch
+            {
+                // If we can't parse it, assume it's not a confirmation message
+                return false;
+            }
         }
 
         /// <summary>
@@ -1397,9 +1542,6 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         private void LogPerformanceMetrics()
         {
-            if (!_enablePerformanceMonitoring)
-                return;
-
             lock (_metricsLock)
             {
                 var now = DateTime.UtcNow;
@@ -1410,19 +1552,41 @@ namespace KalshiBotAPI.Websockets
                     var messagesPerSecond = _totalMessagesProcessed / timeSinceLastLog.TotalSeconds;
                     var avgProcessingTime = _totalMessagesProcessed > 0 ? _totalProcessingTimeMs / _totalMessagesProcessed : 0;
 
-                    _logger.LogInformation("Performance Metrics - Messages/sec: {MessagesPerSecond:F2}, Avg Processing Time: {AvgProcessingTime}ms, Queue Depth: {QueueDepth}, Total Processed: {TotalProcessed}",
-                        messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
+                    if (_enablePerformanceMonitoring)
+                    {
+                        _logger.LogInformation("Performance Metrics - Messages/sec: {MessagesPerSecond:F2}, Avg Processing Time: {AvgProcessingTime}ms, Queue Depth: {QueueDepth}, Total Processed: {TotalProcessed}",
+                            messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
+                    }
 
                     // Post metrics to central monitoring services
-                    _performanceMetrics.PostMessageProcessingMetrics(
-                        _totalMessagesProcessed,
-                        _totalProcessingTimeMs,
-                        avgProcessingTime,
-                        messagesPerSecond,
-                        _orderBookUpdateQueue.Count);
+                    if (!_enablePerformanceMonitoring)
+                    {
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalMessagesProcessed", "Total Messages Processed", "Total number of messages processed", _totalMessagesProcessed, "count", "MessageProcessing");
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "AverageProcessingTime", "Average Processing Time", "Average time to process a message", avgProcessingTime, "ms", "MessageProcessing");
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "MessagesPerSecond", "Messages Per Second", "Rate of message processing", messagesPerSecond, "msg/s", "MessageProcessing");
+                        _performanceMonitor.RecordDisabledMetric("MessageProcessor", "OrderBookQueueDepth", "Order Book Queue Depth", "Current depth of order book update queue", _orderBookUpdateQueue.Count, "count", "MessageProcessing");
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalMessagesProcessed", "Total Messages Processed", "Total number of messages processed", _totalMessagesProcessed, "count", "MessageProcessing");
+                        _performanceMonitor.RecordSpeedDialMetric("MessageProcessor", "AverageProcessingTime", "Average Processing Time", "Average time to process a message", avgProcessingTime, "ms", "MessageProcessing", null, null, null);
+                        _performanceMonitor.RecordSpeedDialMetric("MessageProcessor", "MessagesPerSecond", "Messages Per Second", "Rate of message processing", messagesPerSecond, "msg/s", "MessageProcessing", null, null, null);
+                        _performanceMonitor.RecordCounterMetric("MessageProcessor", "OrderBookQueueDepth", "Order Book Queue Depth", "Current depth of order book update queue", _orderBookUpdateQueue.Count, "count", "MessageProcessing");
+                    }
 
                     // Post message type distribution metrics
-                    _performanceMetrics.PostMessageTypeMetrics(GetMessageTypeCounts());
+                    var messageTypeCounts = GetMessageTypeCounts();
+                    foreach (var kvp in messageTypeCounts)
+                    {
+                        if (!_enablePerformanceMonitoring)
+                        {
+                            _performanceMonitor.RecordDisabledMetric("MessageProcessor", $"MessageType_{kvp.Key}", $"Message Type {kvp.Key}", $"Count of {kvp.Key} messages", kvp.Value, "count", "MessageTypes");
+                        }
+                        else
+                        {
+                            _performanceMonitor.RecordCounterMetric("MessageProcessor", $"MessageType_{kvp.Key}", $"Message Type {kvp.Key}", $"Count of {kvp.Key} messages", kvp.Value, "count", "MessageTypes");
+                        }
+                    }
 
                     // Reset counters for next interval
                     _totalMessagesProcessed = 0;
@@ -1553,8 +1717,7 @@ namespace KalshiBotAPI.Websockets
                                     var maxWait = _maxWaitTimeMs;
                                     var avgWait = totalCalls > 0 ? (double)totalWait / totalCalls : 0;
 
-                                    _performanceMonitor.RecordDelayedApiCallMetrics(
-                                        "MessageProcessor",
+                                    RecordDelayedApiCallMetricsPrivate(
                                         totalCalls,
                                         avgWait,
                                         maxWait,
@@ -1587,34 +1750,100 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Records delayed API call performance metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="totalCalls">Total number of delayed API calls processed</param>
+        /// <param name="avgWait">Average wait time in milliseconds</param>
+        /// <param name="maxWait">Maximum wait time in milliseconds</param>
+        /// <param name="queueCount">Current queue count</param>
+        /// <param name="enablePerformanceMonitoring">Whether performance monitoring is enabled</param>
+        private void RecordDelayedApiCallMetricsPrivate(long totalCalls, double avgWait, long maxWait, int queueCount, bool enablePerformanceMonitoring)
+        {
+            string className = "MessageProcessor";
+            string category = "DelayedApiCalls";
+
+            if (!enablePerformanceMonitoring)
+            {
+                // Send disabled metrics
+                _performanceMonitor.RecordDisabledMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category);
+                _performanceMonitor.RecordDisabledMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category);
+                _performanceMonitor.RecordDisabledMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category);
+                _performanceMonitor.RecordDisabledMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category);
+            }
+            else
+            {
+                // Record actual metrics
+                _performanceMonitor.RecordCounterMetric(className, "TotalDelayedApiCalls", "Total Delayed API Calls", "Number of delayed API calls processed", totalCalls, "count", category);
+                _performanceMonitor.RecordSpeedDialMetric(className, "AverageWaitTime", "Average Wait Time", "Average wait time for delayed API calls", avgWait, "ms", category, null, null, null);
+                _performanceMonitor.RecordSpeedDialMetric(className, "MaxWaitTime", "Max Wait Time", "Maximum wait time for delayed API calls", maxWait, "ms", category, null, null, null);
+                _performanceMonitor.RecordCounterMetric(className, "QueueCount", "Queue Count", "Current number of queued delayed API calls", queueCount, "count", category);
+            }
+        }
+
+        /// <summary>
         /// Checks and logs warnings for duplicate message detection.
         /// Tracks duplicate messages within a time window and warns if threshold is exceeded.
         /// </summary>
         private void CheckDuplicateMessageWarnings()
         {
-            if (!_enablePerformanceMonitoring)
-                return;
-
             var now = DateTime.UtcNow;
             var timeSinceLastWarning = now - _lastDuplicateWarningTime;
 
-            if (timeSinceLastWarning.TotalMilliseconds >= _config.DuplicateMessageTimeWindowMs)
+            if (timeSinceLastWarning.TotalSeconds >= 10 && _duplicateMessageCount > 0)
             {
-                if (_duplicateMessagesInWindow >= _config.DuplicateMessageWarningThreshold)
+                if (_enablePerformanceMonitoring)
                 {
-                    _logger.LogWarning("DUP-High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
-                        _duplicateMessagesInWindow, _config.DuplicateMessageTimeWindowMs);
-
-                    // Post duplicate metrics to central monitoring
-                    _performanceMetrics.PostDuplicateMessageMetrics(
-                        _duplicateMessageCount,
-                        _duplicateMessagesInWindow,
-                        _lastDuplicateWarningTime);
+                    _logger.LogWarning("DUP-Duplicate messages detected: {DuplicateCount} total duplicates. Any duplicate is unacceptable and should not occur.",
+                        _duplicateMessageCount);
                 }
 
-                // Reset for next window
-                _duplicateMessagesInWindow = 0;
+                // Post duplicate metrics to central monitoring
+                if (!_enablePerformanceMonitoring)
+                {
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalDuplicateMessages", "Total Duplicate Messages", "Total number of duplicate messages detected", _duplicateMessageCount, "count", "DuplicateMessages");
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "DuplicateMessagesInWindow", "Duplicate Messages In Window", "Number of duplicate messages in current time window", _duplicateMessagesInWindow, "count", "DuplicateMessages");
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "LastDuplicateWarningTime", "Last Duplicate Warning Time", "Timestamp of last duplicate message warning", _lastDuplicateWarningTime.Ticks, "ticks", "DuplicateMessages");
+                }
+                else
+                {
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalDuplicateMessages", "Total Duplicate Messages", "Total number of duplicate messages detected", _duplicateMessageCount, "count", "DuplicateMessages");
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "DuplicateMessagesInWindow", "Duplicate Messages In Window", "Number of duplicate messages in current time window", _duplicateMessagesInWindow, "count", "DuplicateMessages");
+                    _performanceMonitor.RecordNumericDisplayMetric("MessageProcessor", "LastDuplicateWarningTime", "Last Duplicate Warning Time", "Timestamp of last duplicate message warning", _lastDuplicateWarningTime.Ticks, "ticks", "DuplicateMessages");
+                }
+
                 _lastDuplicateWarningTime = now;
+            }
+        }
+
+        /// <summary>
+        /// Checks and logs warnings for "Already subscribed" error message detection.
+        /// Tracks these errors within a time window and warns periodically to reduce log spam.
+        /// </summary>
+        private void CheckAlreadySubscribedWarnings()
+        {
+            var now = DateTime.UtcNow;
+            var timeSinceLastWarning = now - _lastAlreadySubscribedWarningTime;
+
+            if (timeSinceLastWarning.TotalSeconds >= 30 && _alreadySubscribedErrorCount > 0)
+            {
+                _logger.LogWarning("Already subscribed errors detected: {ErrorCount} total 'Already subscribed' errors in the last {TimeWindow}s. This indicates redundant subscription attempts.",
+                    _alreadySubscribedErrorCount, timeSinceLastWarning.TotalSeconds);
+
+                // Post metrics to central monitoring
+                if (!_enablePerformanceMonitoring)
+                {
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "TotalAlreadySubscribedErrors", "Total Already Subscribed Errors", "Total number of 'Already subscribed' errors detected", _alreadySubscribedErrorCount, "count", "SubscriptionErrors");
+                    _performanceMonitor.RecordDisabledMetric("MessageProcessor", "AlreadySubscribedErrorsInWindow", "Already Subscribed Errors In Window", "Number of 'Already subscribed' errors in current time window", _alreadySubscribedErrorsInWindow, "count", "SubscriptionErrors");
+                }
+                else
+                {
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "TotalAlreadySubscribedErrors", "Total Already Subscribed Errors", "Total number of 'Already subscribed' errors detected", _alreadySubscribedErrorCount, "count", "SubscriptionErrors");
+                    _performanceMonitor.RecordCounterMetric("MessageProcessor", "AlreadySubscribedErrorsInWindow", "Already Subscribed Errors In Window", "Number of 'Already subscribed' errors in current time window", _alreadySubscribedErrorsInWindow, "count", "SubscriptionErrors");
+                }
+
+                // Reset window counters
+                _alreadySubscribedErrorsInWindow = 0;
+                _lastAlreadySubscribedWarningTime = now;
             }
         }
 

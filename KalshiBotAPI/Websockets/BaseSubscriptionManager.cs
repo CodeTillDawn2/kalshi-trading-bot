@@ -19,38 +19,144 @@ namespace KalshiBotAPI.Websockets
     /// </summary>
     public class BaseSubscriptionManager : ISubscriptionManager
     {
+        /// <summary>
+        /// Logger for recording subscription activities and errors.
+        /// </summary>
         protected readonly ILogger<BaseSubscriptionManager> _logger;
+        /// <summary>
+        /// Manages WebSocket connection lifecycle and communication.
+        /// </summary>
         protected readonly IWebSocketConnectionManager _connectionManager;
+        /// <summary>
+        /// Provides system status and cancellation token management.
+        /// </summary>
         protected readonly IStatusTrackerService _statusTrackerService;
-        protected readonly ISubscriptionManagerPerformanceMetrics? _performanceMetrics;
-        private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
-        private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
-        private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
-        private readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates = new();
-        private readonly SemaphoreSlim _subscriptionUpdateSynchronizationSemaphore = new SemaphoreSlim(1, 1);
-        private readonly SemaphoreSlim _channelSubscriptionSynchronizationSemaphore = new SemaphoreSlim(1, 1);
-        private readonly ConcurrentQueue<(string Action, string[] MarketTickers, string ChannelAction)> _queuedSubscriptionUpdateRequests = new();
-        private int _nextMessageId = 1;
-        private Task _subscriptionQueueProcessorTask = null!;
-        private Task _pendingConfirmationMonitorTask = null!;
-        private readonly object _sequenceNumberSynchronizationLock = new object();
-        private long _latestProcessedSequenceNumber = 0;
+        /// <summary>
+        /// Optional service for posting performance metrics.
+        /// </summary>
+        protected readonly IPerformanceMonitor _performanceMetrics;
+        /// <summary>
+        /// Tracks active WebSocket channel subscriptions with their subscription IDs and associated markets.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
+        /// <summary>
+        /// Tracks pending market subscriptions that are awaiting confirmation.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
+        /// <summary>
+        /// Stores pending subscription confirmations with timestamps and message details.
+        /// </summary>
+        protected readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
+        /// <summary>
+        /// Tracks retry information for failed subscription attempts.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, (int RetryCount, DateTime FirstRetryTime)> _subscriptionRetryInfo = new();
+        /// <summary>
+        /// Maintains subscription states for each market on each channel.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates = new();
+        /// <summary>
+        /// Synchronizes subscription update operations to prevent concurrent modifications.
+        /// </summary>
+        protected readonly SemaphoreSlim _subscriptionUpdateSynchronizationSemaphore = new SemaphoreSlim(1, 1);
+        /// <summary>
+        /// Synchronizes channel subscription operations to prevent concurrent modifications.
+        /// </summary>
+        protected readonly SemaphoreSlim _channelSubscriptionSynchronizationSemaphore = new SemaphoreSlim(1, 1);
+        /// <summary>
+        /// Queues subscription update requests for processing when the connection is restored.
+        /// </summary>
+        protected readonly ConcurrentQueue<(string Action, string[] MarketTickers, string ChannelAction)> _queuedSubscriptionUpdateRequests = new();
+        /// <summary>
+        /// Generates unique message IDs for WebSocket communication.
+        /// </summary>
+        protected int _nextMessageId = 1;
+        /// <summary>
+        /// Background task that processes queued subscription updates.
+        /// </summary>
+        protected Task _subscriptionQueueProcessorTask = null!;
+        /// <summary>
+        /// Background task that monitors pending subscription confirmations.
+        /// </summary>
+        protected Task _pendingConfirmationMonitorTask = null!;
+        /// <summary>
+        /// Synchronizes access to sequence number tracking for order book processing.
+        /// </summary>
+        protected readonly object _sequenceNumberSynchronizationLock = new object();
+        /// <summary>
+        /// Priority queue for order book update messages, ordered by sequence number.
+        /// </summary>
+        protected readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
+        /// <summary>
+        /// Tracks the latest processed sequence number for order book messages.
+        /// </summary>
+        protected long _latestProcessedSequenceNumber = 0;
+        /// <summary>
+        /// Tracks when a sequence gap was first detected, for timeout-based unhealthy raising.
+        /// </summary>
+        protected DateTime? _gapDetectedTime = null;
         // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
-        private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue = new();
-        private readonly object _orderBookQueueSynchronizationLock = new object();
-        private readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
-        private Task _orderBookQueueProcessorTask = null!;
-        private CancellationToken _processingCancellationToken;
+        /// <summary>
+        /// Synchronizes access to the order book update queue.
+        /// </summary>
+        protected readonly object _orderBookQueueSynchronizationLock = new object();
+        /// <summary>
+        /// Counts of different message types processed by the subscription manager.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _messageTypeCounts = new ConcurrentDictionary<string, long>();
+        /// <summary>
+        /// Background task that processes the order book update queue.
+        /// </summary>
+        protected Task _orderBookQueueProcessorTask = null!;
+        /// <summary>
+        /// Cancellation token used to coordinate graceful shutdown of background processing tasks.
+        /// </summary>
+        protected CancellationToken _processingCancellationToken;
 
         // Configuration options
-        private readonly int _subscriptionTimeoutMs;
-        private readonly int _confirmationTimeoutSeconds;
-        private readonly int _retryDelayMs;
-        private readonly int _maxQueueSize;
-        private readonly int _batchSize;
-        private readonly int _healthCheckIntervalMs;
-        private readonly bool _enableMetrics;
+        /// <summary>
+        /// Timeout in milliseconds for subscription operations.
+        /// </summary>
+        protected readonly int _subscriptionTimeoutMs;
+        /// <summary>
+        /// Timeout in seconds for waiting subscription confirmations.
+        /// </summary>
+        protected readonly int _confirmationTimeoutSeconds;
+        /// <summary>
+        /// Delay in milliseconds between subscription retry attempts.
+        /// </summary>
+        protected readonly int _retryDelayMs;
+        /// <summary>
+        /// Maximum size of the subscription update request queue.
+        /// </summary>
+        protected readonly int _maxQueueSize;
+        /// <summary>
+        /// Number of subscription requests to batch together for processing.
+        /// </summary>
+        protected readonly int _batchSize;
+        /// <summary>
+        /// Interval in milliseconds between health check operations.
+        /// </summary>
+        protected readonly int _healthCheckIntervalMs;
+        /// <summary>
+        /// Whether performance metrics collection is enabled.
+        /// </summary>
+        protected readonly bool _enableMetrics;
+
+        /// <summary>
+        /// Timeout in seconds for waiting for sequence gaps to be filled.
+        /// </summary>
+        protected readonly int _sequenceGapTimeoutSeconds;
+
+        /// <summary>
+        /// Interval in milliseconds between processing subscription batches.
+        /// </summary>
+        protected readonly int _subscriptionBatchIntervalMs;
+
+        /// <summary>
+        /// Stale subscription threshold in minutes.
+        /// </summary>
+        protected readonly int _staleSubscriptionThresholdMinutes;
 
         // Exponential backoff configuration for subscription retries
         private readonly int _maxSubscriptionRetries = 5;
@@ -58,17 +164,50 @@ namespace KalshiBotAPI.Websockets
         private readonly int _maxRetryDelayMs = 30000;
 
         // Performance metrics
-        private readonly ConcurrentDictionary<string, long> _operationTimings = new();
-        private readonly ConcurrentDictionary<string, long> _operationCounts = new();
-        private readonly ConcurrentDictionary<string, long> _successCounts = new();
+        /// <summary>
+        /// Tracks timing information for different operation types.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _operationTimings = new();
+        /// <summary>
+        /// Counts the number of operations performed for each type.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _operationCounts = new();
+        /// <summary>
+        /// Counts successful operations for each type.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _successCounts = new();
 
         // Lock contention metrics
-        private readonly ConcurrentDictionary<string, long> _lockAcquisitionTimes = new();
-        private readonly ConcurrentDictionary<string, long> _lockContentionCounts = new();
-        private readonly ConcurrentDictionary<string, long> _lockWaitTimes = new();
+        /// <summary>
+        /// Tracks the number of times locks are acquired.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockAcquisitionTimes = new();
+        /// <summary>
+        /// Counts lock contention events.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockContentionCounts = new();
+        /// <summary>
+        /// Tracks wait times for lock acquisitions.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, long> _lockWaitTimes = new();
 
         // Subscription deduplication
-        private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
+        /// <summary>
+        /// Tracks recent subscription attempts to prevent duplicates.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
+
+        // Channel activity tracking for health monitoring
+        /// <summary>
+        /// Tracks the last activity time for each channel.
+        /// </summary>
+        protected readonly ConcurrentDictionary<string, DateTime> _channelLastActivity = new();
+
+        // Exchange outage flag to prevent unhealthy events during exchange-wide outages
+        /// <summary>
+        /// Flag indicating if we're currently in an exchange-wide outage to avoid repeated unhealthy events.
+        /// </summary>
+        private bool _isExchangeOutageMode = false;
 
         /// <summary>
         /// Event raised when WebSocket health becomes unhealthy for specific markets.
@@ -80,10 +219,54 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         public event EventHandler<string[]>? MarketWebSocketHealthy;
 
+        /// <summary>
+        /// Event raised when an order book update is received.
+        /// </summary>
+        public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+
+        /// <summary>
+        /// Event raised when an order book message has been processed in sequence order.
+        /// Allows subscribers to be notified after ordered processing is complete.
+        /// </summary>
+        public event EventHandler<OrderBookEventArgs>? OrderBookProcessed;
+
+        /// <summary>
+        /// Event raised when FirstSnapshotReceived needs to be reset for specific markets.
+        /// This occurs when resubscribing to orderbook channels due to sequence gaps.
+        /// </summary>
+        public event EventHandler<string[]>? FirstSnapshotReceivedReset;
+
+        /// <summary>
+        /// Raises the OrderBookReceived event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected virtual void OnOrderBookReceived(OrderBookEventArgs e)
+        {
+            OrderBookReceived?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Raises the OrderBookProcessed event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected virtual void OnOrderBookProcessed(OrderBookEventArgs e)
+        {
+            OrderBookProcessed?.Invoke(this, e);
+        }
+
         // Health monitoring
-        private Task _healthMonitorTask = null!;
-        private readonly ReaderWriterLockSlim _subscriptionLock = new();
-        private readonly ReaderWriterLockSlim _queueLock = new();
+        /// <summary>
+        /// Background task that monitors subscription health.
+        /// </summary>
+        protected Task _healthMonitorTask = null!;
+        /// <summary>
+        /// Lock for synchronizing subscription operations.
+        /// </summary>
+        protected readonly ReaderWriterLockSlim _subscriptionLock = new();
+        /// <summary>
+        /// Lock for synchronizing queue operations.
+        /// </summary>
+        protected readonly ReaderWriterLockSlim _queueLock = new();
 
         /// <summary>
         /// Initializes a new instance of the BaseSubscriptionManager with required dependencies.
@@ -99,7 +282,7 @@ namespace KalshiBotAPI.Websockets
             IWebSocketConnectionManager connectionManager,
             IStatusTrackerService statusTrackerService,
             IOptions<SubscriptionManagerConfig> config,
-            ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
+            IPerformanceMonitor performanceMetrics)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -116,6 +299,9 @@ namespace KalshiBotAPI.Websockets
             _batchSize = subscriptionConfig.BatchSize;
             _healthCheckIntervalMs = subscriptionConfig.HealthCheckIntervalMs;
             _enableMetrics = subscriptionConfig.EnableSubscriptionManagerMetrics;
+            _sequenceGapTimeoutSeconds = subscriptionConfig.SequenceGapTimeoutSeconds;
+            _subscriptionBatchIntervalMs = subscriptionConfig.SubscriptionBatchIntervalMs;
+            _staleSubscriptionThresholdMinutes = subscriptionConfig.StaleSubscriptionThresholdMinutes;
 
             // Initialize message type counts
             _messageTypeCounts.TryAdd("OrderBook", 0);
@@ -371,9 +557,10 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                // Only add pending confirmations for update_subscription, not for initial subscribe
-                // Subscribe confirmations may not include ID, so we don't track them as pending
-                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !skipMessage && message.Contains("\"cmd\": \"update_subscription\""))
+                // Add pending confirmations for subscribe and update_subscription commands
+                // Both can receive "ok" confirmations with ID
+                if (!skipMessage &&
+                    (message.Contains("\"cmd\": \"update_subscription\"") || message.Contains("\"cmd\": \"subscribe\"")))
                 {
                     _pendingSubscriptionConfirmations.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
                 }
@@ -438,7 +625,7 @@ namespace KalshiBotAPI.Websockets
         /// receive real-time data for all supported channel types.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SubscribeToWatchedMarketsAsync()
+        public virtual async Task SubscribeToWatchedMarketsAsync()
         {
             try
             {
@@ -797,6 +984,7 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Resubscribes to existing channel subscriptions, either selectively or forcefully.
         /// Used to restore subscriptions after connection recovery or when forcing a complete resubscription.
+        /// Always uses unsubscribe-then-resubscribe to refresh the socket without affecting WatchedMarkets.
         /// </summary>
         /// <param name="force">If true, resubscribes to all channels regardless of current state. If false, only resubscribes to channels without active subscriptions.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
@@ -826,16 +1014,95 @@ namespace KalshiBotAPI.Websockets
             {
                 var channel = subscription.Key;
                 var markets = subscription.Value.Markets.ToArray();
+                var action = GetActionFromChannel(channel);
 
                 if (markets.Any() || new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
                 {
                     _logger.LogDebug("Resubscribing to {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
-                    await SubscribeToChannelAsync(GetActionFromChannel(channel), markets);
+
+                    // Always use unsubscribe-then-resubscribe approach to refresh the socket without affecting WatchedMarkets
+                    _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
+                    await UnsubscribeFromChannelAsync(action);
+
+                    // Delay to ensure the unsubscribe is processed and prevent duplicate messages
+                    await Task.Delay(1000, _processingCancellationToken);
+
+                    await SubscribeToChannelAsync(action, markets);
                 }
             }
 
             _logger.LogInformation("Resubscription completed");
         }
+
+        /// <summary>
+        /// Resubscribes a specific stale channel by unsubscribing, waiting, then resubscribing to prevent duplicate messages.
+        /// </summary>
+        /// <param name="channel">The channel name to resubscribe.</param>
+        /// <param name="markets">The markets subscribed to this channel.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task ResubscribeChannelAsync(string channel, HashSet<string> markets)
+        {
+            _logger.LogInformation("Resubscribing stale channel {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
+
+            if (!_connectionManager.IsConnected())
+            {
+                _logger.LogWarning("WebSocket not connected, cannot resubscribe channel {Channel}", channel);
+                return;
+            }
+
+            var action = GetActionFromChannel(channel);
+
+            // Always use unsubscribe-then-resubscribe approach to refresh the socket without affecting WatchedMarkets
+            _logger.LogDebug("Using unsubscribe-then-resubscribe approach for channel {Channel}", channel);
+            await UnsubscribeFromChannelAsync(action);
+            await Task.Delay(1000, _processingCancellationToken);
+            await SubscribeToChannelAsync(action, markets.ToArray());
+
+            _logger.LogInformation("Resubscription completed for channel {Channel}", channel);
+        }
+
+        /// <summary>
+        /// Resubscribes specifically to orderbook channels when sequence gaps are detected.
+        /// This resets the orderbook subscriptions and ensures FirstSnapshotReceived is set to false for affected markets.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ResubscribeOrderBookAsync()
+        {
+            _logger.LogInformation("Resubscribing to orderbook channels due to sequence gap timeout");
+
+            if (!_connectionManager.IsConnected())
+            {
+                _logger.LogWarning("WebSocket not connected, cannot resubscribe orderbook");
+                return;
+            }
+
+            var orderbookChannel = "orderbook_delta";
+            if (_channelSubscriptions.TryGetValue(orderbookChannel, out var subscription) && subscription.Sid != 0)
+            {
+                var markets = subscription.Markets.ToArray();
+                var action = "orderbook";
+
+                if (markets.Any())
+                {
+                    _logger.LogDebug("Resubscribing to orderbook channel for markets: {Markets}", string.Join(", ", markets));
+
+                    // Reset FirstSnapshotReceived for all markets
+                    FirstSnapshotReceivedReset?.Invoke(this, markets);
+
+                    // Unsubscribe then resubscribe to refresh the socket without affecting WatchedMarkets
+                    await UnsubscribeFromChannelAsync(action);
+                    await Task.Delay(1000, _processingCancellationToken);
+                    await SubscribeToChannelAsync(action, markets);
+                }
+            }
+            else
+            {
+                _logger.LogDebug("No active orderbook subscription to resubscribe");
+            }
+
+            _logger.LogInformation("Orderbook resubscription completed");
+        }
+
 
         private string GetActionFromChannel(string channel) => channel switch
         {
@@ -844,7 +1111,24 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "market_lifecycle_v2" => "lifecycle",
+            "event_lifecycle" => "event_lifecycle",
             _ => throw new ArgumentException($"Unknown channel: {channel}")
+        };
+
+        /// <summary>
+        /// Gets the English name for a channel for more readable logging.
+        /// </summary>
+        /// <param name="channel">The technical channel name.</param>
+        /// <returns>The English name for the channel.</returns>
+        private string GetEnglishChannelName(string channel) => channel switch
+        {
+            "orderbook_delta" => "Order Book",
+            "ticker" => "Market Ticker",
+            "trade" => "Trade Data",
+            "fill" => "Fill Data",
+            "market_lifecycle_v2" => "Market Lifecycle",
+            "event_lifecycle" => "Event Lifecycle",
+            _ => channel // Fallback to original name if unknown
         };
 
         /// <summary>
@@ -1026,7 +1310,9 @@ namespace KalshiBotAPI.Websockets
 
                     hasPendingUpdates = _orderBookUpdateQueue.Count > 0 &&
                                 _orderBookUpdateQueue.UnorderedItems.Any(item =>
-                                    item.Element.Data.GetProperty("msg").GetProperty("market_ticker").GetString() == marketTicker);
+                                    item.Element.Data.TryGetProperty("msg", out var msg) &&
+                                    msg.TryGetProperty("market_ticker", out var tickerProp) &&
+                                    tickerProp.GetString() == marketTicker);
                 }
 
                 if (!hasPendingUpdates)
@@ -1080,7 +1366,7 @@ namespace KalshiBotAPI.Websockets
             "trade" => "trade",
             "fill" => "fill",
             "lifecycle" => "market_lifecycle_v2",
-            "event_lifecycle" => "market_lifecycle_v2",
+            "event_lifecycle" => "event_lifecycle",
             _ => throw new ArgumentException($"Invalid action: {action}")
         };
 
@@ -1130,7 +1416,7 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogError(ex, "Error processing queued subscription update");
                 }
 
-                await Task.Delay(_retryDelayMs, _processingCancellationToken);
+                await Task.Delay(_subscriptionBatchIntervalMs, _processingCancellationToken);
             }
             _logger.LogDebug("Subscription queue processor stopped");
         }
@@ -1196,8 +1482,9 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogWarning("Pending confirmation expired for ID {Id}, channel {Channel}, markets {Markets} after {_confirmationTimeoutSeconds} seconds. Retry {RetryCount}/{MaxRetries} with exponential backoff (total retry time: {TotalTime:F1}min).",
                             confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers), _confirmationTimeoutSeconds, currentRetryCount + 1, _maxSubscriptionRetries, totalRetryTime.TotalMinutes);
 
-                        // Raise unhealthy event for affected markets
+                        _logger.LogWarning("BSM: Raising MarketWebSocketUnhealthy for expired confirmation ID {Id}, channel {Channel}, markets {Markets}", confirm.Key, confirm.Value.Channel, string.Join(", ", confirm.Value.MarketTickers));
                         RaiseMarketWebSocketUnhealthy(confirm.Value.MarketTickers);
+
 
                         // Clean up the expired subscription state
                         await CleanupExpiredSubscriptionAsync(confirm.Value.Channel, confirm.Value.MarketTickers);
@@ -1255,7 +1542,7 @@ namespace KalshiBotAPI.Websockets
 
         /// <summary>
         /// Background task that periodically processes the order book update queue.
-        /// Handles order book messages in sequence order, updating sequence numbers and processing updates.
+        /// Handles all messages (orderbook and ok) in strict sequence order with buffering for true gaps.
         /// </summary>
         /// <returns>A task representing the background operation.</returns>
         private async Task ProcessOrderBookQueuePeriodicallyAsync()
@@ -1263,58 +1550,63 @@ namespace KalshiBotAPI.Websockets
             _logger.LogDebug("Starting order book queue processor");
             while (!_processingCancellationToken.IsCancellationRequested)
             {
-                try
+                await Task.Delay(_batchSize * 10, _processingCancellationToken);
+                bool shouldResubscribe = false;
+                lock (_orderBookQueueSynchronizationLock)
                 {
-                    if (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
+                    while (_orderBookUpdateQueue.TryPeek(out var item, out var priority))
                     {
-                        _logger.LogDebug("Processing order book message with seq {Seq}", seq);
-
-                        // Check for sequence gap (global across all markets)
-                        var lockWaitStart = DateTime.UtcNow;
+                        var (data, offerType, seq, eventId) = item;
                         lock (_sequenceNumberSynchronizationLock)
                         {
-                            var lockWaitTime = DateTime.UtcNow - lockWaitStart;
-                            RecordLockMetrics("SequenceNumberLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
-
-                            if (_latestProcessedSequenceNumber > 0 && seq != _latestProcessedSequenceNumber + 1)
+                            long expected = _latestProcessedSequenceNumber + 1;
+                            if (seq == expected)
                             {
-                                _logger.LogWarning("Sequence gap detected: expected {Expected}, got {Seq}. Triggering full orderbook channel resubscribe for new snapshot.",
-                                    _latestProcessedSequenceNumber + 1, seq);
-                                // Trigger resubscribe of entire orderbook channel to get new snapshot
-                                _ = Task.Run(async () =>
-                                {
-                                    try
-                                    {
-                                        await UnsubscribeFromChannelAsync("orderbook");
-                                        await SubscribeToChannelAsync("orderbook", WatchedMarkets.ToArray());
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _logger.LogError(ex, "Failed to resubscribe orderbook channel after sequence gap");
-                                    }
-                                }, _processingCancellationToken);
-                            }
-
-                            if (seq > _latestProcessedSequenceNumber)
-                            {
+                                _orderBookUpdateQueue.Dequeue(); // actually dequeue
+                                _logger.LogInformation("Processing OB seq {Seq} as expected", seq);
+                                _logger.LogDebug("Processed seq {Seq} (expected {Expected}, queue remaining: {Remaining})", seq, expected, _orderBookUpdateQueue.Count);
                                 _latestProcessedSequenceNumber = seq;
+                                // Reset gap detection on successful processing
+                                _gapDetectedTime = null;
+                                // Skip order book event for non-orderbook types
+                                if (offerType != "ok")
+                                {
+                                    var eventArgs = new OrderBookEventArgs(offerType, data);
+                                    OnOrderBookProcessed(eventArgs);
+                                }
+                            }
+                            else if (seq > expected)
+                            {
+                                // Gap detected
+                                if (_gapDetectedTime == null)
+                                {
+                                    _gapDetectedTime = DateTime.UtcNow;
+                                }
+                                else if (DateTime.UtcNow - _gapDetectedTime > TimeSpan.FromSeconds(_sequenceGapTimeoutSeconds))
+                                {
+                                    _logger.LogWarning("Sequence gap not filled within {Timeout} seconds: expected {Expected}, next available {Seq}. Resetting orderbook subscriptions.", _sequenceGapTimeoutSeconds, expected, seq);
+                                    shouldResubscribe = true;
+                                    _gapDetectedTime = null; // Reset after resubscribing
+                                }
+                                break; // Stop processing until gap is filled or timeout
+                            }
+                            else
+                            {
+                                // seq < expected, shouldn't happen since queue is ordered, but remove it
+                                _logger.LogError("Unexpected seq {Seq} < expected {Expected}, removing from queue", seq, expected);
+                                _orderBookUpdateQueue.Dequeue();
                             }
                         }
-
-                        // Process the message
-                        var eventArgs = new OrderBookEventArgs(message.OfferType, message.Data);
-                        // TODO: Coordinate with MessageProcessor to trigger OrderBookReceived event
                     }
                 }
-                catch (Exception ex)
+                if (shouldResubscribe)
                 {
-                    _logger.LogError(ex, "Error processing order book queue message");
+                    await ResubscribeOrderBookAsync();
                 }
-
-                await Task.Delay(10, _processingCancellationToken);
             }
             _logger.LogDebug("Order book queue processor stopped");
         }
+
 
         /// <summary>
         /// Background task that monitors subscription health and detects stale subscriptions.
@@ -1328,14 +1620,13 @@ namespace KalshiBotAPI.Websockets
             {
                 try
                 {
-                    // Only check health every 10 minutes instead of every 30 seconds
-                    // The API doesn't require frequent health checks for active subscriptions
-                    await Task.Delay(TimeSpan.FromMinutes(10), _processingCancellationToken);
+                    await Task.Delay(_healthCheckIntervalMs, _processingCancellationToken);
 
                     var now = DateTime.UtcNow;
-                    var staleThreshold = TimeSpan.FromMinutes(30); // Much longer threshold
-                    bool hasStaleSubscriptions = false;
+                    var staleThreshold = TimeSpan.FromMinutes(_staleSubscriptionThresholdMinutes);
 
+                    // Collect stale subscriptions first
+                    var staleSubscriptions = new List<(string Channel, HashSet<string> Markets)>();
                     _subscriptionLock.EnterReadLock();
                     try
                     {
@@ -1345,15 +1636,33 @@ namespace KalshiBotAPI.Websockets
                             var sid = subscription.Value.Sid;
                             if (sid != 0)
                             {
-                                // Check if this subscription has been active recently
-                                // Look for recent subscription activity (not pending confirmations since they're removed after confirmation)
-                                var hasRecentActivity = _recentSubscriptions.Any(r => r.Key.StartsWith($"{GetActionFromChannel(channel)}:") && (now - r.Value) < staleThreshold);
+                                // Skip stale detection for channels not subscribed when SubscribeToGeneralChannels is false
+                                if (!SubscribeToGeneralChannels &&
+                                    (channel == "fill" || channel == "market_lifecycle_v2"))
+                                {
+                                    continue;
+                                }
+
+                                // Check if this subscription has received messages recently
+                                // For lifecycle channels, check the normalized "lifecycle" activity key
+                                // since both market_lifecycle_v2 and event_lifecycle are recorded as "lifecycle"
+                                bool hasRecentActivity;
+                                if (channel == "market_lifecycle_v2" || channel == "event_lifecycle")
+                                {
+                                    // Check activity on the normalized lifecycle channel
+                                    hasRecentActivity = _channelLastActivity.TryGetValue("lifecycle", out var lifecycleActivity) &&
+                                                        (now - lifecycleActivity) < staleThreshold;
+                                }
+                                else
+                                {
+                                    // For non-lifecycle channels, check the specific channel
+                                    hasRecentActivity = _channelLastActivity.TryGetValue(channel, out var lastActivity) &&
+                                                        (now - lastActivity) < staleThreshold;
+                                }
 
                                 if (!hasRecentActivity)
                                 {
-                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, will resubscribe all", channel, sid);
-                                    hasStaleSubscriptions = true;
-                                    break; // No need to check further, we'll resubscribe all
+                                    staleSubscriptions.Add((channel, subscription.Value.Markets));
                                 }
                             }
                         }
@@ -1363,10 +1672,13 @@ namespace KalshiBotAPI.Websockets
                         _subscriptionLock.ExitReadLock();
                     }
 
-                    if (hasStaleSubscriptions)
+                    // Now resubscribe outside the lock
+                    foreach (var (channel, markets) in staleSubscriptions)
                     {
-                        _logger.LogInformation("Resubscribing to all subscriptions due to detected stale subscriptions");
-                        await ResubscribeAsync(true); // Force resubscribe to all
+                        var englishChannelName = GetEnglishChannelName(channel);
+                        _logger.LogWarning("BSM: Detected potentially stale subscription for {EnglishChannelName} channel ({Channel}) with SID {Sid} (no messages received in {ThresholdMinutes} minutes), resubscribing this channel with markets: {Markets}",
+                            englishChannelName, channel, _channelSubscriptions.TryGetValue(channel, out var sub) ? sub.Sid : 0, staleThreshold.TotalMinutes, string.Join(", ", markets));
+                        await ResubscribeChannelAsync(channel, markets);
                     }
                 }
                 catch (OperationCanceledException)
@@ -1455,7 +1767,7 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostOperationMetrics(metrics);
+                PostOperationMetrics(metrics);
             }
 
             return metrics;
@@ -1484,10 +1796,82 @@ namespace KalshiBotAPI.Websockets
             // Post metrics to performance monitoring service if available
             if (_performanceMetrics != null)
             {
-                _performanceMetrics.PostLockContentionMetrics(metrics);
+                PostLockContentionMetrics(metrics);
             }
 
             return metrics;
+        }
+
+        /// <summary>
+        /// Posts operation performance metrics to the performance monitor.
+        /// </summary>
+        /// <param name="metrics">The operation metrics to post.</param>
+        private void PostOperationMetrics(ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string operation = kvp.Key;
+                var (avgTicks, totalOps, successOps) = kvp.Value;
+                string id = $"BaseSubscriptionManager_Operation_{operation}";
+                string name = $"{operation} Operations";
+                string description = $"Performance metrics for {operation} operations";
+                string category = "BaseSubscriptionManager";
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                }
+                else
+                {
+                    // Record total operations
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Total", $"{name} Total", $"Total {operation} operations", totalOps, "count", category);
+
+                    // Record successful operations
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Success", $"{name} Success", $"Successful {operation} operations", successOps, "count", category);
+
+                    // Record average time in ms
+                    double avgMs = avgTicks / (double)TimeSpan.TicksPerMillisecond;
+                    _performanceMetrics.RecordSpeedDialMetric("BaseSubscriptionManager", $"{id}_AvgTime", $"{name} Avg Time", $"Average time for {operation} operations", avgMs, "ms", category, 0, 1000, 5000);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Posts lock contention metrics to the performance monitor.
+        /// </summary>
+        /// <param name="metrics">The lock metrics to post.</param>
+        private void PostLockContentionMetrics(ConcurrentDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> metrics)
+        {
+            if (_performanceMetrics == null) return;
+
+            foreach (var kvp in metrics)
+            {
+                string lockName = kvp.Key;
+                var (acqCount, avgWaitTicks, contCount) = kvp.Value;
+                string id = $"BaseSubscriptionManager_Lock_{lockName}";
+                string name = $"{lockName} Lock";
+                string description = $"Lock contention metrics for {lockName}";
+                string category = "BaseSubscriptionManager";
+
+                if (!_enableMetrics)
+                {
+                    _performanceMetrics.RecordDisabledMetric("BaseSubscriptionManager", id, name, description, 0, "", category);
+                }
+                else
+                {
+                    // Record acquisition count
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Acquisitions", $"{name} Acquisitions", $"Total acquisitions for {lockName}", acqCount, "count", category);
+
+                    // Record contention count
+                    _performanceMetrics.RecordCounterMetric("BaseSubscriptionManager", $"{id}_Contentions", $"{name} Contentions", $"Total contentions for {lockName}", contCount, "count", category);
+
+                    // Record average wait time in ms
+                    double avgWaitMs = avgWaitTicks / (double)TimeSpan.TicksPerMillisecond;
+                    _performanceMetrics.RecordSpeedDialMetric("BaseSubscriptionManager", $"{id}_AvgWait", $"{name} Avg Wait", $"Average wait time for {lockName}", avgWaitMs, "ms", category, 0, 100, 500);
+                }
+            }
         }
 
         /// <summary>
@@ -1561,11 +1945,45 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Retrieves the most recent pending confirmation.
+        /// Used to handle "Already subscribed" errors that may not have IDs.
+        /// </summary>
+        /// <returns>A tuple containing the ID, channel, and market tickers of the last pending confirmation, or null if none exist.</returns>
+        public (int Id, string Channel, string[] MarketTickers)? GetLastPendingConfirmation()
+        {
+            var last = _pendingSubscriptionConfirmations.OrderByDescending(kvp => kvp.Value.SentTime).FirstOrDefault();
+            if (last.Key != 0)
+            {
+                return (last.Key, last.Value.Channel, last.Value.MarketTickers);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Sets the exchange outage mode to prevent unhealthy events during exchange-wide outages.
+        /// </summary>
+        /// <param name="isOutage">True if we're in an exchange-wide outage, false otherwise.</param>
+        public void SetExchangeOutageMode(bool isOutage)
+        {
+            _isExchangeOutageMode = isOutage;
+            _logger.LogInformation("Exchange outage mode set to {Mode}", isOutage);
+        }
+
+        /// <summary>
         /// Raises the MarketWebSocketUnhealthy event for the specified markets.
+        /// Only raises the event if the connection issues are not due to exchange-wide outages.
         /// </summary>
         /// <param name="markets">Array of market tickers that have unhealthy WebSocket connections.</param>
         public void RaiseMarketWebSocketUnhealthy(string[] markets)
         {
+            // Don't raise unhealthy events during exchange-wide outages
+            // Exchange outages affect all markets, not individual market issues
+            if (_isExchangeOutageMode)
+            {
+                _logger.LogDebug("Skipping MarketWebSocketUnhealthy event for markets {Markets} due to exchange-wide outage", string.Join(", ", markets));
+                return;
+            }
+
             MarketWebSocketUnhealthy?.Invoke(this, markets);
         }
 
@@ -1576,6 +1994,133 @@ namespace KalshiBotAPI.Websockets
         public void RaiseMarketWebSocketHealthy(string[] markets)
         {
             MarketWebSocketHealthy?.Invoke(this, markets);
+        }
+
+        /// <summary>
+        /// Records that a message was received on the specified channel.
+        /// Used for stale subscription detection.
+        /// </summary>
+        /// <param name="channel">The channel name where the message was received.</param>
+        public void RecordChannelActivity(string channel)
+        {
+            _channelLastActivity[channel] = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Enqueues an order book message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="offerType">The offer type.</param>
+        /// <param name="seq">The sequence number.</param>
+        public void EnqueueOrderBookMessage(int sid, JsonElement data, string offerType, long seq)
+        {
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Enqueue((data, offerType, seq, Guid.NewGuid()), seq);
+            }
+        }
+
+        /// <summary>
+        /// Enqueues an ok message for processing.
+        /// </summary>
+        /// <param name="sid">The subscription ID.</param>
+        /// <param name="data">The message data.</param>
+        /// <param name="seq">The sequence number.</param>
+        public void EnqueueOkMessage(int sid, JsonElement data, long seq)
+        {
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Enqueue((data, "ok", seq, Guid.NewGuid()), seq);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current subscription ID for a specific channel.
+        /// </summary>
+        /// <param name="channel">The channel name.</param>
+        /// <returns>The subscription ID, or 0 if not subscribed.</returns>
+        public int GetChannelSid(string channel)
+        {
+            return _channelSubscriptions.TryGetValue(channel, out var subscription) ? subscription.Sid : 0;
+        }
+
+        /// <summary>
+        /// Removes a single channel subscription from local state.
+        /// Used when processing unsubscribe confirmations.
+        /// </summary>
+        /// <param name="channel">The channel name to remove.</param>
+        public void RemoveChannelSubscription(string channel)
+        {
+            if (_channelSubscriptions.TryRemove(channel, out var subscription))
+            {
+                _logger.LogInformation("Removed subscription for channel {Channel}, SID {Sid}", channel, subscription.Sid);
+            }
+        }
+
+        /// <summary>
+        /// Handles WebSocket disconnection by clearing local subscription state.
+        /// This ensures clean reconnection without stale state assumptions.
+        /// </summary>
+        public void HandleDisconnection()
+        {
+            _logger.LogInformation("Handling WebSocket disconnection - clearing local subscription state");
+
+            // Clear all channel subscriptions
+            _channelSubscriptions.Clear();
+
+            // Clear all market channel subscription states
+            _marketChannelSubscriptionStates.Clear();
+
+            // Clear pending confirmations
+            _pendingSubscriptionConfirmations.Clear();
+
+            // Clear pending market subscriptions
+            _pendingMarketSubscriptions.Clear();
+
+            // Clear recent subscriptions to force fresh subscriptions on reconnect
+            _recentSubscriptions.Clear();
+
+            // Clear channel activity tracking
+            _channelLastActivity.Clear();
+
+            // Clear order book queue and reset sequence tracking
+            lock (_orderBookQueueSynchronizationLock)
+            {
+                _orderBookUpdateQueue.Clear();
+                _latestProcessedSequenceNumber = 0;
+                _gapDetectedTime = null;
+            }
+
+            _logger.LogInformation("Local subscription state cleared due to disconnection");
+        }
+
+        private bool _subscribeToGeneralChannels = true;
+
+        /// <summary>
+        /// Gets or sets whether to subscribe to general (non-market-specific) channels like fill and lifecycle.
+        /// When false, only market-specific channels will be subscribed to.
+        /// </summary>
+        public bool SubscribeToGeneralChannels
+        {
+            get => _subscribeToGeneralChannels;
+            set
+            {
+                if (_subscribeToGeneralChannels != value)
+                {
+                    _subscribeToGeneralChannels = value;
+                    OnSubscribeToGeneralChannelsChanged(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when SubscribeToGeneralChannels changes. Can be overridden to handle subscription updates.
+        /// </summary>
+        /// <param name="newValue">The new value of SubscribeToGeneralChannels.</param>
+        protected virtual void OnSubscribeToGeneralChannelsChanged(bool newValue)
+        {
+            // Default implementation does nothing - derived classes can override
         }
     }
 }

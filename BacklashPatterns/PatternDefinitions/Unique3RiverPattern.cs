@@ -3,6 +3,11 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents the Unique 3 River pattern, a three-candle bullish reversal pattern in a downtrend.
+    /// Consists of a strong bearish candle followed by a smaller bearish candle and a bullish candle that opens below the second close and closes above it.
+    /// Indicates potential exhaustion of sellers and possible trend reversal upward.
+    /// </summary>
     public class Unique3RiverPattern : PatternDefinition
     {
         /// <summary>
@@ -28,19 +33,49 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: -0.5 (strong downtrend), Loosest: -0.1 (minimal downtrend still present).
         /// </summary>
         public static double TrendThreshold { get; } = -0.3;
+
+        /// <summary>
+        /// Gets the base name for the Unique 3 River pattern.
+        /// </summary>
         public const string BaseName = "Unique3River";
+
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + "_" + Direction.ToString();
+
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with a strong bearish candle followed by a smaller bearish candle and a bullish candle that opens below the second close and closes above it, signaling slowing bearish momentum.";
+
         /// <summary>
         /// Gets the direction of the pattern.
         /// </summary>
         public override PatternDirection Direction => PatternDirection.Bullish;
+
+        /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
+
+        /// <summary>
+        /// Initializes a new instance of the Unique3RiverPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (three candles).</param>
         public Unique3RiverPattern(List<int> candles) : base(candles)
         {
         }
@@ -55,6 +90,14 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Bullish, opens below second close, closes above it.
          * - Indication: Indicates potential exhaustion of sellers, possible trend reversal upward.
          */
+        /// <summary>
+        /// Determines if a Unique 3 River pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle in the pattern.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+        /// <param name="prices">Array of candle price data.</param>
+        /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+        /// <returns>A Unique3RiverPattern instance if detected, otherwise null.</returns>
         public static async Task<Unique3RiverPattern?> IsPatternAsync(
             int index,
             int trendLookback,

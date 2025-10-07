@@ -656,6 +656,107 @@ body {
     }
 }
 
+/* Pie Chart Control Styles */
+.control-card {
+    background: rgba(16, 16, 13, 0.95);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 8px 25px rgba(28, 51, 39, 0.3);
+    border: 2px solid rgb(28, 51, 39);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.control-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(28, 51, 39, 0.6);
+}
+
+.control-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(225, 221, 206);
+    margin-bottom: 4px;
+}
+
+.control-description {
+    font-size: 11px;
+    color: rgb(225, 221, 206);
+    margin-bottom: 10px;
+}
+
+.pie-chart-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgb(28, 51, 39);
+    box-shadow: 0 0 10px rgba(28, 51, 39, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pie-chart-container:hover .pie-chart {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(28, 51, 39, 0.6);
+}
+
+.pie-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(16, 16, 13, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(225, 221, 206);
+    font-size: 24px;
+    font-weight: 700;
+    border: 2px solid rgb(28, 51, 39);
+}
+
+.pie-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 10px;
+    background: rgb(225, 221, 206);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+}
+
+.pie-legend {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+}
+
+.pie-legend div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pie-legend div div {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
 /* Add subtle glow effects */
 .market-card:hover::before {
     box-shadow: 0 0 20px rgba(28, 51, 39, 0.6);

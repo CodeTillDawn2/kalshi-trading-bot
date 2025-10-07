@@ -1,5 +1,3 @@
-using BacklashBot.Services;
-using BacklashBot.State;
 using BacklashCommon.Helpers;
 using BacklashDTOs;
 
@@ -20,7 +18,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_ValidSnapshot_ReturnsValidResult()
         {
-            TestContext.WriteLine("Testing validation of a valid snapshot with proper orderbook data.");
+            TestContext.Out.WriteLine("Testing validation of a valid snapshot with proper orderbook data.");
             // Arrange: Valid snapshot with orderbook data and reasonable prices
             var snapshot = new MarketSnapshot
             {
@@ -46,7 +44,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Valid snapshot passed all validation checks.");
+            TestContext.Out.WriteLine("Result: Valid snapshot passed all validation checks.");
         }
 
         /// <summary>
@@ -57,7 +55,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_MissingOrderbook_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing validation of a snapshot with missing orderbook data.");
+            TestContext.Out.WriteLine("Testing validation of a snapshot with missing orderbook data.");
             // Arrange: Snapshot with null/empty orderbook
             var snapshot = new MarketSnapshot
             {
@@ -83,7 +81,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.True);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with missing orderbook correctly failed validation.");
+            TestContext.Out.WriteLine("Result: Snapshot with missing orderbook correctly failed validation.");
         }
 
         /// <summary>
@@ -94,7 +92,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_OverlappingPrices_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing validation of a snapshot with overlapping bid prices.");
+            TestContext.Out.WriteLine("Testing validation of a snapshot with overlapping bid prices.");
             // Arrange: Yes bid >= No bid (invalid market condition)
             var snapshot = new MarketSnapshot
             {
@@ -120,7 +118,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.True);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with overlapping prices correctly failed validation.");
+            TestContext.Out.WriteLine("Result: Snapshot with overlapping prices correctly failed validation.");
         }
 
         /// <summary>
@@ -131,7 +129,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyAboveThreshold_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy above default threshold.");
+            TestContext.Out.WriteLine("Testing validation of a snapshot with rate discrepancy above default threshold.");
             // Arrange: Discrepancy > default threshold (0.1)
             var snapshot = new MarketSnapshot
             {
@@ -157,7 +155,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.True);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy above threshold correctly failed validation.");
+            TestContext.Out.WriteLine("Result: Snapshot with rate discrepancy above threshold correctly failed validation.");
         }
 
         /// <summary>
@@ -168,7 +166,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyBelowCustomThreshold_ReturnsValidResult()
         {
-            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy below custom threshold.");
+            TestContext.Out.WriteLine("Testing validation of a snapshot with rate discrepancy below custom threshold.");
             // Arrange: Discrepancy < custom threshold (0.5)
             var snapshot = new MarketSnapshot
             {
@@ -194,7 +192,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy below custom threshold correctly passed validation.");
+            TestContext.Out.WriteLine("Result: Snapshot with rate discrepancy below custom threshold correctly passed validation.");
         }
 
         /// <summary>
@@ -205,7 +203,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyExceedsCustomThreshold_ReturnsInvalidResult()
         {
-            TestContext.WriteLine("Testing validation of a snapshot with rate discrepancy exceeding custom threshold.");
+            TestContext.Out.WriteLine("Testing validation of a snapshot with rate discrepancy exceeding custom threshold.");
             // Arrange: Discrepancy > custom threshold (0.05)
             var snapshot = new MarketSnapshot
             {
@@ -231,7 +229,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.True);
-            TestContext.WriteLine("Result: Snapshot with rate discrepancy exceeding custom threshold correctly failed validation.");
+            TestContext.Out.WriteLine("Result: Snapshot with rate discrepancy exceeding custom threshold correctly failed validation.");
         }
 
         /// <summary>
@@ -242,7 +240,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_ChangeMetricsNotMature_SkipsRateCheck()
         {
-            TestContext.WriteLine("Testing that rate discrepancy checks are skipped when change metrics are not mature.");
+            TestContext.Out.WriteLine("Testing that rate discrepancy checks are skipped when change metrics are not mature.");
             // Arrange: ChangeMetricsMature false, large discrepancy but should be valid
             var snapshot = new MarketSnapshot
             {
@@ -268,7 +266,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Rate discrepancy checks correctly skipped for immature change metrics.");
+            TestContext.Out.WriteLine("Result: Rate discrepancy checks correctly skipped for immature change metrics.");
         }
 
         /// <summary>
@@ -279,7 +277,7 @@ namespace BacklashBotTests
         [Test]
         public void ValidateDiscrepancies_ZeroBestPrices_SkipsOverlapCheck()
         {
-            TestContext.WriteLine("Testing that overlap checks are skipped when best prices are zero.");
+            TestContext.Out.WriteLine("Testing that overlap checks are skipped when best prices are zero.");
             // Arrange: BestYesBid = 0, should not trigger overlap
             var snapshot = new MarketSnapshot
             {
@@ -305,7 +303,7 @@ namespace BacklashBotTests
             Assert.That(result.IsOrderbookMissing, Is.False);
             Assert.That(result.DoPricesOverlap, Is.False);
             Assert.That(result.IsRateDiscrepancy, Is.False);
-            TestContext.WriteLine("Result: Overlap checks correctly skipped for zero best prices.");
+            TestContext.Out.WriteLine("Result: Overlap checks correctly skipped for zero best prices.");
         }
     }
 }

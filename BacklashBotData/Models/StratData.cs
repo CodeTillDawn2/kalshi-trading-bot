@@ -1,4 +1,4 @@
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents strategy configuration and metadata for trading strategies in the Kalshi bot system.

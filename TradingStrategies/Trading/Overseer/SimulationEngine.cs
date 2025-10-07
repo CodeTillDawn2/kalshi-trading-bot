@@ -1,4 +1,5 @@
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
@@ -26,7 +27,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
         private readonly StrategySelectionHelper _strategySelectionHelper;
-        private readonly PerformanceMonitor? _performanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace TradingStrategies.Trading.Overseer
             MarketTypeService marketTypeService,
             StrategySelectionHelper strategySelectionHelper,
             PatternDetectionService patternDetectionService,
-            PerformanceMonitor? performanceMonitor = null)
+            IPerformanceMonitor performanceMonitor)
         {
             _marketTypeService = marketTypeService;
             _strategySelectionHelper = strategySelectionHelper;
@@ -82,7 +83,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Gets the pattern performance monitor for accessing performance metrics.
         /// </summary>
-        public PerformanceMonitor? PerformanceMonitor => _performanceMonitor;
+        public IPerformanceMonitor PerformanceMonitor => _performanceMonitor;
 
         /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
@@ -90,7 +91,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="scenario">The trading scenario containing strategies organized by market conditions.</param>
         /// <param name="snapshots">The sequence of market snapshots to simulate against, in chronological order.</param>
         /// <param name="isSingleStrategy">Whether to run in single-strategy mode (modifies paths in-place) or multi-strategy mode (creates new path branches).</param>
-        /// <returns>A list of completed simulation paths, each representing a possible outcome of the trading scenario.</returns>
+        /// <returns>A task that returns a list of completed simulation paths, each representing a possible outcome of the trading scenario.</returns>
         /// <remarks>
         /// This method orchestrates the entire simulation process:
         /// 1. Initializes simulation paths with starting conditions
@@ -106,7 +107,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Risk controls and position limits
         /// - Multiple concurrent strategy paths
         /// </remarks>
-        public List<SimulationPath> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
+        public async Task<List<SimulationPath>> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
         {
             if (scenario == null) throw new ArgumentNullException(nameof(scenario));
             if (snapshots == null) throw new ArgumentNullException(nameof(snapshots));
@@ -149,7 +150,7 @@ namespace TradingStrategies.Trading.Overseer
 
                     if (!path.StrategiesByMarketConditions.TryGetValue(currentMarketConditions, out var activeStrategies) || !activeStrategies.Any())
                     {
-                        var newPath = HandleScenarioWithNoActiveStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
+                        var newPath = await HandleScenarioWithNoActiveStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
                         newPaths.Add(newPath);
                         continue;
                     }
@@ -158,7 +159,7 @@ namespace TradingStrategies.Trading.Overseer
 
                     foreach (var kvp in actionGroups)
                     {
-                        var newPath = ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
+                        var newPath = await ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
                             currentMarketConditions, book, isSingleStrategy);
                         if (newPath != null)
                         {
@@ -181,28 +182,30 @@ namespace TradingStrategies.Trading.Overseer
                 LastIOReadTime = TimeSpan.Zero; // Placeholder for future I/O tracking
                 LastIOWriteTime = TimeSpan.Zero; // Placeholder for future I/O tracking
 
-                // Record metrics to PerformanceMonitor if available and enabled
-                if (_performanceMonitor != null && _performanceMonitor.EnablePerformanceMetrics)
+                // Record metrics to PerformanceMonitor
+                if (_enablePerformanceMetrics)
                 {
-                    var metrics = new Dictionary<string, object>
-                    {
-                        ["TotalExecutionTime"] = LastExecutionTime,
-                        ["MemoryUsed"] = LastMemoryUsed,
-                        ["ThroughputSnapshotsPerSecond"] = LastThroughputSnapshotsPerSecond,
-                        ["SnapshotsProcessed"] = snapshots.Count,
-                        ["IOReadTime"] = LastIOReadTime,
-                        ["IOWriteTime"] = LastIOWriteTime,
-                        ["EnablePerformanceMetrics"] = _enablePerformanceMetrics
-                    };
-                    _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics, _enablePerformanceMetrics);
+                    _performanceMonitor.RecordSpeedDialMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", LastExecutionTime.TotalMilliseconds, "ms", "Simulation", 0, 1000, 5000);
+                    _performanceMonitor.RecordProgressBarMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", LastMemoryUsed, "bytes", "Simulation", 0, 1000000, 10000000);
+                    _performanceMonitor.RecordNumericDisplayMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", LastThroughputSnapshotsPerSecond, "/s", "Simulation");
+                    _performanceMonitor.RecordCounterMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", snapshots.Count, "count", "Simulation");
+                    _performanceMonitor.RecordTrafficLightMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", _enablePerformanceMetrics ? 1 : 0, "", "Simulation", 0, 0.5, 1);
+                }
+                else
+                {
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "TotalExecutionTime", "Total Execution Time", "Total time for simulation", 0, "ms", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "MemoryUsed", "Memory Used", "Memory used in simulation", 0, "bytes", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "ThroughputSnapshotsPerSecond", "Throughput", "Snapshots per second", 0, "/s", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "SnapshotsProcessed", "Snapshots Processed", "Number of snapshots processed", 0, "count", "Simulation");
+                    _performanceMonitor.RecordDisabledMetric("SimulationEngine", "EnablePerformanceMetrics", "Performance Metrics Enabled", "Whether performance metrics are enabled", 0, "", "Simulation");
                 }
             }
 
             // Post MarketTypeService metrics automatically
-            _marketTypeService.PostMetrics(_performanceMonitor);
+            _marketTypeService.PostMetrics();
 
             // Post StrategySelectionHelper metrics automatically
-            _strategySelectionHelper.PostMetrics(_performanceMonitor);
+            _strategySelectionHelper.PostMetrics();
 
             return activePaths;
         }
@@ -288,7 +291,8 @@ namespace TradingStrategies.Trading.Overseer
                 if (order.expiration.HasValue && order.expiration < timestamp)
                 {
                     var targetBook = (order.action == "buy" && order.side == "yes") || (order.action == "sell" && order.side == "no") ? path.SimulatedBook.YesBids : path.SimulatedBook.NoBids;
-                    path.SimulatedBook.ReduceDepth(targetBook, order.price, order.count);
+                    int bookPrice = (order.action == "buy" && order.side == "yes") || (order.action == "sell" && order.side == "no") ? order.price : (order.action == "sell" && order.side == "yes" ? 100 - order.price : 100 - order.price);
+                    path.SimulatedBook.ReduceDepth(targetBook, bookPrice, order.count);
                     path.SimulatedRestingOrders.RemoveAt(i);
                 }
             }
@@ -367,7 +371,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Detects and includes any candlestick patterns
         /// - Preserves resting orders and position information
         /// </remarks>
-        private SimulationPath HandleScenarioWithNoActiveStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
+        private async Task<SimulationPath> HandleScenarioWithNoActiveStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
             SimulatedOrderbook actionBook;
@@ -398,7 +402,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
-            var patterns = DetectPatterns(effectiveSnapshot);
+            var patterns = DetectPatternsAsync(effectiveSnapshot).GetAwaiter().GetResult();
 
             var eventLog = new SimulationEventLog
             {
@@ -506,7 +510,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - Logs the action event with comprehensive market metrics
         /// - Returns null if the action execution was skipped due to constraints
         /// </remarks>
-        private SimulationPath ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
+        private async Task<SimulationPath> ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
        MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
        MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
@@ -559,7 +563,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
-            var patterns = DetectPatterns(effectiveSnapshot);
+            var patterns = await DetectPatternsAsync(effectiveSnapshot);
 
             var eventLog = new SimulationEventLog
             {
@@ -686,7 +690,7 @@ namespace TradingStrategies.Trading.Overseer
                     int noBidPx = 100 - sellPriceYes;
                     if (sellPriceYes > 0 && sellPriceYes < 100 && noBidPx >= 1 && noBidPx <= 99)
                     {
-                        actionBook.AddToDepth(actionBook.NoBids, noBidPx, desiredQty, timestamp);
+                        actionBook.AddToDepth(actionBook.NoBids, noBidPx, desiredQty, timestamp, isOwn: true);
                         actionResting.Add(("sell", "yes", "limit", desiredQty, sellPriceYes, decision.Expiration));
                     }
                 }
@@ -695,7 +699,7 @@ namespace TradingStrategies.Trading.Overseer
                     int yesBidPx = decision.Price;
                     if (yesBidPx > 0 && yesBidPx < 100)
                     {
-                        actionBook.AddToDepth(actionBook.YesBids, yesBidPx, desiredQty, timestamp);
+                        actionBook.AddToDepth(actionBook.YesBids, yesBidPx, desiredQty, timestamp, isOwn: true);
                         actionResting.Add(("buy", "yes", "limit", desiredQty, yesBidPx, decision.Expiration));
                     }
                 }
@@ -718,11 +722,12 @@ namespace TradingStrategies.Trading.Overseer
 
                 double remainingCash = newCash;
 
-                for (int p = 99; p >= 1; p--)
+                foreach (var kvp in bookToReduce.Reverse()) // Highest prices first
                 {
+                    int p = kvp.Key;
                     if (remainingQty <= 0) break;
-                    if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
-                    int depth = bookToReduce[p].Sum(o => o.count);
+                    if (!kvp.Value.Any()) continue;
+                    int depth = kvp.Value.Sum(o => o.Count);
                     double levelPrice = LevelPriceFunc(p);
                     int maxFillByCash = isPaying ? (int)Math.Floor(remainingCash / levelPrice) : depth;
                     int maxFill = Math.Min(depth, maxFillByCash);
@@ -766,7 +771,7 @@ namespace TradingStrategies.Trading.Overseer
                 DateTime? exp = decision.Expiration;
                 if (limitPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, postQty, effectiveSnapshot.Timestamp, isOwn: true);
                     actionResting.Add(("buy", "yes", "limit", postQty, limitPrice, exp));
                 }
             }
@@ -779,7 +784,7 @@ namespace TradingStrategies.Trading.Overseer
                 DateTime? exp = decision.Expiration;
                 if (bidPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, postQty, effectiveSnapshot.Timestamp, isOwn: true);
                     actionResting.Add(("sell", "yes", "limit", postQty, sellPrice, exp));
                 }
             }
@@ -989,27 +994,39 @@ namespace TradingStrategies.Trading.Overseer
         /// for analysis of pattern-based trading signals.
         /// Records comprehensive performance metrics to performance monitor if available.
         /// </remarks>
-        private List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
+        private async Task<List<BacklashPatterns.PatternDefinitions.PatternDefinition>> DetectPatternsAsync(MarketSnapshot snapshot)
         {
-            var result = _patternDetectionService.DetectPatterns(snapshot);
+            var result = await _patternDetectionService.DetectPatternsAsync(snapshot);
 
-            // Record comprehensive performance metrics if monitor is available and metrics were collected
-            if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
+            // Record comprehensive performance metrics if monitor is available
+            if (_performanceMonitor != null)
             {
-                var metricsDict = new Dictionary<string, object>
+                if (_enablePerformanceMetrics)
                 {
-                    ["MethodName"] = "PatternDetectionService.DetectPatterns",
-                    ["TotalExecutionTimeMs"] = result.ExecutionTimeMs.Value,
-                    ["TotalItemsProcessed"] = result.TotalCandlesProcessed ?? 0,
-                    ["TotalItemsFound"] = result.TotalPatternsFound ?? 0,
-                    ["ItemCheckTimes"] = result.PatternCheckTimes,
-                    ["Timestamp"] = DateTime.UtcNow
-                };
+                    _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", result.ExecutionTimeMs.Value, "ms", "PatternDetection", 0, 1000, 5000);
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", result.TotalCandlesProcessed ?? 0, "count", "PatternDetection");
+                    _performanceMonitor.RecordCounterMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", result.TotalPatternsFound ?? 0, "count", "PatternDetection");
+                    foreach (var kvp in result.PatternCheckTimes)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", (double)kvp.Value, "ms", "PatternDetection", 0, 1000, 5000);
+                    }
 
-                _performanceMonitor.RecordSimulationMetrics("PatternDetectionService", metricsDict, _enablePerformanceMetrics);
+                }
+                else
+                {
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalExecutionTimeMs", "Total Execution Time", "Execution time for pattern detection", 0, "ms", "PatternDetection");
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsProcessed", "Items Processed", "Number of candles processed", 0, "count", "PatternDetection");
+                    _performanceMonitor.RecordDisabledMetric("PatternDetectionService", "TotalItemsFound", "Items Found", "Number of patterns found", 0, "count", "PatternDetection");
+                    foreach (var kvp in result.PatternCheckTimes)
+                    {
+                        _performanceMonitor.RecordDisabledMetric("PatternDetectionService", $"ItemCheckTime_{kvp.Key}", $"Check Time - {kvp.Key}", $"Time spent checking {kvp.Key} pattern", 0, "ms", "PatternDetection");
+                    }
+                }
             }
 
             return result.Patterns;
         }
+
+
     }
 }

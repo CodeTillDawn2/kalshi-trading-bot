@@ -4,58 +4,60 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-/// <summary>
-/// Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
-/// from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
-/// information used in trading decisions, technical analysis, and snapshot creation.
-///
-/// The MarketData class maintains:
-/// - Current order book state with bid/ask prices and depths
-/// - Historical candlestick data across multiple timeframes (minute, hour, day)
-/// - Real-time ticker updates and price movements
-/// - Position information and P&amp;L calculations
-/// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
-/// - Order book change velocities and trade metrics
-/// - Support/resistance levels and market metadata
-///
-/// Data integrity is ensured through comprehensive input validation:
-/// - Candlestick data validation for non-negative prices (0-100), valid timestamps, and reasonable values
-/// - Ticker data validation for price ranges, volume, and timestamp integrity
-/// - Orderbook data validation for price bounds, quantities, and side validity
-/// - Position data validation for size reasonableness, exposure bounds, and update timestamps
-/// Invalid data triggers informative warnings via logging but processing continues to maintain system resilience.
-///
-/// Data is updated through various mechanisms:
-/// - WebSocket events for real-time order book and ticker updates
-/// - Periodic API calls for position and market information
-/// - Asynchronous background calculations for technical indicators and metrics to avoid blocking
-/// - Historical data loading from candlestick storage
-///
-/// Performance optimizations include:
-/// - Efficient data structures and minimized LINQ queries
-/// - Parallel processing for CPU-intensive calculations
-/// - Binary search for large dataset lookups
-/// - Asynchronous operations to maintain responsiveness
-///
-/// Calculation parameters such as tolerance percentages, fee rates, time periods for slope calculations,
-/// and lookback periods are configurable via CalculationConfig to allow runtime customization without code changes.
-///
-/// This class implements the IMarketData interface and is used throughout the trading bot
-/// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
-/// </summary>
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.State
 {
+    /// <summary>
+    /// Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
+    /// from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
+    /// information used in trading decisions, technical analysis, and snapshot creation.
+    ///
+    /// The MarketData class maintains:
+    /// - Current order book state with bid/ask prices and depths
+    /// - Historical candlestick data across multiple timeframes (minute, hour, day)
+    /// - Real-time ticker updates and price movements
+    /// - Position information and PandL calculations
+    /// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
+    /// - Order book change velocities and trade metrics
+    /// - Support/resistance levels and market metadata
+    ///
+    /// Data integrity is ensured through comprehensive input validation:
+    /// - Candlestick data validation for non-negative prices (0-100), valid timestamps, and reasonable values
+    /// - Ticker data validation for price ranges, volume, and timestamp integrity
+    /// - Orderbook data validation for price bounds, quantities, and side validity
+    /// - Position data validation for size reasonableness, exposure bounds, and update timestamps
+    /// Invalid data triggers informative warnings via logging but processing continues to maintain system resilience.
+    ///
+    /// Data is updated through various mechanisms:
+    /// - WebSocket events for real-time order book and ticker updates
+    /// - Periodic API calls for position and market information
+    /// - Asynchronous background calculations for technical indicators and metrics to avoid blocking
+    /// - Historical data loading from candlestick storage
+    ///
+    /// Performance optimizations include:
+    /// - Efficient data structures and minimized LINQ queries
+    /// - Parallel processing for CPU-intensive calculations
+    /// - Binary search for large dataset lookups
+    /// - Asynchronous operations to maintain responsiveness
+    ///
+    /// Calculation parameters such as tolerance percentages, fee rates, time periods for slope calculations,
+    /// and lookback periods are configurable via CalculationConfig to allow runtime customization without code changes.
+    ///
+    /// This class implements the IMarketData interface and is used throughout the trading bot
+    /// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
+    /// </summary>
     public class MarketData : IMarketData
     {
         private readonly MarketServiceDataConfig _marketDataConfig;
+        private readonly CalculationsConfig _calculationsConfig;
 
         private readonly ILogger<IMarketData> _logger;
         private readonly IOrderbookChangeTracker _changeTracker;
         private readonly ITradingCalculator _tradingCalculator;
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private string _marketTicker = "";
         private MarketDTO _marketInfo = null!;
         private readonly Dictionary<string, List<CandlestickData>> _candlesticks;
@@ -67,9 +69,15 @@ namespace BacklashBot.State
         private DateTime _lastSnapshotTaken;
         private string _marketCategory = "";
 
+        /// <summary>
+        /// Gets or sets the category classification for this market (e.g., politics, weather).
+        /// </summary>
         public string MarketCategory { get => _marketCategory; set => _marketCategory = value; }
 
         private string _marketStatus = "";
+        /// <summary>
+        /// Gets or sets the current status of the market (e.g., open, closed, settled).
+        /// </summary>
         public string MarketStatus
         {
             get => _marketStatus;
@@ -83,6 +91,9 @@ namespace BacklashBot.State
             }
         }
 
+        /// <summary>
+        /// Gets or sets the date and time of the last successful synchronization with the market data source.
+        /// </summary>
         public DateTime LastSuccessfulSync { get; set; } = DateTime.MinValue;
 
         private (int Ask, int Bid, DateTime When) _tickerPrice = (0, 0, DateTime.MinValue);
@@ -142,10 +153,16 @@ namespace BacklashBot.State
         /// </summary>
         public double NoBidSlopePerMinute_Medium { get { return _noBidSlopePerMinute_Medium; } set { _noBidSlopePerMinute_Medium = value; } }
 
+        /// <summary>
+        /// Gets or sets the type of market (e.g., binary yes/no outcome).
+        /// </summary>
         public string MarketType { get; set; } = "";
 
         private double _tolerancePercentage;
 
+        /// <summary>
+        /// Gets a value indicating whether the order book change metrics have matured and are ready for analysis.
+        /// </summary>
         public bool ChangeMetricsMature => _changeTracker.IsMature;
 
         /// <summary>
@@ -159,16 +176,19 @@ namespace BacklashBot.State
         /// <param name="tradingCalculator">Calculator service for technical indicators and trading metrics.</param>
         /// <param name="changeTracker">Tracker for monitoring order book changes and velocities.</param>
         /// <param name="marketDataConfig">Configuration options for calculation parameters and thresholds, allowing runtime customization.</param>
+        /// <param name="calculationsConfig">Configuration options for calculation parameters.</param>
         /// <exception cref="ArgumentNullException">Thrown when any required dependency is null.</exception>
         public MarketData(
             MarketDTO market,
             ILogger<IMarketData> logger,
             ITradingCalculator tradingCalculator,
             IOrderbookChangeTracker changeTracker,
-            IOptions<MarketServiceDataConfig> marketDataConfig)
+            IOptions<MarketServiceDataConfig> marketDataConfig,
+            IOptions<CalculationsConfig> calculationsConfig)
         {
             _marketDataConfig = marketDataConfig?.Value ?? throw new ArgumentNullException(nameof(marketDataConfig));
-            _tolerancePercentage = _marketDataConfig.Calculations.TolerancePercentage;
+            _calculationsConfig = calculationsConfig?.Value ?? throw new ArgumentNullException(nameof(calculationsConfig));
+            _tolerancePercentage = _calculationsConfig.TolerancePercentage;
             _marketTicker = market.market_ticker ?? "";
             _marketCategory = market.category ?? "";
             _marketInfo = market;
@@ -176,6 +196,7 @@ namespace BacklashBot.State
             _tradingCalculator = tradingCalculator ?? throw new ArgumentNullException(nameof(tradingCalculator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _changeTracker = changeTracker ?? throw new ArgumentNullException(nameof(changeTracker));
+            _cancellationTokenSource = new CancellationTokenSource();
             _candlesticks = new Dictionary<string, List<CandlestickData>>
             {
                 ["minute"] = new List<CandlestickData>(),
@@ -189,6 +210,16 @@ namespace BacklashBot.State
 
             _logger.LogDebug("MarketData initialized for ticker {MarketTicker}", _marketTicker);
         }
+
+        /// <summary>
+        /// Cancels all ongoing operations for this market data instance.
+        /// Used when the market is being removed from watch list to prevent further processing.
+        /// </summary>
+        public void CancelOperations()
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
         /// <summary>
         /// Validates candlestick data for integrity before processing.
         /// Checks for non-negative prices within valid range (0-100), non-negative volume, and reasonable timestamps.
@@ -345,6 +376,10 @@ namespace BacklashBot.State
                 .Sum(o => o.RestingContracts);
         }
 
+        /// <summary>
+        /// Gets or sets the expected fees for the current position.
+        /// Calculated based on position size and order book levels.
+        /// </summary>
         public double ExpectedFees { get { return _expectedFees; } set { _expectedFees = value; } }
 
         /// <summary>
@@ -358,11 +393,19 @@ namespace BacklashBot.State
             get => _tolerancePercentage;
             set => _tolerancePercentage = Math.Max(0, value);
         }
+        /// <summary>
+        /// Gets or sets the timestamp of the last order book event received.
+        /// Used to track the freshness of order book data.
+        /// </summary>
         public DateTime LastOrderbookEventTimestamp
         {
             get => _lastOrderbookEventTimestamp;
             set => _lastOrderbookEventTimestamp = value;
         }
+        /// <summary>
+        /// Gets or sets the timestamp when the last market snapshot was taken.
+        /// Used for tracking snapshot frequency and data persistence.
+        /// </summary>
         public DateTime LastSnapshotTaken
         {
             get => _lastSnapshotTaken;
@@ -378,6 +421,10 @@ namespace BacklashBot.State
             _changeTracker.RecalculateAllMetrics();
         }
 
+        /// <summary>
+        /// Gets the order book change tracker instance for monitoring market dynamics.
+        /// Provides access to velocity calculations and trade metrics.
+        /// </summary>
         public IOrderbookChangeTracker ChangeTracker => _changeTracker;
 
         private double _AverageTradeSize_Yes = 0;
@@ -387,11 +434,35 @@ namespace BacklashBot.State
         private int _NonTradeRelatedOrderCount_Yes = 0;
         private int _NonTradeRelatedOrderCount_No = 0;
 
+        /// <summary>
+        /// Gets or sets the average trade size for yes positions.
+        /// Calculated from recent trading activity.
+        /// </summary>
         public double AverageTradeSize_Yes { get { return _AverageTradeSize_Yes; } set { _AverageTradeSize_Yes = value; } }
+        /// <summary>
+        /// Gets or sets the average trade size for no positions.
+        /// Calculated from recent trading activity.
+        /// </summary>
         public double AverageTradeSize_No { get { return _AverageTradeSize_No; } set { _AverageTradeSize_No = value; } }
+        /// <summary>
+        /// Gets or sets the count of trades for yes positions.
+        /// Tracks the number of executed trades for yes contracts.
+        /// </summary>
         public int TradeCount_Yes { get { return _TradeCount_Yes; } set { _TradeCount_Yes = value; } }
+        /// <summary>
+        /// Gets or sets the count of trades for no positions.
+        /// Tracks the number of executed trades for no contracts.
+        /// </summary>
         public int TradeCount_No { get { return _TradeCount_No; } set { _TradeCount_No = value; } }
+        /// <summary>
+        /// Gets or sets the count of non-trade related orders for yes positions.
+        /// Includes cancellations, modifications, and other order book changes.
+        /// </summary>
         public int NonTradeRelatedOrderCount_Yes { get { return _NonTradeRelatedOrderCount_Yes; } set { _NonTradeRelatedOrderCount_Yes = value; } }
+        /// <summary>
+        /// Gets or sets the count of non-trade related orders for no positions.
+        /// Includes cancellations, modifications, and other order book changes.
+        /// </summary>
         public int NonTradeRelatedOrderCount_No { get { return _NonTradeRelatedOrderCount_No; } set { _NonTradeRelatedOrderCount_No = value; } }
 
         private double _velocityPerMinute_Top_Yes_Bid = 0;
@@ -404,9 +475,25 @@ namespace BacklashBot.State
         private int _yesBidBottomLevelCount = 0;
         private int _noBidBottomLevelCount = 0;
 
+        /// <summary>
+        /// Gets or sets the count of price levels in the top portion of the yes bid order book.
+        /// Used to analyze order book depth and liquidity distribution.
+        /// </summary>
         public int LevelCount_Top_Yes_Bid { get { return _yesBidTopLevelCount; } set { _yesBidTopLevelCount = value; } }
+        /// <summary>
+        /// Gets or sets the count of price levels in the top portion of the no bid order book.
+        /// Used to analyze order book depth and liquidity distribution.
+        /// </summary>
         public int LevelCount_Top_No_Bid { get { return _noBidTopLevelCount; } set { _noBidTopLevelCount = value; } }
+        /// <summary>
+        /// Gets or sets the count of price levels in the bottom portion of the no bid order book.
+        /// Used to analyze order book depth and liquidity distribution.
+        /// </summary>
         public int LevelCount_Bottom_No_Bid { get { return _yesBidBottomLevelCount; } set { _yesBidBottomLevelCount = value; } }
+        /// <summary>
+        /// Gets or sets the count of price levels in the bottom portion of the yes bid order book.
+        /// Used to analyze order book depth and liquidity distribution.
+        /// </summary>
         public int LevelCount_Bottom_Yes_Bid { get { return _noBidBottomLevelCount; } set { _noBidBottomLevelCount = value; } }
 
         /// <summary>
@@ -459,17 +546,53 @@ namespace BacklashBot.State
         private double _yesBidOrderRatePerMinute = 0;
         private double _noBidOrderRatePerMinute = 0;
 
+        /// <summary>
+        /// Gets or sets the order volume per minute for yes bids.
+        /// Represents the volume of orders placed for yes contracts in the last minute.
+        /// </summary>
         public double OrderVolumePerMinute_YesBid { get { return _yesBidOrderRatePerMinute; } set { _yesBidOrderRatePerMinute = value; } }
+        /// <summary>
+        /// Gets or sets the order volume per minute for no bids.
+        /// Represents the volume of orders placed for no contracts in the last minute.
+        /// </summary>
         public double OrderVolumePerMinute_NoBid { get { return _noBidOrderRatePerMinute; } set { _noBidOrderRatePerMinute = value; } }
 
+        /// <summary>
+        /// Gets the best (highest) bid price for yes contracts.
+        /// Calculated from the current order book data.
+        /// </summary>
         public int BestYesBid => GetBids("yes").Any() ? GetBids("yes").Max(o => o.Price) : 0;
+        /// <summary>
+        /// Gets the best (highest) bid price for no contracts.
+        /// Calculated from the current order book data.
+        /// </summary>
         public int BestNoBid => GetBids("no").Any() ? GetBids("no").Max(o => o.Price) : 0;
+        /// <summary>
+        /// Gets the best (lowest) ask price for yes contracts.
+        /// Calculated as 100 minus the best no bid price.
+        /// </summary>
         public int BestYesAsk => 100 - BestNoBid;
+        /// <summary>
+        /// Gets the best (lowest) ask price for no contracts.
+        /// Calculated as 100 minus the best yes bid price.
+        /// </summary>
         public int BestNoAsk => 100 - BestYesBid;
 
+        /// <summary>
+        /// Gets the bid-ask spread for yes contracts.
+        /// Represents the difference between the best ask and best bid for yes.
+        /// </summary>
         public int YesSpread => BestYesAsk - BestYesBid;
+        /// <summary>
+        /// Gets the bid-ask spread for no contracts.
+        /// Represents the difference between the best ask and best bid for no.
+        /// </summary>
         public int NoSpread => BestNoAsk - BestNoBid;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the first market snapshot has been received.
+        /// Used to ensure data initialization before processing.
+        /// </summary>
         public bool ReceivedFirstSnapshot { get; set; } = false;
 
         /// <summary>
@@ -478,33 +601,103 @@ namespace BacklashBot.State
         /// </summary>
         public bool WebSocketHealthy { get; set; } = true;
 
+        /// <summary>
+        /// Gets the depth (total resting contracts) at the best yes bid price.
+        /// Represents the liquidity available at the current best bid for yes.
+        /// </summary>
         public int DepthAtBestYesBid => GetBids("yes")
             .Where(o => o.Price == BestYesBid)
             .Sum(o => o.RestingContracts);
+        /// <summary>
+        /// Gets the depth (total resting contracts) at the best no bid price.
+        /// Represents the liquidity available at the current best bid for no.
+        /// </summary>
         public int DepthAtBestNoBid => GetBids("no")
             .Where(o => o.Price == BestNoBid)
             .Sum(o => o.RestingContracts);
+        /// <summary>
+        /// Gets the depth at the best yes ask price (equivalent to best no bid depth).
+        /// </summary>
         public int DepthAtBestYesAsk => DepthAtBestNoBid;
+        /// <summary>
+        /// Gets the depth at the best no ask price (equivalent to best yes bid depth).
+        /// </summary>
         public int DepthAtBestNoAsk => DepthAtBestYesBid;
 
+        /// <summary>
+        /// Gets the depth within the top 10% tolerance range for yes bids.
+        /// Calculated using the configured tolerance percentage.
+        /// </summary>
         public int TopTenPercentLevelDepth_Yes => CalculateDepthWithinTolerance("yes", _tolerancePercentage);
+        /// <summary>
+        /// Gets the depth within the top 10% tolerance range for no bids.
+        /// Calculated using the configured tolerance percentage.
+        /// </summary>
         public int TopTenPercentLevelDepth_No => CalculateDepthWithinTolerance("no", _tolerancePercentage);
 
+        /// <summary>
+        /// Gets the price range of yes bids (max - min).
+        /// Represents the spread of bid prices for yes contracts.
+        /// </summary>
         public int BidRange_Yes => GetBids("yes").Any() ?
             GetBids("yes").Max(o => o.Price) - GetBids("yes").Min(o => o.Price) : 0;
+        /// <summary>
+        /// Gets the price range of no bids (max - min).
+        /// Represents the spread of bid prices for no contracts.
+        /// </summary>
         public int BidRange_No => GetBids("no").Any() ?
             GetBids("no").Max(o => o.Price) - GetBids("no").Min(o => o.Price) : 0;
 
+        /// <summary>
+        /// Gets the total number of resting contracts for yes bids.
+        /// Sum of all resting contracts in the yes bid order book.
+        /// </summary>
         public int TotalBidContracts_Yes => GetBids("yes").Sum(o => o.RestingContracts);
+        /// <summary>
+        /// Gets the total number of resting contracts for no bids.
+        /// Sum of all resting contracts in the no bid order book.
+        /// </summary>
         public int TotalBidContracts_No => GetBids("no").Sum(o => o.RestingContracts);
+        /// <summary>
+        /// Gets the total bid volume (contracts * price) for yes bids.
+        /// Weighted sum of resting contracts by price for yes.
+        /// </summary>
         public double TotalBidVolume_Yes => GetBids("yes").Sum(o => o.RestingContracts * o.Price);
+        /// <summary>
+        /// Gets the total bid volume (contracts * price) for no bids.
+        /// Weighted sum of resting contracts by price for no.
+        /// </summary>
         public double TotalBidVolume_No => GetBids("no").Sum(o => o.RestingContracts * o.Price);
+        /// <summary>
+        /// Gets the imbalance between yes and no bid contract counts.
+        /// Positive values indicate more yes contracts, negative more no contracts.
+        /// </summary>
         public int BidCountImbalance => TotalBidContracts_Yes - TotalBidContracts_No;
+        /// <summary>
+        /// Gets the imbalance between yes and no bid volumes.
+        /// Positive values indicate higher yes volume, negative higher no volume.
+        /// </summary>
         public double BidVolumeImbalance => TotalBidVolume_Yes - TotalBidVolume_No;
 
+        /// <summary>
+        /// Gets or sets the Parabolic SAR (Stop and Reverse) indicator value.
+        /// Used for identifying potential reversal points in price direction.
+        /// </summary>
         public double? PSAR { get; set; }
+        /// <summary>
+        /// Gets or sets the Average Directional Index (ADX) indicator value.
+        /// Measures the strength of a trend, regardless of direction.
+        /// </summary>
         public double? ADX { get; set; }
+        /// <summary>
+        /// Gets or sets the Plus Directional Indicator (+DI) value.
+        /// Measures upward price movement strength.
+        /// </summary>
         public double? PlusDI { get; set; }
+        /// <summary>
+        /// Gets or sets the Minus Directional Indicator (-DI) value.
+        /// Measures downward price movement strength.
+        /// </summary>
         public double? MinusDI { get; set; }
 
         private double _highestVolume_Day = 0;
@@ -515,29 +708,67 @@ namespace BacklashBot.State
         private double _recentVolume_LastMonth = 0;
 
 
+        /// <summary>
+        /// Gets or sets the highest trading volume recorded for the day.
+        /// Used for volume analysis and market activity assessment.
+        /// </summary>
         public double HighestVolume_Day { get { return _highestVolume_Day; } set { _highestVolume_Day = value; } }
+        /// <summary>
+        /// Gets or sets the highest trading volume recorded for the hour.
+        /// Used for volume analysis and market activity assessment.
+        /// </summary>
         public double HighestVolume_Hour { get { return _highestVolume_Hour; } set { _highestVolume_Hour = value; } }
+        /// <summary>
+        /// Gets or sets the highest trading volume recorded for the minute.
+        /// Used for volume analysis and market activity assessment.
+        /// </summary>
         public double HighestVolume_Minute { get { return _highestVolume_Minute; } set { _highestVolume_Minute = value; } }
+        /// <summary>
+        /// Gets or sets the recent trading volume for the last hour.
+        /// Used for short-term volume analysis.
+        /// </summary>
         public double RecentVolume_LastHour { get { return _recentVolume_LastHour; } set { _recentVolume_LastHour = value; } }
+        /// <summary>
+        /// Gets or sets the recent trading volume for the last three hours.
+        /// Used for medium-term volume analysis.
+        /// </summary>
         public double RecentVolume_LastThreeHours { get { return _recentVolume_LastThreeHours; } set { _recentVolume_LastThreeHours = value; } }
+        /// <summary>
+        /// Gets or sets the recent trading volume for the last month.
+        /// Used for long-term volume analysis.
+        /// </summary>
         public double RecentVolume_LastMonth { get { return _recentVolume_LastMonth; } set { _recentVolume_LastMonth = value; } }
 
-
+        /// <summary>
+        /// Gets the depth (total resting contracts) at the top 4 yes bid prices.
+        /// Represents the liquidity available in the best yes bid levels.
+        /// </summary>
         public int DepthAtTop4YesBids => GetBids("yes")
             .OrderByDescending(o => o.Price)
             .Take(4)
             .Sum(o => o.RestingContracts);
 
+        /// <summary>
+        /// Gets the depth (total resting contracts) at the top 4 no bid prices.
+        /// Represents the liquidity available in the best no bid levels.
+        /// </summary>
         public int DepthAtTop4NoBids => GetBids("no")
             .OrderByDescending(o => o.Price)
             .Take(4)
             .Sum(o => o.RestingContracts);
 
-
+        /// <summary>
+        /// Gets the center of mass for yes bid prices, weighted by price and volume.
+        /// Represents the average price point weighted by contract volume for yes bids.
+        /// </summary>
         public double YesBidCenterOfMass => GetBids("yes").Any() ?
             Math.Round(GetBids("yes").Sum(o => o.Price * (double)o.Price * o.RestingContracts) /
             GetBids("yes").Sum(o => o.Price * (double)o.RestingContracts), 2) : 0;
 
+        /// <summary>
+        /// Gets the center of mass for no bid prices, weighted by price and volume.
+        /// Represents the average price point weighted by contract volume for no bids.
+        /// </summary>
         public double NoBidCenterOfMass => GetBids("no").Any() ?
             Math.Round(GetBids("no").Sum(o => o.Price * (double)o.Price * o.RestingContracts) /
             GetBids("no").Sum(o => o.Price * (double)o.RestingContracts), 2) : 0;
@@ -552,6 +783,7 @@ namespace BacklashBot.State
         /// <param name="source">The source of the price update (e.g., "Candlestick", "Ticker").</param>
         public void UpdateCurrentPrice(int yesAsk, int yesBid, DateTime timestamp, string source)
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
 
             if (timestamp >= _tickerPrice.When && (yesAsk != _tickerPrice.Ask || yesBid != _tickerPrice.Bid))
             {
@@ -581,8 +813,15 @@ namespace BacklashBot.State
             RefreshPositionMetadata();
         }
 
+        /// <summary>
+        /// Refreshes candlestick metadata by validating data integrity and updating price extremes.
+        /// Processes minute-level candlesticks to calculate all-time and recent high/low prices for both yes and no sides.
+        /// Updates current price if candlestick data is more recent than ticker data.
+        /// </summary>
         public void RefreshCandlestickMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate candlestick data integrity
             ValidateCandlesticks(_candlesticks["minute"]);
 
@@ -607,7 +846,7 @@ namespace BacklashBot.State
                 if (candle != null) _allTimeLowNoBid = (candle.AskHigh, candle.Date);
 
 
-                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-_marketDataConfig.Calculations.RecentCandlestickDays)).ToList();
+                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-_calculationsConfig.RecentCandlestickDays)).ToList();
                 candle = recentCandlesticks.MaxBy(x => x.BidHigh);
                 if (candle != null) _recentHighYesBid = (candle.BidHigh, candle.Date);
                 candle = recentCandlesticks.MaxBy(x => 100 - x.AskHigh);
@@ -639,6 +878,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task RefreshTickerMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate ticker data integrity
             ValidateTickers(_tickers.ToList());
 
@@ -654,8 +895,8 @@ namespace BacklashBot.State
         private void CalculateSlope()
         {
             var now = DateTime.UtcNow;
-            var shortMinAgo = now.AddMinutes(-_marketDataConfig.Calculations.SlopeShortMinutes);
-            var mediumMinAgo = now.AddMinutes(-_marketDataConfig.Calculations.SlopeMediumMinutes);
+            var shortMinAgo = now.AddMinutes(-_calculationsConfig.SlopeShortMinutes);
+            var mediumMinAgo = now.AddMinutes(-_calculationsConfig.SlopeMediumMinutes);
 
             var recentTickers = _tickers
                 .Where(t => t.LoggedDate >= shortMinAgo && t.LoggedDate <= now)
@@ -745,6 +986,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task UpdateTradingMetrics()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             _logger.LogDebug("**Started updating trading metrics for {marketTicker}**", _marketTicker);
             _minutePseudoCandlesticks = await BuildPseudoCandlesticks("minute", _marketDataConfig.PseudoCandlestickLookbackPeriods);
             _hourPseudoCandlesticks = await BuildPseudoCandlesticks("hour", _marketDataConfig.PseudoCandlestickLookbackPeriods);
@@ -755,26 +998,26 @@ namespace BacklashBot.State
 
             await Task.Run(() =>
             {
-                _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _marketDataConfig.Calculations.RSI_Short_Periods);
+                _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _calculationsConfig.RSI_Short_Periods);
                 if (_rsi_Short != null) _rsi_Short = Math.Round((double)_rsi_Short, 2);
-                _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _marketDataConfig.Calculations.RSI_Medium_Periods);
+                _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _calculationsConfig.RSI_Medium_Periods);
                 if (_rsi_Medium != null) _rsi_Medium = Math.Round((double)_rsi_Medium, 2);
-                _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _marketDataConfig.Calculations.RSI_Long_Periods);
+                _rsi_Long = _tradingCalculator.CalculateRSI(dayCopy, _calculationsConfig.RSI_Long_Periods);
                 if (_rsi_Long != null) _rsi_Long = Math.Round((double)_rsi_Long, 2);
 
                 _macd_Medium = _tradingCalculator.CalculateMACD(hourCopy,
-                    _marketDataConfig.Calculations.MACD_Medium_FastPeriod,
-                    _marketDataConfig.Calculations.MACD_Medium_SlowPeriod,
-                    _marketDataConfig.Calculations.MACD_Medium_SignalPeriod);
+                    _calculationsConfig.MACD_Medium_FastPeriod,
+                    _calculationsConfig.MACD_Medium_SlowPeriod,
+                    _calculationsConfig.MACD_Medium_SignalPeriod);
 
                 if (_macd_Medium.MACD != null) _macd_Medium.MACD = Math.Round((double)_macd_Medium.MACD, 2);
                 if (_macd_Medium.Signal != null) _macd_Medium.Signal = Math.Round((double)_macd_Medium.Signal, 2);
                 if (_macd_Medium.Histogram != null) _macd_Medium.Histogram = Math.Round((double)_macd_Medium.Histogram, 2);
 
                 _macd_Long = _tradingCalculator.CalculateMACD(dayCopy,
-                    _marketDataConfig.Calculations.MACD_Long_FastPeriod,
-                    _marketDataConfig.Calculations.MACD_Long_SlowPeriod,
-                    _marketDataConfig.Calculations.MACD_Long_SignalPeriod);
+                    _calculationsConfig.MACD_Long_FastPeriod,
+                    _calculationsConfig.MACD_Long_SlowPeriod,
+                    _calculationsConfig.MACD_Long_SignalPeriod);
 
                 if (_macd_Long.MACD != null) _macd_Long.MACD = Math.Round((double)_macd_Long.MACD, 2);
                 if (_macd_Long.Signal != null) _macd_Long.Signal = Math.Round((double)_macd_Long.Signal, 2);
@@ -782,50 +1025,50 @@ namespace BacklashBot.State
 
 
                 _ema_Medium = TradingCalculations.CalculateEMA(hourCopy.Select(c => c.MidClose).ToList(),
-                _marketDataConfig.Calculations.EMA_Medium_Periods);
+                _calculationsConfig.EMA_Medium_Periods);
                 if (_ema_Medium != null) _ema_Medium = Math.Round((double)_ema_Medium, 2);
 
 
                 _ema_Long = TradingCalculations.CalculateEMA(dayCopy.Select(c => c.MidClose).ToList(),
-                    _marketDataConfig.Calculations.EMA_Long_Periods);
+                    _calculationsConfig.EMA_Long_Periods);
                 if (_ema_Long != null) _ema_Long = Math.Round((double)_ema_Long, 2);
 
                 _bollingerbands_Medium = _tradingCalculator.CalculateBollingerBands(hourCopy,
-                    _marketDataConfig.Calculations.BollingerBands_Medium_Periods,
-                    _marketDataConfig.Calculations.BollingerBands_Medium_StdDev);
+                    _calculationsConfig.BollingerBands_Medium_Periods,
+                    _calculationsConfig.BollingerBands_Medium_StdDev);
 
                 if (_bollingerbands_Medium.lower != null) _bollingerbands_Medium.lower = Math.Round((double)_bollingerbands_Medium.lower, 2);
                 if (_bollingerbands_Medium.middle != null) _bollingerbands_Medium.middle = Math.Round((double)_bollingerbands_Medium.middle, 2);
                 if (_bollingerbands_Medium.upper != null) _bollingerbands_Medium.upper = Math.Round((double)_bollingerbands_Medium.upper, 2);
 
                 _bollingerbands_Long = _tradingCalculator.CalculateBollingerBands(dayCopy,
-                    _marketDataConfig.Calculations.BollingerBands_Long_Periods,
-                    _marketDataConfig.Calculations.BollingerBands_Long_StdDev);
+                    _calculationsConfig.BollingerBands_Long_Periods,
+                    _calculationsConfig.BollingerBands_Long_StdDev);
                 if (_bollingerbands_Long.lower != null) _bollingerbands_Long.lower = Math.Round((double)_bollingerbands_Long.lower, 2);
                 if (_bollingerbands_Long.middle != null) _bollingerbands_Long.middle = Math.Round((double)_bollingerbands_Long.middle, 2);
                 if (_bollingerbands_Long.upper != null) _bollingerbands_Long.upper = Math.Round((double)_bollingerbands_Long.upper, 2);
 
-                _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _marketDataConfig.Calculations.ATR_Medium_Periods);
+                _atr_Medium = _tradingCalculator.CalculateATR(hourCopy, _calculationsConfig.ATR_Medium_Periods);
                 if (_atr_Medium != null) _atr_Medium = Math.Round((double)_atr_Medium, 2);
-                _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _marketDataConfig.Calculations.ATR_Long_Periods);
+                _atr_Long = _tradingCalculator.CalculateATR(dayCopy, _calculationsConfig.ATR_Long_Periods);
                 if (_atr_Long != null) _atr_Long = Math.Round((double)_atr_Long, 2);
-                _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _marketDataConfig.Calculations.VWAP_Short_Periods);
+                _vwap_Short = (double?)_tradingCalculator.CalculateVWAP(minuteCopy, periods: _calculationsConfig.VWAP_Short_Periods);
                 if (_vwap_Short != null) _vwap_Short = Math.Round((double)_vwap_Short, 2);
-                _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _marketDataConfig.Calculations.VWAP_Medium_Periods);
+                _vwap_Medium = (double?)_tradingCalculator.CalculateVWAP(hourCopy, periods: _calculationsConfig.VWAP_Medium_Periods);
                 if (_vwap_Medium != null) _vwap_Medium = Math.Round((double)_vwap_Medium, 2);
                 _stochasticoscilator_Short = _tradingCalculator.CalculateStochastic(minuteCopy,
-                    _marketDataConfig.Calculations.Stochastic_Short_Periods,
-                    _marketDataConfig.Calculations.Stochastic_Short_DPeriods);
+                    _calculationsConfig.Stochastic_Short_Periods,
+                    _calculationsConfig.Stochastic_Short_DPeriods);
                 if (_stochasticoscilator_Short.K != null) _stochasticoscilator_Short.K = Math.Round((double)_stochasticoscilator_Short.K, 2);
                 if (_stochasticoscilator_Short.D != null) _stochasticoscilator_Short.D = Math.Round((double)_stochasticoscilator_Short.D, 2);
                 _stochasticoscilator_Medium = _tradingCalculator.CalculateStochastic(hourCopy,
-                    _marketDataConfig.Calculations.Stochastic_Medium_Periods,
-                    _marketDataConfig.Calculations.Stochastic_Medium_DPeriods);
+                    _calculationsConfig.Stochastic_Medium_Periods,
+                    _calculationsConfig.Stochastic_Medium_DPeriods);
                 if (_stochasticoscilator_Medium.K != null) _stochasticoscilator_Medium.K = Math.Round((double)_stochasticoscilator_Medium.K, 2);
                 if (_stochasticoscilator_Medium.D != null) _stochasticoscilator_Medium.D = Math.Round((double)_stochasticoscilator_Medium.D, 2);
                 _stochasticoscilator_Long = _tradingCalculator.CalculateStochastic(dayCopy,
-                    _marketDataConfig.Calculations.Stochastic_Long_Periods,
-                    _marketDataConfig.Calculations.Stochastic_Long_DPeriods);
+                    _calculationsConfig.Stochastic_Long_Periods,
+                    _calculationsConfig.Stochastic_Long_DPeriods);
                 if (_stochasticoscilator_Long.K != null) _stochasticoscilator_Long.K = Math.Round((double)_stochasticoscilator_Long.K, 2);
                 if (_stochasticoscilator_Long.D != null) _stochasticoscilator_Long.D = Math.Round((double)_stochasticoscilator_Long.D, 2);
                 _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
@@ -843,28 +1086,48 @@ namespace BacklashBot.State
 
                 CalculateSlope();
 
-                RecentCandlesticks = minuteCopy.TakeLast(_marketDataConfig.Calculations.RecentCandlesticksCount).ToList();
+                RecentCandlesticks = minuteCopy.TakeLast(_calculationsConfig.RecentCandlesticksCount).ToList();
                 var psarValue = _tradingCalculator.CalculatePSAR(minuteCopy);
                 PSAR = psarValue.HasValue ? Math.Round((double)psarValue.Value, 2) : null;
                 _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
             });
         }
 
+        /// <summary>
+        /// Gets or sets the short-term Relative Strength Index (RSI) indicator value.
+        /// RSI measures the speed and change of price movements on a scale of 0 to 100.
+        /// Values above 70 indicate overbought conditions, below 30 indicate oversold conditions.
+        /// </summary>
         public double? RSI_Short
         {
             get => _rsi_Short;
             set => _rsi_Short = value;
         }
+        /// <summary>
+        /// Gets or sets the medium-term Relative Strength Index (RSI) indicator value.
+        /// RSI measures the speed and change of price movements on a scale of 0 to 100.
+        /// Values above 70 indicate overbought conditions, below 30 indicate oversold conditions.
+        /// </summary>
         public double? RSI_Medium
         {
             get => _rsi_Medium;
             set => _rsi_Medium = value;
         }
+        /// <summary>
+        /// Gets or sets the long-term Relative Strength Index (RSI) indicator value.
+        /// RSI measures the speed and change of price movements on a scale of 0 to 100.
+        /// Values above 70 indicate overbought conditions, below 30 indicate oversold conditions.
+        /// </summary>
         public double? RSI_Long
         {
             get => _rsi_Long;
             set => _rsi_Long = value;
         }
+        /// <summary>
+        /// Gets or sets the medium-term Moving Average Convergence Divergence (MACD) indicator values.
+        /// MACD is a trend-following momentum indicator that shows the relationship between two moving averages.
+        /// Contains MACD line, signal line, and histogram values.
+        /// </summary>
         public (double? MACD, double? Signal, double? Histogram) MACD_Medium
         {
             get => _macd_Medium;
@@ -875,6 +1138,11 @@ namespace BacklashBot.State
                 _macd_Medium.Histogram = value.Histogram;
             }
         }
+        /// <summary>
+        /// Gets or sets the long-term Moving Average Convergence Divergence (MACD) indicator values.
+        /// MACD is a trend-following momentum indicator that shows the relationship between two moving averages.
+        /// Contains MACD line, signal line, and histogram values.
+        /// </summary>
         public (double? MACD, double? Signal, double? Histogram) MACD_Long
         {
             get => _macd_Long;
@@ -885,16 +1153,31 @@ namespace BacklashBot.State
                 _macd_Long.Histogram = value.Histogram;
             }
         }
+        /// <summary>
+        /// Gets or sets the medium-term Exponential Moving Average (EMA) value.
+        /// EMA gives more weight to recent prices, making it more responsive to price changes.
+        /// Used for trend identification and support/resistance levels.
+        /// </summary>
         public double? EMA_Medium
         {
             get => _ema_Medium;
             set => _ema_Medium = value;
         }
+        /// <summary>
+        /// Gets or sets the long-term Exponential Moving Average (EMA) value.
+        /// EMA gives more weight to recent prices, making it more responsive to price changes.
+        /// Used for trend identification and support/resistance levels.
+        /// </summary>
         public double? EMA_Long
         {
             get => _ema_Long;
             set => _ema_Long = value;
         }
+        /// <summary>
+        /// Gets or sets the medium-term Bollinger Bands values.
+        /// Bollinger Bands consist of a middle band (SMA) and upper/lower bands based on standard deviation.
+        /// Used to identify volatility and potential price reversals.
+        /// </summary>
         public (double? lower, double? middle, double? upper) BollingerBands_Medium
         {
             get => _bollingerbands_Medium;
@@ -905,6 +1188,11 @@ namespace BacklashBot.State
                 _bollingerbands_Medium.upper = value.upper;
             }
         }
+        /// <summary>
+        /// Gets or sets the long-term Bollinger Bands values.
+        /// Bollinger Bands consist of a middle band (SMA) and upper/lower bands based on standard deviation.
+        /// Used to identify volatility and potential price reversals.
+        /// </summary>
         public (double? lower, double? middle, double? upper) BollingerBands_Long
         {
             get => _bollingerbands_Long;
@@ -915,26 +1203,49 @@ namespace BacklashBot.State
                 _bollingerbands_Long.upper = value.upper;
             }
         }
+        /// <summary>
+        /// Gets or sets the medium-term Average True Range (ATR) value.
+        /// ATR measures volatility by calculating the average of true ranges over a specified period.
+        /// Higher ATR values indicate higher volatility.
+        /// </summary>
         public double? ATR_Medium
         {
             get => _atr_Medium;
             set => _atr_Medium = value;
         }
+        /// <summary>
+        /// Gets or sets the long-term Average True Range (ATR) value.
+        /// ATR measures volatility by calculating the average of true ranges over a specified period.
+        /// Higher ATR values indicate higher volatility.
+        /// </summary>
         public double? ATR_Long
         {
             get => _atr_Long;
             set => _atr_Long = value;
         }
+        /// <summary>
+        /// Gets or sets the short-term Volume Weighted Average Price (VWAP) value.
+        /// VWAP calculates the average price weighted by volume, providing insight into institutional trading activity.
+        /// </summary>
         public double? VWAP_Short
         {
             get => _vwap_Short;
             set => _vwap_Short = value;
         }
+        /// <summary>
+        /// Gets or sets the medium-term Volume Weighted Average Price (VWAP) value.
+        /// VWAP calculates the average price weighted by volume, providing insight into institutional trading activity.
+        /// </summary>
         public double? VWAP_Medium
         {
             get => _vwap_Medium;
             set => _vwap_Medium = value;
         }
+        /// <summary>
+        /// Gets or sets the short-term Stochastic Oscillator values.
+        /// Stochastic Oscillator compares a closing price to its price range over a given time period.
+        /// Contains %K (fast) and %D (slow) lines, used to identify overbought/oversold conditions.
+        /// </summary>
         public (double? K, double? D) StochasticOscillator_Short
         {
             get => _stochasticoscilator_Short;
@@ -944,6 +1255,11 @@ namespace BacklashBot.State
                 _stochasticoscilator_Short.D = value.D;
             }
         }
+        /// <summary>
+        /// Gets or sets the medium-term Stochastic Oscillator values.
+        /// Stochastic Oscillator compares a closing price to its price range over a given time period.
+        /// Contains %K (fast) and %D (slow) lines, used to identify overbought/oversold conditions.
+        /// </summary>
         public (double? K, double? D) StochasticOscillator_Medium
         {
             get => _stochasticoscilator_Medium;
@@ -953,6 +1269,11 @@ namespace BacklashBot.State
                 _stochasticoscilator_Medium.D = value.D;
             }
         }
+        /// <summary>
+        /// Gets or sets the long-term Stochastic Oscillator values.
+        /// Stochastic Oscillator compares a closing price to its price range over a given time period.
+        /// Contains %K (fast) and %D (slow) lines, used to identify overbought/oversold conditions.
+        /// </summary>
         public (double? K, double? D) StochasticOscillator_Long
         {
             get => _stochasticoscilator_Long;
@@ -962,19 +1283,36 @@ namespace BacklashBot.State
                 _stochasticoscilator_Long.D = value.D;
             }
         }
+        /// <summary>
+        /// Gets or sets the medium-term On-Balance Volume (OBV) value.
+        /// OBV uses volume flow to predict price changes by cumulatively adding or subtracting volume based on price direction.
+        /// Rising OBV indicates positive volume pressure, falling OBV indicates negative volume pressure.
+        /// </summary>
         public long OBV_Medium
         {
             get => _obv_Medium;
             set => _obv_Medium = value;
         }
+        /// <summary>
+        /// Gets or sets the long-term On-Balance Volume (OBV) value.
+        /// OBV uses volume flow to predict price changes by cumulatively adding or subtracting volume based on price direction.
+        /// Rising OBV indicates positive volume pressure, falling OBV indicates negative volume pressure.
+        /// </summary>
         public long OBV_Long
         {
             get => _obv_Long;
             set => _obv_Long = value;
         }
 
+        /// <summary>
+        /// Refreshes position metadata by validating data integrity and recalculating position metrics.
+        /// Updates position size, exposure, buy-in price, ROI, upside/downside calculations, and other position-related values.
+        /// Uses current order book data to calculate liquidation prices and expected fees.
+        /// </summary>
         public void RefreshPositionMetadata()
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
+
             // Validate position and orderbook data integrity
             if (_positions != null)
             {
@@ -1039,43 +1377,180 @@ namespace BacklashBot.State
         private double CalculateTradingFees(int contracts, double priceInDollars)
         {
             // fees = roundup(fee_rate * C * P * (1-P))
-            double fee = _marketDataConfig.Calculations.TradingFeeRate * contracts * priceInDollars * (1 - priceInDollars);
+            double fee = _calculationsConfig.TradingFeeRate * contracts * priceInDollars * (1 - priceInDollars);
             return Math.Ceiling(fee * 100) / 100; // Round up to the next cent
         }
 
+        /// <summary>
+        /// Gets or sets the unique ticker symbol for this market.
+        /// Used as the primary identifier for market data operations.
+        /// </summary>
         public string MarketTicker { get => _marketTicker; set => _marketTicker = value; }
+        /// <summary>
+        /// Gets or sets the market information DTO containing static market details.
+        /// Includes market metadata like title, description, trading times, and contract specifications.
+        /// </summary>
         public MarketDTO MarketInfo { get => _marketInfo; set => _marketInfo = value; }
+        /// <summary>
+        /// Gets the dictionary of candlestick data organized by timeframe.
+        /// Keys are "minute", "hour", "day"; values are lists of CandlestickData objects.
+        /// Contains historical price data used for technical analysis.
+        /// </summary>
         public Dictionary<string, List<CandlestickData>> Candlesticks => _candlesticks;
+        /// <summary>
+        /// Gets or sets the collection of real-time ticker data.
+        /// Contains recent price updates and trading activity information.
+        /// </summary>
         public ConcurrentBag<TickerDTO> Tickers { get => _tickers; set => _tickers = value; }
+        /// <summary>
+        /// Gets or sets the current order book data.
+        /// Contains bid and ask prices with their corresponding resting contract volumes.
+        /// </summary>
         public List<OrderbookData> OrderbookData { get => _orderbookData; set => _orderbookData = value; }
+        /// <summary>
+        /// Gets or sets the timestamp of the last WebSocket message received.
+        /// Used to monitor data freshness and connection health.
+        /// </summary>
         public DateTime LastWebSocketMessageReceived { get => _lastWebSocketMessageReceived; set => _lastWebSocketMessageReceived = value; }
+        /// <summary>
+        /// Gets the source of the current price data.
+        /// Indicates whether price comes from candlesticks, tickers, or other sources.
+        /// </summary>
         public string CurrentPriceSource => _currentPriceSource;
+        /// <summary>
+        /// Gets the current ticker price information for yes contracts.
+        /// Contains ask price, bid price, and timestamp of the last update.
+        /// </summary>
         public (int Ask, int Bid, DateTime When) TickerPriceYes => _tickerPrice;
+        /// <summary>
+        /// Gets the current ticker price information for no contracts.
+        /// Calculated as 100 minus the yes prices, with the same timestamp.
+        /// </summary>
         public (int Ask, int Bid, DateTime When) TickerPriceNo => (100 - _tickerPrice.Bid, 100 - _tickerPrice.Ask, _tickerPrice.When);
+        /// <summary>
+        /// Gets or sets the all-time high bid price for yes contracts.
+        /// Includes the price value and the timestamp when it occurred.
+        /// </summary>
         public (int Bid, DateTime When) AllTimeHighYes_Bid { get => _allTimeHighYesBid; set => _allTimeHighYesBid = value; }
+        /// <summary>
+        /// Gets the all-time high bid price for no contracts.
+        /// Calculated as 100 minus the all-time low yes bid price.
+        /// </summary>
         public (int Bid, DateTime When) AllTimeHighNo_Bid => (_allTimeHighNoBid.Bid, _allTimeHighNoBid.When);
+        /// <summary>
+        /// Gets or sets the all-time low bid price for yes contracts.
+        /// Includes the price value and the timestamp when it occurred.
+        /// </summary>
         public (int Bid, DateTime When) AllTimeLowYes_Bid { get => _allTimeLowYesBid; set => _allTimeLowYesBid = value; }
+        /// <summary>
+        /// Gets the all-time low bid price for no contracts.
+        /// Calculated as 100 minus the all-time high yes bid price.
+        /// </summary>
         public (int Bid, DateTime When) AllTimeLowNo_Bid => (_allTimeLowNoBid.Bid, _allTimeHighYesBid.When);
+        /// <summary>
+        /// Gets or sets the recent high bid price for yes contracts.
+        /// Based on recent candlestick data within the configured time window.
+        /// </summary>
         public (int Bid, DateTime When) RecentHighYes_Bid { get => _recentHighYesBid; set => _recentHighYesBid = value; }
+        /// <summary>
+        /// Gets the recent high bid price for no contracts.
+        /// Calculated as 100 minus the recent low yes bid price.
+        /// </summary>
         public (int Bid, DateTime When) RecentHighNo_Bid => (_recentHighNoBid.Bid, _recentHighNoBid.When);
+        /// <summary>
+        /// Gets or sets the recent low bid price for yes contracts.
+        /// Based on recent candlestick data within the configured time window.
+        /// </summary>
         public (int Bid, DateTime When) RecentLowYes_Bid { get => _recentLowYesBid; set => _recentLowYesBid = value; }
+        /// <summary>
+        /// Gets the recent low bid price for no contracts.
+        /// Calculated as 100 minus the recent high yes bid price.
+        /// </summary>
         public (int Bid, DateTime When) RecentLowNo_Bid => (_recentLowNoBid.Bid, _recentLowNoBid.When);
+        /// <summary>
+        /// Gets or sets the qualitative assessment of the current price for yes contracts.
+        /// Indicates whether the price is considered "good" or "bad" based on market analysis.
+        /// </summary>
         public string GoodBadPriceYes { get => _goodBadPriceYes; set => _goodBadPriceYes = value; }
+        /// <summary>
+        /// Gets or sets the qualitative assessment of the current price for no contracts.
+        /// Indicates whether the price is considered "good" or "bad" based on market analysis.
+        /// </summary>
         public string GoodBadPriceNo { get => _goodBadPriceNo; set => _goodBadPriceNo = value; }
+        /// <summary>
+        /// Gets or sets the behavioral analysis of the market for yes contracts.
+        /// Describes market trends, momentum, or patterns observed in yes contract trading.
+        /// </summary>
         public string MarketBehaviorYes { get => _marketBehaviorYes; set => _marketBehaviorYes = value; }
+        /// <summary>
+        /// Gets or sets the behavioral analysis of the market for no contracts.
+        /// Describes market trends, momentum, or patterns observed in no contract trading.
+        /// </summary>
         public string MarketBehaviorNo { get => _marketBehaviorNo; set => _marketBehaviorNo = value; }
+        /// <summary>
+        /// Gets or sets the collection of market position data.
+        /// Contains information about current positions, including size, exposure, and PandL.
+        /// </summary>
         public List<MarketPositionDTO> Positions { get => _positions; set => _positions = value; }
+        /// <summary>
+        /// Gets the current position size in contracts.
+        /// Positive values indicate long yes positions, negative values indicate long no positions.
+        /// </summary>
         public int PositionSize => _positionSize;
+        /// <summary>
+        /// Gets the side of the current position.
+        /// Returns "Yes" for positive position sizes, "No" for negative position sizes.
+        /// </summary>
         public string PositionSide => _positionSize >= 0 ? "Yes" : "No";
+        /// <summary>
+        /// Gets the market exposure as a decimal (0.0 to 1.0).
+        /// Represents the portion of the position that is exposed to market risk.
+        /// </summary>
         public double MarketExposure => _marketExposure;
+        /// <summary>
+        /// Gets the buy-in price for the current position.
+        /// Calculated based on market exposure and position size.
+        /// </summary>
         public double BuyinPrice => _buyinPrice;
+        /// <summary>
+        /// Gets the potential upside profit for the current position.
+        /// Calculated based on liquidation price and expected fees.
+        /// </summary>
         public double PositionUpside => _positionUpside;
+        /// <summary>
+        /// Gets the potential downside loss for the current position.
+        /// Calculated based on liquidation price and expected fees.
+        /// </summary>
         public double PositionDownside => _positionDownside;
+        /// <summary>
+        /// Gets the return on investment amount for the current position.
+        /// Represents the dollar amount of potential profit or loss.
+        /// </summary>
         public double PositionROIAmt => _positionROIAmt;
+        /// <summary>
+        /// Gets the total volume traded for this position.
+        /// Tracks the cumulative trading activity for position management.
+        /// </summary>
         public long TotalPositionTraded => _totalpositionTraded;
+        /// <summary>
+        /// Gets the realized profit and loss for the position.
+        /// Represents actual gains or losses from closed trades.
+        /// </summary>
         public double RealizedPnl => _realizedPnl;
+        /// <summary>
+        /// Gets the total fees paid for the position.
+        /// Includes trading fees and other transaction costs.
+        /// </summary>
         public double FeesPaid => _feesPaid;
+        /// <summary>
+        /// Gets or sets the list of resting orders for this market.
+        /// Contains pending orders that have not yet been executed.
+        /// </summary>
         public List<OrderDTO> RestingOrders { get { return _restingOrders; } set { _restingOrders = value; } }
+        /// <summary>
+        /// Gets the return on investment percentage for the current position.
+        /// Calculated as (PositionROIAmt / BuyinPrice) * 100.
+        /// </summary>
         public double PositionROI => _positionROI;
 
         /// <summary>
@@ -1090,6 +1565,8 @@ namespace BacklashBot.State
         /// <returns>A task that represents the asynchronous operation, containing the list of pseudo candlesticks.</returns>
         public async Task<List<PseudoCandlestick>> BuildPseudoCandlesticks(string period, int lookbackPeriods = 0)
         {
+            if (_cancellationTokenSource.IsCancellationRequested) return new List<PseudoCandlestick>();
+
             _logger.LogDebug("Starting BuildPseudoCandlesticks: period={Period}, lookbackPeriods={Lookback}", period, lookbackPeriods);
             return await Task.Run(() =>
             {
@@ -1122,7 +1599,7 @@ namespace BacklashBot.State
                 // Use default lookback if not specified
                 if (lookbackPeriods == 0)
                 {
-                    lookbackPeriods = _marketDataConfig.Calculations.PseudoCandlestickLookbackPeriods;
+                    lookbackPeriods = _calculationsConfig.PseudoCandlestickLookbackPeriods;
                 }
 
                 // Retrieve and sort data once (ascending for binary search efficiency)
@@ -1326,7 +1803,14 @@ namespace BacklashBot.State
                     }
                 }
 
-                _logger.LogDebug("Produced {Count} candlesticks", result.Count);
+                if (result.Count == 0)
+                {
+                    _logger.LogInformation("BuildPseudoCandlesticks produced empty list for {MarketTicker}, period={Period}, lookbackPeriods={Lookback}", _marketTicker, period, lookbackPeriods);
+                }
+                else
+                {
+                    _logger.LogDebug("Produced {Count} candlesticks", result.Count);
+                }
                 return result;
             });
         }
@@ -1379,6 +1863,10 @@ namespace BacklashBot.State
             return result;
         }
 
+        /// <summary>
+        /// Gets or sets the list of recent pseudo candlesticks.
+        /// Contains aggregated price data for recent time periods, used for technical analysis.
+        /// </summary>
         public List<PseudoCandlestick> RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
         private List<PseudoCandlestick> _recentCandlesticks = new List<PseudoCandlestick>();
 
@@ -1386,6 +1874,11 @@ namespace BacklashBot.State
         private List<PseudoCandlestick> _hourPseudoCandlesticks = new List<PseudoCandlestick>();
         private List<PseudoCandlestick> _dayPseudoCandlesticks = new List<PseudoCandlestick>();
 
+        /// <summary>
+        /// Gets the time duration the current position has been held.
+        /// Calculated as the difference between now and the position's last update time.
+        /// Returns null if no position exists or position size is zero.
+        /// </summary>
         public TimeSpan? HoldTime
         {
             get
@@ -1398,6 +1891,10 @@ namespace BacklashBot.State
             }
         }
 
+        /// <summary>
+        /// Gets the age of the market since it opened.
+        /// Calculated as the difference between now and the market's open time.
+        /// </summary>
         public TimeSpan? MarketAge
         {
             get
@@ -1405,6 +1902,10 @@ namespace BacklashBot.State
                 return DateTime.UtcNow - _marketInfo.open_time;
             }
         }
+        /// <summary>
+        /// Gets the time remaining until the market closes.
+        /// Calculated as the difference between the market's close time and now.
+        /// </summary>
         public TimeSpan? TimeLeft
         {
             get
@@ -1413,6 +1914,10 @@ namespace BacklashBot.State
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this market can be closed early.
+        /// Determined by the market's configuration settings.
+        /// </summary>
         public bool CanCloseEarly
         {
             get { return _marketInfo.can_close_early; }
@@ -1420,7 +1925,11 @@ namespace BacklashBot.State
 
         private List<SupportResistanceLevel> _allSupportResistanceLevels = new List<SupportResistanceLevel>();
 
-
+        /// <summary>
+        /// Gets or sets the collection of support and resistance levels for this market.
+        /// Contains price levels where the market has historically shown significant buying or selling pressure.
+        /// Used for technical analysis and trading decision support.
+        /// </summary>
         public List<SupportResistanceLevel> AllSupportResistanceLevels
         {
             get => _allSupportResistanceLevels;
@@ -1463,60 +1972,100 @@ namespace BacklashBot.State
             set => _currentTradeRatePerMinute_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade volume per minute for no contracts.
+        /// Represents the most recent trading volume activity for no positions.
+        /// </summary>
         public double CurrentTradeVolumePerMinute_No
         {
             get => _currentTradeVolumePerMinute_No;
             set => _currentTradeVolumePerMinute_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade volume per minute for yes contracts.
+        /// Represents the most recent trading volume activity for yes positions.
+        /// </summary>
         public double CurrentTradeVolumePerMinute_Yes
         {
             get => _currentTradeVolumePerMinute_Yes;
             set => _currentTradeVolumePerMinute_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade count for yes contracts.
+        /// Tracks the number of recent trades executed for yes positions.
+        /// </summary>
         public double CurrentTradeCount_Yes
         {
             get => _currentTradeCount_Yes;
             set => _currentTradeCount_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade count for no contracts.
+        /// Tracks the number of recent trades executed for no positions.
+        /// </summary>
         public double CurrentTradeCount_No
         {
             get => _currentTradeCount_No;
             set => _currentTradeCount_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current order volume per minute for yes bid orders.
+        /// Measures the rate of order book changes for yes bid levels.
+        /// </summary>
         public double CurrentOrderVolumePerMinute_YesBid
         {
             get => _currentOrderVolumePerMinute_YesBid;
             set => _currentOrderVolumePerMinute_YesBid = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current order volume per minute for no bid orders.
+        /// Measures the rate of order book changes for no bid levels.
+        /// </summary>
         public double CurrentOrderVolumePerMinute_NoBid
         {
             get => _currentOrderVolumePerMinute_NoBid;
             set => _currentOrderVolumePerMinute_NoBid = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current count of non-trade related orders for yes contracts.
+        /// Includes order cancellations, modifications, and other order book changes.
+        /// </summary>
         public double CurrentNonTradeRelatedOrderCount_Yes
         {
             get => _currentNonTradeRelatedOrderCount_Yes;
             set => _currentNonTradeRelatedOrderCount_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current count of non-trade related orders for no contracts.
+        /// Includes order cancellations, modifications, and other order book changes.
+        /// </summary>
         public double CurrentNonTradeRelatedOrderCount_No
         {
             get => _currentNonTradeRelatedOrderCount_No;
             set => _currentNonTradeRelatedOrderCount_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current average trade size for yes contracts.
+        /// Calculated from recent trading activity to assess market participation.
+        /// </summary>
         public double CurrentAverageTradeSize_Yes
         {
             get => _currentAverageTradeSize_Yes;
             set => _currentAverageTradeSize_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current average trade size for no contracts.
+        /// Calculated from recent trading activity to assess market participation.
+        /// </summary>
         public double CurrentAverageTradeSize_No
         {
             get => _currentAverageTradeSize_No;
@@ -1524,6 +2073,12 @@ namespace BacklashBot.State
         }
 
 
+        /// <summary>
+        /// Gets a filtered copy of the support and resistance levels.
+        /// Returns all support and resistance levels currently identified for this market.
+        /// Used for technical analysis and chart visualization.
+        /// </summary>
+        /// <returns>A list of SupportResistanceLevel objects for the market.</returns>
         public List<SupportResistanceLevel> GetFilteredSupportResistanceLevels()
         {
             if (AllSupportResistanceLevels == null)

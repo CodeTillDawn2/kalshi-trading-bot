@@ -1,21 +1,24 @@
 using BacklashBot.Configuration;
-using BacklashBot.Services;
-using BacklashBot.State;
 using BacklashBotData.Configuration;
 using BacklashCommon.Configuration;
 using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using TradingStrategies.Configuration;
 
 namespace BacklashBotTests
 {
+    /// <summary>
+    /// Test fixture for validating configuration settings and secrets interpolation.
+    /// </summary>
     [TestFixture]
     public class ConfigurationTests
     {
         private IConfiguration _configuration;
 
+        /// <summary>
+        /// Sets up the test fixture by loading the configuration from appsettings.json.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -27,10 +30,14 @@ namespace BacklashBotTests
             _configuration = builder.Build();
         }
 
+        /// <summary>
+        /// Validates that all configuration classes can be successfully bound from appsettings.json
+        /// using reflection to discover config types with SectionName fields.
+        /// </summary>
         [Test]
         public void ValidateAllConfigs_FromAppsettings_Valid_Reflective()
         {
-            TestContext.WriteLine("Testing validation of all configurations from appsettings.json using reflection.");
+            TestContext.Out.WriteLine("Testing validation of all configurations from appsettings.json using reflection.");
             var configInstances = new Dictionary<string, object>();
 
             // Get all config types with SectionName from assemblies referenced by BacklashBot.csproj
@@ -57,20 +64,17 @@ namespace BacklashBotTests
                 ValidateConfig(instance, section);
             }
 
-            // Special handling for nested configs
-            if (configInstances.TryGetValue(MarketServiceDataConfig.SectionName, out var marketDataInstance) &&
-                configInstances.TryGetValue(CalculationsConfig.SectionName, out var calculationsInstance))
-            {
-                ((MarketServiceDataConfig)marketDataInstance).Calculations = (CalculationsConfig)calculationsInstance;
-                ValidateConfig(marketDataInstance, _configuration.GetSection(MarketServiceDataConfig.SectionName));
-            }
-            TestContext.WriteLine("Result: All configurations validated successfully.");
+            TestContext.Out.WriteLine("Result: All configurations validated successfully.");
         }
 
+        /// <summary>
+        /// Validates that there are no unused configuration sections in appsettings.json
+        /// by comparing all configuration keys against known SectionName values from config classes.
+        /// </summary>
         [Test]
         public void ValidateNoUnusedSections_InAppsettings_Reflective()
         {
-            TestContext.WriteLine("Testing for unused configuration sections in appsettings.json using reflection.");
+            TestContext.Out.WriteLine("Testing for unused configuration sections in appsettings.json using reflection.");
             var usedSections = new HashSet<string>();
 
             // Automatically collect all SectionName values from assemblies referenced by BacklashBot.csproj
@@ -102,20 +106,25 @@ namespace BacklashBotTests
                 !usedSections.Any(used => key == used || key.StartsWith(used + ":") || used.StartsWith(key + ":"))
             ).ToList();
 
-            TestContext.WriteLine("Reflective: Unused configuration keys found:");
+            TestContext.Out.WriteLine("Reflective: Unused configuration keys found:");
             foreach (var key in unusedKeys)
             {
-                TestContext.WriteLine($"  {key}");
+                TestContext.Out.WriteLine($"  {key}");
             }
 
             Assert.That(unusedKeys, Is.Empty, $"Reflective: Unused configuration keys found in appsettings.json: {string.Join(", ", unusedKeys)}");
-            TestContext.WriteLine("Result: No unused configuration sections found.");
+            TestContext.Out.WriteLine("Result: No unused configuration sections found.");
         }
 
+        /// <summary>
+        /// Validates that secrets interpolation works correctly and that the interpolated key file exists.
+        /// Tests the ConfigurationHelper.InterpolateConfigurationValue method and verifies
+        /// that secrets are properly loaded and interpolated from configuration placeholders.
+        /// </summary>
         [Test]
         public void ValidateSecretsInterpolationAndKeyFileExists()
         {
-            TestContext.WriteLine("Testing secrets interpolation and key file existence.");
+            TestContext.Out.WriteLine("Testing secrets interpolation and key file existence.");
             // Set up configuration with secrets loaded
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var builder = new ConfigurationBuilder()
@@ -126,7 +135,7 @@ namespace BacklashBotTests
 
             // Debug: Check what the secrets path is
             var secretsPath = baseConfig.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
-            TestContext.WriteLine($"Secrets path from config: {secretsPath}");
+            TestContext.Out.WriteLine($"Secrets path from config: {secretsPath}");
 
             builder.AddSecretsConfiguration(basePath, baseConfig);
             var configuration = builder.Build();
@@ -134,16 +143,16 @@ namespace BacklashBotTests
             // Debug: Check if secrets were loaded
             var botKeyId = configuration["Kalshi:BotKeyId"];
             var botKeyFile = configuration["Kalshi:BotKeyFile"];
-            TestContext.WriteLine($"Kalshi:BotKeyId from config: {MaskKeyId(botKeyId)}");
-            TestContext.WriteLine($"Kalshi:BotKeyFile from config: {botKeyFile}");
+            TestContext.Out.WriteLine($"Kalshi:BotKeyId from config: {MaskKeyId(botKeyId)}");
+            TestContext.Out.WriteLine($"Kalshi:BotKeyFile from config: {botKeyFile}");
 
             // Test KalshiConfig binding (this will still have placeholders because binding doesn't interpolate)
             var kalshiConfig = new KalshiConfig();
             var kalshiSection = configuration.GetSection(KalshiConfig.SectionName);
             kalshiSection.Bind(kalshiConfig);
 
-            TestContext.WriteLine($"KalshiConfig.KeyId (raw): {kalshiConfig.KeyId}");
-            TestContext.WriteLine($"KalshiConfig.KeyFile (raw): {kalshiConfig.KeyFile}");
+            TestContext.Out.WriteLine($"KalshiConfig.KeyId (raw): {kalshiConfig.KeyId}");
+            TestContext.Out.WriteLine($"KalshiConfig.KeyFile (raw): {kalshiConfig.KeyFile}");
 
             // The raw binding will still have placeholders - this is expected
             Assert.That(kalshiConfig.KeyId, Does.Contain("{"),
@@ -154,14 +163,14 @@ namespace BacklashBotTests
             // Test manual interpolation using ConfigurationHelper
             var rawKeyId = configuration["Kalshi:KeyId"];
             var rawKeyFile = configuration["Kalshi:KeyFile"];
-            TestContext.WriteLine($"Raw Kalshi:KeyId from config: {rawKeyId}");
-            TestContext.WriteLine($"Raw Kalshi:KeyFile from config: {rawKeyFile}");
+            TestContext.Out.WriteLine($"Raw Kalshi:KeyId from config: {rawKeyId}");
+            TestContext.Out.WriteLine($"Raw Kalshi:KeyFile from config: {rawKeyFile}");
 
             var interpolatedKeyId = ConfigurationHelper.InterpolateConfigurationValue(rawKeyId, configuration);
             var interpolatedKeyFileName = ConfigurationHelper.InterpolateConfigurationValue(rawKeyFile, configuration);
 
-            TestContext.WriteLine($"Interpolated KeyId: {interpolatedKeyId}");
-            TestContext.WriteLine($"Interpolated KeyFile: {interpolatedKeyFileName}");
+            TestContext.Out.WriteLine($"Interpolated KeyId: {interpolatedKeyId}");
+            TestContext.Out.WriteLine($"Interpolated KeyFile: {interpolatedKeyFileName}");
 
             // Verify interpolation worked
             Assert.That(interpolatedKeyId, Does.Not.Contain("{"),
@@ -187,16 +196,16 @@ namespace BacklashBotTests
 
             // Verify the interpolated key file exists
             var keyFilePath = Path.Combine(secretsPath, interpolatedKeyFileName);
-            TestContext.WriteLine($"Checking key file at: {keyFilePath}");
+            TestContext.Out.WriteLine($"Checking key file at: {keyFilePath}");
             Assert.That(File.Exists(keyFilePath),
                 $"Interpolated key file should exist at: {keyFilePath}");
 
-            TestContext.WriteLine($"✓ Secrets loaded successfully");
-            TestContext.WriteLine($"✓ Interpolation working correctly");
-            TestContext.WriteLine($"✓ Key file exists: {keyFilePath}");
-            TestContext.WriteLine($"✓ Kalshi KeyId: {MaskKeyId(interpolatedKeyId)}");
-            TestContext.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
-            TestContext.WriteLine("Result: Secrets interpolation and key file validation completed successfully.");
+            TestContext.Out.WriteLine($"✓ Secrets loaded successfully");
+            TestContext.Out.WriteLine($"✓ Interpolation working correctly");
+            TestContext.Out.WriteLine($"✓ Key file exists: {keyFilePath}");
+            TestContext.Out.WriteLine($"✓ Kalshi KeyId: {MaskKeyId(interpolatedKeyId)}");
+            TestContext.Out.WriteLine($"✓ Kalshi KeyFile: {interpolatedKeyFileName}");
+            TestContext.Out.WriteLine("Result: Secrets interpolation and key file validation completed successfully.");
         }
 
         private void ValidateConfig(object config, IConfigurationSection section)

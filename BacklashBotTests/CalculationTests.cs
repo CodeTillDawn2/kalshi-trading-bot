@@ -1,14 +1,12 @@
 using BacklashBot.Configuration;
 using BacklashBot.Helpers;
+using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
-using BacklashBot.State;
-using BacklashCommon.Configuration;
+using BacklashBot.State.Interfaces;
 using BacklashCommon.Services;
-using BacklashDTOs.Data;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
+using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotTests;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -58,6 +56,11 @@ namespace BacklashBotTests
         private Mock<ILogger<TradingCalculator>> _tradingCalculatorLoggerMock;
 
         /// <summary>
+        /// Real performance monitor for TradingCalculator.
+        /// </summary>
+        private IPerformanceMonitor _performanceMonitor;
+
+        /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).
         /// </summary>
         private IOptions<CalculationsConfig> _calculationOptions;
@@ -79,6 +82,26 @@ namespace BacklashBotTests
         private IServiceScopeFactory _scopeFactory;
 
         /// <summary>
+        /// Logger for CentralPerformanceMonitor.
+        /// </summary>
+        private Mock<ILogger<ICentralPerformanceMonitor>> _centralPerformanceMonitorLoggerMock;
+
+        /// <summary>
+        /// Status tracker service for CentralPerformanceMonitor.
+        /// </summary>
+        private Mock<IStatusTrackerService> _statusTrackerServiceMock;
+
+        /// <summary>
+        /// Queue monitoring config for CentralPerformanceMonitor.
+        /// </summary>
+        private IOptions<QueueMonitoringConfig> _queueMonitoringOptions;
+
+        /// <summary>
+        /// Central performance monitor config for CentralPerformanceMonitor.
+        /// </summary>
+        private IOptions<CentralPerformanceMonitorConfig> _centralPerformanceMonitorOptions;
+
+        /// <summary>
         /// Initializes test fixtures before each test execution.
         /// Sets up mock services, creates temporary directories, and configures
         /// the TradingCalculator instance with test-specific parameters.
@@ -92,9 +115,26 @@ namespace BacklashBotTests
             _scopeFactory = new Mock<IServiceScopeFactory>().Object;
             _tradingSnapshotServiceLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             _tradingCalculatorLoggerMock = new Mock<ILogger<TradingCalculator>>();
+            _centralPerformanceMonitorLoggerMock = new Mock<ILogger<ICentralPerformanceMonitor>>();
+            _statusTrackerServiceMock = new Mock<IStatusTrackerService>();
             _generalExecutionOptions = TestHelper.GetGeneralExecutionConfig();
             _calculationOptions = TestHelper.GetCalculationConfig();
-            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions);
+
+            // Create configs for CentralPerformanceMonitor
+            _queueMonitoringOptions = Options.Create(new QueueMonitoringConfig { EnablePerformanceMetrics = false });
+            _centralPerformanceMonitorOptions = Options.Create(new CentralPerformanceMonitorConfig { EnablePerformanceMetrics = true });
+
+            // Create real CentralPerformanceMonitor
+            _performanceMonitor = new CentralPerformanceMonitor(
+                _centralPerformanceMonitorLoggerMock.Object,
+                _generalExecutionOptions,
+                "TestInstance",
+                _queueMonitoringOptions,
+                _centralPerformanceMonitorOptions,
+                _scopeFactory,
+                _statusTrackerServiceMock.Object);
+
+            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions, _performanceMonitor);
             _marginFactor = 0.001; // 0.1% margin factor
 
             var snapshotServiceConfig = TestHelper.GetTradingSnapshotServiceConfig();
@@ -128,17 +168,17 @@ namespace BacklashBotTests
         [Test]
         public void TestRSICalculation()
         {
-            TestContext.WriteLine("Testing RSI calculation accuracy across multiple scenarios.");
+            TestContext.Out.WriteLine("Testing RSI calculation accuracy across multiple scenarios.");
             foreach (var scenario in TradingMetricScenarios.GetRSIScenarios())
             {
                 // Arrange
                 var candlesticks = scenario.Candlesticks.TakeLast(13 + 1).ToList();
-                TestContext.WriteLine($"Scenario: {scenario.Name}, Candlesticks Count: {candlesticks.Count}, Periods: 13");
-                TestContext.WriteLine($"Prices: [{string.Join(", ", candlesticks.Select(c => c.MidClose))}]");
+                TestContext.Out.WriteLine($"Scenario: {scenario.Name}, Candlesticks Count: {candlesticks.Count}, Periods: 13");
+                TestContext.Out.WriteLine($"Prices: [{string.Join(", ", candlesticks.Select(c => c.MidClose))}]");
 
                 // Act
                 var rsi = _tradingCalculator.CalculateRSI(candlesticks, 13);
-                TestContext.WriteLine($"Calculated RSI: {rsi}");
+                TestContext.Out.WriteLine($"Calculated RSI: {rsi}");
 
                 // Assert
                 if (!scenario.ExpectedRSI.HasValue)
@@ -146,11 +186,11 @@ namespace BacklashBotTests
                 var expected = scenario.ExpectedRSI.Value;
                 var absoluteDiff = Math.Abs((decimal)(rsi - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedRSI.Value))) * 100 : absoluteDiff;
-                TestContext.WriteLine($"{scenario.Name}: RSI Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: RSI Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedRSI.Value);
                 Assert.That(rsi, Is.EqualTo((double)scenario.ExpectedRSI.Value).Within(margin), $"{scenario.Name}: RSI mismatch. Expected: {expected}, Actual: {rsi}");
             }
-            TestContext.WriteLine("Result: All RSI calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All RSI calculations validated successfully.");
         }
 
         /// <summary>
@@ -165,7 +205,7 @@ namespace BacklashBotTests
         [Test]
         public void TestMACDCalculation()
         {
-            TestContext.WriteLine("Testing MACD calculation accuracy.");
+            TestContext.Out.WriteLine("Testing MACD calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetMACDScenarios())
             {
                 // Arrange
@@ -181,25 +221,25 @@ namespace BacklashBotTests
                 var expectedMacd = scenario.ExpectedMACD.macdLine.Value;
                 var macdDiff = Math.Abs((decimal)(macdLine - expectedMacd));
                 var macdPercentageDiff = expectedMacd != 0 ? (macdDiff / Math.Abs((decimal)(scenario.ExpectedMACD.macdLine.Value))) * 100 : macdDiff;
-                TestContext.WriteLine($"{scenario.Name}: MACD Line Percentage Difference: {(expectedMacd != 0 ? $"{macdPercentageDiff:F6}%" : $"Absolute Diff: {macdDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: MACD Line Percentage Difference: {(expectedMacd != 0 ? $"{macdPercentageDiff:F6}%" : $"Absolute Diff: {macdDiff:F6}")}");
                 var macdMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.macdLine.Value);
                 Assert.That(macdLine, Is.EqualTo((double)scenario.ExpectedMACD.macdLine.Value).Within(macdMargin), $"{scenario.Name}: MACD Line mismatch");
 
                 var expectedSignal = scenario.ExpectedMACD.signalLine.Value;
                 var signalDiff = Math.Abs((decimal)(signalLine - expectedSignal));
                 var signalPercentageDiff = expectedSignal != 0 ? (signalDiff / Math.Abs((decimal)(scenario.ExpectedMACD.signalLine.Value))) * 100 : signalDiff;
-                TestContext.WriteLine($"{scenario.Name}: Signal Line Percentage Difference: {(expectedSignal != 0 ? $"{signalPercentageDiff:F6}%" : $"Absolute Diff: {signalDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: Signal Line Percentage Difference: {(expectedSignal != 0 ? $"{signalPercentageDiff:F6}%" : $"Absolute Diff: {signalDiff:F6}")}");
                 var signalMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.signalLine.Value);
                 Assert.That(signalLine, Is.EqualTo((double)scenario.ExpectedMACD.signalLine.Value).Within(signalMargin), $"{scenario.Name}: Signal Line mismatch");
 
                 var expectedHistogram = scenario.ExpectedMACD.histogram.Value;
                 var histogramDiff = Math.Abs((decimal)(histogram - expectedHistogram));
                 var histogramPercentageDiff = expectedHistogram != 0 ? (histogramDiff / Math.Abs((decimal)(scenario.ExpectedMACD.histogram.Value))) * 100 : histogramDiff;
-                TestContext.WriteLine($"{scenario.Name}: Histogram Percentage Difference: {(expectedHistogram != 0 ? $"{histogramPercentageDiff:F6}%" : $"Absolute Diff: {histogramDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: Histogram Percentage Difference: {(expectedHistogram != 0 ? $"{histogramPercentageDiff:F6}%" : $"Absolute Diff: {histogramDiff:F6}")}");
                 var histogramMargin = _marginFactor * Math.Abs(scenario.ExpectedMACD.histogram.Value);
                 Assert.That(histogram, Is.EqualTo((double)scenario.ExpectedMACD.histogram.Value).Within(histogramMargin), $"{scenario.Name}: Histogram mismatch");
             }
-            TestContext.WriteLine("Result: All MACD calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All MACD calculations validated successfully.");
         }
 
         /// <summary>
@@ -213,7 +253,7 @@ namespace BacklashBotTests
         [Test]
         public void TestEMACalculation()
         {
-            TestContext.WriteLine("Testing EMA calculation accuracy.");
+            TestContext.Out.WriteLine("Testing EMA calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetEMAScenarios())
             {
                 // Arrange
@@ -228,11 +268,11 @@ namespace BacklashBotTests
                 var expected = scenario.ExpectedEMA.Value;
                 var absoluteDiff = Math.Abs((decimal)(result - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedEMA.Value))) * 100 : absoluteDiff;
-                TestContext.WriteLine($"{scenario.Name}: EMA Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: EMA Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedEMA.Value);
                 Assert.That(result, Is.EqualTo((double)scenario.ExpectedEMA.Value).Within(margin), $"{scenario.Name}: EMA mismatch. Expected: {expected}, Actual: {result}");
             }
-            TestContext.WriteLine("Result: All EMA calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All EMA calculations validated successfully.");
         }
 
         /// <summary>
@@ -246,7 +286,7 @@ namespace BacklashBotTests
         [Test]
         public void TestBollingerBandsCalculation()
         {
-            TestContext.WriteLine("Testing Bollinger Bands calculation accuracy.");
+            TestContext.Out.WriteLine("Testing Bollinger Bands calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetBollingerBandsScenarios())
             {
                 // Arrange
@@ -262,25 +302,25 @@ namespace BacklashBotTests
                 var expectedMiddle = scenario.ExpectedBollingerBands.middle.Value;
                 var middleDiff = Math.Abs((decimal)(middle - expectedMiddle));
                 var middlePercentageDiff = expectedMiddle != 0 ? (middleDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.middle.Value))) * 100 : middleDiff;
-                TestContext.WriteLine($"{scenario.Name}: Middle Band Percentage Difference: {(expectedMiddle != 0 ? $"{middlePercentageDiff:F6}%" : $"Absolute Diff: {middleDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: Middle Band Percentage Difference: {(expectedMiddle != 0 ? $"{middlePercentageDiff:F6}%" : $"Absolute Diff: {middleDiff:F6}")}");
                 var middleMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.middle.Value);
                 Assert.That(middle, Is.EqualTo((double)scenario.ExpectedBollingerBands.middle.Value).Within(middleMargin), $"{scenario.Name}: Middle band mismatch");
 
                 var expectedUpper = scenario.ExpectedBollingerBands.upper.Value;
                 var upperDiff = Math.Abs((decimal)(upper - expectedUpper));
                 var upperPercentageDiff = expectedUpper != 0 ? (upperDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.upper.Value))) * 100 : upperDiff;
-                TestContext.WriteLine($"{scenario.Name}: Upper Band Percentage Difference: {(expectedUpper != 0 ? $"{upperPercentageDiff:F6}%" : $"Absolute Diff: {upperDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: Upper Band Percentage Difference: {(expectedUpper != 0 ? $"{upperPercentageDiff:F6}%" : $"Absolute Diff: {upperDiff:F6}")}");
                 var upperMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.upper.Value);
                 Assert.That(upper, Is.EqualTo((double)scenario.ExpectedBollingerBands.upper.Value).Within(upperMargin), $"{scenario.Name}: Upper band mismatch");
 
                 var expectedLower = scenario.ExpectedBollingerBands.lower.Value;
                 var lowerDiff = Math.Abs((decimal)(lower - expectedLower));
                 var lowerPercentageDiff = expectedLower != 0 ? (lowerDiff / Math.Abs((decimal)(scenario.ExpectedBollingerBands.lower.Value))) * 100 : lowerDiff;
-                TestContext.WriteLine($"{scenario.Name}: Lower Band Percentage Difference: {(expectedLower != 0 ? $"{lowerPercentageDiff:F6}%" : $"Absolute Diff: {lowerDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: Lower Band Percentage Difference: {(expectedLower != 0 ? $"{lowerPercentageDiff:F6}%" : $"Absolute Diff: {lowerDiff:F6}")}");
                 var lowerMargin = _marginFactor * Math.Abs(scenario.ExpectedBollingerBands.lower.Value);
                 Assert.That(lower, Is.EqualTo((double)scenario.ExpectedBollingerBands.lower.Value).Within(lowerMargin), $"{scenario.Name}: Lower band mismatch");
             }
-            TestContext.WriteLine("Result: All Bollinger Bands calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All Bollinger Bands calculations validated successfully.");
         }
 
         /// <summary>
@@ -295,7 +335,7 @@ namespace BacklashBotTests
         [Test]
         public void TestATRCalculation()
         {
-            TestContext.WriteLine("Testing ATR calculation accuracy.");
+            TestContext.Out.WriteLine("Testing ATR calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetATRScenarios())
             {
                 // Arrange
@@ -310,11 +350,11 @@ namespace BacklashBotTests
                 var expected = scenario.ExpectedATR.Value;
                 var absoluteDiff = Math.Abs((decimal)(result - expected));
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedATR.Value))) * 100 : absoluteDiff;
-                TestContext.WriteLine($"{scenario.Name}: ATR Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: ATR Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedATR.Value);
                 Assert.That(result, Is.EqualTo((double)scenario.ExpectedATR.Value).Within(margin), $"{scenario.Name}: ATR mismatch. Expected: {expected}, Actual: {result}");
             }
-            TestContext.WriteLine("Result: All ATR calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All ATR calculations validated successfully.");
         }
 
         /// <summary>
@@ -328,7 +368,7 @@ namespace BacklashBotTests
         [Test]
         public void TestVWAPCalculation()
         {
-            TestContext.WriteLine("Testing VWAP calculation accuracy.");
+            TestContext.Out.WriteLine("Testing VWAP calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetVWAPScenarios())
             {
                 // Arrange
@@ -343,11 +383,11 @@ namespace BacklashBotTests
                 var expected = scenario.ExpectedVWAP.Value;
                 var absoluteDiff = Math.Abs(result.Value - (decimal)expected);
                 var percentageDiff = expected != 0 ? (absoluteDiff / Math.Abs((decimal)(scenario.ExpectedVWAP.Value))) * 100 : absoluteDiff;
-                TestContext.WriteLine($"{scenario.Name}: VWAP Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: VWAP Percentage Difference: {(expected != 0 ? $"{percentageDiff:F6}%" : $"Absolute Diff: {absoluteDiff:F6}")}");
                 var margin = _marginFactor * Math.Abs(scenario.ExpectedVWAP.Value);
                 Assert.That((double)result.Value, Is.EqualTo(scenario.ExpectedVWAP.Value).Within(margin), $"{scenario.Name}: VWAP mismatch. Expected: {expected}, Actual: {result}");
             }
-            TestContext.WriteLine("Result: All VWAP calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All VWAP calculations validated successfully.");
         }
 
         /// <summary>
@@ -362,7 +402,7 @@ namespace BacklashBotTests
         [Test]
         public void TestStochasticOscillatorCalculation()
         {
-            TestContext.WriteLine("Testing Stochastic Oscillator calculation accuracy.");
+            TestContext.Out.WriteLine("Testing Stochastic Oscillator calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetStochasticScenarios())
             {
                 // Arrange
@@ -377,7 +417,7 @@ namespace BacklashBotTests
                 var expectedK = scenario.ExpectedStochastic.k.Value;
                 var kDiff = Math.Abs((decimal)(kResult - expectedK));
                 var kPercentageDiff = expectedK != 0 ? (kDiff / Math.Abs((decimal)(scenario.ExpectedStochastic.k.Value))) * 100 : kDiff;
-                TestContext.WriteLine($"{scenario.Name}: %K Percentage Difference: {(expectedK != 0 ? $"{kPercentageDiff:F6}%" : $"Absolute Diff: {kDiff:F6}")}");
+                TestContext.Out.WriteLine($"{scenario.Name}: %K Percentage Difference: {(expectedK != 0 ? $"{kPercentageDiff:F6}%" : $"Absolute Diff: {kDiff:F6}")}");
                 var kMargin = _marginFactor * Math.Abs(scenario.ExpectedStochastic.k.Value);
                 Assert.That(kResult, Is.EqualTo((double)scenario.ExpectedStochastic.k.Value).Within(kMargin), $"{scenario.Name}: %K mismatch");
 
@@ -387,11 +427,11 @@ namespace BacklashBotTests
                     var expectedD = scenario.ExpectedStochastic.d.Value;
                     var dDiff = Math.Abs(dResult.GetValueOrDefault() - expectedD);
                     var dPercentageDiff = expectedD != 0 ? (dDiff / Math.Abs(scenario.ExpectedStochastic.d.Value)) * 100 : dDiff;
-                    TestContext.WriteLine($"{scenario.Name}: %D Percentage Difference: {(expectedD != 0 ? $"{dPercentageDiff:F6}%" : $"Absolute Diff: {dDiff:F6}")}");
+                    TestContext.Out.WriteLine($"{scenario.Name}: %D Percentage Difference: {(expectedD != 0 ? $"{dPercentageDiff:F6}%" : $"Absolute Diff: {dDiff:F6}")}");
                 }
                 Assert.That(dResult, Is.EqualTo(scenario.ExpectedStochastic.d.HasValue ? (double)scenario.ExpectedStochastic.d.Value : null).Within(dMargin).Or.Null, $"{scenario.Name}: %D mismatch");
             }
-            TestContext.WriteLine("Result: All Stochastic Oscillator calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All Stochastic Oscillator calculations validated successfully.");
         }
 
         /// <summary>
@@ -406,7 +446,7 @@ namespace BacklashBotTests
         [Test]
         public void TestOBVCalculation()
         {
-            TestContext.WriteLine("Testing OBV calculation accuracy.");
+            TestContext.Out.WriteLine("Testing OBV calculation accuracy.");
             foreach (var scenario in TradingMetricScenarios.GetOBVScenarios())
             {
                 // Arrange
@@ -418,7 +458,7 @@ namespace BacklashBotTests
                 // Assert
                 Assert.That(result, Is.EqualTo(scenario.ExpectedOBV), $"{scenario.Name}: OBV mismatch. Expected: {scenario.ExpectedOBV}, Actual: {result}");
             }
-            TestContext.WriteLine("Result: All OBV calculations validated successfully.");
+            TestContext.Out.WriteLine("Result: All OBV calculations validated successfully.");
         }
     }
 }

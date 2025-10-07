@@ -1,4 +1,3 @@
-using BacklashBot.Configuration;
 using BacklashCommon.Configuration;
 using KalshiBotLogging;
 using Microsoft.Extensions.Configuration;
@@ -37,7 +36,7 @@ namespace BacklashIntegrationTests
             _serviceProvider = services.BuildServiceProvider();
 
             // Initialize the logging queue as a singleton (not hosted service for test)
-            _loggingQueue = new DatabaseLoggingQueue(null, false); // isOverseer = false
+            _loggingQueue = new DatabaseLoggingQueue(null, ApplicationType.Bot);
         }
 
         /// <summary>

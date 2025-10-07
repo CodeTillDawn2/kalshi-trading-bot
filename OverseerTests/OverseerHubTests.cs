@@ -1,16 +1,13 @@
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.IO;
-using System.Net;
 
 namespace OverseerTests
 {
@@ -26,8 +23,7 @@ namespace OverseerTests
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
         private BrainPersistenceService _brainService;
         private Mock<ILogger<BrainPersistenceService>> _brainServiceLoggerMock;
-        private PerformanceMetricsService _performanceMetrics;
-        private Mock<ILogger<PerformanceMetricsService>> _performanceMetricsLoggerMock;
+        private Mock<IPerformanceMonitor> _performanceMonitorMock;
         private OverseerHubConfig _config;
         private OverseerHub _hub;
 
@@ -64,8 +60,7 @@ namespace OverseerTests
             _brainServiceLoggerMock = new Mock<ILogger<BrainPersistenceService>>();
             _brainService = new BrainPersistenceService(brainConfigOptions, null, _brainServiceLoggerMock.Object, null);
 
-            _performanceMetricsLoggerMock = new Mock<ILogger<PerformanceMetricsService>>();
-            _performanceMetrics = new PerformanceMetricsService(_performanceMetricsLoggerMock.Object);
+            _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             var configOptions = Options.Create(_config);
 
@@ -74,7 +69,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 configOptions,
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
         }
 
@@ -92,7 +87,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 configOptions,
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
 
             // Assert
@@ -121,7 +116,7 @@ namespace OverseerTests
                     _scopeFactoryMock.Object,
                     _brainService,
                     configOptions,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
@@ -132,7 +127,7 @@ namespace OverseerTests
                     null,
                     _brainService,
                     configOptions,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
@@ -147,18 +142,18 @@ namespace OverseerTests
             //     );
             // });
 
-            Assert.DoesNotThrow(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
                     _scopeFactoryMock.Object,
                     _brainService,
                     null,
-                    _performanceMetrics
+                    _performanceMonitorMock.Object
                 );
             });
 
-            Assert.DoesNotThrow(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var hub = new OverseerHub(
                     _loggerMock.Object,
@@ -187,7 +182,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -226,7 +221,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -244,14 +239,6 @@ namespace OverseerTests
                 LastSnapshot = DateTime.UtcNow,
                 IsStartingUp = false,
                 IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 10,
-                MinimumInterest = 0.5,
-                UsageMin = 10,
-                UsageMax = 80,
                 CurrentCpuUsage = 25.5,
                 EventQueueAvg = 15.2,
                 TickerQueueAvg = 8.7,
@@ -263,8 +250,7 @@ namespace OverseerTests
                 LastRefreshUsagePercentage = 35.7,
                 LastRefreshTimeAcceptable = true,
                 LastPerformanceSampleDate = DateTime.UtcNow,
-                IsWebSocketConnected = true,
-                WatchedMarkets = new List<OverseerBotShared.MarketWatchData>()
+                IsWebSocketConnected = true
             };
 
             // Act
@@ -298,7 +284,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -401,7 +387,7 @@ namespace OverseerTests
                 _scopeFactoryMock.Object,
                 _brainService,
                 Options.Create(_config),
-                _performanceMetrics
+                _performanceMonitorMock.Object
             );
             hub.SetContext(hubCallerContextMock.Object);
 
@@ -412,6 +398,8 @@ namespace OverseerTests
             var hasClients = OverseerHub.HasConnectedClients();
             Assert.That(hasClients, Is.False);
         }
+
+
 
         /// <summary>
         /// Cleans up test fixtures after each test execution.
@@ -434,8 +422,8 @@ namespace OverseerTests
             IServiceScopeFactory scopeFactory,
             BrainPersistenceService brainService,
             IOptions<OverseerHubConfig> config,
-            PerformanceMetricsService performanceMetrics)
-            : base(logger, scopeFactory, brainService, config, performanceMetrics)
+            IPerformanceMonitor performanceMonitor)
+            : base(logger, scopeFactory, brainService, config, performanceMonitor)
         {
         }
 
@@ -457,11 +445,6 @@ namespace OverseerTests
         public async Task TestOnDisconnectedAsync(Exception? exception)
         {
             await base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task TestHandshake(string clientId, string clientName, string clientType)
-        {
-            await base.Handshake(clientId, clientName, clientType);
         }
 
         public async Task TestProcessCheckIn(OverseerBotShared.CheckInData checkInData)

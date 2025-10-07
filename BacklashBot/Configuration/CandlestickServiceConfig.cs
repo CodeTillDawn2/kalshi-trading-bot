@@ -53,5 +53,12 @@ namespace BacklashBot.Configuration
         /// <value>Default is 4 parallel tasks.</value>
         [Required(ErrorMessage = "The 'MaxParallelParquetTasks' is missing in the configuration.")]
         public int MaxParallelParquetTasks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the folder name for storing candlestick data.
+        /// </summary>
+        /// <value>Default is "Candlesticks".</value>
+        [Required(ErrorMessage = "The 'CandlestickFolderName' is missing in the configuration.")]
+        public string CandlestickFolderName { get; set; }
     }
 }

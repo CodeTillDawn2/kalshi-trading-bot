@@ -1,3 +1,4 @@
+using BacklashInterfaces.PerformanceMetrics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -72,29 +73,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "AAPL", "GOOGL", "MSFT" },
                 ErrorCount = 42,
-                LastSnapshot = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc),
-                IsStartingUp = false,
-                IsShuttingDown = true,
-                WatchPositions = true,
-                WatchOrders = false,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 150,
-                MinimumInterest = 2.5,
-                UsageMin = 60.0,
-                UsageMax = 85.0,
-                CurrentCpuUsage = 45.7,
-                EventQueueAvg = 12.3,
-                TickerQueueAvg = 8.9,
-                NotificationQueueAvg = 5.2,
-                OrderbookQueueAvg = 15.6,
-                LastRefreshCycleSeconds = 2.1,
-                LastRefreshCycleInterval = 30,
-                LastRefreshMarketCount = 25,
-                LastRefreshUsagePercentage = 72.5,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = new DateTime(2024, 1, 15, 10, 25, 0, DateTimeKind.Utc),
-                IsWebSocketConnected = true
+                LastSnapshot = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc)
             };
 
             // Act - Serialize and deserialize
@@ -107,28 +86,6 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.Markets, deserializedData.Markets);
             Assert.Equal(originalData.ErrorCount, deserializedData.ErrorCount);
             Assert.Equal(originalData.LastSnapshot, deserializedData.LastSnapshot);
-            Assert.Equal(originalData.IsStartingUp, deserializedData.IsStartingUp);
-            Assert.Equal(originalData.IsShuttingDown, deserializedData.IsShuttingDown);
-            Assert.Equal(originalData.WatchPositions, deserializedData.WatchPositions);
-            Assert.Equal(originalData.WatchOrders, deserializedData.WatchOrders);
-            Assert.Equal(originalData.ManagedWatchList, deserializedData.ManagedWatchList);
-            Assert.Equal(originalData.CaptureSnapshots, deserializedData.CaptureSnapshots);
-            Assert.Equal(originalData.TargetWatches, deserializedData.TargetWatches);
-            Assert.Equal(originalData.MinimumInterest, deserializedData.MinimumInterest);
-            Assert.Equal(originalData.UsageMin, deserializedData.UsageMin);
-            Assert.Equal(originalData.UsageMax, deserializedData.UsageMax);
-            Assert.Equal(originalData.CurrentCpuUsage, deserializedData.CurrentCpuUsage);
-            Assert.Equal(originalData.EventQueueAvg, deserializedData.EventQueueAvg);
-            Assert.Equal(originalData.TickerQueueAvg, deserializedData.TickerQueueAvg);
-            Assert.Equal(originalData.NotificationQueueAvg, deserializedData.NotificationQueueAvg);
-            Assert.Equal(originalData.OrderbookQueueAvg, deserializedData.OrderbookQueueAvg);
-            Assert.Equal(originalData.LastRefreshCycleSeconds, deserializedData.LastRefreshCycleSeconds);
-            Assert.Equal(originalData.LastRefreshCycleInterval, deserializedData.LastRefreshCycleInterval);
-            Assert.Equal(originalData.LastRefreshMarketCount, deserializedData.LastRefreshMarketCount);
-            Assert.Equal(originalData.LastRefreshUsagePercentage, deserializedData.LastRefreshUsagePercentage);
-            Assert.Equal(originalData.LastRefreshTimeAcceptable, deserializedData.LastRefreshTimeAcceptable);
-            Assert.Equal(originalData.LastPerformanceSampleDate, deserializedData.LastPerformanceSampleDate);
-            Assert.Equal(originalData.IsWebSocketConnected, deserializedData.IsWebSocketConnected);
         }
 
         [Fact(DisplayName = "CheckInResponse round-trip: serialize/deserialize maintains exact structure")]
@@ -163,28 +120,106 @@ namespace OverseerBotShared.Tests
             {
                 BrainInstanceName = "TestBrain",
                 Timestamp = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc),
-                DatabaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>
+                AllMetrics = new List<PerformanceMetricEntry>
                 {
-                    ["Users"] = (100, 5, TimeSpan.FromMilliseconds(150), 0.85),
-                    ["Orders"] = (200, 10, TimeSpan.FromMilliseconds(300), 0.92)
-                },
-                MessageProcessorTotalMessagesProcessed = 1500,
-                MessageProcessorTotalProcessingTimeMs = 2500,
-                MessageProcessorAverageProcessingTimeMs = 1.67,
-                MessageProcessorMessagesPerSecond = 25.5,
-                MessageProcessorOrderBookQueueDepth = 12,
-                MessageProcessorDuplicateMessageCount = 3,
-                MessageProcessorDuplicatesInWindow = 1,
-                MessageProcessorLastDuplicateWarningTime = new DateTime(2024, 1, 15, 10, 25, 0, DateTimeKind.Utc),
-                MessageProcessorMessageTypeCounts = new Dictionary<string, long>
-                {
-                    ["MarketUpdate"] = 800,
-                    ["OrderBook"] = 700
-                },
-                ConfigurableMetrics = new Dictionary<string, object>
-                {
-                    ["CustomMetric1"] = 42.5,
-                    ["CustomMetric2"] = "test_value"
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "total-messages",
+                            Name = "Total Messages Processed",
+                            Description = "Total number of messages processed",
+                            Value = 1500,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "total-processing-time",
+                            Name = "Total Processing Time",
+                            Description = "Total processing time in milliseconds",
+                            Value = 2500,
+                            Unit = "ms",
+                            VisualType = VisualType.NumericDisplay,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "avg-processing-time",
+                            Name = "Average Processing Time",
+                            Description = "Average processing time per message",
+                            Value = 1.67,
+                            Unit = "ms",
+                            VisualType = VisualType.SpeedDial,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "messages-per-second",
+                            Name = "Messages Per Second",
+                            Description = "Processing rate",
+                            Value = 25.5,
+                            Unit = "msg/s",
+                            VisualType = VisualType.NumericDisplay,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "queue-depth",
+                            Name = "Order Book Queue Depth",
+                            Description = "Current queue depth",
+                            Value = 12,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "duplicate-count",
+                            Name = "Duplicate Message Count",
+                            Description = "Number of duplicate messages detected",
+                            Value = 3,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    },
+                    new PerformanceMetricEntry
+                    {
+                        ClassName = "MessageProcessor",
+                        Metric = new GeneralPerformanceMetric
+                        {
+                            Id = "duplicates-in-window",
+                            Name = "Duplicates In Window",
+                            Description = "Duplicates detected in current window",
+                            Value = 1,
+                            Unit = "count",
+                            VisualType = VisualType.Counter,
+                            Category = "Message Processing"
+                        }
+                    }
                 }
             };
 
@@ -196,16 +231,24 @@ namespace OverseerBotShared.Tests
             Assert.NotNull(deserializedMetrics);
             Assert.Equal(originalMetrics.BrainInstanceName, deserializedMetrics.BrainInstanceName);
             Assert.Equal(originalMetrics.Timestamp, deserializedMetrics.Timestamp);
-            Assert.Equal(originalMetrics.MessageProcessorTotalMessagesProcessed, deserializedMetrics.MessageProcessorTotalMessagesProcessed);
-            Assert.Equal(originalMetrics.MessageProcessorTotalProcessingTimeMs, deserializedMetrics.MessageProcessorTotalProcessingTimeMs);
-            Assert.Equal(originalMetrics.MessageProcessorAverageProcessingTimeMs, deserializedMetrics.MessageProcessorAverageProcessingTimeMs);
-            Assert.Equal(originalMetrics.MessageProcessorMessagesPerSecond, deserializedMetrics.MessageProcessorMessagesPerSecond);
-            Assert.Equal(originalMetrics.MessageProcessorOrderBookQueueDepth, deserializedMetrics.MessageProcessorOrderBookQueueDepth);
-            Assert.Equal(originalMetrics.MessageProcessorDuplicateMessageCount, deserializedMetrics.MessageProcessorDuplicateMessageCount);
-            Assert.Equal(originalMetrics.MessageProcessorDuplicatesInWindow, deserializedMetrics.MessageProcessorDuplicatesInWindow);
-            Assert.Equal(originalMetrics.MessageProcessorLastDuplicateWarningTime, deserializedMetrics.MessageProcessorLastDuplicateWarningTime);
-            Assert.Equal(originalMetrics.MessageProcessorMessageTypeCounts, deserializedMetrics.MessageProcessorMessageTypeCounts);
-            Assert.Equal(originalMetrics.ConfigurableMetrics, deserializedMetrics.ConfigurableMetrics);
+            Assert.NotNull(deserializedMetrics.AllMetrics);
+            Assert.Equal(originalMetrics.AllMetrics.Count, deserializedMetrics.AllMetrics.Count);
+
+            // Verify each metric matches
+            for (int i = 0; i < originalMetrics.AllMetrics.Count; i++)
+            {
+                var original = originalMetrics.AllMetrics[i];
+                var deserialized = deserializedMetrics.AllMetrics[i];
+
+                Assert.Equal(original.ClassName, deserialized.ClassName);
+                Assert.Equal(original.Metric.Id, deserialized.Metric.Id);
+                Assert.Equal(original.Metric.Name, deserialized.Metric.Name);
+                Assert.Equal(original.Metric.Description, deserialized.Metric.Description);
+                Assert.Equal(original.Metric.Value, deserialized.Metric.Value);
+                Assert.Equal(original.Metric.Unit, deserialized.Metric.Unit);
+                Assert.Equal(original.Metric.VisualType, deserialized.Metric.VisualType);
+                Assert.Equal(original.Metric.Category, deserialized.Metric.Category);
+            }
         }
 
         [Fact(DisplayName = "TargetTickersConfirmationResponse round-trip: serialize/deserialize maintains exact structure")]
@@ -241,30 +284,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = null, // Test nullable string
                 Markets = null, // Test nullable list
                 LastSnapshot = null, // Test nullable DateTime
-                LastPerformanceSampleDate = null,
-                // Other properties with default values
-                ErrorCount = 0,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = false,
-                WatchOrders = false,
-                ManagedWatchList = false,
-                CaptureSnapshots = false,
-                TargetWatches = 0,
-                MinimumInterest = 0.0,
-                UsageMin = 0.0,
-                UsageMax = 0.0,
-                CurrentCpuUsage = 0.0,
-                EventQueueAvg = 0.0,
-                TickerQueueAvg = 0.0,
-                NotificationQueueAvg = 0.0,
-                OrderbookQueueAvg = 0.0,
-                LastRefreshCycleSeconds = 0.0,
-                LastRefreshCycleInterval = 0,
-                LastRefreshMarketCount = 0,
-                LastRefreshUsagePercentage = 0.0,
-                LastRefreshTimeAcceptable = false,
-                IsWebSocketConnected = false
+                ErrorCount = 0
             };
 
             // Act
@@ -276,9 +296,7 @@ namespace OverseerBotShared.Tests
             Assert.Null(deserializedData.BrainInstanceName);
             Assert.Null(deserializedData.Markets);
             Assert.Null(deserializedData.LastSnapshot);
-            Assert.Null(deserializedData.LastPerformanceSampleDate);
             Assert.Equal(originalData.ErrorCount, deserializedData.ErrorCount);
-            Assert.Equal(originalData.IsStartingUp, deserializedData.IsStartingUp);
         }
 
         [Fact(DisplayName = "DTOs with complex structures: multiple round-trips maintain integrity")]
@@ -290,29 +308,7 @@ namespace OverseerBotShared.Tests
                 BrainInstanceName = "ComplexTestBrain",
                 Markets = new List<string> { "MARKET1", "MARKET2", "MARKET3" },
                 ErrorCount = 100,
-                LastSnapshot = DateTime.UtcNow,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 200,
-                MinimumInterest = 5.0,
-                UsageMin = 50.0,
-                UsageMax = 90.0,
-                CurrentCpuUsage = 75.5,
-                EventQueueAvg = 25.0,
-                TickerQueueAvg = 15.0,
-                NotificationQueueAvg = 10.0,
-                OrderbookQueueAvg = 30.0,
-                LastRefreshCycleSeconds = 5.0,
-                LastRefreshCycleInterval = 60,
-                LastRefreshMarketCount = 50,
-                LastRefreshUsagePercentage = 80.0,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = DateTime.UtcNow.AddMinutes(-5),
-                IsWebSocketConnected = true
+                LastSnapshot = DateTime.UtcNow
             };
 
             // Act - Multiple round trips to ensure stability
@@ -326,8 +322,6 @@ namespace OverseerBotShared.Tests
             Assert.Equal(originalData.BrainInstanceName, final.BrainInstanceName);
             Assert.Equal(originalData.Markets.Count, final.Markets.Count);
             Assert.Equal(originalData.ErrorCount, final.ErrorCount);
-            Assert.Equal(originalData.TargetWatches, final.TargetWatches);
-            Assert.Equal(originalData.CurrentCpuUsage, final.CurrentCpuUsage);
 
             // Verify JSON strings are identical (ensuring consistent serialization)
             Assert.Equal(json1, json2);

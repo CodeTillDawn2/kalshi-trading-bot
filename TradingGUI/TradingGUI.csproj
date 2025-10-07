@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -14,15 +14,17 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);8892;8618;8602;8604;1998;1571;1587;NU1701;CS1591</NoWarn>
+    <WarningsAsErrors>CS1570;CS1587;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningsAsErrors>CS1587</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningsAsErrors>CS1587</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
+    <ProjectReference Include="..\BacklashBotLogging\BacklashBotLogging.csproj" />
     <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
@@ -73,3 +76,4 @@
   </ItemGroup>
 
 </Project>
+

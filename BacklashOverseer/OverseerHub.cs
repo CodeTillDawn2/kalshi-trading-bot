@@ -1,8 +1,9 @@
 using BacklashBotData.Data.Interfaces;
+using BacklashDTOs.Data;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
 using BacklashOverseer.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -25,6 +26,7 @@ namespace BacklashOverseer
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
         private static readonly ConcurrentDictionary<string, ClientInfo> _clientInfo = new();
+        private static readonly ConcurrentDictionary<string, double> _brainPortfolioValues = new();
 
         // Performance metrics are now handled by PerformanceMetricsService
 
@@ -39,13 +41,26 @@ namespace BacklashOverseer
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly BrainPersistenceService _brainService;
         private readonly OverseerHubConfig _config;
-        private readonly PerformanceMetricsService _performanceMetrics;
+        private readonly IPerformanceMonitor _performanceMonitor;
+
+        // Local metric tracking
+        private long _handshakeRequests;
+        private long _checkInRequests;
+        private long _signalrMessages;
+        private double _handshakeLatencySum;
+        private double _checkInLatencySum;
+        private double _messageLatencySum;
+        private int _handshakeLatencyCount;
+        private int _checkInLatencyCount;
+        private int _messageLatencyCount;
+        private DateTime _lastMetricsReset = DateTime.UtcNow;
 
         static OverseerHub()
         {
             // Initialize timers
             _healthCheckTimer = new Timer(PerformHealthChecks, null, 0, 60000); // 60 seconds
             _rateLimitCleanupTimer = new Timer(CleanupRateLimits, null, 0, 300000); // 5 minutes
+
         }
 
         /// <summary>
@@ -122,19 +137,19 @@ namespace BacklashOverseer
         /// <param name="scopeFactory">The service scope factory.</param>
         /// <param name="brainService">The brain persistence service.</param>
         /// <param name="config">The hub configuration options.</param>
-        /// <param name="performanceMetrics">The performance metrics service.</param>
+        /// <param name="performanceMonitor">The performance monitor interface.</param>
         public OverseerHub(
             ILogger<OverseerHub> logger,
             IServiceScopeFactory scopeFactory,
             BrainPersistenceService brainService,
             IOptions<OverseerHubConfig> config,
-            PerformanceMetricsService performanceMetrics)
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _brainService = brainService;
-            _config = config?.Value;
-            _performanceMetrics = performanceMetrics;
+            _config = config?.Value ?? throw new ArgumentNullException(nameof(config), "OverseerHubConfig is required");
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
         }
 
         /// <summary>
@@ -162,8 +177,8 @@ namespace BacklashOverseer
                 // Handle case in unit tests where HttpContext is not available
             }
 
-            _logger.LogInformation("Client connected: {ConnectionId} from IP: {IPAddress}. Total clients: {ClientCount}",
-                Context.ConnectionId, ipAddress, _connectedClients.Count);
+            _logger.LogInformation("OVERSEER- Client connected: ConnectionId={ConnectionId}, IP={IPAddress}",
+                Context.ConnectionId, ipAddress);
 
             await base.OnConnectedAsync();
         }
@@ -232,24 +247,23 @@ namespace BacklashOverseer
         /// <returns>A dictionary containing performance metrics.</returns>
         public Dictionary<string, object> GetPerformanceMetrics()
         {
-            var signalRMetrics = _performanceMetrics.GetSignalRMetrics();
             var now = DateTime.UtcNow;
-            var timeSinceReset = now - signalRMetrics.LastReset;
+            var timeSinceReset = now - _lastMetricsReset;
             var minutesSinceReset = timeSinceReset.TotalMinutes;
 
             return new Dictionary<string, object>
             {
-                ["TotalMessagesProcessed"] = signalRMetrics.MessagesProcessed,
-                ["TotalHandshakeRequests"] = signalRMetrics.HandshakeRequests,
-                ["TotalCheckInRequests"] = signalRMetrics.CheckInRequests,
-                ["MessagesPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.MessagesProcessed / minutesSinceReset : 0,
-                ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.HandshakeRequests / minutesSinceReset : 0,
-                ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.CheckInRequests / minutesSinceReset : 0,
-                ["AverageHandshakeLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgHandshakeLatencyMs : 0,
-                ["AverageCheckInLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgCheckInLatencyMs : 0,
-                ["AverageMessageLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgMessageLatencyMs : 0,
+                ["TotalMessagesProcessed"] = _signalrMessages,
+                ["TotalHandshakeRequests"] = _handshakeRequests,
+                ["TotalCheckInRequests"] = _checkInRequests,
+                ["MessagesPerMinute"] = minutesSinceReset > 0 ? _signalrMessages / minutesSinceReset : 0,
+                ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? _handshakeRequests / minutesSinceReset : 0,
+                ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? _checkInRequests / minutesSinceReset : 0,
+                ["AverageHandshakeLatencyMs"] = _config.EnablePerformanceMetrics && _handshakeLatencyCount > 0 ? _handshakeLatencySum / _handshakeLatencyCount : 0,
+                ["AverageCheckInLatencyMs"] = _config.EnablePerformanceMetrics && _checkInLatencyCount > 0 ? _checkInLatencySum / _checkInLatencyCount : 0,
+                ["AverageMessageLatencyMs"] = _config.EnablePerformanceMetrics && _messageLatencyCount > 0 ? _messageLatencySum / _messageLatencyCount : 0,
                 ["CurrentConnectionCount"] = _connectedClients.Count,
-                ["LastMetricsReset"] = signalRMetrics.LastReset
+                ["LastMetricsReset"] = _lastMetricsReset
             };
         }
 
@@ -258,7 +272,16 @@ namespace BacklashOverseer
         /// </summary>
         public void ResetPerformanceMetrics()
         {
-            _performanceMetrics.ResetSignalRMetrics();
+            _handshakeRequests = 0;
+            _checkInRequests = 0;
+            _signalrMessages = 0;
+            _handshakeLatencySum = 0;
+            _checkInLatencySum = 0;
+            _messageLatencySum = 0;
+            _handshakeLatencyCount = 0;
+            _checkInLatencyCount = 0;
+            _messageLatencyCount = 0;
+            _lastMetricsReset = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -290,125 +313,7 @@ namespace BacklashOverseer
             return false;
         }
 
-        /// <summary>
-        /// Performs initial handshake with a client, validating and storing client information,
-        /// generating an authentication token, and logging the client to the database.
-        /// Includes rate limiting to prevent abuse.
-        /// </summary>
-        /// <param name="clientId">Unique identifier for the client.</param>
-        /// <param name="clientName">Name of the client (typically the brain instance name).</param>
-        /// <param name="clientType">Type of client connecting (e.g., brain, dashboard).</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handshake(string clientId, string clientName, string clientType)
-        {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
 
-            var ipAddress = "unknown";
-            try
-            {
-                var httpContext = Context.GetHttpContext();
-                ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            }
-            catch (NullReferenceException)
-            {
-                // Handle case in unit tests where HttpContext is not available
-            }
-
-            // Rate limiting check
-            if (IsRateLimited(ipAddress, "handshake", _config.MaxHandshakeRequestsPerMinute))
-            {
-                _logger.LogWarning("Handshake rate limit exceeded for IP: {IPAddress}", ipAddress);
-                await Clients.Caller.SendAsync("HandshakeResponse", new
-                {
-                    Success = false,
-                    Message = "Rate limit exceeded. Please try again later."
-                });
-                return;
-            }
-
-            if (_config.EnablePerformanceMetrics)
-            {
-                _performanceMetrics.RecordSignalRHandshake();
-                _performanceMetrics.RecordSignalRMessage();
-            }
-
-            _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
-                clientId, clientName, clientType);
-
-            try
-            {
-
-                // Store client information
-                var clientInfo = new ClientInfo
-                {
-                    ClientId = clientId,
-                    ClientName = clientName,
-                    ClientType = clientType,
-                    IPAddress = ipAddress,
-                    ConnectionId = Context.ConnectionId,
-                    LastSeen = DateTime.UtcNow
-                };
-
-                _clientInfo[Context.ConnectionId] = clientInfo;
-
-                // Log to database if available and performance metrics are enabled
-                if (_config.EnablePerformanceMetrics)
-                {
-                    try
-                    {
-                        using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-
-                        var signalRClient = new BacklashDTOs.SignalRClient
-                        {
-                            ClientId = clientId,
-                            ClientName = clientName,
-                            IPAddress = ipAddress,
-                            ClientType = clientType,
-                            AuthToken = GenerateAuthToken(clientId, clientName),
-                            IsActive = true,
-                            ConnectionId = Context.ConnectionId,
-                            LastSeen = DateTime.UtcNow
-                        };
-
-                        await context.AddOrUpdateSignalRClient(signalRClient);
-                        _logger.LogInformation("Client registered in database: {ClientId} from {IPAddress}", clientId, ipAddress);
-                    }
-                    catch (Exception dbEx)
-                    {
-                        _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}. Exception: {Message}, Inner: {Inner}", clientId, dbEx.Message, dbEx.InnerException?.Message ?? "None");
-                    }
-                }
-
-                // Send handshake response
-                var response = new
-                {
-                    Success = true,
-                    AuthToken = GenerateAuthToken(clientId, clientName),
-                    Message = "Handshake successful"
-                };
-
-                await Clients.Caller.SendAsync("HandshakeResponse", response);
-                _logger.LogInformation("Handshake completed for client: {ClientId}", clientId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during handshake for client: {ClientId}", clientId);
-                await Clients.Caller.SendAsync("HandshakeResponse", new
-                {
-                    Success = false,
-                    Message = $"Handshake failed: {ex.Message}"
-                });
-            }
-            finally
-            {
-                if (stopwatch != null)
-                {
-                    stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRHandshakeLatency(stopwatch.Elapsed);
-                }
-            }
-        }
 
         /// <summary>
         /// Processes a check-in request from a connected brain instance.
@@ -432,10 +337,17 @@ namespace BacklashOverseer
                 return;
             }
 
+            _checkInRequests++;
+            _signalrMessages++;
             if (_config.EnablePerformanceMetrics)
             {
-                _performanceMetrics.RecordSignalRCheckIn();
-                _performanceMetrics.RecordSignalRMessage();
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR");
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_requests", "CheckIn Requests", "Total number of check-in requests", _checkInRequests, "count", "SignalR");
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
             }
 
             _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
@@ -573,6 +485,32 @@ namespace BacklashOverseer
                     existingBrain = new BrainPersistence { BrainInstanceName = "" };
                 }
 
+                // Update BrainPersistence with status values from checkInData
+                if (existingBrain != null)
+                {
+                    existingBrain.IsStartingUp = checkInData.IsStartingUp;
+                    existingBrain.IsShuttingDown = checkInData.IsShuttingDown;
+                    existingBrain.ErrorCount = checkInData.ErrorCount;
+                    existingBrain.LastSnapshot = checkInData.LastSnapshot;
+                    existingBrain.IsWebSocketConnected = checkInData.IsWebSocketConnected;
+                    // The performance metrics are already updated via UpdateMetricHistoryAsync
+                }
+
+                // Get brain instance for TargetWatches
+                BrainInstanceDTO? brainInstanceDto = null;
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    try
+                    {
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                        brainInstanceDto = await context.GetBrainInstanceByName(clientInfo.ClientName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to get BrainInstance for {ClientName}", clientInfo.ClientName);
+                    }
+                }
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
@@ -583,20 +521,20 @@ namespace BacklashOverseer
                     ErrorCount = checkInData.ErrorCount,
                     LastSnapshot = checkInData.LastSnapshot,
                     LastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
-                    IsStartingUp = checkInData.IsStartingUp,
-                    IsShuttingDown = checkInData.IsShuttingDown,
+                    IsStartingUp = existingBrain?.IsStartingUp ?? false,
+                    IsShuttingDown = existingBrain?.IsShuttingDown ?? false,
 
-                    // Brain configuration
-                    WatchPositions = checkInData.WatchPositions,
-                    WatchOrders = checkInData.WatchOrders,
-                    ManagedWatchList = checkInData.ManagedWatchList,
-                    CaptureSnapshots = checkInData.CaptureSnapshots,
-                    TargetWatches = checkInData.TargetWatches,
-                    MinimumInterest = checkInData.MinimumInterest,
-                    UsageMin = checkInData.UsageMin,
-                    UsageMax = checkInData.UsageMax,
+                    // Brain configuration - sourced from database, not from client data
+                    WatchPositions = brainInstanceDto?.WatchPositions ?? false,
+                    WatchOrders = brainInstanceDto?.WatchOrders ?? false,
+                    ManagedWatchList = brainInstanceDto?.ManagedWatchList ?? false,
+                    CaptureSnapshots = brainInstanceDto?.CaptureSnapshots ?? false,
+                    TargetWatches = brainInstanceDto?.TargetWatches ?? 0,
+                    MinimumInterest = brainInstanceDto?.MinimumInterest ?? 0.0,
+                    UsageMin = brainInstanceDto?.UsageMin ?? 0.0,
+                    UsageMax = brainInstanceDto?.UsageMax ?? 0.0,
 
-                    // Performance metrics
+                    // Performance metrics - sourced from checkin data
                     CurrentCpuUsage = checkInData.CurrentCpuUsage,
                     EventQueueAvg = checkInData.EventQueueAvg,
                     TickerQueueAvg = checkInData.TickerQueueAvg,
@@ -610,10 +548,10 @@ namespace BacklashOverseer
                     LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
 
                     // Connection status
-                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
+                    IsWebSocketConnected = existingBrain?.IsWebSocketConnected ?? true,
 
                     // Market watch data
-                    WatchedMarkets = checkInData.WatchedMarkets
+                    WatchedMarkets = null
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
@@ -631,6 +569,11 @@ namespace BacklashOverseer
                     serverUtc = DateTime.UtcNow
                 });
 
+                // Update and broadcast total portfolio value
+                _brainPortfolioValues[clientInfo.ClientName ?? ""] = checkInData.PortfolioValue;
+                double totalPortfolio = _brainPortfolioValues.Values.Sum();
+                await Clients.All.SendAsync("PortfolioUpdate", new { TotalPortfolio = totalPortfolio, Timestamp = DateTime.UtcNow });
+
             }
             catch (Exception ex)
             {
@@ -646,7 +589,16 @@ namespace BacklashOverseer
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRCheckInLatency(stopwatch.Elapsed);
+                    _checkInLatencySum += stopwatch.Elapsed.TotalMilliseconds;
+                    _checkInLatencyCount++;
+                    if (_config.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "checkin_latency", "CheckIn Latency", "Latency for check-in processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
+                    }
                 }
             }
         }
@@ -741,20 +693,9 @@ namespace BacklashOverseer
                     }
                 }
 
-                // Broadcast performance metrics update to all connected clients (including web UI)
-                var connections = _connectedClients.Count;
-                _logger.LogInformation("Broadcasting PerformanceMetricsUpdate for {Brain} to {Count} connections",
-                    performanceMetrics.BrainInstanceName, connections);
-
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
-
-                await Clients.All.SendAsync("BroadcastTrace", new
-                {
-                    kind = "PerformanceMetricsUpdate",
-                    brain = performanceMetrics.BrainInstanceName,
-                    timestamp = performanceMetrics.Timestamp,
-                    serverUtc = DateTime.UtcNow
-                });
+                // Performance metrics stored successfully - no broadcasting needed
+                _logger.LogInformation("Performance metrics received and stored for brain: {BrainName}",
+                    performanceMetrics.BrainInstanceName);
 
                 await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
                 {
@@ -777,7 +718,16 @@ namespace BacklashOverseer
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRCheckInLatency(stopwatch.Elapsed);
+                    _messageLatencySum += stopwatch.Elapsed.TotalMilliseconds;
+                    _messageLatencyCount++;
+                    if (_config.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
+                    }
                 }
             }
         }
@@ -794,22 +744,15 @@ namespace BacklashOverseer
 
             try
             {
-                // Store the performance metrics in the brain persistence service
-                // The brain instance name and other details are embedded in the metrics object
-                await _brainService.UpdatePerformanceMetricsAsync("DefaultBrain", performanceMetrics);
-
-                // Broadcast the performance metrics to all connected clients (including web UI)
-                var connections = _connectedClients.Count;
-                _logger.LogInformation("Broadcasting performance metrics update to {Count} connections", connections);
-
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
-
-                await Clients.All.SendAsync("BroadcastTrace", new
+                string brainName = "DefaultBrain";
+                if (performanceMetrics is PerformanceMetricsData pmData && !string.IsNullOrEmpty(pmData.BrainInstanceName))
                 {
-                    kind = "PerformanceMetricsUpdate",
-                    timestamp = DateTime.UtcNow,
-                    serverUtc = DateTime.UtcNow
-                });
+                    brainName = pmData.BrainInstanceName;
+                }
+                // Store the performance metrics in the brain persistence service
+                await _brainService.UpdatePerformanceMetricsAsync(brainName, performanceMetrics);
+
+                _logger.LogInformation("Performance metrics received and stored for brain: {BrainName}", brainName);
             }
             catch (Exception ex)
             {
@@ -820,7 +763,16 @@ namespace BacklashOverseer
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRMessageLatency(stopwatch.Elapsed);
+                    _messageLatencySum += stopwatch.Elapsed.TotalMilliseconds;
+                    _messageLatencyCount++;
+                    if (_config.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
+                    }
                 }
             }
         }
@@ -842,19 +794,168 @@ namespace BacklashOverseer
                 // Store the performance metrics in brain persistence
                 await _brainService.UpdatePerformanceMetricsAsync(brainInstanceName, performanceMetrics);
 
-                // Broadcast the performance metrics update to all connected clients (including web UI)
-                await Clients.All.SendAsync("PerformanceMetricsUpdate", new
-                {
-                    BrainInstanceName = brainInstanceName,
-                    PerformanceMetrics = performanceMetrics,
-                    Timestamp = timestamp
-                });
-
-                _logger.LogInformation("Performance metrics update processed and broadcasted for brain {BrainInstanceName}", brainInstanceName);
+                _logger.LogInformation("Performance metrics update processed and stored for brain {BrainInstanceName}", brainInstanceName);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing performance metrics update from brain {BrainInstanceName}", brainInstanceName);
+            }
+        }
+
+        /// <summary>
+        /// Processes initial handshake with a connecting client, validates credentials,
+        /// registers the client, and generates an authentication token for subsequent communications.
+        /// </summary>
+        /// <param name="request">The handshake request containing client identification information.</param>
+        /// <returns>A task representing the asynchronous operation that returns a handshake response.</returns>
+        public async Task<HandshakeResponse> Handshake(HandshakeRequest request)
+        {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            // Rate limiting check
+            var connectionId = Context.ConnectionId;
+            if (IsRateLimited(connectionId, "handshake", _config.MaxHandshakeRequestsPerMinute))
+            {
+                _logger.LogWarning("Handshake rate limit exceeded for connection: {ConnectionId}", connectionId);
+                return new HandshakeResponse
+                {
+                    Success = false,
+                    Message = "Rate limit exceeded. Please try again later."
+                };
+            }
+
+            _handshakeRequests++;
+            _signalrMessages++;
+            if (_config.EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR");
+                _performanceMonitor.RecordCounterMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
+            }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_requests", "Handshake Requests", "Total number of handshake requests", _handshakeRequests, "count", "SignalR");
+                _performanceMonitor.RecordDisabledMetric("OverseerHub", "signalr_messages", "SignalR Messages", "Total number of SignalR messages", _signalrMessages, "count", "SignalR");
+            }
+
+            _logger.LogInformation("Handshake received from connection: {ConnectionId}", connectionId);
+
+            try
+            {
+                // Validate HandshakeRequest
+                if (request == null)
+                {
+                    _logger.LogWarning("Handshake received with null request from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "Handshake request is null."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientId))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientId from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientId is required."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientName))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientName from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientName is required."
+                    };
+                }
+
+                if (string.IsNullOrEmpty(request.ClientType))
+                {
+                    _logger.LogWarning("Handshake received with missing ClientType from connection: {ConnectionId}", connectionId);
+                    return new HandshakeResponse
+                    {
+                        Success = false,
+                        Message = "ClientType is required."
+                    };
+                }
+
+                // Get IP address
+                var ipAddress = "unknown";
+                try
+                {
+                    var httpContext = Context.GetHttpContext();
+                    if (httpContext != null)
+                    {
+                        ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                    }
+                }
+                catch (NullReferenceException)
+                {
+                    // Handle case in unit tests where HttpContext is not available
+                }
+
+                // Generate authentication token
+                var authToken = GenerateAuthToken(request.ClientId, request.ClientName);
+
+                // Store client information
+                var clientInfo = new ClientInfo
+                {
+                    ClientId = request.ClientId,
+                    ClientName = request.ClientName,
+                    ClientType = request.ClientType,
+                    IPAddress = ipAddress,
+                    ConnectionId = connectionId,
+                    LastSeen = DateTime.UtcNow
+                };
+
+                _clientInfo[connectionId] = clientInfo;
+
+                _logger.LogInformation("Handshake successful for client {ClientId} ({ClientName}) from IP {IPAddress}",
+                    request.ClientId, request.ClientName, ipAddress);
+
+                // Send handshake response to client
+                await Clients.Caller.SendAsync("HandshakeResponse", new HandshakeResponse
+                {
+                    Success = true,
+                    AuthToken = authToken,
+                    Message = "Handshake successful. Client registered."
+                });
+
+                return new HandshakeResponse
+                {
+                    Success = true,
+                    AuthToken = authToken,
+                    Message = "Handshake successful. Client registered."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing Handshake from connection: {ConnectionId}", connectionId);
+                return new HandshakeResponse
+                {
+                    Success = false,
+                    Message = $"Handshake processing failed: {ex.Message}"
+                };
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _handshakeLatencySum += stopwatch.Elapsed.TotalMilliseconds;
+                    _handshakeLatencyCount++;
+                    if (_config.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "handshake_latency", "Handshake Latency", "Latency for handshake processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
+                    }
+                }
             }
         }
 
@@ -916,7 +1017,16 @@ namespace BacklashOverseer
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();
-                    _performanceMetrics.RecordSignalRMessageLatency(stopwatch.Elapsed);
+                    _messageLatencySum += stopwatch.Elapsed.TotalMilliseconds;
+                    _messageLatencyCount++;
+                    if (_config.EnablePerformanceMetrics)
+                    {
+                        _performanceMonitor.RecordSpeedDialMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR", null, null, null);
+                    }
+                    else
+                    {
+                        _performanceMonitor.RecordDisabledMetric("OverseerHub", "message_latency", "Message Latency", "Latency for message processing", stopwatch.Elapsed.TotalMilliseconds, "ms", "SignalR");
+                    }
                 }
             }
         }

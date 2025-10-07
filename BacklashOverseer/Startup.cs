@@ -1,8 +1,6 @@
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
-using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
-using BacklashBot.State;
 using BacklashBot.State.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
@@ -10,7 +8,6 @@ using BacklashBotData.Data.Interfaces;
 using BacklashCommon.Configuration;
 using BacklashCommon.Helpers;
 using BacklashCommon.Services;
-using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer.Config;
@@ -20,7 +17,7 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data;
+using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotLogging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -79,8 +76,11 @@ namespace BacklashOverseer
                 builder.SetMinimumLevel(LogLevel.Trace);
             });
 
+            // Generate session identifier
+            var sessionIdentifier = BacklashCommon.Helpers.SessionIdentifierGenerator.GenerateSessionIdentifier();
+
             // Add database logging services
-            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), true)); // isOverseer = true
+            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), ApplicationType.Overseer));
             services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             services.AddSingleton<ILoggerProvider>(provider =>
@@ -93,7 +93,7 @@ namespace BacklashOverseer
                     loggingConfig,
                     instanceNameConfig.Name,
                     minLevel,
-                    null, // brainStatus
+                    sessionIdentifier, // sessionIdentifier
                     loggingConfig.Environment // defaultEnvironment
                 );
             });
@@ -110,16 +110,17 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IKalshiAPIService>(),
                 sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
                 sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
-                sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
                 sp.GetRequiredService<IPerformanceMonitor>()
             ));
-            services.AddScoped<ISubscriptionManager>(sp => new BaseSubscriptionManager(
+            services.AddScoped<ISubscriptionManager>(sp => new OverseerSubscriptionManager(
                 sp.GetRequiredService<ILogger<BaseSubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
+                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
+                sp.GetRequiredService<IPerformanceMonitor>()
             ));
-            services.AddScoped<IKalshiWebSocketClient>(sp => {
+            services.AddScoped<IKalshiWebSocketClient>(sp =>
+            {
                 var client = new KalshiWebSocketClient(
                     sp.GetRequiredService<IOptions<KalshiConfig>>(),
                     sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
@@ -130,7 +131,7 @@ namespace BacklashOverseer
                     sp.GetRequiredService<IWebSocketConnectionManager>(),
                     sp.GetRequiredService<ISubscriptionManager>(),
                     sp.GetRequiredService<IMessageProcessor>(),
-                    sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+                    sp.GetRequiredService<IPerformanceMonitor>(),
                     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
                     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics
@@ -145,23 +146,24 @@ namespace BacklashOverseer
             {
                 var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
                 var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-                var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
+                var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
                 var connectionString = serviceProvider.GetRequiredService<string>();
-                return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
+                return new BacklashBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
             });
             services.AddScoped<BacklashBotContext>(provider =>
             {
                 var connectionString = provider.GetRequiredService<string>();
                 var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
                 var dataConfig = Configuration.GetSection(BacklashBotDataConfig.SectionName).Get<BacklashBotDataConfig>();
-                return new BacklashBotContext(connectionString, logger, dataConfig);
+                var performanceMonitor = provider.GetRequiredService<IPerformanceMonitor>();
+                return new BacklashBotContext(connectionString, logger, dataConfig, performanceMonitor);
             });
             services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
 
-            services.AddScoped<IWebSocketMonitorService>(sp => new BacklashCommon.Services.OverseerWebSocketMonitorService(
-                sp.GetRequiredService<ILogger<BacklashCommon.Services.OverseerWebSocketMonitorService>>(),
+            services.AddScoped<IWebSocketMonitorService>(sp => new OverseerWebSocketMonitorService(
+                sp.GetRequiredService<ILogger<OverseerWebSocketMonitorService>>(),
                 sp.GetRequiredService<IKalshiWebSocketClient>(),
                 sp.GetRequiredService<IServiceScopeFactory>()
             ));
@@ -191,9 +193,9 @@ namespace BacklashOverseer
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Configure SnapshotAggregationService settings
-            services.AddOptions<Config.SnapshotAggregationServiceConfig>()
-                .Bind(Configuration.GetSection(Config.SnapshotAggregationServiceConfig.SectionName))
+            // Configure SnapshotService settings
+            services.AddOptions<Config.SnapshotServiceConfig>()
+                .Bind(Configuration.GetSection(Config.SnapshotServiceConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -296,8 +298,10 @@ namespace BacklashOverseer
             var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(Configuration);
             services.AddSingleton(connectionString);
 
-            services.PostConfigure<IBotReadyStatus>(status => {
-                if (status is OverseerReadyStatus ors) {
+            services.PostConfigure<IBotReadyStatus>(status =>
+            {
+                if (status is OverseerReadyStatus ors)
+                {
                     ors.InitializationCompleted.SetResult(true);
                 }
             });
@@ -310,24 +314,18 @@ namespace BacklashOverseer
             services.AddMemoryCache();
 
             // Register SnapshotService with dependencies
-            services.AddScoped<SnapshotAggregationService>(sp =>
-                new SnapshotAggregationService(
+            services.AddScoped<SnapshotService>(sp =>
+                new SnapshotService(
                     sp.GetRequiredService<IBacklashBotContext>(),
-                    sp.GetRequiredService<IOptions<Config.SnapshotAggregationServiceConfig>>(),
-                    sp.GetRequiredService<PerformanceMetricsService>(),
-                    sp.GetRequiredService<ILogger<SnapshotAggregationService>>()
+                    sp.GetRequiredService<IOptions<Config.SnapshotServiceConfig>>(),
+                    sp.GetRequiredService<IPerformanceMonitor>(),
+                    sp.GetRequiredService<ILogger<SnapshotService>>()
                 ));
 
             // Register PerformanceMetricsService
             services.AddSingleton<PerformanceMetricsService>();
             services.AddSingleton<IPerformanceMonitor>(provider =>
                 provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-                (IWebSocketPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
-                (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
-            services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-                (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
 
             // Register services needed for OvernightActivitiesHelper
@@ -341,14 +339,14 @@ namespace BacklashOverseer
                     provider.GetRequiredService<ISnapshotGroupHelper>(),
                     provider.GetRequiredService<IOptions<DataStorageConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
-                    provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
+                    provider.GetRequiredService<IPerformanceMonitor>()));
 
             // Register BrainPersistenceService
             services.AddScoped<BrainPersistenceService>(sp => new BrainPersistenceService(
                 sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
-                sp.GetRequiredService<IBacklashBotContext>(),
+                sp.GetRequiredService<IServiceScopeFactory>(),
                 sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
-                sp.GetRequiredService<PerformanceMetricsService>()
+                sp.GetRequiredService<IPerformanceMonitor>()
             ));
 
 

@@ -3,6 +3,10 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents the Tristar pattern, a rare three-candle reversal pattern consisting of three Doji candles.
+    /// Indicates potential reversal from downtrend to uptrend (bullish) or uptrend to downtrend (bearish).
+    /// </summary>
     public class TristarPattern : PatternDefinition
     {
         /// <summary>
@@ -42,11 +46,19 @@ namespace BacklashPatterns.PatternDefinitions
         public static double CloseToleranceBase { get; } = 1.5;
 
         /// <summary>
-        /// Factor applied to the first candle s range to adjust close tolerance dynamically.
+        /// Factor applied to the first candle's range to adjust close tolerance dynamically.
         /// Strictest: 0.1 (tight range-based tolerance), Loosest: 0.3 (broader range allowance).
         /// </summary>
         public static double CloseToleranceRangeFactor { get; } = 0.2;
+
+        /// <summary>
+        /// Gets the base name for the Tristar pattern.
+        /// </summary>
         public const string BaseName = "Tristar";
+
+        /// <summary>
+        /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
+        /// </summary>
         public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
@@ -58,10 +70,30 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the direction of the pattern.
         /// </summary>
         public override PatternDirection Direction { get; }
+
+        /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the TristarPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (three candles).</param>
+        /// <param name="direction">The direction of the pattern.</param>
         public TristarPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
             Direction = direction;

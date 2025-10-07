@@ -1,7 +1,10 @@
 using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.State;
+using BacklashBot.State.Interfaces;
 using BacklashCommon.Configuration;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
@@ -27,16 +30,50 @@ namespace BacklashBot.Services
 
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
+        private readonly IStatusTrackerService _statusTrackerService;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
         private HubConnection? _hubConnection;
         private Timer? _checkInTimer;
         private Timer? _overseerDiscoveryTimer;
         private bool _isConnected = false;
+        private bool _handshakeCompleted = false;
 
         /// <summary>
         /// Gets a value indicating whether the service is currently connected to an Overseer.
         /// </summary>
         public bool IsConnected => _isConnected;
+
+        /// <summary>
+        /// Updates the connection state and notifies the status tracker of overseer connection changes.
+        /// </summary>
+        /// <param name="connected">True if connected, false if disconnected.</param>
+        private void UpdateConnectionState(bool connected)
+        {
+            bool stateChanged = _isConnected != connected;
+            _isConnected = connected;
+
+            if (stateChanged)
+            {
+                // Notify status tracker of overseer connection change
+                var statusTracker = _statusTrackerService as KalshiBotStatusTracker;
+                statusTracker?.SetOverseerConnected(connected);
+            }
+        }
+
+        /// <summary>
+        /// Handles BrainMode changes by updating WebSocket subscription settings.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="mode">The new brain mode.</param>
+        private void OnBrainModeChanged(object? sender, KalshiBotStatusTracker.BrainMode mode)
+        {
+            bool subscribeToGeneral = mode == KalshiBotStatusTracker.BrainMode.Autonomous;
+            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+            webSocketClient?.SetSubscribeToGeneralChannels(subscribeToGeneral);
+            _logger.LogInformation("OVERSEER- Updated WebSocket general channel subscription to {Subscribe} based on BrainMode {Mode}",
+                subscribeToGeneral, mode);
+        }
         private string _clientId;
         private string _clientName = "BacklashBot";
         private string _clientType = "TradingBot";
@@ -88,20 +125,33 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
+        /// <param name="statusTrackerService">Status tracker service for managing bot state.</param>
         /// <param name="overseerConfig">Configuration options for the overseer.</param>
         /// <param name="instanceNameConfig">Configuration options for general execution settings.</param>
+        /// <param name="performanceMonitor">Performance monitor for recording metrics.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
+            IStatusTrackerService statusTrackerService,
             IOptions<OverseerClientServiceConfig> overseerConfig,
             IOptions<InstanceNameConfig> instanceNameConfig,
+            IPerformanceMonitor performanceMonitor,
             ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _statusTrackerService = statusTrackerService;
+            _performanceMonitor = performanceMonitor;
             _clientId = Guid.NewGuid().ToString();
+            _centralPerformanceMonitor = centralPerformanceMonitor;
+
+            // Subscribe to BrainMode changes to update WebSocket subscriptions
+            var statusTracker = _statusTrackerService as KalshiBotStatusTracker;
+            if (statusTracker != null)
+            {
+                statusTracker.BrainModeChanged += OnBrainModeChanged;
+            }
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
             _clientName = instanceNameConfig.Value.Name;
@@ -133,8 +183,8 @@ namespace BacklashBot.Services
             {
                 _logger.LogInformation("OVERSEER- Starting OverseerClientService...");
 
-                // Start Overseer Discovery timer first - this ensures we keep trying to find overseer
-                _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.Zero, _overseerDiscoveryInterval);
+                // Start Overseer Discovery timer - wait for initial connection attempt to complete before starting discovery
+                _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, _overseerDiscoveryInterval, _overseerDiscoveryInterval);
                 _logger.LogInformation("OVERSEER- Overseer discovery timer started (every {Interval} minutes)", _overseerDiscoveryInterval.TotalMinutes);
 
                 // Start CheckIn timer - it will only send if connected
@@ -198,12 +248,15 @@ namespace BacklashBot.Services
                 // Use lock to safely clean up connection
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                     _currentOverseer = null;
                     _currentOverseerUrl = null;
                 }
 
                 await CleanupConnectionAsync();
+
+                // Reset handshake completed flag
+                _handshakeCompleted = false;
 
                 _logger.LogInformation("OVERSEER- Overseer client stopped");
             }
@@ -409,7 +462,7 @@ namespace BacklashBot.Services
                 // Reset connection state
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                     _currentOverseerUrl = null;
                 }
                 _logger.LogDebug("OVERSEER- Connection state reset");
@@ -417,9 +470,21 @@ namespace BacklashBot.Services
                 // Create new connection
                 _logger.LogDebug("OVERSEER- Creating new HubConnection");
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(overseerUrl)
+                    .WithUrl(overseerUrl, options =>
+                    {
+                        options.HttpMessageHandlerFactory = (handler) =>
+                        {
+                            if (handler is HttpClientHandler clientHandler)
+                            {
+                                clientHandler.UseProxy = false;
+                            }
+                            return handler;
+                        };
+                    })
+                    .AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; })
                     .WithAutomaticReconnect()
                     .Build();
+                _logger.LogDebug("OVERSEER- HubConnection created, about to call StartAsync");
                 _logger.LogDebug("OVERSEER- HubConnection created, initial state: {State}", _hubConnection.State);
 
                 // Set up event handlers
@@ -441,6 +506,7 @@ namespace BacklashBot.Services
 
                     _hubConnection = new HubConnectionBuilder()
                         .WithUrl(overseerUrl)
+                        .AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; })
                         .WithAutomaticReconnect()
                         .Build();
 
@@ -453,14 +519,22 @@ namespace BacklashBot.Services
                     _logger.LogDebug("OVERSEER- Fresh connection created");
                 }
 
-                _logger.LogDebug("OVERSEER- About to call StartAsync with configurable timeout");
+                _logger.LogDebug("OVERSEER- About to call StartAsync with configurable timeout ({Timeout}s)", _connectionTimeout.TotalSeconds);
                 using var cts = new CancellationTokenSource(_connectionTimeout);
-                await _hubConnection.StartAsync(cts.Token);
-                _logger.LogInformation("OVERSEER- StartAsync completed successfully, state: {State}", _hubConnection.State);
+                try
+                {
+                    await _hubConnection.StartAsync(cts.Token);
+                    _logger.LogInformation("OVERSEER- StartAsync completed successfully, state: {State}", _hubConnection.State);
+                }
+                catch (Exception startEx)
+                {
+                    _logger.LogWarning("OVERSEER- StartAsync failed with exception: {Message}", startEx.Message);
+                    throw;
+                }
 
                 lock (_connectionStateLock)
                 {
-                    _isConnected = true;
+                    UpdateConnectionState(true);
                     _currentOverseerUrl = overseerUrl;
                 }
                 _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
@@ -486,6 +560,10 @@ namespace BacklashBot.Services
             catch (TaskCanceledException)
             {
                 _logger.LogInformation("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
+                lock (_connectionStateLock)
+                {
+                    UpdateConnectionState(false);
+                }
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -498,6 +576,10 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogInformation("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
+                lock (_connectionStateLock)
+                {
+                    UpdateConnectionState(false);
+                }
                 if (_enablePerformanceMetrics)
                 {
                     lock (_circuitBreakerLock)
@@ -550,11 +632,11 @@ namespace BacklashBot.Services
                 var mostRecentOverseer = activeOverseers.First();
 
                 // Check if we're still connected to the most recent overseer
-                if (_currentOverseer.Id != mostRecentOverseer.Id)
+                if (_currentOverseer == null || _currentOverseer.Id != mostRecentOverseer.Id)
                 {
                     _logger.LogInformation("OVERSEER- Found newer overseer available. Current: {CurrentHost} ({CurrentHeartbeat}), Available: {RecentHost} ({RecentHeartbeat})",
-                        _currentOverseer.HostName,
-                        _currentOverseer.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never",
+                        _currentOverseer?.HostName ?? "N/A",
+                        _currentOverseer?.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never",
                         mostRecentOverseer.HostName,
                         mostRecentOverseer.LastHeartbeat?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never");
 
@@ -684,6 +766,7 @@ namespace BacklashBot.Services
         {
             return _hubConnection != null &&
                    _isConnected &&
+                   _handshakeCompleted &&
                    _hubConnection.State == HubConnectionState.Connected;
         }
 
@@ -929,24 +1012,48 @@ namespace BacklashBot.Services
             _logger.LogDebug("OVERSEER- Checking connection state for handshake: IsConnected={IsConnected}, State={State}",
                 _isConnected, _hubConnection.State);
 
-            if (!IsConnectionActive())
+            if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
             {
-                _logger.LogInformation("OVERSEER- Cannot send handshake: Connection not active (IsConnected={IsConnected}, State={State})",
-                    _isConnected, _hubConnection.State);
+                _logger.LogInformation("OVERSEER- Cannot send handshake: Connection not established (State={State})",
+                    _hubConnection?.State ?? HubConnectionState.Disconnected);
                 return;
             }
 
             try
             {
+                // Reset handshake completed flag
+                _handshakeCompleted = false;
+
                 // Ensure auth token is valid
                 await EnsureValidAuthTokenAsync();
 
+                // Delay to ensure connection is fully established
+                await Task.Delay(1000);
+
+                var handshakeRequest = new HandshakeRequest
+                {
+                    ClientId = _clientId,
+                    ClientName = _clientName,
+                    ClientType = _clientType,
+                    AuthToken = _authToken
+                };
+
                 _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}, AuthToken={HasToken}",
-                    _clientId, _clientName, _clientType, !string.IsNullOrEmpty(_authToken));
+                    handshakeRequest.ClientId, handshakeRequest.ClientName, handshakeRequest.ClientType, !string.IsNullOrEmpty(handshakeRequest.AuthToken));
 
                 var stopwatch = Stopwatch.StartNew();
-                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType, _authToken);
-                stopwatch.Stop();
+                HandshakeResponse response;
+                try
+                {
+                    response = await _hubConnection.InvokeAsync<HandshakeResponse>("Handshake", handshakeRequest);
+                    stopwatch.Stop();
+                    _logger.LogInformation("OVERSEER- Handshake InvokeAsync completed successfully");
+                }
+                catch (Exception invokeEx)
+                {
+                    _logger.LogWarning("OVERSEER- Handshake InvokeAsync failed: {Message}", invokeEx.Message);
+                    throw;
+                }
 
                 if (_enablePerformanceMetrics)
                 {
@@ -958,14 +1065,24 @@ namespace BacklashBot.Services
                     }
                 }
 
-                _logger.LogInformation("OVERSEER- Handshake sent successfully to overseer");
+                _logger.LogInformation("OVERSEER- Handshake response received: Success={Success}, Message={Message}", response.Success, response.Message);
+
+                if (response.Success)
+                {
+                    _handshakeCompleted = true;
+                    _logger.LogInformation("OVERSEER- Handshake completed successfully, client is now registered");
+                }
+                else
+                {
+                    _logger.LogWarning("OVERSEER- Handshake failed: {Message}", response.Message);
+                }
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
             {
                 _logger.LogInformation("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false;
+                    UpdateConnectionState(false);
                 }
             }
             catch (Exception ex)
@@ -982,11 +1099,17 @@ namespace BacklashBot.Services
                 return;
             }
 
+            if (!_handshakeCompleted)
+            {
+                _logger.LogDebug("OVERSEER- Handshake not completed yet, skipping CheckIn (will retry on next cycle)");
+                return;
+            }
+
             try
             {
                 // Post metrics to central performance monitor
                 var metrics = GetMetrics();
-                _centralPerformanceMonitor.RecordOverseerClientServiceMetrics(metrics, _enablePerformanceMetrics);
+                RecordOverseerClientServiceMetrics(metrics, _enablePerformanceMetrics);
 
                 // Log metrics every 10 check-ins
                 if (_connectionSuccessCount > 0 && _connectionSuccessCount % 10 == 0)
@@ -1011,39 +1134,36 @@ namespace BacklashBot.Services
                 var markets = await _serviceFactory.GetMarketDataService().FetchWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
 
-                var checkInData = new
+                // Get brain instance configuration from database
+                BacklashDTOs.Data.BrainInstanceDTO? brainInstance = null;
+                using var scope = _serviceFactory.GetScopeManager().CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<BacklashBotData.Data.Interfaces.IBacklashBotContext>();
+                brainInstance = await context.GetBrainInstanceByName(_clientName);
+
+                var dataCache = _serviceFactory.GetDataCache();
+                var checkInData = new CheckInData
                 {
-                    BrainInstanceName = _clientName, // Add the brain instance name
+                    BrainInstanceName = _clientName,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = errorHandler.LastSuccessfulSnapshot == DateTime.MinValue
                         ? (DateTime?)null
                         : errorHandler.LastSuccessfulSnapshot,
-                    LastErrorDate = errorHandler.LastErrorDate == DateTime.MinValue
-                        ? (DateTime?)null
-                        : errorHandler.LastErrorDate,
-                    IsStartingUp = false, // Could be determined from service state
-                    IsShuttingDown = false,
-                    WatchPositions = true, // From configuration
-                    WatchOrders = true,
-                    ManagedWatchList = true,
-                    CaptureSnapshots = false,
-                    TargetWatches = 200, // From configuration
-                    MinimumInterest = 5.0,
-                    UsageMin = 70.0,
-                    UsageMax = 90.0,
-                    CurrentCpuUsage = 0.0, // Could get from system
-                    EventQueueAvg = 0.0,
-                    TickerQueueAvg = 0.0,
-                    NotificationQueueAvg = 0.0,
-                    OrderbookQueueAvg = 0.0,
-                    LastRefreshCycleSeconds = 0.0,
-                    LastRefreshCycleInterval = 0,
-                    LastRefreshMarketCount = 0,
-                    LastRefreshUsagePercentage = 0.0,
-                    LastRefreshTimeAcceptable = true,
-                    LastPerformanceSampleDate = (DateTime?)null,
-                    IsWebSocketConnected = true // Could be determined
+                    IsStartingUp = _centralPerformanceMonitor.IsStartingUp,
+                    IsShuttingDown = _centralPerformanceMonitor.IsShuttingDown,
+                    CurrentCpuUsage = _centralPerformanceMonitor.GetCurrentCpuUsage(),
+                    EventQueueAvg = _centralPerformanceMonitor.GetEventQueueAvg(),
+                    TickerQueueAvg = _centralPerformanceMonitor.GetTickerQueueAvg(),
+                    NotificationQueueAvg = _centralPerformanceMonitor.GetNotificationQueueAvg(),
+                    OrderbookQueueAvg = _centralPerformanceMonitor.GetOrderbookQueueAvg(),
+                    LastRefreshCycleSeconds = _centralPerformanceMonitor.GetLastRefreshCycleSeconds(),
+                    LastRefreshCycleInterval = _centralPerformanceMonitor.GetLastRefreshCycleInterval(),
+                    LastRefreshMarketCount = _centralPerformanceMonitor.GetLastRefreshMarketCount(),
+                    LastRefreshUsagePercentage = _centralPerformanceMonitor.GetLastRefreshUsagePercentage(),
+                    LastRefreshTimeAcceptable = _centralPerformanceMonitor.GetLastRefreshTimeAcceptable(),
+                    LastPerformanceSampleDate = _centralPerformanceMonitor.GetLastPerformanceSampleDate(),
+                    IsWebSocketConnected = _centralPerformanceMonitor.IsWebSocketConnected,
+                    PortfolioValue = dataCache.PortfolioValue
                 };
 
                 _logger.LogDebug("OVERSEER- Sending CheckIn to overseer: {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",
@@ -1070,7 +1190,7 @@ namespace BacklashBot.Services
                 _logger.LogWarning("OVERSEER- Connection became inactive during CheckIn attempt. Will mark as disconnected and retry. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                    UpdateConnectionState(false); // Mark as disconnected so discovery can try to reconnect
                 }
             }
             catch (Exception ex)
@@ -1078,7 +1198,7 @@ namespace BacklashBot.Services
                 _logger.LogWarning("OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
                 lock (_connectionStateLock)
                 {
-                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                    UpdateConnectionState(false); // Mark as disconnected so discovery can try to reconnect
                 }
             }
         }
@@ -1093,6 +1213,16 @@ namespace BacklashBot.Services
                 }
             }
             _logger.LogInformation("OVERSEER- Handshake response received from overseer: Success={Success}, Message={Message}", response.Success, response.Message);
+
+            if (response.Success)
+            {
+                _handshakeCompleted = true;
+                _logger.LogInformation("OVERSEER- Handshake completed successfully, client is now registered");
+            }
+            else
+            {
+                _logger.LogWarning("OVERSEER- Handshake failed: {Message}", response.Message);
+            }
         }
 
         private void HandleCheckInResponse(CheckInResponse response)
@@ -1123,7 +1253,7 @@ namespace BacklashBot.Services
         {
             lock (_connectionStateLock)
             {
-                _isConnected = false;
+                UpdateConnectionState(false);
             }
 
             if (exception != null)
@@ -1138,30 +1268,108 @@ namespace BacklashBot.Services
             return Task.CompletedTask;
         }
 
-        private Task HandleReconnected(string? connectionId)
+        private async Task HandleReconnected(string? connectionId)
         {
             lock (_connectionStateLock)
             {
-                _isConnected = true;
+                UpdateConnectionState(true);
             }
+
+            // Reset handshake completed flag on reconnection
+            _handshakeCompleted = false;
 
             _logger.LogInformation("OVERSEER- Successfully reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection
-            _ = Task.Run(async () =>
+            try
             {
-                try
+                await PerformHandshakeAsync();
+                _logger.LogInformation("OVERSEER- Handshake completed after reconnection");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
+                // If handshake fails, mark as not connected
+                lock (_connectionStateLock)
                 {
-                    await PerformHandshakeAsync();
-                    _logger.LogInformation("OVERSEER- Handshake completed after reconnection");
+                    UpdateConnectionState(false);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning("OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
-                }
-            });
+            }
+        }
 
-            return Task.CompletedTask;
+        private void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics, bool enablePerformanceMetrics)
+        {
+            string className = nameof(OverseerClientService);
+            string category = "Connection";
+
+            // Define all possible metrics with their properties
+            var allMetrics = new Dictionary<string, (string Name, string Description, string Unit, string VisualType, double? MinThreshold, double? WarningThreshold, double? CriticalThreshold)>
+            {
+                ["ConnectionAttempts"] = ("Connection Attempts", "Total number of connection attempts made", "count", "Counter", null, null, null),
+                ["ConnectionSuccesses"] = ("Connection Successes", "Number of successful connections", "count", "Counter", null, null, null),
+                ["ConnectionSuccessRate"] = ("Connection Success Rate", "Rate of successful connections", "%", "ProgressBar", 0, 50, 80),
+                ["CircuitBreakerFailures"] = ("Circuit Breaker Failures", "Number of circuit breaker failures", "count", "Counter", null, null, null),
+                ["DiscoveryOperations"] = ("Discovery Operations", "Number of overseer discovery operations", "count", "Counter", null, null, null),
+                ["AverageDiscoveryTimeMs"] = ("Average Discovery Time", "Average time spent on discovery operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalDiscoveryTimeMs"] = ("Total Discovery Time", "Total time spent on discovery operations", "ms", "NumericDisplay", null, null, null),
+                ["IsCircuitBreakerOpen"] = ("Circuit Breaker Status", "Whether the circuit breaker is currently open", "state", "TrafficLight", 0, 0.5, 1),
+                ["AverageHandshakeTimeMs"] = ("Average Handshake Time", "Average time for handshake operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalHandshakeTimeMs"] = ("Total Handshake Time", "Total time spent on handshake operations", "ms", "NumericDisplay", null, null, null),
+                ["HandshakeCount"] = ("Handshake Count", "Number of handshake operations", "count", "Counter", null, null, null),
+                ["AverageCheckInTimeMs"] = ("Average Check-In Time", "Average time for check-in operations", "ms", "NumericDisplay", null, null, null),
+                ["TotalCheckInTimeMs"] = ("Total Check-In Time", "Total time spent on check-in operations", "ms", "NumericDisplay", null, null, null),
+                ["CheckInCount"] = ("Check-In Count", "Number of check-in operations", "count", "Counter", null, null, null),
+                ["AverageConnectionAttemptTimeMs"] = ("Average Connection Attempt Time", "Average time for connection attempts", "ms", "NumericDisplay", null, null, null),
+                ["TotalConnectionAttemptTimeMs"] = ("Total Connection Attempt Time", "Total time spent on connection attempts", "ms", "NumericDisplay", null, null, null),
+                ["ConnectionAttemptTimeCount"] = ("Connection Attempt Time Count", "Number of connection attempt time measurements", "count", "Counter", null, null, null),
+                ["MessagesSent"] = ("Messages Sent", "Number of messages sent", "count", "Counter", null, null, null),
+                ["MessagesReceived"] = ("Messages Received", "Number of messages received", "count", "Counter", null, null, null),
+                ["MessagesPerSecond"] = ("Messages Per Second", "Messages processed per second", "msg/s", "NumericDisplay", null, null, null),
+                ["TimeoutFailureCount"] = ("Timeout Failures", "Number of timeout failures", "count", "Counter", null, null, null),
+                ["AuthFailureCount"] = ("Auth Failures", "Number of authentication failures", "count", "Counter", null, null, null),
+                ["NetworkFailureCount"] = ("Network Failures", "Number of network failures", "count", "Counter", null, null, null),
+                ["OtherFailureCount"] = ("Other Failures", "Number of other failures", "count", "Counter", null, null, null)
+            };
+
+            if (enablePerformanceMetrics)
+            {
+                // Send all metrics in the dictionary as enabled
+                foreach (var kvp in metrics)
+                {
+                    if (allMetrics.TryGetValue(kvp.Key, out var metricInfo))
+                    {
+                        double value = kvp.Key == "ConnectionSuccessRate" ? Convert.ToDouble(kvp.Value) * 100 : Convert.ToDouble(kvp.Value);
+                        if (kvp.Key == "IsCircuitBreakerOpen")
+                        {
+                            value = Convert.ToBoolean(kvp.Value) ? 1.0 : 0.0;
+                        }
+
+                        switch (metricInfo.VisualType)
+                        {
+                            case "Counter":
+                                _performanceMonitor.RecordCounterMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                break;
+                            case "ProgressBar":
+                                _performanceMonitor.RecordProgressBarMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                break;
+                            case "NumericDisplay":
+                                _performanceMonitor.RecordNumericDisplayMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category);
+                                break;
+                            case "TrafficLight":
+                                _performanceMonitor.RecordTrafficLightMetric(className, kvp.Key, metricInfo.Name, metricInfo.Description, value, metricInfo.Unit, category, metricInfo.MinThreshold ?? 0, metricInfo.WarningThreshold ?? 0, metricInfo.CriticalThreshold ?? 0);
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Send all possible metrics as disabled
+                foreach (var kvp in allMetrics)
+                {
+                    _performanceMonitor.RecordDisabledMetric(className, kvp.Key, kvp.Value.Name, kvp.Value.Description, 0, "disabled", category);
+                }
+            }
         }
     }
 }

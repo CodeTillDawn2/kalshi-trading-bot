@@ -1,4 +1,5 @@
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
@@ -31,15 +32,18 @@ namespace TradingStrategies.Trading.Overseer
     public class EquityCalculator
     {
         private readonly EquityCalculatorConfig _config;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly List<long> _calculationTimes = new List<long>();
 
         /// <summary>
         /// Initializes a new instance of the EquityCalculator class.
         /// </summary>
         /// <param name="config">The equity calculator configuration containing performance metrics settings.</param>
-        public EquityCalculator(IOptions<EquityCalculatorConfig> config)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        public EquityCalculator(IOptions<EquityCalculatorConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
         }
 
         /// <summary>
@@ -197,29 +201,46 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Posts aggregated performance metrics to the PerformanceMonitor.
         /// </summary>
-        /// <param name="performanceMonitor">The performance monitor to record metrics to.</param>
         /// <remarks>
         /// This method aggregates all recorded calculation times and posts them to the PerformanceMonitor
         /// for comprehensive performance analysis. Only posts if performance metrics are enabled.
         /// </remarks>
-        public void PostMetrics(PerformanceMonitor performanceMonitor)
+        public void PostMetrics()
         {
-            if (!performanceMonitor.EnablePerformanceMetrics || !_config.EnablePerformanceMetrics) return;
+            if (!_config.EnablePerformanceMetrics) return;
 
             long totalExecutionTimeMs = _calculationTimes.Sum();
             int totalCalculations = _calculationTimes.Count;
+            double averageExecutionTimeMs = totalCalculations > 0 ? totalExecutionTimeMs / (double)totalCalculations : 0;
 
             var metricsDict = new Dictionary<string, object>
             {
                 ["MethodName"] = "EquityCalculator.GetEquity",
-                ["TotalExecutionTimeMs"] = totalExecutionTimeMs,
+                ["AverageExecutionTimeMs"] = averageExecutionTimeMs,
                 ["TotalItemsProcessed"] = totalCalculations,
                 ["TotalItemsFound"] = 0,
                 ["ItemCheckTimes"] = (Dictionary<string, long>?)null,
                 ["Timestamp"] = DateTime.UtcNow
             };
 
-            performanceMonitor.RecordSimulationMetrics("EquityCalculator", metricsDict, _config.EnablePerformanceMetrics);
+            RecordSimulationMetrics(metricsDict, _config.EnablePerformanceMetrics);
+        }
+
+        /// <summary>
+        /// Records simulation performance metrics using the performance monitor.
+        /// </summary>
+        /// <param name="metricsDict">The dictionary containing metric data.</param>
+        /// <param name="enabled">Whether performance metrics are enabled.</param>
+        private void RecordSimulationMetrics(Dictionary<string, object> metricsDict, bool enabled)
+        {
+            if (!enabled)
+            {
+                _performanceMonitor.RecordDisabledMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance");
+            }
+            else
+            {
+                _performanceMonitor.RecordSpeedDialMetric("EquityCalculator", "AverageExecutionTime", "Average Execution Time", "Average time per equity calculation", (double)metricsDict["AverageExecutionTimeMs"], "ms", "Performance", null, null, null);
+            }
         }
     }
 }

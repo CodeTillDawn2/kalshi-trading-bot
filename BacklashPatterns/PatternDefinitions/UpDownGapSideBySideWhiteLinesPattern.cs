@@ -83,46 +83,15 @@ namespace BacklashPatterns.PatternDefinitions
             Direction = direction;
         }
 
-        /*
-         * Up/Down Gap Side-by-Side White Lines Pattern:
-         * - Description: A three-candle continuation pattern in a trending market. 
-         *   Indicates sustained momentum after a gap.
-         * - Requirements (Source: BabyPips):
-         *   1. First candle: Strong candle in trend direction (bullish or bearish).
-         *   2. Second candle: Same direction, gaps from first candle.
-         *   3. Third candle: Same direction, opens near second candle s open, similar size.
-         * - Indication: Bullish version confirms uptrend continuation; bearish version confirms downtrend continuation.
-         */
-        /// <summary>IsPatternAsync</summary>
-        /// <summary>IsPatternAsync</summary>
         /// <summary>
+        /// Determines if an Up Down Gap Side By Side White Lines pattern exists at the specified index.
         /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
+        /// <param name="index">The index of the third candle in the pattern.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
+        /// <param name="prices">Array of candle price data.</param>
+        /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+        /// <returns>An UpDownGapSideBySideWhiteLinesPattern instance if detected, otherwise null.</returns>
         public static async Task<UpDownGapSideBySideWhiteLinesPattern?> IsPatternAsync(
                     int index,
                     int trendLookback,

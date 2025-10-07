@@ -513,7 +513,7 @@ namespace BacklashCommon.Helpers
         /// Gap acceptability rules:
         /// - Gaps of SmallGapMinutes or less are always acceptable
         /// - Larger gaps are acceptable if within MaxActiveGapHours of active trading
-        /// - Invalid time sequences (t2 <= t1) are not acceptable
+        /// - Invalid time sequences (t2 less than or equal to t1) are not acceptable
         ///
         /// This allows for brief interruptions while preventing analysis of disconnected market periods.
         /// </remarks>

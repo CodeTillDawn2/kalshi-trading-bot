@@ -3,53 +3,29 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
-    /*
-     * Morning Doji Star Pattern:
-     * - Description: A three-candle bullish reversal pattern, a variant of the Morning Star, where the middle candle is 
-     *   a Doji, signaling stronger indecision before a bullish reversal.
-     * - Requirements (Source: Investopedia, BabyPips):
-     *   - Occurs in a downtrend.
-     *   - First candle: Bearish with a significant body.
-     *   - Second candle: Doji (very small body), typically gapped down from the first candle.
-     *   - Third candle: Bullish, closes above the first candle s midpoint or close, confirming reversal.
-     *   - Indicates: Stronger bullish reversal potential due to the Doji s indecision.
-     */
-
+    /// <summary>
+    /// Represents a Morning Doji Star candlestick pattern, a three-candle bullish reversal pattern.
+    /// Occurs in a downtrend with a bearish candle, a Doji star, and a bullish candle.
+    /// Requirements: Downtrend, bearish first candle, Doji second, bullish third closing above first.
+    /// Optimized for: Loose thresholds for maximum detection in a 0-100 fixed-range market.
+    /// </summary>
     public class MorningDojiStarPattern : PatternDefinition
     {
         /// <summary>
         /// Minimum body size for the first bearish candle, ensuring a significant downward move.
         /// - Strictest: 1.0 (significant body).
-        /// - Loosest: 0.5 (smaller but noticeable bearish candle, per BabyPips  loose reversal patterns).
+        /// - Loosest: 0.5 (smaller but noticeable bearish candle, per BabyPips loose reversal patterns).
         /// </summary>
         public static double MinBodySize { get; } = 1.0;
-        /// <summary>Gets or sets the Strength.</summary>
-        /// <summary>Gets or sets the Name.</summary>
-        /// <summary>
-        /// </summary>
 
-        /// <summary>MorningDojiStarPattern</summary>
-        /// <summary>
-        /// </summary>
         /// <summary>
         /// Threshold for confirming a downtrend prior to the pattern. Negative values indicate a bearish trend.
         /// - Strictest: -0.5 (strong downtrend).
-        /// - Loosest: -0.1 (minimal downtrend, per Investopedia s relaxed Morning Doji Star).
+        /// - Loosest: -0.1 (minimal downtrend, per Investopedia's relaxed Morning Doji Star).
         /// </summary>
         public static double TrendThreshold { get; } = -0.3;
         /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// Maximum allowable gap between the first candle s close and the second candle s open.
+        /// Maximum allowable gap between the first candle's close and the second candle's open.
         /// - Strictest: 0.2 (tight gap for clear Doji indecision).
         /// - Loosest: 1.0 (larger gap allowed, per loose Doji Star definitions).
         /// </summary>
@@ -62,38 +38,25 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
 
         /// <summary>
-        /// </summary>
-        /// <summary>
-        /// Factor determining the minimum size of the third candle s body relative to the first candle s body.
+        /// Factor determining the minimum size of the third candle's body relative to the first candle's body.
         /// - Strictest: 0.5 (third candle closes at least at the midpoint).
         /// - Loosest: 0.1 (minimal penetration, per relaxed reversal standards).
         /// </summary>
         public static double ThirdBodyFactor { get; } = 0.3;
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
 
-        /// <summary>
-        /// </summary>
-        /// <summary>
-        /// </summary>
         /// <summary>
         /// Minimum absolute body size for the third candle, ensuring a significant bullish move.
         /// - Strictest: 1.0 (significant bullish candle).
-        /// - Loosest: 0.5 (smaller but noticeable bullish move, per BabyPips  flexibility).
+        /// - Loosest: 0.5 (smaller but noticeable bullish move, per BabyPips flexibility).
         /// </summary>
         public static double MinThirdBody { get; } = 1.0;
         /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Gets the base name for the Morning Doji Star pattern.
         /// </summary>
         public const string BaseName = "MorningDojiStar";
+
         /// <summary>
-        /// </summary>
-        /// <summary>
+        /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
@@ -104,15 +67,45 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the direction of the pattern.
         /// </summary>
         public override PatternDirection Direction => PatternDirection.Bullish;
-        public override double Strength { get; protected set; }
+
         /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
+        public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
         /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
+
+        /// <summary>
+        /// Initializes a new instance of the MorningDojiStarPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (three candles).</param>
+        /// <summary>
+        /// Initializes a new instance of the MorningDojiStarPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (three candles).</param>
         public MorningDojiStarPattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if a Morning Doji Star pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle in the pattern.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+        /// <param name="prices">Array of candle price data.</param>
+        /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+        /// <returns>A MorningDojiStarPattern instance if detected, otherwise null.</returns>
         public static async Task<MorningDojiStarPattern?> IsPatternAsync(
             int index,
             int trendLookback,

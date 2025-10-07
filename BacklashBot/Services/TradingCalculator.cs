@@ -1,7 +1,8 @@
 using BacklashBot.Helpers;
-using BacklashBot.State;
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Text;
 using TradingStrategies.Helpers.Interfaces;
 
@@ -23,19 +24,47 @@ namespace BacklashBot.Services
     public class TradingCalculator : ITradingCalculator
     {
         private readonly ILogger<ITradingCalculator> _logger;
-        private readonly CalculationsConfig _config;
+        private readonly BacklashBot.Configuration.CalculationsConfig _config;
+        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
-        /// Initializes a new instance of the TradingCalculator class with the specified logger and configuration.
+        /// Initializes a new instance of the TradingCalculator class with the specified logger, configuration, and performance monitor.
         /// The CalculationConfig provides parameters for indicator calculations such as PSAR acceleration factors, ADX periods, and exponential multipliers.
         /// </summary>
         /// <param name="logger">The logger instance for recording calculation events and errors.</param>
         /// <param name="config">The CalculationConfig instance containing parameters for technical indicator calculations.</param>
-        /// <exception cref="ArgumentNullException">Thrown when logger or config is null.</exception>
-        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.State.CalculationsConfig> config)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        /// <exception cref="ArgumentNullException">Thrown when logger, config, or performanceMonitor is null.</exception>
+        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.Configuration.CalculationsConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
+            _enablePerformanceMetrics = true; // TODO: Add to CalculationsConfig
+        }
+
+        /// <summary>
+        /// Records execution time metrics using the IPerformanceMonitor interface.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being timed</param>
+        /// <param name="executionTimeMs">Execution time in milliseconds</param>
+        /// <param name="enableMetrics">Whether performance metrics are enabled</param>
+        private void RecordExecutionTimePrivate(string operationName, long executionTimeMs, bool enableMetrics)
+        {
+            string className = "TradingCalculator";
+            string category = "Calculations";
+
+            if (!enableMetrics)
+            {
+                // Send disabled metric
+                _performanceMonitor.RecordDisabledMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category);
+            }
+            else
+            {
+                // Record actual metric
+                _performanceMonitor.RecordSpeedDialMetric(className, operationName, $"{operationName} Execution Time", $"Execution time for {operationName}", executionTimeMs, "ms", category, null, null, null);
+            }
         }
 
         /// <summary>
@@ -54,6 +83,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public double? CalculateRSI(List<PseudoCandlestick> pseudoCandles, int periods)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -130,6 +161,12 @@ namespace BacklashBot.Services
             rsi = double.IsNaN(rsi.Value) || double.IsInfinity(rsi.Value) ? null : rsi;
             _logger.LogDebug("RSI calculated: {RSI} for {Periods} periods.", rsi, periods);
 
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateRSI", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return rsi;
         }
 
@@ -168,6 +205,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public (double? MACD, double? Signal, double? Histogram) CalculateMACD(List<PseudoCandlestick> pseudoCandlesticks, int shortPeriod, int longPeriod, int signalPeriod)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandlesticks == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandlesticks), "The list of pseudo-candlesticks cannot be null.");
@@ -231,6 +270,12 @@ namespace BacklashBot.Services
             _logger.LogDebug("MACD calculated: Line={Line}, Signal={Signal}, Histogram={Histogram}.",
                 macdLine, signalLine, histogram);
 
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateMACD", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return (macdLine, signalLine, histogram);
         }
 
@@ -272,6 +317,8 @@ namespace BacklashBot.Services
         public (double? Lower, double? Middle, double? Upper) CalculateBollingerBands(
                     List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -341,6 +388,13 @@ namespace BacklashBot.Services
 
             log.AppendLine($"SMA: {sma}, StdDev: {stdDev}, Upper: {upper}, Lower: {lower}");
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateBollingerBands", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return (lower, sma, upper);
         }
 
@@ -380,6 +434,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public (double? K, double? D) CalculateStochastic(List<PseudoCandlestick> pseudoCandles, int kPeriod, int dPeriod)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -450,6 +506,13 @@ namespace BacklashBot.Services
 
             log.AppendLine($"%D: {d}");
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateStochastic", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return (k, d);
         }
 
@@ -488,6 +551,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public double? CalculateATR(List<PseudoCandlestick> pseudoCandles, int period)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -550,6 +615,13 @@ namespace BacklashBot.Services
             }
 
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateATR", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return result;
         }
 
@@ -586,6 +658,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public decimal? CalculateVWAP(List<PseudoCandlestick> pseudoCandles, int periods)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -639,6 +713,13 @@ namespace BacklashBot.Services
             log.AppendLine($"Weighted Sum: {weightedSum}, Total Volume: {totalVolume}, VWAP: {result}");
 
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateVWAP", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return result;
         }
 
@@ -672,6 +753,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public decimal CalculateOBV(List<PseudoCandlestick> pseudoCandles)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -712,6 +795,13 @@ namespace BacklashBot.Services
 
             log.AppendLine($"Final OBV: {obv}");
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateOBV", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return obv;
         }
 
@@ -757,6 +847,8 @@ namespace BacklashBot.Services
             double sigma,
             int minDistance)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             var log = new StringBuilder();
             log.AppendLine($"Calculating Unified Historical Supports and Resistances for {marketTicker}");
 
@@ -897,6 +989,13 @@ namespace BacklashBot.Services
 
             log.AppendLine($"Selected {selectedLevels.Count} unified levels.");
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateHistoricalSupportResistance", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return selectedLevels;
         }
 
@@ -953,6 +1052,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public double? CalculatePSAR(List<PseudoCandlestick> pseudoCandles)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             var log = new StringBuilder();
             log.AppendLine($"Calculating PSAR with InitialAF={_config.PSAR_InitialAF}, MaxAF={_config.PSAR_MaxAF}, AFStep={_config.PSAR_AFStep}.");
 
@@ -1033,6 +1134,13 @@ namespace BacklashBot.Services
             }
 
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculatePSAR", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return psar;
         }
 
@@ -1084,6 +1192,8 @@ namespace BacklashBot.Services
         /// </remarks>
         public (double? ADX, double? PlusDI, double? MinusDI) CalculateADX(List<PseudoCandlestick> pseudoCandles)
         {
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (pseudoCandles == null)
             {
                 throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
@@ -1190,6 +1300,13 @@ namespace BacklashBot.Services
 
             log.AppendLine($"ADX: {adx:F2}, +DI: {latestPlusDI:F2}, -DI: {latestMinusDI:F2}");
             _logger.LogDebug("{Log}", log.ToString());
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                RecordExecutionTimePrivate("CalculateADX", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
+            }
+
             return (adx, latestPlusDI, latestMinusDI);
         }
 

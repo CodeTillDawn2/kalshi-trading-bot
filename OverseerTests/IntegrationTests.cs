@@ -1,6 +1,7 @@
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashOverseer;
 using BacklashOverseer.Config;
 using BacklashOverseer.Models;
@@ -26,8 +27,7 @@ namespace OverseerTests
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
         private Mock<ILogger<Overseer>> _loggerMock;
         private Mock<IHubContext<OverseerHub>> _hubContextMock;
-        private Mock<PerformanceMetricsService> _performanceMetricsMock;
-        private Mock<ILogger<PerformanceMetricsService>> _performanceLoggerMock;
+        private Mock<IPerformanceMonitor> _performanceMonitorMock;
         private OverseerConfig _config;
         private Overseer _overseer;
 
@@ -42,8 +42,7 @@ namespace OverseerTests
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
             _loggerMock = new Mock<ILogger<Overseer>>();
             _hubContextMock = new Mock<IHubContext<OverseerHub>>();
-            _performanceLoggerMock = new Mock<ILogger<PerformanceMetricsService>>();
-            _performanceMetricsMock = new Mock<PerformanceMetricsService>(_performanceLoggerMock.Object);
+            _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             _config = new OverseerConfig
             {
@@ -62,7 +61,7 @@ namespace OverseerTests
                 _loggerMock.Object,
                 _hubContextMock.Object,
                 configOptions,
-                _performanceMetricsMock.Object
+                _performanceMonitorMock.Object
             );
         }
 
@@ -218,13 +217,13 @@ namespace OverseerTests
 
             var fillHandler = new EventHandler<FillEventArgs>((sender, e) =>
             {
-                _performanceMetricsMock.Object.RecordWebSocketEvent();
+                _performanceMonitorMock.Object.RecordCounterMetric("Overseer", "WebSocketFillEvent", "WebSocket Fill Events", "Number of fill events received", 1, "count", "WebSocket");
                 _loggerMock.Object.LogInformation("Received Fill event: {EventData}", e);
             });
 
             var marketHandler = new EventHandler<MarketLifecycleEventArgs>((sender, e) =>
             {
-                _performanceMetricsMock.Object.RecordWebSocketEvent();
+                _performanceMonitorMock.Object.RecordCounterMetric("Overseer", "WebSocketMarketEvent", "WebSocket Market Events", "Number of market lifecycle events received", 1, "count", "WebSocket");
                 _loggerMock.Object.LogInformation("Received MarketLifecycle event: {EventData}", e);
             });
 
@@ -254,7 +253,7 @@ namespace OverseerTests
             var brainServiceMock = new Mock<BrainPersistenceService>(
                 Options.Create(new BrainPersistenceServiceConfig { MaxHistoryEntries = 100, EnablePerformanceMetrics = true, PersistenceSaveIntervalMinutes = 10 }),
                 null, null, null);
-            var hubPerformanceMetricsMock = new Mock<PerformanceMetricsService>(_performanceLoggerMock.Object);
+            var hubPerformanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             var hubConfig = new OverseerHubConfig
             {
@@ -271,7 +270,7 @@ namespace OverseerTests
                 hubScopeFactoryMock.Object,
                 brainServiceMock.Object,
                 Options.Create(hubConfig),
-                hubPerformanceMetricsMock.Object
+                hubPerformanceMonitorMock.Object
             );
 
             var testableHub = new TestableOverseerHub(
@@ -279,7 +278,7 @@ namespace OverseerTests
                 hubScopeFactoryMock.Object,
                 brainServiceMock.Object,
                 Options.Create(hubConfig),
-                hubPerformanceMetricsMock.Object
+                hubPerformanceMonitorMock.Object
             );
 
             // Mock SignalR clients
@@ -301,30 +300,7 @@ namespace OverseerTests
                 BrainInstanceName = "TestBrain",
                 Markets = new List<string> { "MARKET1", "MARKET2" },
                 ErrorCount = 5,
-                LastSnapshot = DateTime.UtcNow,
-                IsStartingUp = false,
-                IsShuttingDown = false,
-                WatchPositions = true,
-                WatchOrders = true,
-                ManagedWatchList = true,
-                CaptureSnapshots = true,
-                TargetWatches = 10,
-                MinimumInterest = 0.5,
-                UsageMin = 10,
-                UsageMax = 80,
-                CurrentCpuUsage = 25.5,
-                EventQueueAvg = 15.2,
-                TickerQueueAvg = 8.7,
-                NotificationQueueAvg = 12.3,
-                OrderbookQueueAvg = 6.4,
-                LastRefreshCycleSeconds = 45.2,
-                LastRefreshCycleInterval = 60.0,
-                LastRefreshMarketCount = 150,
-                LastRefreshUsagePercentage = 35.7,
-                LastRefreshTimeAcceptable = true,
-                LastPerformanceSampleDate = DateTime.UtcNow,
-                IsWebSocketConnected = true,
-                WatchedMarkets = new List<MarketWatchData>()
+                LastSnapshot = DateTime.UtcNow
             };
 
             // Act

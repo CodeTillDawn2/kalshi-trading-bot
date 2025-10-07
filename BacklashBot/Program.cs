@@ -26,29 +26,6 @@ using Microsoft.Extensions.Options;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
 
-// Local function to generate session identifier
-string GenerateSessionIdentifier(int length = 5)
-{
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    // Use more bytes for better entropy
-    var data = new byte[length + 8]; // Extra 8 bytes for timestamp
-    using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-    {
-        rng.GetBytes(data);
-    }
-    // Incorporate timestamp for additional entropy
-    var timestamp = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-    for (int i = 0; i < Math.Min(8, data.Length); i++)
-    {
-        data[i] ^= timestamp[i];
-    }
-    var result = new char[length];
-    for (int i = 0; i < length; i++)
-    {
-        result[i] = chars[data[i] % chars.Length];
-    }
-    return new string(result);
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +45,7 @@ builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
 builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
 // Register DatabaseLoggingQueue as a singleton and hosted service
-builder.Services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), false)); // isOverseer = false
+builder.Services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), ApplicationType.Bot));
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
 // ## Configuration Setup
@@ -127,8 +104,8 @@ builder.Services.AddOptions<SubscriptionManagerConfig>()
     .Bind(builder.Configuration.GetSection(SubscriptionManagerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<WebSocketMonitorConfig>()
-    .Bind(builder.Configuration.GetSection(WebSocketMonitorConfig.SectionName))
+builder.Services.AddOptions<WebSocketMonitorServiceConfig>()
+    .Bind(builder.Configuration.GetSection(WebSocketMonitorServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<KalshiWebSocketClientConfig>()
@@ -161,6 +138,10 @@ builder.Services.AddOptions<InstanceNameConfig>()
     .ValidateOnStart();
 builder.Services.AddOptions<OverseerClientServiceConfig>()
     .Bind(builder.Configuration.GetSection(OverseerClientServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<BacklashBotHubConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBotHubConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<CandlestickServiceConfig>()
@@ -215,12 +196,24 @@ builder.Services.AddOptions<CentralErrorHandlerConfig>()
     .Bind(builder.Configuration.GetSection(CentralErrorHandlerConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddOptions<KalshiBotReadyStatusConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiBotReadyStatusConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<KalshiBotStatusTrackerConfig>()
+    .Bind(builder.Configuration.GetSection(KalshiBotStatusTrackerConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddOptions<MarketManagerServiceConfig>()
+    .Bind(builder.Configuration.GetSection(MarketManagerServiceConfig.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddOptions<OrderBookServiceConfig>()
     .Bind(builder.Configuration.GetSection(OrderBookServiceConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddOptions<BacklashBot.State.CalculationsConfig>()
-    .Bind(builder.Configuration.GetSection(BacklashBot.State.CalculationsConfig.SectionName))
+builder.Services.AddOptions<BacklashBot.Configuration.CalculationsConfig>()
+    .Bind(builder.Configuration.GetSection(BacklashBot.Configuration.CalculationsConfig.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddOptions<BacklashBotDataConfig>()
@@ -237,10 +230,10 @@ builder.Services.AddOptions<InstanceNameConfig>()
     .ValidateOnStart();
 
 var connectionString = BacklashCommon.Configuration.ConfigurationHelper.BuildConnectionString(builder.Configuration);
-builder.Services.AddSingleton(connectionString);
+builder.Services.AddSingleton(new BacklashCommon.Configuration.ConnectionStringProvider(connectionString));
 
 // Generate session identifier early to avoid circular dependency
-var sessionIdentifier = GenerateSessionIdentifier();
+var sessionIdentifier = BacklashCommon.Helpers.SessionIdentifierGenerator.GenerateSessionIdentifier();
 builder.Services.AddSingleton(sessionIdentifier);
 
 // Increase shutdown timeout
@@ -251,7 +244,11 @@ builder.Services.Configure<HostOptions>(options =>
 
 // ## Service Registrations
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
-builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
+builder.Services.AddSingleton<IStatusTrackerService>(sp => new KalshiBotStatusTracker(
+    sp.GetRequiredService<ILogger<KalshiBotStatusTracker>>(),
+    null, // performanceMonitor will be set later
+    sp.GetRequiredService<IOptions<KalshiBotStatusTrackerConfig>>()));
+builder.Services.AddSingleton<CentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
     sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>().Value.Name,
@@ -259,18 +256,10 @@ builder.Services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerfo
     sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>()));
+builder.Services.AddSingleton<ICentralPerformanceMonitor>(provider =>
+    provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IPerformanceMonitor>(provider =>
-    provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<IMessageProcessorPerformanceMetrics>(provider =>
-    (IMessageProcessorPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<ISqlDataServicePerformanceMetrics>(provider =>
-    (ISqlDataServicePerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-    (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<ISubscriptionManagerPerformanceMetrics>(provider =>
-    (ISubscriptionManagerPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-    (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
+    provider.GetRequiredService<CentralPerformanceMonitor>());
 builder.Services.AddSingleton<IScopeManagerService, KalshiBotScopeManagerService>();
 builder.Services.AddSingleton<IServiceFactory, ServiceFactory>();
 builder.Services.AddSingleton<ICentralBrain>(sp =>
@@ -283,10 +272,8 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
     var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
     Console.WriteLine("Resolving IOptions<TradingSnapshotServiceConfig>");
     var tradingSnapshotServiceConfig = sp.GetRequiredService<IOptions<TradingSnapshotServiceConfig>>();
-    Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 1");
-    var generalExecutionConfig1 = sp.GetRequiredService<IOptions<GeneralExecutionConfig>>();
-    Console.WriteLine("Resolving IOptions<GeneralExecutionConfig> 2");
-    var generalExecutionConfig2 = sp.GetRequiredService<IOptions<InstanceNameConfig>>();
+    Console.WriteLine("Resolving IOptions<instanceNameConfig>");
+    var instanceNameConfig = sp.GetRequiredService<IOptions<InstanceNameConfig>>();
     Console.WriteLine("Resolving ICentralErrorHandler");
     var centralErrorHandler = sp.GetRequiredService<ICentralErrorHandler>();
     Console.WriteLine("Resolving ICentralPerformanceMonitor");
@@ -313,40 +300,39 @@ builder.Services.AddSingleton<ICentralBrain>(sp =>
         serviceFactory,
         scopeFactory,
         tradingSnapshotServiceConfig,
-        generalExecutionConfig1,
-        generalExecutionConfig2,
+        instanceNameConfig,
         centralErrorHandler,
         centralPerformanceMonitor,
         marketManager,
         appLifetime,
-        scopeManagerService,
         statusTrackerService,
         botReadyStatus,
         brainStatusService,
         centralBrainConfig,
         timerFactory);
 });
-builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
-    (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
-builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
-    (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMarketManagerService>(sp => new MarketManagerService(
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<ILogger<IMarketManagerService>>(),
     sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>(),
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
+    sp.GetRequiredService<IOptions<MarketManagerServiceConfig>>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IBrainStatusService>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<ITargetCalculationService>()));
-builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
-builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
+builder.Services.AddSingleton<IBotReadyStatus>(sp => new KalshiBotReadyStatus(
+    sp.GetRequiredService<ILogger<KalshiBotReadyStatus>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
+    sp.GetRequiredService<IOptions<KalshiBotReadyStatusConfig>>()));
 builder.Services.AddSingleton<IBrainStatusService>(sp => new BrainStatusService(
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
     sp.GetRequiredService<IOptions<BrainStatusServiceConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
     sp.GetRequiredService<string>(), // sessionIdentifier
     sp.GetRequiredService<ILogger<BrainStatusService>>()));
 builder.Services.AddSingleton<ITargetCalculationService, TargetCalculationService>();
@@ -382,7 +368,7 @@ builder.Services.AddTransient(provider =>
         provider.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
-        provider.GetRequiredService<ICentralPerformanceMonitor>()
+        provider.GetRequiredService<IPerformanceMonitor>()
     );
 });
 
@@ -408,9 +394,10 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<ICentralPerformanceMonitor>()
+                sp.GetRequiredService<IPerformanceMonitor>()
             ),
-            sp.GetRequiredService<IOptions<MarketServiceDataConfig>>()
+            sp.GetRequiredService<IOptions<MarketServiceDataConfig>>(),
+            sp.GetRequiredService<IOptions<BacklashBot.Configuration.CalculationsConfig>>()
         );
     };
 });
@@ -420,11 +407,13 @@ builder.Services.AddScoped<IBacklashBotContext>(provider =>
 {
     var logger = provider.GetRequiredService<ILogger<BacklashBotContext>>();
     var dataConfig = provider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-    return new BacklashBotContext(connectionString, logger, dataConfig);
+    var connStr = provider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
+    var performanceMonitor = provider.GetRequiredService<IPerformanceMonitor>();
+    return new BacklashBotContext(connStr, logger, dataConfig, performanceMonitor);
 });
 builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
     sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
-    sp.GetRequiredService<string>(), // connectionString
+    sp.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value, // connectionString
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
@@ -437,9 +426,9 @@ builder.Services.AddScoped<ISqlDataService>(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<ISqlDataService>>();
     var dataConfig = serviceProvider.GetRequiredService<IOptions<BacklashBotDataConfig>>().Value;
-    var performanceMetrics = serviceProvider.GetServices<ISqlDataServicePerformanceMetrics>();
-    var connectionString = serviceProvider.GetRequiredService<string>();
-    return new KalshiBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMetrics);
+    var performanceMonitor = serviceProvider.GetRequiredService<IPerformanceMonitor>();
+    var connectionString = serviceProvider.GetRequiredService<BacklashCommon.Configuration.ConnectionStringProvider>().Value;
+    return new BacklashBotData.Data.SqlDataService(connectionString, logger, dataConfig, performanceMonitor);
 });
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
@@ -452,6 +441,7 @@ builder.Services.AddScoped<IOrderBookService>(provider =>
         provider.GetRequiredService<IServiceFactory>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
+        provider.GetRequiredService<IPerformanceMonitor>(),
         provider.GetRequiredService<IOptions<OrderBookServiceConfig>>().Value
     ));
 builder.Services.AddScoped<IMarketDataInitializer, MarketDataInitializer>();
@@ -460,19 +450,17 @@ builder.Services.AddScoped<ICandlestickService>(sp => new CandlestickService(
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<CandlestickServiceConfig>>(),
-    sp.GetRequiredService<IOptions<CentralBrainConfig>>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>(),
     sp.GetRequiredService<IOptions<DataStorageConfig>>(),
     sp.GetRequiredService<IServiceFactory>(),
-    sp.GetRequiredService<IScopeManagerService>()));
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddScoped<IBroadcastService>(sp => new BroadcastService(
     sp.GetRequiredService<IHubContext<BacklashBotHub>>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<ILogger<IBroadcastService>>(),
-    sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IConfiguration>(),
+    (IPerformanceMonitor)sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
     sp.GetRequiredService<IOptions<BacklashBot.Configuration.BroadcastServiceConfig>>()));
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
@@ -484,18 +472,21 @@ builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorS
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>()));
+    sp.GetRequiredService<IPerformanceMonitor>()));
 builder.Services.AddSingleton<IOverseerClientService>(sp => new OverseerClientService(
     sp.GetRequiredService<ILogger<OverseerClientService>>(),
     sp.GetRequiredService<IServiceFactory>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IOptions<OverseerClientServiceConfig>>(),
     sp.GetRequiredService<IOptions<InstanceNameConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConnectionManager(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
     sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
-    sp.GetRequiredService<ICentralPerformanceMonitor>()
+    sp.GetRequiredService<IPerformanceMonitor>(),
+    sp.GetRequiredService<IKalshiAPIService>()
 ));
 builder.Services.AddScoped<IDataCache, DataCache>();
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
@@ -507,17 +498,18 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IKalshiAPIService>(),
     sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
     sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
-    sp.GetRequiredService<IMessageProcessorPerformanceMetrics>(),
     sp.GetRequiredService<IPerformanceMonitor>()
 ));
-builder.Services.AddScoped<ISubscriptionManager>(sp => new KalshiBotAPI.Websockets.SubscriptionManager(
+builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<ILogger<KalshiBotAPI.Websockets.SubscriptionManager>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
+    sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>()
 ));
-builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
+builder.Services.AddScoped<IKalshiWebSocketClient>(sp =>
+{
     var client = new KalshiWebSocketClient(
         sp.GetRequiredService<IOptions<KalshiConfig>>(),
         sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
@@ -528,7 +520,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => {
         sp.GetRequiredService<IWebSocketConnectionManager>(),
         sp.GetRequiredService<ISubscriptionManager>(),
         sp.GetRequiredService<IMessageProcessor>(),
-        sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+        sp.GetRequiredService<IPerformanceMonitor>(),
         sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
     );
     // Enable all channels for BacklashBot
@@ -542,7 +534,7 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
         provider.GetRequiredService<ISnapshotGroupHelper>(),
         provider.GetRequiredService<IOptions<DataStorageConfig>>(),
         provider.GetRequiredService<ISqlDataService>(),
-        provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
+        provider.GetRequiredService<IPerformanceMonitor>()));
 builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
     new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>().Value));
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
@@ -570,6 +562,13 @@ builder.Logging.SetMinimumLevel(consoleLogLevel);
 Console.WriteLine($"Building application at {DateTime.UtcNow}");
 var app = builder.Build();
 Console.WriteLine($"Application built at {DateTime.UtcNow}");
+
+// Set performance monitor for status tracker
+var statusTracker = app.Services.GetRequiredService<IStatusTrackerService>() as KalshiBotStatusTracker;
+if (statusTracker != null)
+{
+    statusTracker.SetPerformanceMonitor(app.Services.GetRequiredService<IPerformanceMonitor>());
+}
 
 // Validate DI container
 try

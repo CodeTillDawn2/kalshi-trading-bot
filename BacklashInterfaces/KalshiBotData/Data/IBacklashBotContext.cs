@@ -42,6 +42,13 @@ namespace BacklashBotData.Data.Interfaces
         /// </summary>
         /// <param name="dtos">The list of event DTOs to add or update.</param>
         Task AddOrUpdateEvents(List<EventDTO> dtos);
+
+        /// <summary>
+        /// Retrieves a list of events with optional wildcard search on ticker.
+        /// </summary>
+        /// <param name="tickerWildcard">Optional wildcard pattern to search in event ticker (e.g., "mention*").</param>
+        /// <returns>List of event data transfer objects matching the specified criteria.</returns>
+        Task<List<EventDTO>> GetEvents(string? tickerWildcard = null);
         #endregion
 
         #region Markets
@@ -182,14 +189,15 @@ namespace BacklashBotData.Data.Interfaces
         /// <param name="excludedStatuses">Optional set of excluded market statuses.</param>
         /// <param name="includedMarkets">Optional set of included market tickers.</param>
         /// <param name="excludedMarkets">Optional set of excluded market tickers.</param>
+        /// <param name="eventTicker">Optional event ticker to filter markets by.</param>
         /// <param name="hasMarketWatch">Optional flag to filter markets with a market watch.</param>
         /// <param name="minimumInterestScore">Optional minimum interest score threshold.</param>
         /// <param name="maxInterestScoreDate">Optional maximum date for interest score filtering.</param>
         /// <param name="maxAPILastFetchTime">Optional maximum API last fetch time for filtering.</param>
         /// <returns>A list of filtered market DTOs.</returns>
         Task<List<MarketDTO>> GetMarkets(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
-            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, bool? hasMarketWatch = null,
-            double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, string? eventTicker = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
 
         /// <summary>
         /// Updates the last candlestick timestamp for a market.
@@ -207,12 +215,12 @@ namespace BacklashBotData.Data.Interfaces
 
         #region Tickers
         /// <summary>
-        /// Gets tickers filtered by market ticker and logged date.
+        /// Gets tickers filtered by market ticker and timestamp.
         /// </summary>
         /// <param name="marketTicker">Optional market ticker to filter by.</param>
-        /// <param name="loggedDate">Optional logged date for filtering.</param>
+        /// <param name="ts">Optional Unix timestamp for filtering.</param>
         /// <returns>A list of filtered ticker DTOs.</returns>
-        Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null);
+        Task<List<TickerDTO>> GetTickers(string? marketTicker = null, long? ts = null);
 
         /// <summary>
         /// Adds or updates multiple tickers in the database.
@@ -546,6 +554,12 @@ namespace BacklashBotData.Data.Interfaces
         Task AddOverseerLogEntry(LogEntryDTO dto);
 
         /// <summary>
+        /// Adds a backtesting log entry to the database.
+        /// </summary>
+        /// <param name="dto">The backtesting log entry DTO to add.</param>
+        Task AddBacktestingLogEntry(LogEntryDTO dto);
+
+        /// <summary>
         /// Gets log entries filtered by brain instance, level, dates, and maximum records.
         /// </summary>
         /// <param name="brainInstance">Optional brain instance to filter by.</param>
@@ -617,6 +631,21 @@ namespace BacklashBotData.Data.Interfaces
         /// </summary>
         /// <param name="announcements">The list of announcement DTOs to add.</param>
         Task AddAnnouncements(List<AnnouncementDTO> announcements);
+        #endregion
+
+        #region Milestones
+        /// <summary>
+        /// Adds multiple milestones to the database.
+        /// </summary>
+        /// <param name="milestones">The list of milestone DTOs to add.</param>
+        Task AddMilestones(List<MilestoneDTO> milestones);
+
+        /// <summary>
+        /// Gets milestones by event ticker.
+        /// </summary>
+        /// <param name="eventTicker">The event ticker to filter by.</param>
+        /// <returns>A list of milestone DTOs for the event.</returns>
+        Task<List<MilestoneDTO>> GetMilestonesByEventTickerAsync(string eventTicker);
         #endregion
 
         #region Exchange Schedule
@@ -722,7 +751,8 @@ namespace BacklashBotData.Data.Interfaces
         IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics();
 
         /// <summary>
-        /// Resets the performance metrics.
+        /// Resets all accumulated performance metrics for database operations to their initial state.
+        /// This clears success counts, failure counts, total times, and average times for all tracked operations.
         /// </summary>
         void ResetPerformanceMetrics();
         #endregion

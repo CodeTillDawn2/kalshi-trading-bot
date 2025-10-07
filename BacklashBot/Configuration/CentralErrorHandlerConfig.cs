@@ -58,5 +58,13 @@ namespace BacklashBot.Configuration
         /// <value>Default is 60000 milliseconds (60 seconds).</value>
         [Required(ErrorMessage = "The 'InternetCheckMaxDelayMs' is missing in the configuration.")]
         public int InternetCheckMaxDelayMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether performance metrics are enabled for the error handler.
+        /// When enabled, the error handler will record performance metrics such as processing times and error counts.
+        /// </summary>
+        /// <value>Default is false.</value>
+        [Required(ErrorMessage = "The 'EnablePerformanceMetrics' is missing in the configuration.")]
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

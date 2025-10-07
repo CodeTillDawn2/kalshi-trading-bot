@@ -8,6 +8,12 @@ namespace BacklashDTOs.KalshiAPI
     public class KalshiEvent
     {
         /// <summary>
+        /// Gets or sets whether the event is available to trade on brokers.
+        /// </summary>
+        [JsonPropertyName("available_on_brokers")]
+        public bool AvailableOnBrokers { get; set; }
+
+        /// <summary>
         /// Gets or sets the category of the event.
         /// </summary>
         [JsonPropertyName("category")]
@@ -30,6 +36,12 @@ namespace BacklashDTOs.KalshiAPI
         /// </summary>
         [JsonPropertyName("mutually_exclusive")]
         public bool MutuallyExclusive { get; set; }
+
+        /// <summary>
+        /// Gets or sets the price level structure for this event.
+        /// </summary>
+        [JsonPropertyName("price_level_structure")]
+        public string? PriceLevelStructure { get; set; }
 
         /// <summary>
         /// Gets or sets the series ticker.

@@ -5,6 +5,7 @@ using BacklashCommon.Configuration;
 
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,7 @@ namespace BacklashCommon.Services
     {
         private readonly ILogger<IInterestScoreService> _logger;
         private readonly InterestScoreConfig _config;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private Dictionary<string, (double P90, double P95, double P99, double MaxValue, DateTime LastUpdated)> percentileThresholdsCache = new();
         private (double MaxBidSum, double MaxVolume, DateTime LastUpdated) maxMarketValuesCache;
 
@@ -43,11 +45,16 @@ namespace BacklashCommon.Services
         /// </summary>
         private void RecordCacheHit()
         {
+            Interlocked.Increment(ref _cacheHits);
             if (_config.EnablePerformanceMetrics)
             {
-                Interlocked.Increment(ref _cacheHits);
-                LogMetricsIfNeeded();
+                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance");
             }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHits", "Cache Hits", "Number of successful cache retrievals", _cacheHits, "count", "Performance");
+            }
+            LogMetricsIfNeeded();
         }
 
         /// <summary>
@@ -57,11 +64,16 @@ namespace BacklashCommon.Services
         /// </summary>
         private void RecordCacheMiss()
         {
+            Interlocked.Increment(ref _cacheMisses);
             if (_config.EnablePerformanceMetrics)
             {
-                Interlocked.Increment(ref _cacheMisses);
-                LogMetricsIfNeeded();
+                _performanceMonitor.RecordCounterMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance");
             }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheMisses", "Cache Misses", "Number of cache misses requiring recalculation", _cacheMisses, "count", "Performance");
+            }
+            LogMetricsIfNeeded();
         }
 
         /// <summary>
@@ -72,18 +84,23 @@ namespace BacklashCommon.Services
         /// <param name="duration">The time taken for the scoring operation.</param>
         private void RecordScoringOperationTime(TimeSpan duration)
         {
+            lock (_scoringOperationTimes)
+            {
+                _scoringOperationTimes.Add(duration);
+                if (_scoringOperationTimes.Count > _config.MaxPerformanceMetricsHistory)
+                {
+                    _scoringOperationTimes.RemoveAt(0);
+                }
+            }
             if (_config.EnablePerformanceMetrics)
             {
-                lock (_scoringOperationTimes)
-                {
-                    _scoringOperationTimes.Add(duration);
-                    if (_scoringOperationTimes.Count > _config.MaxPerformanceMetricsHistory)
-                    {
-                        _scoringOperationTimes.RemoveAt(0);
-                    }
-                }
-                LogMetricsIfNeeded();
+                _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance", null, null, null);
             }
+            else
+            {
+                _performanceMonitor.RecordDisabledMetric("InterestScoreService", "OperationTime", "Operation Time", "Time taken for scoring operation", duration.TotalMilliseconds, "ms", "Performance");
+            }
+            LogMetricsIfNeeded();
         }
 
         /// <summary>
@@ -126,14 +143,14 @@ namespace BacklashCommon.Services
         }
 
         /// <summary>
-        /// Logs performance metrics if enough time has passed since the last log.
-        /// Periodically outputs cache hit rates, average operation times, and request counts
+        /// Records performance metrics if enough time has passed since the last record.
+        /// Periodically records cache hit rates, average operation times, and request counts
         /// to provide insights into system performance and cache efficiency.
-        /// Logging occurs every 5 minutes when performance metrics are enabled.
+        /// Recording occurs every 5 minutes.
         /// </summary>
         private void LogMetricsIfNeeded()
         {
-            if (_config.EnablePerformanceMetrics && DateTime.UtcNow - _lastMetricsLog > TimeSpan.FromMinutes(5))
+            if (DateTime.UtcNow - _lastMetricsLog > TimeSpan.FromMinutes(5))
             {
                 var hits = _cacheHits;
                 var misses = _cacheMisses;
@@ -149,8 +166,18 @@ namespace BacklashCommon.Services
                     }
                 }
 
-                _logger.LogInformation("InterestScoreService Performance Metrics - Cache Hit Rate: {HitRate:F2}%, Avg Operation Time: {AvgTime:F2}ms, Total Requests: {TotalRequests}",
-                    hitRate, avgOperationTime, totalRequests);
+                if (_config.EnablePerformanceMetrics)
+                {
+                    _performanceMonitor.RecordProgressBarMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance", 0, 50, 90);
+                    _performanceMonitor.RecordSpeedDialMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance", null, null, null);
+                    _performanceMonitor.RecordCounterMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance");
+                }
+                else
+                {
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "CacheHitRate", "Cache Hit Rate", "Percentage of cache hits vs misses", hitRate, "%", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "AverageOperationTime", "Average Operation Time", "Average time for scoring operations", avgOperationTime, "ms", "Performance");
+                    _performanceMonitor.RecordDisabledMetric("InterestScoreService", "TotalRequests", "Total Requests", "Total cache requests", totalRequests, "count", "Performance");
+                }
 
                 _lastMetricsLog = DateTime.UtcNow;
             }
@@ -226,10 +253,12 @@ namespace BacklashCommon.Services
         /// </summary>
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="config">The configuration options for the interest score service, including cache duration and performance metrics settings.</param>
-        public InterestScoreService(ILogger<IInterestScoreService> logger, IOptions<InterestScoreConfig> config)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        public InterestScoreService(ILogger<IInterestScoreService> logger, IOptions<InterestScoreConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _config = config.Value;
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -319,7 +348,7 @@ namespace BacklashCommon.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Failed to calculate interest score for market {Ticker}. Using default score of 0.", ticker);
+                        _logger.LogWarning("Failed to calculate interest score for market {Ticker}. Using default score of 0. {ex}", ticker, ex.Message);
                         score = 0.0;
                     }
                     marketScores.Add((ticker, score));
@@ -451,7 +480,6 @@ CalculateMarketInterestScoreAsync(
                     continuity: continuityScore * 10.0
                 );
 
-                _logger.LogInformation("Calculated interest score {Score} for market.", finalScore);
                 RecordScoringOperationTime(DateTime.UtcNow - startTime);
                 return (finalScore, scoreParts);
             }

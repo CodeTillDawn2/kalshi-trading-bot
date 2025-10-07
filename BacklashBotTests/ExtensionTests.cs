@@ -1,6 +1,6 @@
 using BacklashDTOs.Data;
-using KalshiBotData.Extensions;
-using KalshiBotData.Models;
+using BacklashBotData.Extensions;
+using BacklashBotData.Models;
 
 namespace BacklashBotTests
 {
@@ -20,7 +20,7 @@ namespace BacklashBotTests
         [Test]
         public void TestAnnouncementExtensions()
         {
-            TestContext.WriteLine("Testing AnnouncementExtensions for null parameter validation and transformation accuracy.");
+            TestContext.Out.WriteLine("Testing AnnouncementExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Announcement)null).ToAnnouncementDTO());
             Assert.Throws<ArgumentNullException>(() => ((AnnouncementDTO)null).ToAnnouncement());
@@ -85,7 +85,7 @@ namespace BacklashBotTests
             var metrics = AnnouncementExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToAnnouncementDTO"), Is.True);
-            TestContext.WriteLine("Result: All AnnouncementExtensions validated successfully.");
+            TestContext.Out.WriteLine("Result: All AnnouncementExtensions validated successfully.");
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace BacklashBotTests
         [Test]
         public void TestBrainInstanceExtensions()
         {
-            TestContext.WriteLine("Testing BrainInstanceExtensions for null parameter validation and transformation accuracy.");
+            TestContext.Out.WriteLine("Testing BrainInstanceExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((BrainInstance)null).ToBrainInstanceDTO());
             Assert.Throws<ArgumentNullException>(() => ((BrainInstanceDTO)null).ToBrainInstance());
@@ -167,7 +167,7 @@ namespace BacklashBotTests
             var metrics = BrainInstanceExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToBrainInstanceDTO"), Is.True);
-            TestContext.WriteLine("Result: All BrainInstanceExtensions validated successfully.");
+            TestContext.Out.WriteLine("Result: All BrainInstanceExtensions validated successfully.");
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace BacklashBotTests
         [Test]
         public void TestCandlestickExtensions()
         {
-            TestContext.WriteLine("Testing CandlestickExtensions for null parameter validation and transformation accuracy.");
+            TestContext.Out.WriteLine("Testing CandlestickExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Candlestick)null).ToCandlestickDTO());
             Assert.Throws<ArgumentNullException>(() => ((CandlestickDTO)null).ToCandlestick());
@@ -267,7 +267,7 @@ namespace BacklashBotTests
             var metrics = CandlestickExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToCandlestickDTO"), Is.True);
-            TestContext.WriteLine("Result: All CandlestickExtensions validated successfully.");
+            TestContext.Out.WriteLine("Result: All CandlestickExtensions validated successfully.");
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace BacklashBotTests
         [Test]
         public void TestEventExtensions()
         {
-            TestContext.WriteLine("Testing EventExtensions for null parameter validation and transformation accuracy.");
+            TestContext.Out.WriteLine("Testing EventExtensions for null parameter validation and transformation accuracy.");
             // Test null parameter validation
             Assert.Throws<ArgumentNullException>(() => ((Event)null).ToEventDTO());
             Assert.Throws<ArgumentNullException>(() => ((EventDTO)null).ToEvent());
@@ -354,7 +354,7 @@ namespace BacklashBotTests
             var metrics = EventExtensions.GetPerformanceMetrics();
             Assert.That(metrics, Is.Not.Null);
             Assert.That(metrics.ContainsKey("ToEventDTO"), Is.True);
-            TestContext.WriteLine("Result: All EventExtensions validated successfully.");
+            TestContext.Out.WriteLine("Result: All EventExtensions validated successfully.");
         }
 
         #endregion

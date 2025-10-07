@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace BacklashBot.Configuration
 {
     /// <summary>
@@ -13,9 +11,8 @@ namespace BacklashBot.Configuration
         public const string SectionName = "Central:BrainStatusService";
 
         /// <summary>
-        /// Gets or sets the length of the session identifier string.
+        /// Gets or sets whether performance metrics are enabled for the BrainStatusService.
         /// </summary>
-        [Required(ErrorMessage = "The 'SessionIdLength' is missing in the configuration.")]
-        public int SessionIdLength { get; set; }
+        public bool EnablePerformanceMetrics { get; set; }
     }
 }

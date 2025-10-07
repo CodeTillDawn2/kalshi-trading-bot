@@ -10,6 +10,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.SmokehouseBot.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using BTimer = BacklashInterfaces.SmokehouseBot.Timers.ITimer;
@@ -45,8 +46,6 @@ namespace BacklashBot.Management
         private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly InstanceNameConfig _instanceNameConfig;
-        private readonly GeneralExecutionConfig _generalConfig;
-        private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
         private BTimer? _snapshotTimer;
@@ -57,8 +56,20 @@ namespace BacklashBot.Management
         private bool _servicesStopped = false;
         private bool _isStartingUp = false;
         private bool _isShuttingDown = false;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently stopped.
+        /// </summary>
         public bool IsServicesStopped => _servicesStopped;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently starting up.
+        /// </summary>
         public bool IsStartingUp => _isStartingUp;
+
+        /// <summary>
+        /// Gets a value indicating whether the services are currently shutting down.
+        /// </summary>
         public bool IsShuttingDown => _isShuttingDown;
 
         private BTimer? _shutdownTimer;
@@ -72,21 +83,36 @@ namespace BacklashBot.Management
 
         private BrainInstanceDTO? _thisBrain = null;
 
-        private PerformanceMetrics _performanceMetrics = new PerformanceMetrics();
+        private BrainPerformanceMetricsDTO _performanceMetrics = new BrainPerformanceMetricsDTO();
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CentralBrain"/> class with all required dependencies.
+        /// </summary>
+        /// <param name="logger">Logger instance for recording operations.</param>
+        /// <param name="serviceFactory">Factory for creating service instances.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="tradingSnapshotServiceConfig">Configuration for trading snapshot service.</param>
+        /// <param name="instanceNameConfig">Instance name configuration.</param>
+        /// <param name="backlashErrorHandler">Error handler service.</param>
+        /// <param name="backlashPerformanceTracker">Performance tracking service.</param>
+        /// <param name="marketManager">Market management service.</param>
+        /// <param name="appLifetime">Application lifetime manager.</param>
+        /// <param name="statusTrackerService">Status tracking service.</param>
+        /// <param name="readyStatus">Bot ready status service.</param>
+        /// <param name="brainStatusService">Brain status service.</param>
+        /// <param name="centralBrainConfig">Central brain configuration.</param>
+        /// <param name="timerFactory">Factory for creating timer instances.</param>
         public CentralBrain(
             ILogger<ICentralBrain> logger,
             IServiceFactory serviceFactory,
             IServiceScopeFactory scopeFactory,
             IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
-            IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IOptions<InstanceNameConfig> instanceNameConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
             IMarketManagerService marketManager,
             IHostApplicationLifetime appLifetime,
-            IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBotReadyStatus readyStatus,
             IBrainStatusService brainStatusService,
@@ -95,7 +121,6 @@ namespace BacklashBot.Management
         {
             Console.WriteLine("CentralBrain constructor started");
             _logger = logger;
-            _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
             _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig.Value;
@@ -163,7 +188,7 @@ namespace BacklashBot.Management
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "BRAIN: Health check threw exception. Continuing startup anyway.");
+                    _logger.LogWarning("BRAIN: Health check threw exception. Continuing startup anyway.");
                 }
 
                 _logger.LogInformation("BRAIN: Ensuring brain status initialized...");
@@ -266,6 +291,10 @@ namespace BacklashBot.Management
             ConfigureScheduledTasks();
         }
 
+        /// <summary>
+        /// Starts the dashboard and initializes all trading services and components.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StartDashboard()
         {
             if (_isStartingUp)
@@ -571,6 +600,10 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Shuts down the dashboard and gracefully stops all trading services and components.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ShutdownDashboardAsync()
         {
             File.AppendAllText("logs/shutodown.log", $"{DateTime.Now.ToString()} - Shutting down\n");
@@ -604,6 +637,15 @@ namespace BacklashBot.Management
                 }
 
                 _errorHandler.LastSuccessfulSnapshot = DateTime.MinValue;
+
+                // Stop the error check timer to prevent it from firing during shutdown and restart
+                if (_errorCheckTimer != null)
+                {
+                    _errorCheckTimer.Stop();
+                    _errorCheckTimer.Dispose();
+                    _errorCheckTimer = null;
+                    _logger.LogDebug("BRAIN: Error check timer stopped and disposed");
+                }
 
                 var webSocketService = _serviceFactory.GetWebSocketHostedService();
                 _logger.LogDebug("Stopping WebSocketHostedService...");
@@ -694,6 +736,9 @@ namespace BacklashBot.Management
             _logger.LogInformation("BRAIN: Dependent services shut down successfully");
         }
 
+        /// <summary>
+        /// Disposes of the CentralBrain instance and releases all managed resources.
+        /// </summary>
         public void Dispose()
         {
             _snapshotTimer?.Dispose();
@@ -1089,6 +1134,7 @@ namespace BacklashBot.Management
 
             foreach (var level in kvp.Value.OrderbookData)
             {
+                if (level == null) continue; // Skip null levels to prevent NullReferenceException
                 if (level.Side == "yes")
                 {
                     totalYesDepth += level.RestingContracts * level.Price;
@@ -1390,21 +1436,51 @@ namespace BacklashBot.Management
         /// <param name="state">The state object passed to the timer callback.</param>
         private async void MonitorAndHandleErrors(object state)
         {
+            // Skip if catastrophic error already detected to prevent repeated shutdown attempts
+            if (_errorHandler.CatastrophicErrorAlreadyDetected)
+            {
+                _logger.LogDebug("BRAIN: Skipping error monitoring - catastrophic error already detected");
+                return;
+            }
+
             if (await _errorHandler.HandleErrors())
             {
                 await ShutdownDashboardAsync();
                 _logger.LogInformation("BRAIN: Delaying 5 seconds before attempting restart.");
                 await Task.Delay(5000);
-                _logger.LogInformation("BRAIN: Attempting restart.");
-                try
+
+                int retryCount = 0;
+                int maxRetries = 3;
+                int delayMs = 5000;
+                bool restartSuccessful = false;
+
+                while (retryCount < maxRetries && !restartSuccessful)
                 {
-                    await StartDashboard();
-                    _logger.LogInformation("BRAIN: Restarted.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogCritical(ex, "BRAIN: Failed to restart after catastrophic error. Application will exit.");
-                    Environment.Exit(1);
+                    try
+                    {
+                        _logger.LogInformation("BRAIN: Attempting restart (attempt {Attempt}/{Max})", retryCount + 1, maxRetries);
+                        // Reset all services before restart to ensure fresh instances and clear cancelled tokens
+                        _serviceFactory.ResetAll();
+                        _statusTrackerService.ResetAll();
+                        await StartDashboard();
+                        _logger.LogInformation("BRAIN: Restarted successfully.");
+                        restartSuccessful = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        retryCount++;
+                        if (retryCount >= maxRetries)
+                        {
+                            _logger.LogCritical(ex, "BRAIN: Failed to restart after {Retries} attempts. Application will exit.", maxRetries);
+                            Environment.Exit(1);
+                        }
+                        else
+                        {
+                            _logger.LogWarning(ex, "BRAIN: Restart attempt {Attempt} failed. Retrying in {Delay}ms.", retryCount, delayMs);
+                            await Task.Delay(delayMs);
+                            delayMs = Math.Min(delayMs * 2, 30000); // exponential backoff, max 30s
+                        }
+                    }
                 }
             }
         }

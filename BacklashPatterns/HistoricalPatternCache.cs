@@ -19,16 +19,47 @@ namespace BacklashPatterns
         /// <summary>
         /// Represents metrics for a historical pattern instance.
         /// </summary>
+        /// <summary>
+        /// Represents metrics for a historical pattern instance.
+        /// </summary>
         public class PatternMetrics
         {
+            /// <summary>
+            /// Gets or sets the name of the pattern.
+            /// </summary>
             public string PatternName { get; set; }
-            public double PowerScore { get; set; } // Power component of strength
-            public double MatchScore { get; set; } // Match component of strength
+
+            /// <summary>
+            /// Gets or sets the power component of the pattern strength.
+            /// </summary>
+            public double PowerScore { get; set; }
+
+            /// <summary>
+            /// Gets or sets the match component of the pattern strength.
+            /// </summary>
+            public double MatchScore { get; set; }
+
+            /// <summary>
+            /// Gets or sets the combined strength score of the pattern.
+            /// </summary>
             public double CombinedStrength { get; set; }
+
+            /// <summary>
+            /// Gets or sets the timestamp when the pattern was detected.
+            /// </summary>
             public DateTime Timestamp { get; set; }
+
+            /// <summary>
+            /// Gets or sets the market ticker where the pattern was detected.
+            /// </summary>
             public string MarketTicker { get; set; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the HistoricalPatternCache class.
+        /// </summary>
+        /// <param name="logger">The logger for recording operations.</param>
+        /// <param name="snapshotService">The service for loading market snapshots.</param>
         public HistoricalPatternCache(
             ILogger<HistoricalPatternCache> logger,
             ITradingSnapshotService snapshotService)

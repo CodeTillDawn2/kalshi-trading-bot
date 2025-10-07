@@ -11,7 +11,7 @@ namespace BacklashPatterns.PatternDefinitions
     /// - Small body (close near open), showing balance between buyers and sellers.
     /// - Long upper and lower wicks, roughly equal in length, exceeding the body size.
     /// - Total range indicates volatility, but body remains small_iterations
-
+    /// </summary>
     public class SpinningTopPattern : PatternDefinition
     {
         /// <summary>

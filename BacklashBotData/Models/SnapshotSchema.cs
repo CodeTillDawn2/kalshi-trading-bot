@@ -1,5 +1,5 @@
 
-namespace KalshiBotData.Models
+namespace BacklashBotData.Models
 {
     /// <summary>
     /// Represents the schema definition and versioning for market snapshots.

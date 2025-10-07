@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Text.Json;
 
 namespace BacklashBotTests
 {
@@ -192,21 +191,22 @@ namespace BacklashBotTests
 
             // Initialize real context to query for dynamic test data
             var logger = new Mock<ILogger<BacklashBotContext>>().Object;
-            _realContext = new BacklashBotContext(_connectionString, logger, _dataConfig);
+            var performanceMonitorMock = new Mock<IPerformanceMonitor>().Object;
+            _realContext = new BacklashBotContext(_connectionString, logger, _dataConfig, performanceMonitorMock);
 
             // Query for an active market
-            var activeMarket = await _realContext.GetMarketsFiltered(
+            var activeMarkets = await _realContext.GetMarketsFiltered(
                 includedStatuses: new HashSet<string> { KalshiConstants.Status_Active }
             );
 
-            Assert.That(activeMarket, Is.Not.Empty, "No active markets found in the database");
+            Assert.That(activeMarkets, Is.Not.Empty, "No active markets found in the database");
 
             // Get a market with good liquidity for testing
-            var marketDto = activeMarket.Where(x => x.yes_bid > 20 && x.no_bid > 20).OrderByDescending(x => x.APILastFetchedDate).FirstOrDefault();
+            var marketDto = activeMarkets.Where(x => x.yes_bid > 20 && x.no_bid > 20).OrderByDescending(x => x.APILastFetchedDate).FirstOrDefault();
             if (marketDto == null)
             {
                 // Fallback to first market if no good bids found
-                marketDto = activeMarket.First();
+                marketDto = activeMarkets.First();
             }
 
             _testMarketTicker = marketDto.market_ticker;
@@ -214,6 +214,35 @@ namespace BacklashBotTests
 
             // Get event data for the selected market
             var eventDto = await _realContext.GetEventByTicker(_testEventTicker);
+            if (eventDto == null)
+            {
+                // Event not in database, fetch it from API
+                var tempLogger = new Mock<ILogger<IKalshiAPIService>>().Object;
+                var statusTrackerMock = new Mock<IStatusTrackerService>();
+                statusTrackerMock.Setup(s => s.GetCancellationToken()).Returns(CancellationToken.None);
+                var tempPerformanceMonitorMock = new Mock<IPerformanceMonitor>().Object;
+                var scopeFactoryMock = new Mock<IServiceScopeFactory>();
+                var scopeMock = new Mock<IServiceScope>();
+                var serviceProviderMock = new Mock<IServiceProvider>();
+                serviceProviderMock.Setup(sp => sp.GetService(typeof(IBacklashBotContext))).Returns(_realContext);
+                scopeMock.Setup(s => s.ServiceProvider).Returns(serviceProviderMock.Object);
+                scopeFactoryMock.Setup(f => f.CreateScope()).Returns(scopeMock.Object);
+                var apiConfig = new KalshiAPIServiceConfig { EnablePerformanceMetrics = false };
+                var apiConfigOptions = Options.Create(apiConfig);
+                var kalshiConfigOptions = Options.Create(_kalshiConfig);
+                var tempApiService = new KalshiAPIService(
+                    tempLogger,
+                    _connectionString,
+                    scopeFactoryMock.Object,
+                    statusTrackerMock.Object,
+                    kalshiConfigOptions,
+                    apiConfigOptions,
+                    tempPerformanceMonitorMock
+                );
+                await tempApiService.FetchEventAsync(_testEventTicker);
+                eventDto = await _realContext.GetEventByTicker(_testEventTicker);
+            }
+
             Assert.That(eventDto, Is.Not.Null, $"Event not found for ticker {_testEventTicker}");
             _testSeriesTicker = eventDto.series_ticker;
 
@@ -392,21 +421,24 @@ namespace BacklashBotTests
         [Category(MarketDataCategory)]
         public async Task FetchMarketsAsync_WithStatusOpen_ReturnsProcessedMarkets()
         {
-            TestContext.WriteLine("🧪 Testing: Fetch Markets with Open Status");
-            TestContext.WriteLine("   Expected: API should return processed markets with no errors");
-            TestContext.WriteLine("   Parameters: status=open");
+            TestContext.Out.WriteLine("🧪 Testing: Fetch Markets with Open Status");
+            TestContext.Out.WriteLine("   Expected: API should return processed markets with no errors");
+            TestContext.Out.WriteLine("   Parameters: status=open, max_close_ts=1 week from now");
+
+            // Limit to markets closing within 1 week to avoid fetching all open markets
+            var maxCloseTs = ((DateTimeOffset)DateTime.UtcNow.AddDays(7)).ToUnixTimeSeconds().ToString();
 
             // Act
-            var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(status: KalshiConstants.Status_Open);
+            var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(status: KalshiConstants.Status_Open, maxCloseTs: maxCloseTs);
 
             // Output details
-            TestContext.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
+            TestContext.Out.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
 
             // Assert
             Assert.That(processedCount, Is.GreaterThan(0), "Expected some open markets to be processed");
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch - all markets should be processed successfully");
 
-            TestContext.WriteLine("✅ PASSED: Markets fetched successfully with open status");
+            TestContext.Out.WriteLine("✅ PASSED: Markets fetched successfully with open status");
         }
 
         /// <summary>
@@ -418,21 +450,21 @@ namespace BacklashBotTests
         [Category(MarketDataCategory)]
         public async Task FetchMarketsAsync_WithSpecificTicker_ReturnsProcessedMarket()
         {
-            TestContext.WriteLine("🧪 Testing: Fetch Markets with Specific Ticker");
-            TestContext.WriteLine("   Expected: API should return exactly one processed market with no errors");
-            TestContext.WriteLine($"   Parameters: ticker={_testMarketTicker}");
+            TestContext.Out.WriteLine("🧪 Testing: Fetch Markets with Specific Ticker");
+            TestContext.Out.WriteLine("   Expected: API should return exactly one processed market with no errors");
+            TestContext.Out.WriteLine($"   Parameters: ticker={_testMarketTicker}");
 
             // Act
             var (processedCount, errorCount) = await _apiService.FetchMarketsAsync(tickers: new[] { _testMarketTicker });
 
             // Output details
-            TestContext.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
+            TestContext.Out.WriteLine($"   Result: Processed {processedCount} markets with {errorCount} errors");
 
             // Assert
             Assert.That(processedCount, Is.EqualTo(1), "Expected exactly one market to be processed");
             Assert.That(errorCount, Is.EqualTo(0), "Expected no errors during fetch");
 
-            TestContext.WriteLine("✅ PASSED: Specific market fetched successfully");
+            TestContext.Out.WriteLine("✅ PASSED: Specific market fetched successfully");
         }
 
         /// <summary>
@@ -444,9 +476,9 @@ namespace BacklashBotTests
         [Category(MetadataCategory)]
         public async Task FetchSeriesAsync_WithValidTicker_ReturnsSeriesData()
         {
-            TestContext.WriteLine("🧪 Testing: Fetch Series with Valid Ticker");
-            TestContext.WriteLine("   Expected: API should return series data with matching ticker");
-            TestContext.WriteLine($"   Parameters: series_ticker={_testSeriesTicker}");
+            TestContext.Out.WriteLine("🧪 Testing: Fetch Series with Valid Ticker");
+            TestContext.Out.WriteLine("   Expected: API should return series data with matching ticker");
+            TestContext.Out.WriteLine($"   Parameters: series_ticker={_testSeriesTicker}");
 
             // Act
             var result = await _apiService.FetchSeriesAsync(_testSeriesTicker);
@@ -454,14 +486,14 @@ namespace BacklashBotTests
             // Output details
             if (result != null)
             {
-                TestContext.WriteLine($"   Result: Ticker={result.Series.Ticker}, Title={result.Series.Title}, Category={result.Series.Category}");
+                TestContext.Out.WriteLine($"   Result: Ticker={result.Series.Ticker}, Title={result.Series.Title}, Category={result.Series.Category}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected series data to be returned");
             Assert.That(result.Series.Ticker, Is.EqualTo(_testSeriesTicker), "Ticker mismatch in response");
 
-            TestContext.WriteLine("✅ PASSED: Series data fetched successfully");
+            TestContext.Out.WriteLine("✅ PASSED: Series data fetched successfully");
         }
 
         /// <summary>
@@ -472,9 +504,9 @@ namespace BacklashBotTests
         [Test]
         public async Task FetchEventAsync_WithValidTicker_ReturnsEventData()
         {
-            TestContext.WriteLine("🧪 Testing: Fetch Event with Valid Ticker");
-            TestContext.WriteLine("   Expected: API should return event data with matching ticker");
-            TestContext.WriteLine($"   Parameters: event_ticker={_testEventTicker}");
+            TestContext.Out.WriteLine("🧪 Testing: Fetch Event with Valid Ticker");
+            TestContext.Out.WriteLine("   Expected: API should return event data with matching ticker");
+            TestContext.Out.WriteLine($"   Parameters: event_ticker={_testEventTicker}");
 
             // Act
             var result = await _apiService.FetchEventAsync(_testEventTicker);
@@ -482,14 +514,14 @@ namespace BacklashBotTests
             // Output details
             if (result != null)
             {
-                TestContext.WriteLine($"   Result: Ticker={result.Event.EventTicker}, Title={result.Event.Title}, Category={result.Event.Category}");
+                TestContext.Out.WriteLine($"   Result: Ticker={result.Event.EventTicker}, Title={result.Event.Title}, Category={result.Event.Category}");
             }
 
             // Assert
             Assert.That(result, Is.Not.Null, "Expected event data to be returned");
             Assert.That(result.Event.EventTicker, Is.EqualTo(_testEventTicker), "Ticker mismatch in response");
 
-            TestContext.WriteLine("✅ PASSED: Event data fetched successfully");
+            TestContext.Out.WriteLine("✅ PASSED: Event data fetched successfully");
         }
     }
 }

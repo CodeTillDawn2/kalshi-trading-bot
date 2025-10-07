@@ -1,5 +1,4 @@
 using BacklashBot.Management.Interfaces;
-using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBotData.Configuration;
 using BacklashBotData.Data;
@@ -9,7 +8,7 @@ using BacklashCommon.Helpers;
 using BacklashCommon.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using KalshiBotData.Data;
+using BacklashBotData.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TradingSimulator.Configuration;
 using TradingSimulator.Simulator;
 using TradingSimulator.Strategies;
 using TradingStrategies.Classification.Interfaces;
@@ -79,6 +79,8 @@ namespace TradingSimulator
         private SnapshotGroupHelper _marketAnalysisHelper;
         private IOptions<DataStorageConfig> _dataStorageConfig;
         private IOptions<TradingSimulatorServiceConfig> _simulatorOptions;
+        private IOptions<MarketProcessorConfig> _marketProcessorOptions;
+        private IOptions<DataStorageConfig> _dataStorageOptions;
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
@@ -100,6 +102,17 @@ namespace TradingSimulator
 
         private SqlDataService _sqlDataService;
         private PerformanceMonitor _performanceMonitor;
+
+        /// <summary>
+        /// Initializes a new instance of the TradingSimulatorService class.
+        /// </summary>
+        /// <param name="marketProcessorOptions">Configuration options for the market processor.</param>
+        /// <param name="dataStorageOptions">Configuration options for data storage.</param>
+        public TradingSimulatorService(IOptions<MarketProcessorConfig> marketProcessorOptions, IOptions<DataStorageConfig> dataStorageOptions)
+        {
+            _marketProcessorOptions = marketProcessorOptions;
+            _dataStorageOptions = dataStorageOptions;
+        }
 
         /// <summary>
         /// Formats a file name using the configured pattern and provided parameters.
@@ -182,6 +195,7 @@ namespace TradingSimulator
             // Add services required by TradingOverseer
             services.AddScoped<MarketTypeService>();
             services.AddScoped<StrategySelectionHelper>();
+            services.AddScoped<StrategyResolver>();
             services.AddScoped<PatternDetectionService>();
             services.AddScoped<SimulationEngine>();
             services.AddScoped<EquityCalculator>();
@@ -202,27 +216,24 @@ namespace TradingSimulator
             var equityCalculator = serviceProvider.GetRequiredService<EquityCalculator>();
             var tradingOverseerConfig = Options.Create(config.GetSection(TradingOverseerConfig.SectionName).Get<TradingOverseerConfig>()!);
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, simulationEngine, equityCalculator, tradingOverseerConfig, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _dataStorageConfig, serviceProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>(), null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _dataStorageConfig, serviceProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>(), null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, null);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, _performanceMonitor);
 
             _processedMarkets = new HashSet<string>();
-            _cacheDirectory = _simulatorOptions.Value.CacheDirectory;
+            _cacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService, serviceProvider.GetRequiredService<IOptions<DataLoaderConfig>>());
-            var marketProcessorConfig = new MarketProcessorConfig
-            {
-                CacheDirectory = _cacheDirectory,
-                ProcessingTimeoutSeconds = _simulatorOptions.Value.ProcessingTimeoutSeconds
-            };
+            var marketProcessorConfig = _marketProcessorOptions.Value;
+            marketProcessorConfig.CacheDirectory = _dataStorageOptions.Value.SimulationCacheDirectory;
             _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, marketProcessorConfig, _simulatorReporting, _performanceMonitor);
             _marketProcessor.OnTestProgress += msg => OnTestProgress?.Invoke(msg);
-            _strategyResolver = new StrategyResolver();
+            _strategyResolver = serviceProvider.GetRequiredService<StrategyResolver>();
 
             OnTestProgress?.Invoke("Setup completed.");
         }
@@ -275,6 +286,125 @@ namespace TradingSimulator
             return await _dataLoader.LoadSnapshotsForMarketAsync(context, marketName);
         }
 
+
+        /// <summary>
+        /// Runs all specified strategy sets for a single market in GUI display.
+        /// This method validates inputs, resolves the strategy family, loads snapshots once,
+        /// then processes each weight set sequentially on the same data, and saves results.
+        /// </summary>
+        /// <param name="setKey">The key identifying the strategy family.</param>
+        /// <param name="weightNames">List of weight set names to process.</param>
+        /// <param name="market">The market name to process.</param>
+        /// <param name="writeToFile">Whether to save detailed market data to JSON files.</param>
+        public async Task RunAllSetsForSingleMarketAsync(
+            string setKey,
+            List<string> weightNames,
+            string market,
+            bool writeToFile)
+        {
+            // Validate inputs
+            if (string.IsNullOrWhiteSpace(setKey))
+            {
+                OnTestProgress?.Invoke("Warning: setKey is null or empty. Skipping execution.");
+                return;
+            }
+
+            if (weightNames == null || !weightNames.Any())
+            {
+                OnTestProgress?.Invoke("Warning: weightNames is null or empty. Skipping execution.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(market))
+            {
+                OnTestProgress?.Invoke("Warning: market is null or empty. Skipping execution.");
+                return;
+            }
+
+            // map provided setKey -> family
+            var family = MapFamilyFromSetKey(setKey);
+
+            // resolve strategies + param sets for that family
+            var (strategiesList, paramSets, label) = ResolveFamily(family);
+
+            // prep context once
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+
+            // Load data for this market only once
+            var marketSnapshots = await _dataLoader.LoadSnapshotsForMarketAsync(context, market);
+            if (!marketSnapshots.Any())
+            {
+                OnTestProgress?.Invoke($"Warning: No snapshots found for market {market}. Skipping.");
+                return;
+            }
+
+            var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
+
+            // Process each weight set
+            foreach (var weightName in weightNames)
+            {
+                // find the requested weight set by name (exact, case-insensitive)
+                var idx = paramSets.FindIndex(ps =>
+                    string.Equals(ps.Name, weightName, StringComparison.OrdinalIgnoreCase));
+                if (idx < 0)
+                {
+                    OnTestProgress?.Invoke($"Warning: Weight set '{weightName}' not found in {label}. Skipping.");
+                    continue;
+                }
+
+                // create DTO for this set
+                var (name, parameters) = paramSets[idx];
+                var dto = new WeightSetDTO
+                {
+                    StrategyName = name,
+                    Weights = JsonSerializer.Serialize(parameters),
+                    LastRun = DateTime.UtcNow,
+                    WeightSetMarkets = new List<WeightSetMarketDTO>()
+                };
+
+                var strategies = strategiesList[idx]; // the selected set
+                OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] processing market {market}");
+
+                var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc, patterns) =
+                    await _marketProcessor.ProcessMarketAsync(
+                        market, marketSnapshots, strategies,
+                        progressPrefix: $"[{label}/{dto.StrategyName}] ",
+                        writeToFile: writeToFile, group: groupForId,
+                        ignoreProcessedCache: true);
+
+                if (writeToFile)
+                {
+                    var fileName = FormatFileName(_simulatorOptions.Value.MarketDataFileNamePattern, new Dictionary<string, string>
+                    {
+                        { "market", market },
+                        { "label", label },
+                        { "strategy", dto.StrategyName },
+                        { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+                    });
+                    _marketProcessor.SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
+                        pos, avgCost, rest, disc, patterns, fileNameSuffix: fileName);
+                }
+
+                dto.WeightSetMarkets.Add(new WeightSetMarketDTO
+                {
+                    MarketTicker = market,
+                    PnL = (decimal)finalPnL,
+                    LastRun = DateTime.UtcNow
+                });
+
+                OnProfitLossUpdate?.Invoke(market, finalPnL);
+
+                // save this set
+                using var saveScope = _scopeFactory.CreateScope();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
+
+                OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} for market {market}");
+            }
+
+            marketSnapshots.Clear();
+        }
 
         /// <summary>
         /// Runs a specific strategy set for GUI display, processing the selected parameter set against the specified markets.
@@ -345,10 +475,15 @@ namespace TradingSimulator
                 WeightSetMarkets = new List<WeightSetMarketDTO>()
             };
 
-            // Load snapshot data using DataLoader
-            var dataset = await _dataLoader.LoadSnapshotsForMarketsAsync(context, marketsToRun ?? new List<string>());
+            // Get list of all available market names without loading group data
+            var allMarketNames = await GetSnapshotGroupNames();
 
-            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set {dataset.Count} markets");
+            // Filter markets if specific ones were requested
+            var marketList = marketsToRun != null
+                ? allMarketNames.Where(m => marketsToRun.Contains(m, StringComparer.OrdinalIgnoreCase)).ToList()
+                : allMarketNames.ToList();
+
+            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set {marketList.Count} markets");
 
             int totalDiscrepancies = 0;
 
@@ -365,12 +500,18 @@ namespace TradingSimulator
                 }
             }
 
-            // iterate markets
-            var marketList = dataset.Keys.ToList();
+            // Process each market individually to avoid loading all data at once
             for (int mIdx = 0; mIdx < marketList.Count; mIdx++)
             {
                 var market = marketList[mIdx];
-                var marketSnapshots = dataset[market];
+
+                // Load data for this market only
+                var marketSnapshots = await _dataLoader.LoadSnapshotsForMarketAsync(context, market);
+                if (!marketSnapshots.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: No snapshots found for market {market}. Skipping.");
+                    continue;
+                }
 
                 var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
 
@@ -408,7 +549,6 @@ namespace TradingSimulator
                 });
 
                 OnProfitLossUpdate?.Invoke(market, finalPnL);
-
 
                 OnMarketProcessed?.Invoke(market);
                 marketSnapshots.Clear();
@@ -590,10 +730,10 @@ ResolveFamily(StrategyFamily family)
             }
 
             var label = "MLShared";
-            var helper = new StrategySelectionHelper();
             var paramSets = MLEntrySeekerShared.MLSharedParameterSets;
 
             using var scope = _scopeFactory.CreateScope();
+            var helper = scope.ServiceProvider.GetRequiredService<StrategySelectionHelper>();
             var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             // Initialize DTOs for results
@@ -610,30 +750,48 @@ ResolveFamily(StrategyFamily family)
                 });
             }
 
-            // Load snapshots using DataLoader
-            var dataset = await _dataLoader.LoadSnapshotsForMarketsAsync(context, marketsToRun ?? new List<string>());
-            foreach (var kvp in dataset)
-            {
-                OnTestProgress?.Invoke($"Loaded {kvp.Value.Count} snapshots for {kvp.Key}");
-            }
+            // Get list of all available market names without loading group data
+            var allMarketNames = await GetSnapshotGroupNames();
 
-            if (!dataset.Any())
+            // Filter markets if specific ones were requested
+            var marketList = marketsToRun != null
+                ? allMarketNames.Where(m => marketsToRun.Contains(m, StringComparer.OrdinalIgnoreCase)).ToList()
+                : allMarketNames.ToList();
+
+            if (!marketList.Any())
             {
-                OnTestProgress?.Invoke("No valid data found for ML training and simulation.");
-                OnTestProgress?.Invoke("No snapshots loaded for any markets.");
+                OnTestProgress?.Invoke("No valid markets found for ML training and simulation.");
                 return;
             }
 
-            // Split dataset: 80% train, 20% test
+            // Load and split data for each market individually
             var trainData = new Dictionary<string, List<MarketSnapshot>>();
             var testData = new Dictionary<string, List<MarketSnapshot>>();
-            foreach (var kvp in dataset)
+            foreach (var market in marketList)
             {
-                var snapshots = kvp.Value;
-                int splitIdx = (int)(snapshots.Count * 0.8);
-                trainData[kvp.Key] = snapshots.Take(splitIdx).ToList();
-                testData[kvp.Key] = snapshots.Skip(splitIdx).ToList();
-                OnTestProgress?.Invoke($"Split for {kvp.Key}: {trainData[kvp.Key].Count} train, {testData[kvp.Key].Count} test");
+                var marketSnapshots = await _dataLoader.LoadSnapshotsForMarketAsync(context, market);
+                if (!marketSnapshots.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: No snapshots found for market {market}. Skipping.");
+                    continue;
+                }
+
+                OnTestProgress?.Invoke($"Loaded {marketSnapshots.Count} snapshots for {market}");
+
+                // Split: 80% train, 20% test
+                int splitIdx = (int)(marketSnapshots.Count * 0.8);
+                trainData[market] = marketSnapshots.Take(splitIdx).ToList();
+                testData[market] = marketSnapshots.Skip(splitIdx).ToList();
+                OnTestProgress?.Invoke($"Split for {market}: {trainData[market].Count} train, {testData[market].Count} test");
+
+                // Clear the original data to free memory
+                marketSnapshots.Clear();
+            }
+
+            if (!trainData.Any())
+            {
+                OnTestProgress?.Invoke("No valid data found for ML training and simulation.");
+                return;
             }
 
             // Offline training and evaluation
@@ -666,11 +824,11 @@ ResolveFamily(StrategyFamily family)
             // Clear ResearchBus before run
             ResearchBus.Clear();
 
-            var marketList = dataset.Keys.ToList();
-            for (int mIdx = 0; mIdx < marketList.Count; mIdx++)
+            var testMarketList = testData.Keys.ToList();
+            for (int mIdx = 0; mIdx < testMarketList.Count; mIdx++)
             {
-                var market = marketList[mIdx];
-                var marketSnapshots = dataset[market];
+                var market = testMarketList[mIdx];
+                var marketSnapshots = testData[market];
                 var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
 
                 for (int setIdx = 0; setIdx < strategiesList.Count; setIdx++)
@@ -819,18 +977,30 @@ ResolveFamily(StrategyFamily family)
                 });
             }
 
-            // Load snapshot data using DataLoader
-            var dataset = await _dataLoader.LoadSnapshotsForMarketsAsync(context, marketsToRun ?? new List<string>());
+            // Get list of all available market names without loading group data
+            var allMarketNames = await GetSnapshotGroupNames();
 
-            OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets {dataset.Count} markets");
+            // Filter markets if specific ones were requested
+            var marketList = marketsToRun != null
+                ? allMarketNames.Where(m => marketsToRun.Contains(m, StringComparer.OrdinalIgnoreCase)).ToList()
+                : allMarketNames.ToList();
+
+            OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets {marketList.Count} markets");
 
             int totalDiscrepancies = 0;
 
-            var marketList = dataset.Keys.ToList();
+            // Process each market individually to avoid loading all data at once
             for (int mIdx = 0; mIdx < marketList.Count; mIdx++)
             {
                 var market = marketList[mIdx];
-                var marketSnapshots = dataset[market];
+
+                // Load data for this market only
+                var marketSnapshots = await _dataLoader.LoadSnapshotsForMarketAsync(context, market);
+                if (!marketSnapshots.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: No snapshots found for market {market}. Skipping.");
+                    continue;
+                }
 
                 var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
 
@@ -877,15 +1047,17 @@ ResolveFamily(StrategyFamily family)
 
                 OnMarketProcessed?.Invoke(market);
                 marketSnapshots.Clear();
+
+                // Save results after each market to avoid losing progress
+                foreach (var dto in weightSetDtos)
+                {
+                    using var saveScope = _scopeFactory.CreateScope();
+                    var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+                    await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
+                }
+                OnTestProgress?.Invoke($"Saved results for market {market} ({mIdx + 1}/{marketList.Count})");
             }
 
-            foreach (var dto in weightSetDtos)
-            {
-                using var saveScope = _scopeFactory.CreateScope();
-                var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-                await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
-                OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{marketList.Count} markets)");
-            }
 
             string csvPath = Path.Combine(_cacheDirectory, FormatFileName(_simulatorOptions.Value.ResearchBusFileNamePattern, new Dictionary<string, string>
             {

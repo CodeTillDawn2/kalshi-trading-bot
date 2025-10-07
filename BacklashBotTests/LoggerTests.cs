@@ -37,7 +37,8 @@ namespace BacklashBotTests
             services.Configure<InstanceNameConfig>(configuration.GetSection(InstanceNameConfig.SectionName));
             _serviceProvider = services.BuildServiceProvider();
 
-            _loggingQueueMock = new Mock<DatabaseLoggingQueue>(null, false);
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            _loggingQueueMock = new Mock<DatabaseLoggingQueue>(serviceProviderMock.Object, ApplicationType.Bot);
         }
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace BacklashBotTests
         [Test]
         public void DatabaseLoggerProvider_CanBeInstantiated()
         {
-            TestContext.WriteLine("Testing that the DatabaseLoggerProvider can be instantiated with mocked dependencies.");
+            TestContext.Out.WriteLine("Testing that the DatabaseLoggerProvider can be instantiated with mocked dependencies.");
             // Arrange - Load configs from DI
             var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
             var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
@@ -67,7 +68,7 @@ namespace BacklashBotTests
                 // Verify the provider is not null
                 Assert.That(provider, Is.Not.Null);
             });
-            TestContext.WriteLine("Result: DatabaseLoggerProvider instantiated successfully.");
+            TestContext.Out.WriteLine("Result: DatabaseLoggerProvider instantiated successfully.");
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace BacklashBotTests
         [Test]
         public void DatabaseLoggerProvider_CanCreateLogger()
         {
-            TestContext.WriteLine("Testing that the DatabaseLoggerProvider can create a logger instance.");
+            TestContext.Out.WriteLine("Testing that the DatabaseLoggerProvider can create a logger instance.");
             // Arrange - Load configs from DI
             var loggingConfig = _serviceProvider.GetRequiredService<IOptions<LoggingConfig>>().Value;
             var instanceNameConfig = _serviceProvider.GetRequiredService<IOptions<InstanceNameConfig>>().Value;
@@ -97,7 +98,7 @@ namespace BacklashBotTests
             // Assert
             Assert.That(logger, Is.Not.Null);
             Assert.That(logger, Is.InstanceOf<ILogger>());
-            TestContext.WriteLine("Result: Logger instance created successfully.");
+            TestContext.Out.WriteLine("Result: Logger instance created successfully.");
         }
 
         /// <summary>

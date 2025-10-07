@@ -1,8 +1,6 @@
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.State.Interfaces;
-using BacklashCommon.Services;
 using BacklashDTOs.KalshiAPI;
-using BacklashInterfaces.PerformanceMetrics;
+using BacklashOverseer.Services;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -326,13 +324,13 @@ namespace OverseerTests
 
             _apiServiceMock.Setup(x => x.GetExchangeStatusAsync()).ReturnsAsync(exchangeStatus);
             _webSocketClientMock.Setup(x => x.IsConnected()).Returns(true);
-            _webSocketClientMock.Setup(x => x.ResetConnectionAsync()).Returns(Task.CompletedTask);
+            _webSocketClientMock.Setup(x => x.ResetConnectionAsync(It.IsAny<bool>())).Returns(Task.CompletedTask);
 
             // Act
             await _service.TriggerConnectionCheckAsync();
 
             // Assert - Simplified verification
-            _webSocketClientMock.Verify(x => x.ResetConnectionAsync(), Times.Once);
+            _webSocketClientMock.Verify(x => x.ResetConnectionAsync(It.IsAny<bool>()), Times.Once);
             TestContext.WriteLine("Result: WebSocket connection reset when exchange is inactive.");
         }
 
@@ -360,7 +358,7 @@ namespace OverseerTests
 
             // Assert - Simplified verification
             _webSocketClientMock.Verify(x => x.ConnectAsync(It.IsAny<int>()), Times.Never);
-            _webSocketClientMock.Verify(x => x.ResetConnectionAsync(), Times.Never);
+            _webSocketClientMock.Verify(x => x.ResetConnectionAsync(It.IsAny<bool>()), Times.Never);
             TestContext.WriteLine("Result: No connection actions taken when exchange status is unchanged.");
         }
 
@@ -475,7 +473,7 @@ namespace OverseerTests
             var exception = new Exception("WebSocket reset error");
             _apiServiceMock.Setup(x => x.GetExchangeStatusAsync()).ReturnsAsync(exchangeStatus);
             _webSocketClientMock.Setup(x => x.IsConnected()).Returns(true);
-            _webSocketClientMock.Setup(x => x.ResetConnectionAsync()).ThrowsAsync(exception);
+            _webSocketClientMock.Setup(x => x.ResetConnectionAsync(It.IsAny<bool>())).ThrowsAsync(exception);
 
             // Act
             await _service.TriggerConnectionCheckAsync();

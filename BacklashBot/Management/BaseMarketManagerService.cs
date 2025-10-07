@@ -8,6 +8,7 @@ using BacklashCommon.Configuration;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
@@ -21,21 +22,77 @@ namespace BacklashBot.Management
     /// </summary>
     public abstract class BaseMarketManagerService : IMarketManagerService
     {
+        /// <summary>
+        /// Factory for accessing various bot services and dependencies.
+        /// </summary>
         protected readonly IServiceFactory _serviceFactory;
+        /// <summary>
+        /// Service for managing dependency injection scopes.
+        /// </summary>
         protected readonly IScopeManagerService _scopeManagerService;
+        /// <summary>
+        /// Logger for recording market management operations and errors.
+        /// </summary>
         protected readonly ILogger<IMarketManagerService> _logger;
+        /// <summary>
+        /// Factory for creating service scopes for dependency injection.
+        /// </summary>
         protected readonly IServiceScopeFactory _scopeFactory;
+        /// <summary>
+        /// Service providing brain instance status information and lock management.
+        /// </summary>
         protected readonly IBrainStatusService _brainStatus;
-        protected readonly ICentralPerformanceMonitor _performanceMonitor;
+        /// <summary>
+        /// Monitor for tracking system performance metrics and resource usage.
+        /// </summary>
+        protected readonly IPerformanceMonitor _performanceMonitor;
+        /// <summary>
+        /// Monitor for getting system performance metrics and resource usage.
+        /// </summary>
+        protected readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        /// <summary>
+        /// Service for calculating optimal market targets based on performance metrics.
+        /// </summary>
         protected readonly ITargetCalculationService _targetCalculationService;
+        /// <summary>
+        /// List of market tickers that have been flagged for reset operations.
+        /// </summary>
         protected List<string> MarketsToReset = new List<string>();
+        /// <summary>
+        /// List of market tickers to be added back to the watch list after reset operations complete.
+        /// </summary>
         protected List<string> MarketsToAddAfterReset = new List<string>();
+        /// <summary>
+        /// Flag indicating whether a recent market adjustment has been made.
+        /// </summary>
         protected bool _recentMarketAdjustment = false;
+        /// <summary>
+        /// Flag indicating whether this is the first watch list update operation.
+        /// </summary>
         protected bool _firstWatchUpdate = true;
+        /// <summary>
+        /// Configuration options for instance name parameters.
+        /// </summary>
         protected readonly InstanceNameConfig _instanceNameConfig;
+        /// <summary>
+        /// Configuration options for central brain parameters and limits.
+        /// </summary>
         protected readonly CentralBrainConfig _centralBrainConfig;
+        /// <summary>
+        /// Configuration options for market manager service parameters.
+        /// </summary>
+        protected readonly MarketManagerServiceConfig _marketManagerServiceConfig;
+        /// <summary>
+        /// Service for tracking operation status and managing cancellation tokens.
+        /// </summary>
         protected IStatusTrackerService _statusTrackerService;
+        /// <summary>
+        /// Flag indicating whether the watch list monitoring operation is currently active.
+        /// </summary>
         protected bool MonitoringWatchList = false;
+        /// <summary>
+        /// Lock object for thread-safe access to reset operation queues.
+        /// </summary>
         protected readonly object _resetLock = new();
 
         /// <summary>
@@ -49,28 +106,34 @@ namespace BacklashBot.Management
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="instanceNameConfig">Configuration options for instance name parameters</param>
         /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
+        /// <param name="marketManagerServiceConfig">Configuration options for market manager service parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="centralPerformanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         protected BaseMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
-            ICentralPerformanceMonitor performanceMonitor,
+            IPerformanceMonitor performanceMonitor,
             IOptions<InstanceNameConfig> instanceNameConfig,
             IOptions<CentralBrainConfig> centralBrainConfig,
+            IOptions<MarketManagerServiceConfig> marketManagerServiceConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
             ITargetCalculationService targetCalculationService)
         {
             _serviceFactory = serviceFactory;
             _scopeManagerService = scopeManagerService;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
             _statusTrackerService = statusTrackerService;
             _logger = logger;
             _scopeFactory = scopeFactory;
             _instanceNameConfig = instanceNameConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
+            _marketManagerServiceConfig = marketManagerServiceConfig.Value;
             _performanceMonitor = performanceMonitor;
             _brainStatus = brainStatus;
             _targetCalculationService = targetCalculationService;
@@ -136,7 +199,7 @@ namespace BacklashBot.Management
         /// <param name="brain">The brain instance configuration containing watch list settings</param>
         /// <param name="metrics">Current performance metrics for decision making</param>
         /// <returns>A task representing the asynchronous monitoring operation</returns>
-        public abstract Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics);
+        public abstract Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics);
 
         /// <summary>
         /// Calculates the optimal target number of markets to watch based on current performance metrics.
@@ -145,7 +208,7 @@ namespace BacklashBot.Management
         /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
         /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
         /// <returns>The calculated target number of markets to watch</returns>
-        public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
+        public int CalculateTarget(BrainPerformanceMetricsDTO metrics, BrainInstanceDTO brain)
         {
             return _targetCalculationService.CalculateTarget(metrics, brain);
         }

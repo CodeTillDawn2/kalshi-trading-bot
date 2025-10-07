@@ -1,3 +1,4 @@
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -40,6 +41,8 @@ namespace TradingStrategies.Trading.Helpers
 
         private readonly StrategySelectionHelperConfig _config;
 
+        private readonly IPerformanceMonitor _performanceMonitor;
+
         /// <summary>
         /// Flag to enable/disable performance metrics collection.
         /// Uses configuration from StrategySelectionHelperConfig:EnablePerformanceMetrics.
@@ -56,9 +59,11 @@ namespace TradingStrategies.Trading.Helpers
         /// Initializes a new instance of the StrategySelectionHelper class.
         /// </summary>
         /// <param name="config">The strategy selection helper configuration containing performance metrics settings.</param>
-        public StrategySelectionHelper(IOptions<StrategySelectionHelperConfig> config)
+        /// <param name="performanceMonitor">The performance monitor for recording metrics.</param>
+        public StrategySelectionHelper(IOptions<StrategySelectionHelperConfig> config, IPerformanceMonitor performanceMonitor)
         {
             _config = config.Value;
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -107,12 +112,25 @@ namespace TradingStrategies.Trading.Helpers
         }
 
         /// <summary>
-        /// Posts the current performance metrics to the specified performance monitor.
+        /// Posts the current performance metrics to the injected performance monitor.
         /// </summary>
-        /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
-        public void PostMetrics(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
+        public void PostMetrics()
         {
-            if (performanceMonitor == null || !EnablePerformanceMetrics) return;
+            if (_performanceMonitor == null) return;
+
+            if (!EnablePerformanceMetrics)
+            {
+                _performanceMonitor.RecordDisabledMetric(
+                    className: "StrategySelectionHelper",
+                    id: "StrategyInstantiationMetrics",
+                    name: "Strategy Instantiation Metrics",
+                    description: "Performance metrics for strategy instantiation (disabled)",
+                    value: 0,
+                    unit: "",
+                    category: "Performance"
+                );
+                return;
+            }
 
             var allMetrics = GetPerformanceMetrics();
             if (!allMetrics.Any()) return;
@@ -131,20 +149,62 @@ namespace TradingStrategies.Trading.Helpers
                 var totalInstances = metrics.Sum(m => m.InstanceCount);
                 var totalMemory = metrics.Sum(m => m.TotalMemoryAllocated);
 
-                var metricsDict = new Dictionary<string, object>
-                {
-                    ["StrategyType"] = strategyType,
-                    ["TotalInstantiationTimeMs"] = totalTime,
-                    ["AverageInstantiationTimeMs"] = avgTime,
-                    ["TotalInstances"] = totalInstances,
-                    ["TotalMemoryAllocated"] = totalMemory,
-                    ["MetricsCount"] = metrics.Count,
-                    ["IndividualInstantiationTimes"] = metrics.SelectMany(m => m.IndividualInstantiationTimes).ToList(),
-                    ["IndividualMemoryAllocations"] = metrics.SelectMany(m => m.IndividualMemoryAllocations).ToList(),
-                    ["Timestamp"] = DateTime.UtcNow
-                };
+                // Record individual metrics
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "StrategySelectionHelper",
+                    id: $"StrategyInstantiationTotalTime_{strategyType}",
+                    name: $"Total Instantiation Time - {strategyType}",
+                    description: $"Total time spent instantiating {strategyType} strategies",
+                    value: totalTime,
+                    unit: "ms",
+                    category: "Performance",
+                    minThreshold: 0,
+                    warningThreshold: 1000,
+                    criticalThreshold: 5000
+                );
 
-                performanceMonitor.RecordSimulationMetrics($"StrategySelectionHelper.{strategyType}", metricsDict, EnablePerformanceMetrics);
+                _performanceMonitor.RecordSpeedDialMetric(
+                    className: "StrategySelectionHelper",
+                    id: $"StrategyInstantiationAvgTime_{strategyType}",
+                    name: $"Average Instantiation Time - {strategyType}",
+                    description: $"Average time per instantiation for {strategyType} strategies",
+                    value: avgTime,
+                    unit: "ms",
+                    category: "Performance",
+                    minThreshold: 0,
+                    warningThreshold: 100,
+                    criticalThreshold: 500
+                );
+
+                _performanceMonitor.RecordCounterMetric(
+                    className: "StrategySelectionHelper",
+                    id: $"StrategyInstantiationTotalInstances_{strategyType}",
+                    name: $"Total Instances - {strategyType}",
+                    description: $"Total number of {strategyType} strategy instances created",
+                    value: totalInstances,
+                    unit: "count",
+                    category: "Performance"
+                );
+
+                _performanceMonitor.RecordNumericDisplayMetric(
+                    className: "StrategySelectionHelper",
+                    id: $"StrategyInstantiationTotalMemory_{strategyType}",
+                    name: $"Total Memory Allocated - {strategyType}",
+                    description: $"Total memory allocated for {strategyType} strategy instantiation",
+                    value: totalMemory,
+                    unit: "bytes",
+                    category: "Performance"
+                );
+
+                _performanceMonitor.RecordCounterMetric(
+                    className: "StrategySelectionHelper",
+                    id: $"StrategyInstantiationMetricsCount_{strategyType}",
+                    name: $"Metrics Count - {strategyType}",
+                    description: $"Number of metric records for {strategyType} strategy instantiation",
+                    value: metrics.Count,
+                    unit: "count",
+                    category: "Performance"
+                );
             }
         }
         /// <summary>

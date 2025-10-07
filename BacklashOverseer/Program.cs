@@ -19,9 +19,7 @@ partial class Program
         var overseer = scope.ServiceProvider.GetRequiredService<Overseer>();
         await overseer.Start();
 
-        Console.WriteLine("Services started. Web server running at http://localhost:5000");
-        Console.WriteLine("MarketWatch GUI available at: http://localhost:5000/marketwatch");
-        Console.WriteLine("Press Ctrl+C to stop...");
+        Console.WriteLine($"BacklashOverseer v{Overseer.Version} started");
 
         // Wait for shutdown signal
         var shutdownTokenSource = new CancellationTokenSource();

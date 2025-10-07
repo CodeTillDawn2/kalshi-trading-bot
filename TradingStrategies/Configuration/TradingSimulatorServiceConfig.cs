@@ -13,20 +13,6 @@ namespace TradingStrategies.Configuration
         public const string SectionName = "Simulator:TradingSimulatorService";
 
         /// <summary>
-        /// Gets or sets the directory path where simulation cache files and reports are stored.
-        /// This directory is created automatically if it doesn't exist.
-        /// </summary>
-        [Required(ErrorMessage = "The 'CacheDirectory' is missing in the configuration.")]
-        public string CacheDirectory { get; set; } = null!;
-
-        /// <summary>
-        /// Gets or sets the timeout in seconds for processing market data during simulation.
-        /// Default is 300 seconds (5 minutes).
-        /// </summary>
-        [Required(ErrorMessage = "The 'ProcessingTimeoutSeconds' is missing in the configuration.")]
-        public int ProcessingTimeoutSeconds { get; set; }
-
-        /// <summary>
         /// Gets or sets the file naming pattern for market data JSON files.
         /// Supports placeholders: {market}, {label}, {strategy}, {timestamp}.
         /// Default pattern: "{market}_{label}_{strategy}_{timestamp}.json"

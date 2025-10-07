@@ -3,7 +3,10 @@ using BacklashDTOs.KalshiAPI;
 namespace BacklashBot.KalshiAPI.Interfaces
 {
     /// <summary>
-    /// Interface for interacting with the Kalshi API to fetch market data, positions, orders, and other trading information.
+    /// Defines the contract for services that interact with the Kalshi trading platform API.
+    /// This interface provides methods for fetching market data, managing positions and orders,
+    /// retrieving account information, and accessing exchange status and schedules.
+    /// Implementations should handle authentication, error handling, and data transformation.
     /// </summary>
     public interface IKalshiAPIService
     {
@@ -36,6 +39,20 @@ namespace BacklashBot.KalshiAPI.Interfaces
         /// <param name="withNestedMarkets">Whether to include nested markets in the response.</param>
         /// <returns>The event response if found, null otherwise.</returns>
         Task<EventResponse?> FetchEventAsync(string eventTicker, bool withNestedMarkets = false);
+
+        /// <summary>
+        /// Fetches a paginated list of events from the Kalshi API.
+        /// </summary>
+        /// <param name="limit">Optional limit on the number of events to retrieve (1-200, defaults to 100).</param>
+        /// <param name="cursor">Optional cursor for pagination.</param>
+        /// <param name="withNestedMarkets">Whether to include nested markets in the response.</param>
+        /// <param name="status">Optional status filter ('open', 'closed', 'settled').</param>
+        /// <param name="seriesTicker">Optional series ticker filter.</param>
+        /// <param name="minCloseTs">Optional minimum close timestamp filter.</param>
+        /// <returns>The events response if successful, null otherwise.</returns>
+        Task<EventsResponse?> GetEventsAsync(
+            int? limit = null, string? cursor = null, bool withNestedMarkets = false,
+            string? status = null, string? seriesTicker = null, long? minCloseTs = null);
 
         /// <summary>
         /// Fetches positions from the Kalshi API based on specified filters.
@@ -105,5 +122,34 @@ namespace BacklashBot.KalshiAPI.Interfaces
         /// </summary>
         /// <returns>A tuple containing processed count and error count.</returns>
         Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync();
+
+        /// <summary>
+        /// Retrieves milestones from the Kalshi API with support for various filters and pagination.
+        /// Provides information about important events, deadlines, or significant occurrences related to markets and trading activities.
+        /// </summary>
+        /// <param name="minimumStartDate">Optional minimum start date filter for milestones (RFC3339 timestamp).</param>
+        /// <param name="category">Optional filter for milestone category.</param>
+        /// <param name="competition">Optional filter for competition.</param>
+        /// <param name="type">Optional filter for milestone type.</param>
+        /// <param name="relatedEventTicker">Optional filter for related event ticker.</param>
+        /// <param name="limit">Required limit on the number of milestones to retrieve per request (1-200).</param>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of milestones.</param>
+        /// <returns>The milestones response containing milestone data, or null if the operation fails.</returns>
+        Task<MilestonesResponse?> GetMilestonesAsync(
+            string? minimumStartDate = null,
+            string? category = null,
+            string? competition = null,
+            string? type = null,
+            string? relatedEventTicker = null,
+            int? limit = null,
+            string? cursor = null);
+
+        /// <summary>
+        /// Creates an order on the Kalshi platform.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker.</param>
+        /// <param name="orderRequest">The order request details.</param>
+        /// <returns>The create order response if successful, null otherwise.</returns>
+        Task<CreateOrderResponse?> CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest);
     }
 }

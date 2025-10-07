@@ -370,7 +370,7 @@ function createBrainCard(item) {
                         <div class="stat-label">Current Markets</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">${item.marketCount || '--'}</span>
+                        <span class="stat-value">${item.TargetWatches || '--'}</span>
                         <div class="stat-label">Target Watches</div>
                     </div>
                     <div class="stat-item">

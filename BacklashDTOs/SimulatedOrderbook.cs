@@ -5,26 +5,47 @@ namespace BacklashDTOs
     /// </summary>
     public class SimulatedOrderbook
     {
-        // Array of lists for prices 1-99; index 0 unused
         /// <summary>
-        /// Gets the array of yes bid orders organized by price level.
+        /// Represents an order level in the order book.
         /// </summary>
-        public readonly List<(int count, DateTime timestamp)>[] YesBids = new List<(int count, DateTime timestamp)>[100];
+        public class OrderLevel
+        {
+            /// <summary>
+            /// Gets or sets the unique identifier for the order.
+            /// </summary>
+            public string Id { get; set; } = Guid.NewGuid().ToString();
+
+            /// <summary>
+            /// Gets or sets the count of contracts at this level.
+            /// </summary>
+            public int Count { get; set; }
+
+            /// <summary>
+            /// Gets or sets the timestamp when the order was placed.
+            /// </summary>
+            public DateTime Timestamp { get; set; }
+
+            /// <summary>
+            /// Gets or sets whether this is an order placed by our own strategy.
+            /// </summary>
+            public bool IsOwnOrder { get; set; }
+        }
+
         /// <summary>
-        /// Gets the array of no bid orders organized by price level.
+        /// Gets the sorted dictionary of yes bid orders organized by price level.
         /// </summary>
-        public readonly List<(int count, DateTime timestamp)>[] NoBids = new List<(int count, DateTime timestamp)>[100];
+        public readonly SortedDictionary<int, List<OrderLevel>> YesBids = new SortedDictionary<int, List<OrderLevel>>();
+        /// <summary>
+        /// Gets the sorted dictionary of no bid orders organized by price level.
+        /// </summary>
+        public readonly SortedDictionary<int, List<OrderLevel>> NoBids = new SortedDictionary<int, List<OrderLevel>>();
 
         /// <summary>
         /// Initializes a new instance of the SimulatedOrderbook class.
         /// </summary>
         public SimulatedOrderbook()
         {
-            for (int i = 0; i < 100; i++)
-            {
-                YesBids[i] = new(); // Lazy init
-                NoBids[i] = new();
-            }
+            // SortedDictionary is initialized automatically
         }
 
         /// <summary>
@@ -33,11 +54,7 @@ namespace BacklashDTOs
         /// <returns>The best yes bid price, or 0 if no bids exist.</returns>
         public int GetBestYesBid()
         {
-            for (int p = 99; p >= 1; p--)
-            {
-                if (YesBids[p] != null && YesBids[p].Count > 0) return p;
-            }
-            return 0;
+            return YesBids.Count > 0 ? YesBids.Keys.Last() : 0;
         }
 
         /// <summary>
@@ -46,11 +63,7 @@ namespace BacklashDTOs
         /// <returns>The best no bid price, or 0 if no bids exist.</returns>
         public int GetBestNoBid()
         {
-            for (int p = 99; p >= 1; p--)
-            {
-                if (NoBids[p] != null && NoBids[p].Count > 0) return p;
-            }
-            return 0;
+            return NoBids.Count > 0 ? NoBids.Keys.Last() : 0;
         }
 
         /// <summary>
@@ -69,13 +82,21 @@ namespace BacklashDTOs
         /// Gets the total depth at the best yes bid price.
         /// </summary>
         /// <returns>The total contract count at the best yes bid price.</returns>
-        public int GetDepthAtBestYesBid() => YesBids[GetBestYesBid()]?.Sum(o => o.count) ?? 0;
+        public int GetDepthAtBestYesBid()
+        {
+            int best = GetBestYesBid();
+            return best > 0 && YesBids.TryGetValue(best, out var list) ? list.Sum(o => o.Count) : 0;
+        }
 
         /// <summary>
         /// Gets the total depth at the best no bid price.
         /// </summary>
         /// <returns>The total contract count at the best no bid price.</returns>
-        public int GetDepthAtBestNoBid() => NoBids[GetBestNoBid()]?.Sum(o => o.count) ?? 0;
+        public int GetDepthAtBestNoBid()
+        {
+            int best = GetBestNoBid();
+            return best > 0 && NoBids.TryGetValue(best, out var list) ? list.Sum(o => o.Count) : 0;
+        }
 
         /// <summary>
         /// Gets the total depth at the best yes ask price.
@@ -96,16 +117,25 @@ namespace BacklashDTOs
         public SimulatedOrderbook Clone()
         {
             var clone = new SimulatedOrderbook();
-            for (int p = 1; p <= 99; p++)
+            foreach (var kvp in YesBids)
             {
-                if (YesBids[p] != null)
+                clone.YesBids[kvp.Key] = kvp.Value.Select(o => new OrderLevel
                 {
-                    clone.YesBids[p] = YesBids[p].Select(o => o).ToList(); // Deep copy list
-                }
-                if (NoBids[p] != null)
+                    Id = o.Id,
+                    Count = o.Count,
+                    Timestamp = o.Timestamp,
+                    IsOwnOrder = o.IsOwnOrder
+                }).ToList();
+            }
+            foreach (var kvp in NoBids)
+            {
+                clone.NoBids[kvp.Key] = kvp.Value.Select(o => new OrderLevel
                 {
-                    clone.NoBids[p] = NoBids[p].Select(o => o).ToList();
-                }
+                    Id = o.Id,
+                    Count = o.Count,
+                    Timestamp = o.Timestamp,
+                    IsOwnOrder = o.IsOwnOrder
+                }).ToList();
             }
             return clone;
         }
@@ -116,11 +146,8 @@ namespace BacklashDTOs
         /// <param name="snapshot">The market snapshot to initialize from.</param>
         public void InitializeFromSnapshot(MarketSnapshot snapshot)
         {
-            for (int i = 1; i <= 99; i++)
-            {
-                YesBids[i] = new();
-                NoBids[i] = new();
-            }
+            YesBids.Clear();
+            NoBids.Clear();
 
             DateTime initTime = snapshot.Timestamp; // Assume all initial orders at snapshot time
             if (snapshot.OrderbookData is null) return;
@@ -132,15 +159,16 @@ namespace BacklashDTOs
 
                 if (price < 1 || price > 99 || side is null) continue;
 
-                var ordersList = new List<(int count, DateTime timestamp)> { (contracts, initTime) }; // Single aggregated order for init
+                var list = new List<OrderLevel>();
+                list.Add(new OrderLevel { Count = contracts, Timestamp = initTime, IsOwnOrder = false });
 
                 if (side == "yes")
                 {
-                    YesBids[price] = ordersList;
+                    YesBids[price] = list;
                 }
                 else if (side == "no")
                 {
-                    NoBids[price] = ordersList;
+                    NoBids[price] = list;
                 }
             }
         }
@@ -148,46 +176,50 @@ namespace BacklashDTOs
         /// <summary>
         /// Reduces the depth at a specific price level by removing orders.
         /// </summary>
-        /// <param name="book">The order book array to modify.</param>
+        /// <param name="book">The order book dictionary to modify.</param>
         /// <param name="price">The price level to modify.</param>
         /// <param name="qty">The quantity to remove.</param>
-        public void ReduceDepth(List<(int count, DateTime timestamp)>[] book, int price, int qty)
+        /// <param name="fromFront">Whether to remove from the front (FIFO) or back (LIFO for expiration).</param>
+        public void ReduceDepth(SortedDictionary<int, List<OrderLevel>> book, int price, int qty, bool fromFront = true)
         {
-            if (price < 1 || price > 99) return;
-            var orders = book[price];
-            if (orders == null) return;
+            if (price < 1 || price > 99 || !book.TryGetValue(price, out var list)) return;
 
             int remainingQty = qty;
-            for (int i = 0; i < orders.Count && remainingQty > 0; i++)
+            while (remainingQty > 0 && list.Count > 0)
             {
-                var order = orders[i];
-                int fill = Math.Min(remainingQty, order.count);
+                int index = fromFront ? 0 : list.Count - 1;
+                var order = list[index];
+                int fill = Math.Min(remainingQty, order.Count);
                 remainingQty -= fill;
-                orders[i] = (order.count - fill, order.timestamp);
+                order.Count -= fill;
+                if (order.Count <= 0)
+                {
+                    list.RemoveAt(index);
+                }
             }
-            // Remove zero-count orders
-            orders.RemoveAll(o => o.count <= 0);
-            if (orders.Count == 0)
+            if (list.Count == 0)
             {
-                book[price] = new();
+                book.Remove(price);
             }
         }
 
         /// <summary>
         /// Adds depth at a specific price level by adding new orders.
         /// </summary>
-        /// <param name="book">The order book array to modify.</param>
+        /// <param name="book">The order book dictionary to modify.</param>
         /// <param name="price">The price level to modify.</param>
         /// <param name="qty">The quantity to add.</param>
         /// <param name="timestamp">The timestamp for the new orders.</param>
-        public void AddToDepth(List<(int count, DateTime timestamp)>[] book, int price, int qty, DateTime timestamp)
+        /// <param name="isOwn">Whether this is an order placed by our own strategy.</param>
+        public void AddToDepth(SortedDictionary<int, List<OrderLevel>> book, int price, int qty, DateTime timestamp, bool isOwn = true)
         {
             if (price < 1 || price > 99) return;
-            if (book[price] == null)
+            if (!book.TryGetValue(price, out var list))
             {
-                book[price] = new List<(int count, DateTime timestamp)>();
+                list = new List<OrderLevel>();
+                book[price] = list;
             }
-            book[price].Add((qty, timestamp)); // Add to end (newest)
+            list.Add(new OrderLevel { Count = qty, Timestamp = timestamp, IsOwnOrder = isOwn });
         }
 
         /// <summary>
@@ -202,7 +234,7 @@ namespace BacklashDTOs
             ApplyDeltasInternal(NoBids, noDeltas, currentTime);
         }
 
-        private void ApplyDeltasInternal(List<(int count, DateTime timestamp)>[] book, Dictionary<int, int> deltas, DateTime currentTime)
+        private void ApplyDeltasInternal(SortedDictionary<int, List<OrderLevel>> book, Dictionary<int, int> deltas, DateTime currentTime)
         {
             foreach (var kv in deltas)
             {
@@ -212,12 +244,12 @@ namespace BacklashDTOs
 
                 if (delta > 0)
                 {
-                    // Add new orders at end (assume aggregated new order)
-                    AddToDepth(book, price, delta, currentTime);
+                    // Add new external orders (isOwn = false)
+                    AddToDepth(book, price, delta, currentTime, isOwn: false);
                 }
                 else if (delta < 0)
                 {
-                    // Reduce from front (oldest)
+                    // Reduce from front (FIFO)
                     ReduceDepth(book, price, -delta);
                 }
             }

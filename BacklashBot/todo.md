@@ -1,72 +1,3 @@
-BacklashBot:
-
-SlopeShortMinutes: New=5 (old 1).
-SlopeMediumMinutes: New=15 (old 5).
-RSI periods all New=14 (old varied 9-21).
-MACD periods: New=12/26/9 (old standard, but confirmed same).
-EMA periods: New=14 (old 21).
-BollingerBands periods: New=20, StdDev=2.0 (old 20/2, same).
-ATR periods: New=14 (old 14, same).
-VWAP periods: New=15 (old 20).
-Stochastic periods: New=14/3 (old 14/3, same).
-TradingFeeRate: New=0.07 (old 0.05?).
-PseudoCandlestickLookbackPeriods: New=34 (old 20).
-RecentCandlesticksCount: New=15 (old 10).
-PSAR params: New=0.02/0.2/0.02 (old same).
-ADX_Periods: New=14 (old 14).
-ResistanceLevels params: New=2.0/0.1/6/2.0/3 (old varied, e.g., MaxLevels=5).
-CandlestickService.MaxParallelCandlestickTasks: New=4 (old 2).
-CandlestickMandatoryOverlapDays: New=15d7h3m (old 7d).
-MaxParallelParquetTasks: New=4 (old 1).
-OrderbookChangeTracker.EventCalculationPeriod: New=5 (old 1).
-MarketRefreshService.RefreshIntervalMinutes: New=5 (old 1).
-RefreshThresholdRatio: New=0.25 (old 0.5).
-TimeBudgetRatio: New=0.60 (old 0.8).
-TradingGUI:
-
-TradingSimulatorService.ProcessingTimeoutSeconds: New=300 (old 60s).
-MaxConcurrentMarkets: New=5 (old 1).
-BatchSize: New=10 (old 50).
-DiscrepancyThresholdPercentage: New=10 (old 5).
-DiscrepancyDetection.VelocityThreshold: New=0.1 (old 0.05).
-MinSnapshotsForDetection: New=10 (old 5).
-PatternDetectionService.LookbackWindow: New=50 (old 20).
-SignificancePriceThreshold: New=0.01 (old 0.005).
-VolumeIncreaseMultiplier: New=1.5 (old 2.0).
-InitialPatternCapacity: New=10 (old 5).
-MaxDegreeOfParallelism: New=4 (old 2).
-SnapshotViewer.ZoomInFactor: New=0.9 (old 0.8).
-ZoomOutFactor: New=1.1 (old 1.2).
-PanThreshold: New=0.001 (old 0.01).
-NavigationTimerInterval: New=300 (old 100).
-Rapid/Fast/Medium thresholds: New=60/15/5 (old 30/10/3).
-Step sizes: New=60/5/2/1 (old 30/3/1/1).
-
-
-# Important warnings to fix
-XML Comment Issues in BacklashDTOs/MarketSnapshot.cs:
-
-Multiple CS1570 warnings for badly formed XML comments (e.g., undefined entity '&L', expected identifiers, mismatched tags)
-These appear to be malformed documentation comments that need fixing for proper IntelliSense and documentation generation
-Nullability Warnings (Extensive):
-
-CS8600/CS8625: Converting null literals to non-nullable types (primarily in KalshiBotTests)
-CS8602/CS8604: Dereference of possibly null references (in TradingGUI and tests)
-CS8620/CS8622: Nullability mismatches in method parameters and delegates
-CS8629: Nullable value types that may be null
-These indicate potential runtime null reference exceptions and should be addressed for code safety
-Async Method Issues:
-
-CS1998: Several async methods lack 'await' operators and run synchronously (in KalshiAPIServiceTests, TradingGUI)
-CS4014: Unawaited async calls that continue execution before completion
-Other Notable Warnings:
-
-CS8618: Non-nullable fields not initialized in constructors (consider 'required' modifier)
-CS0649: Fields never assigned (in test classes)
-CS0168: Unused variables
-CS1571: Duplicate XML param tags
-
-
 # Backlog
 - [ ] Fix build warnings
 - [ ] Change to "fractional cents"
@@ -82,9 +13,9 @@ CS1571: Duplicate XML param tags
 - [ ] Subscribe to rss feed for ChangeLog
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
-
-
-# v0.3.0
+- [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
+- [ ] Rebrand
+- [ ] Rotate all credentials
 - [ ] Automate data cleanup
 - [ ] Make database logging of debug work
 - [ ] Was forced to upgrade to market lifecycle v2, need to update code to capture new fields if necessary
@@ -92,16 +23,17 @@ CS1571: Duplicate XML param tags
 - [ ] Ensure category properly retrieved and saved (missing on some markets still)
 - [ ] Revisit market interest score
 - [ ] Make various refresh threshholds configurable (timing between refreshes, number of extras forced when not many to refresh, etc)
-- [ ] Investigate: Exchange is inactive or reconnection disabled, skipping reconnection attempt (id 458076146,followed by no reconnection attempt for 2 hours, then skipping "late" snapshots, only restarting because of no snapshots in 10 minutes)
-- [ ] Start periodically sampling exchange status and find out if they are warning about sudden outages
+
+# v0.3.0
+- [x] Start periodically sampling exchange status and find out if they are warning about sudden outages
 - [x] Start with no markets watched then build list so there isn't so much of a downtime, start with most active markets to minimize impact of restart
-- [ ] Need to let market refresh service run before init finishes if long running
-- [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
-- [ ] Rebrand
-- [ ] Rotate overseer-dev kalshi key
+- [x] Need to let market refresh service run before init finishes if long running
+- [x] Overseer stable
+- [x] Re-architect
 - [x] New API calls
 - [x] Kalshi Overseer now out there, running
 - [x] Major rework - renamed things to be more clear, added xml docs, cleaned up logging, removed vestigial comments
+- [x] So many things
 
 # v0.2.5
 Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.

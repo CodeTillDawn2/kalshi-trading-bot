@@ -1,5 +1,4 @@
 using BacklashBot.Configuration;
-using BacklashBot.Helpers;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
@@ -16,15 +15,11 @@ using BacklashDTOs;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
-using KalshiBotData.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
 using TradingSimulator.Strategies;
 using TradingStrategies.ML.SpikePrediction;
 
@@ -82,9 +77,7 @@ namespace BacklashBotTasks
             var statusTrackerMock = new Mock<IStatusTrackerService>();
 
             var services = new ServiceCollection();
-            services.AddScoped<IKalshiAPIService, KalshiAPIService>(); // Register with interface
-            services.AddScoped<IServiceFactory, ServiceFactory>();
-            services.AddScoped<CentralPerformanceMonitor>();
+            services.AddLogging();
             services.AddSingleton<IConfiguration>(config);
 
             // Register options using the same pattern as Program.cs
@@ -116,6 +109,22 @@ namespace BacklashBotTasks
                 .Bind(config.GetSection(SnapshotGroupHelperConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
+            services.AddOptions<InstanceNameConfig>()
+                .Bind(config.GetSection(InstanceNameConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<QueueMonitoringConfig>()
+                .Bind(config.GetSection(QueueMonitoringConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<CentralPerformanceMonitorConfig>()
+                .Bind(config.GetSection(CentralPerformanceMonitorConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services.AddOptions<DataStorageConfig>()
+                .Bind(config.GetSection(DataStorageConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             var tempProvider = services.BuildServiceProvider();
 
@@ -127,7 +136,21 @@ namespace BacklashBotTasks
             var snapshotPeriodHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotPeriodHelperConfig>>();
             var snapshotGroupHelperOptions = tempProvider.GetRequiredService<IOptions<SnapshotGroupHelperConfig>>();
 
-            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions);
+            // Create performance monitor mock
+            var performanceMonitorMock = new Mock<IPerformanceMonitor>();
+
+            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions, performanceMonitorMock.Object);
+
+            services.AddScoped<IKalshiAPIService, KalshiAPIService>(); // Register with interface
+            services.AddScoped<IServiceFactory, ServiceFactory>();
+            services.AddSingleton<ICentralPerformanceMonitor>(sp => new CentralPerformanceMonitor(
+                sp.GetRequiredService<ILogger<ICentralPerformanceMonitor>>(),
+                sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
+                sp.GetRequiredService<IOptions<InstanceNameConfig>>().Value.Name,
+                sp.GetRequiredService<IOptions<QueueMonitoringConfig>>(),
+                sp.GetRequiredService<IOptions<CentralPerformanceMonitorConfig>>(),
+                sp.GetRequiredService<IServiceScopeFactory>(),
+                sp.GetRequiredService<IStatusTrackerService>()));
 
             // Register the mocks and options required by KalshiAPIService
             services.AddScoped(p => apiLoggerMock.Object);
@@ -144,24 +167,23 @@ namespace BacklashBotTasks
 
             // Create database context with proper parameters
             var dbContextLoggerMock = new Mock<ILogger<BacklashBotContext>>();
-            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig));
+            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, performanceMonitorMock.Object));
 
             // Create SqlDataService with proper parameters
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
-            var performanceMetricsReceivers = new List<ISqlDataServicePerformanceMetrics>();
-            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMetricsReceivers);
+            _sqlDataService = new SqlDataService(connectionString, _sqlLoggerMock.Object, dataConfig, performanceMonitorMock.Object);
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
-            var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
+            var centralPerformanceMonitor = (CentralPerformanceMonitor)_serviceProvider.GetRequiredService<ICentralPerformanceMonitor>();
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(snapshotPeriodHelperOptions.Value);
 
-            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _dataStorageConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
-            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, null);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, _scopeFactory, centralPerformanceMonitor);
+            _snapshotGroupHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _dataStorageConfig, snapshotGroupHelperOptions, centralPerformanceMonitor, marketAnalysisLoggerMock.Object);
+            _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _snapshotGroupHelper, _dataStorageConfig, _sqlDataService, performanceMonitorMock.Object);
 
-            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig);
+            _dbContext = new BacklashBotContext(connectionString, dbContextLoggerMock.Object, dataConfig, performanceMonitorMock.Object);
         }
 
 

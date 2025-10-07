@@ -2,6 +2,7 @@
 using BacklashBotData.Data;
 using BacklashDTOs;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ScottPlot.Plottable;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -25,8 +26,9 @@ namespace TradingGUI
         private TradingSimulatorService _simulator;
         private BacklashBotContext _context;
         private IServiceProvider _serviceProvider;
+        private ILogger<MainForm> _logger;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
-        private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "trading_gui_config.json");
+        private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string? _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
@@ -144,6 +146,7 @@ namespace TradingGUI
             _simulator = simulator;
             _context = context;
             _serviceProvider = serviceProvider;
+            _logger = _serviceProvider.GetRequiredService<ILogger<MainForm>>();
             _simulator.EnsureInitialized();
 
             // Set up event handlers for the simulator
@@ -478,8 +481,11 @@ namespace TradingGUI
         }
 
 
-        private void AppendLog(string msg)
+        private void AppendLog(string msg, LogLevel level = LogLevel.Information)
         {
+            // Log to the database logger
+            _logger.Log(level, msg);
+
             if (rtbLog.InvokeRequired)
             {
                 rtbLog.BeginInvoke(new Action(() =>
@@ -542,7 +548,7 @@ namespace TradingGUI
                 formsPlot1,
                 _cacheDir,
                 market,
-                AppendLog);
+                msg => AppendLog(msg));
 
             _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Black, 1);
             _hoverLine.IsVisible = false;
@@ -592,32 +598,32 @@ namespace TradingGUI
 
                 AppendLog($"Found {allWeightSets.Count} weight sets to run: {string.Join(", ", allWeightSets)}");
 
-                // Set up progress tracking
-                int totalSteps = allWeightSets.Count;
+                // Set up progress tracking: total combinations of markets and weight sets
+                int totalSteps = sel.Count * allWeightSets.Count;
                 int currentStep = 0;
 
-                // Run each weight set for all selected markets
-                foreach (var weightSet in allWeightSets)
+                // Run all weight sets for each selected market in sequence
+                foreach (var market in sel)
                 {
-                    AppendLog($"Running {selectedStrategy} with parameter set: {weightSet}");
+                    AppendLog($"Processing market {market} with all weight sets");
 
-                    await _simulator.RunSelectedSetForGuiAsync(
+                    await _simulator.RunAllSetsForSingleMarketAsync(
                         setKey: selectedStrategy,
-                        weightName: weightSet,
-                        writeToFile: false, // Don't save files when running all weight sets
-                        marketsToRun: sel);
+                        weightNames: allWeightSets,
+                        market: market,
+                        writeToFile: false); // Don't save files when running all weight sets
 
-                    AppendLog($"Completed {weightSet} for all markets");
+                    AppendLog($"Completed all weight sets for market {market}");
 
-                    // Update progress
-                    currentStep++;
+                    // Update progress: increment by number of weight sets processed for this market
+                    currentStep += allWeightSets.Count;
                     if (_progressBar != null)
                     {
                         _progressBar.Value = (int)((double)currentStep / totalSteps * 100);
                     }
                 }
 
-                AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy}");
+                AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy} on {sel.Count} markets");
             }
             finally
             {
@@ -1042,25 +1048,39 @@ namespace TradingGUI
                 if (File.Exists(_configFilePath))
                 {
                     var json = File.ReadAllText(_configFilePath);
-                    var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
+                    var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
 
-                    if (config != null)
+                    if (appSettings != null && appSettings.TryGetValue("TradingGUI", out var tradingGuiObj))
                     {
-                        // Set strategy selection
-                        if (!string.IsNullOrEmpty(config.LastSelectedStrategy) &&
-                            _strategyTypeComboBox.Items.Contains(config.LastSelectedStrategy))
+                        var tradingGuiJson = JsonSerializer.Serialize(tradingGuiObj);
+                        var config = JsonSerializer.Deserialize<TradingGUIConfig>(tradingGuiJson);
+
+                        if (config != null)
                         {
-                            _strategyTypeComboBox.SelectedItem = config.LastSelectedStrategy;
+                            // Set strategy selection
+                            if (!string.IsNullOrEmpty(config.LastSelectedStrategy) &&
+                                _strategyTypeComboBox.Items.Contains(config.LastSelectedStrategy))
+                            {
+                                _strategyTypeComboBox.SelectedItem = config.LastSelectedStrategy;
+                            }
+                            else
+                            {
+                                _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                            }
+
+                            // Set pattern image generation setting
+                            if (_enablePatternImagesCheckBox != null)
+                            {
+                                _enablePatternImagesCheckBox.Checked = config.EnablePatternImageGeneration;
+                            }
                         }
                         else
                         {
                             _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
-                        }
-
-                        // Set pattern image generation setting
-                        if (_enablePatternImagesCheckBox != null)
-                        {
-                            _enablePatternImagesCheckBox.Checked = config.EnablePatternImageGeneration;
+                            if (_enablePatternImagesCheckBox != null)
+                            {
+                                _enablePatternImagesCheckBox.Checked = true; // Default to enabled
+                            }
                         }
                     }
                     else
@@ -1095,8 +1115,16 @@ namespace TradingGUI
                     EnablePatternImageGeneration = _enablePatternImagesCheckBox?.Checked ?? true
                 };
 
-                var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(_configFilePath, json);
+                // Read the entire appsettings.json
+                var json = File.ReadAllText(_configFilePath);
+                var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+
+                // Update the TradingGUI section
+                appSettings["TradingGUI"] = config;
+
+                // Serialize back with indentation
+                var updatedJson = JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(_configFilePath, updatedJson);
             }
             catch (Exception ex)
             {
@@ -1197,11 +1225,21 @@ namespace TradingGUI
                             try
                             {
                                 var json = File.ReadAllText(_configFilePath);
-                                var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
-                                if (config != null && !string.IsNullOrEmpty(config.LastSelectedWeightSet) &&
-                                    _weightSetComboBox.Items.Contains(config.LastSelectedWeightSet))
+                                var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                                if (appSettings != null && appSettings.TryGetValue("TradingGUI", out var tradingGuiObj))
                                 {
-                                    _weightSetComboBox.SelectedItem = config.LastSelectedWeightSet;
+                                    var tradingGuiJson = JsonSerializer.Serialize(tradingGuiObj);
+                                    var config = JsonSerializer.Deserialize<TradingGUIConfig>(tradingGuiJson);
+                                    if (config != null && !string.IsNullOrEmpty(config.LastSelectedWeightSet) &&
+                                        _weightSetComboBox.Items.Contains(config.LastSelectedWeightSet))
+                                    {
+                                        _weightSetComboBox.SelectedItem = config.LastSelectedWeightSet;
+                                    }
+                                    else
+                                    {
+                                        _weightSetComboBox.SelectedIndex = 0;
+                                    }
                                 }
                                 else
                                 {

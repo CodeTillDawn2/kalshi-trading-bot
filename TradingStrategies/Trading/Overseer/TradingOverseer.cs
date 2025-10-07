@@ -1,7 +1,6 @@
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -111,7 +110,7 @@ namespace TradingStrategies.Trading.Overseer
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
-            var activePaths = await Task.Run(() => _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy));
+            var activePaths = await _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy);
 
             var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 
@@ -136,7 +135,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Post EquityCalculator metrics automatically
-            _equityCalculator.PostMetrics(_performanceMonitor);
+            _equityCalculator.PostMetrics();
 
             return pathData;
         }

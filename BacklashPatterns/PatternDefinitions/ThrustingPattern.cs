@@ -3,7 +3,12 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
-    /// <summary>ThrustingPattern</summary>
+    /// <summary>
+    /// Represents a Thrusting candlestick pattern, a two-candle continuation pattern.
+    /// Bullish: Bearish first candle followed by bullish thrust in downtrend.
+    /// Bearish: Bullish first candle followed by bearish thrust in uptrend.
+    /// Requirements: Prior trend, first candle direction opposite to trend, second candle thrust but not closing beyond first open.
+    /// Optimized for: Loose thresholds for maximum detection in a 0-100 fixed-range market.
     /// </summary>
     public class ThrustingPattern : PatternDefinition
     {
@@ -50,18 +55,57 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override PatternDirection Direction { get; }
 
+        /// <summary>
+        /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
+        /// </summary>
         public override string Name => BaseName + "_" + Direction.ToString();
 
+        /// <summary>
+        /// Gets the calculated strength of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Strength { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated certainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Certainty { get; protected set; }
+
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
+        /// <summary>
+        /// Gets the calculated uncertainty of the pattern.
+        /// Note: Not calculated in this implementation; reserved for future use.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
-
+        /// <summary>
+        /// Initializes a new instance of the ThrustingPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (two candles).</param>
+        /// <param name="direction">The direction of the pattern.</param>
+        /// <summary>
+        /// Initializes a new instance of the ThrustingPattern class.
+        /// </summary>
+        /// <param name="candles">List of candle indices forming the pattern (two candles).</param>
+        /// <param name="direction">The direction of the pattern.</param>
         public ThrustingPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
             Direction = direction;
         }
 
+        /// <summary>
+        /// Determines if a Thrusting pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the second candle in the pattern.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
+        /// <param name="prices">Array of candle price data.</param>
+        /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
+        /// <returns>A ThrustingPattern instance if detected, otherwise null.</returns>
         public static async Task<ThrustingPattern?> IsPatternAsync(
             int index,
             int trendLookback,
