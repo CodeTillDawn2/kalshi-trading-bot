@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface ITradingCalculator | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="ITradingCalculator">
+    <meta name="description" content="Defines the contract for a trading calculator that performs various technical analysis calculations including indicators, oscillators, and support/resistance levels.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator" class="text-break">Interface ITradingCalculator</h1>
-  <div class="markdown level0 summary"><p>ITradingCalculator</p>
+  <div class="markdown level0 summary"><p>Defines the contract for a trading calculator that performs various technical analysis
+calculations including indicators, oscillators, and support/resistance levels.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Helpers.html">Helpers</a>.<a class="xref" href="TradingStrategies.Helpers.Interfaces.html">Interfaces</a></h6>
@@ -97,11 +98,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateADX_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateADX(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L33">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L93">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateADX_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateADX*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateADX_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateADX(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick})">CalculateADX(List&lt;PseudoCandlestick&gt;)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Average Directional Index (ADX) and directional indicators.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -120,7 +122,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate ADX for.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -135,7 +138,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.macd">MACD</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.signal">Signal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.histogram">Histogram</a>)</td>
-        <td></td>
+        <td><p>A tuple containing ADX, PlusDI, and MinusDI values.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -144,11 +148,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateATR_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateATR(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L20">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L53">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateATR_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateATR*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateATR_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateATR(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32)">CalculateATR(List&lt;PseudoCandlestick&gt;, int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Average True Range (ATR) for the given pseudo candlesticks.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -167,12 +172,14 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate ATR for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">period</span></td>
-        <td></td>
+        <td><p>The period for the ATR calculation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -187,7 +194,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
-        <td></td>
+        <td><p>The ATR value, or null if calculation is not possible.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -196,11 +204,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateBollingerBands_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Double_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateBollingerBands(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L36">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateBollingerBands_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateBollingerBands*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateBollingerBands_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Double_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateBollingerBands(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32,System.Double)">CalculateBollingerBands(List&lt;PseudoCandlestick&gt;, int, double)</h4>
-  <div class="markdown level1 summary"><p>CalculateOBV</p>
+  <div class="markdown level1 summary"><p>Calculates Bollinger Bands for the given pseudo candlesticks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -220,17 +228,20 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate Bollinger Bands for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">period</span></td>
-        <td></td>
+        <td><p>The period for the moving average calculation.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">stdDevMultiplier</span></td>
-        <td></td>
+        <td><p>The standard deviation multiplier for the bands.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -245,7 +256,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.macd">MACD</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.signal">Signal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.histogram">Histogram</a>)</td>
-        <td></td>
+        <td><p>A tuple containing Lower, Middle, and Upper band values.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -254,11 +266,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateHistoricalSupportResistance_System_String_System_Collections_Generic_List_BacklashDTOs_CandlestickData__System_Double_System_Int32_System_Double_System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateHistoricalSupportResistance(System.String%2CSystem.Collections.Generic.List%7BBacklashDTOs.CandlestickData%7D%2CSystem.Double%2CSystem.Int32%2CSystem.Double%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L80">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateHistoricalSupportResistance_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateHistoricalSupportResistance*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateHistoricalSupportResistance_System_String_System_Collections_Generic_List_BacklashDTOs_CandlestickData__System_Double_System_Int32_System_Double_System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateHistoricalSupportResistance(System.String,System.Collections.Generic.List{BacklashDTOs.CandlestickData},System.Double,System.Int32,System.Double,System.Int32)">CalculateHistoricalSupportResistance(string, List&lt;CandlestickData&gt;, double, int, double, int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates historical support and resistance levels for the specified market.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -277,32 +290,38 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The market ticker symbol.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.CandlestickData.html">CandlestickData</a>&gt;</td>
         <td><span class="parametername">candlesticks</span></td>
-        <td></td>
+        <td><p>The list of candlestick data to analyze.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">minCandlestickPercentage</span></td>
-        <td></td>
+        <td><p>The minimum candlestick percentage for level detection.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">maxLevels</span></td>
-        <td></td>
+        <td><p>The maximum number of levels to return.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">sigma</span></td>
-        <td></td>
+        <td><p>The sigma value for statistical analysis.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">minDistance</span></td>
-        <td></td>
+        <td><p>The minimum distance between levels.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -317,7 +336,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.SupportResistanceLevel.html">SupportResistanceLevel</a>&gt;</td>
-        <td></td>
+        <td><p>A list of support and resistance levels.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -326,11 +346,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateMACD_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateMACD(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L16">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L27">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateMACD_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateMACD*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateMACD_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Int32_System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateMACD(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32,System.Int32,System.Int32)">CalculateMACD(List&lt;PseudoCandlestick&gt;, int, int, int)</h4>
-  <div class="markdown level1 summary"><p>CalculateHistoricalSupportResistance</p>
+  <div class="markdown level1 summary"><p>Calculates the Moving Average Convergence Divergence (MACD) indicator.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -350,22 +370,26 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandlesticks</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate MACD for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">shortPeriod</span></td>
-        <td></td>
+        <td><p>The short period for the MACD calculation.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">longPeriod</span></td>
-        <td></td>
+        <td><p>The long period for the MACD calculation.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">signalPeriod</span></td>
-        <td></td>
+        <td><p>The signal period for the MACD calculation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -380,7 +404,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.macd">MACD</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.signal">Signal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double-,system.nullable-system.double--.histogram">Histogram</a>)</td>
-        <td></td>
+        <td><p>A tuple containing MACD, Signal, and Histogram values.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -389,11 +414,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateOBV_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateOBV(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L23">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L68">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateOBV_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateOBV*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateOBV_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateOBV(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick})">CalculateOBV(List&lt;PseudoCandlestick&gt;)</h4>
-  <div class="markdown level1 summary"><p>CalculateADX</p>
+  <div class="markdown level1 summary"><p>Calculates the On Balance Volume (OBV) for the given pseudo candlesticks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -413,7 +438,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate OBV for.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -428,7 +454,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.decimal">decimal</a></td>
-        <td></td>
+        <td><p>The OBV value.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -437,11 +464,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculatePSAR_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculatePSAR(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L34">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L100">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculatePSAR_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculatePSAR*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculatePSAR_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculatePSAR(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick})">CalculatePSAR(List&lt;PseudoCandlestick&gt;)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Parabolic Stop and Reverse (PSAR) for the given pseudo candlesticks.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -460,7 +488,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate PSAR for.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -475,7 +504,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
-        <td></td>
+        <td><p>The PSAR value, or null if calculation is not possible.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -484,11 +514,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateRSI_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateRSI(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L17">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateRSI_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateRSI*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateRSI_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateRSI(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32)">CalculateRSI(List&lt;PseudoCandlestick&gt;, int)</h4>
-  <div class="markdown level1 summary"><p>CalculateATR</p>
+  <div class="markdown level1 summary"><p>Calculates the Relative Strength Index (RSI) for the given pseudo candlesticks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -508,12 +538,14 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate RSI for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">periods</span></td>
-        <td></td>
+        <td><p>The number of periods to use for the RSI calculation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -528,7 +560,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
-        <td></td>
+        <td><p>The RSI value, or null if calculation is not possible.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -537,11 +570,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateStochastic_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateStochastic(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L45">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateStochastic_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateStochastic*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateStochastic_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateStochastic(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32,System.Int32)">CalculateStochastic(List&lt;PseudoCandlestick&gt;, int, int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Stochastic Oscillator for the given pseudo candlesticks.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -560,17 +594,20 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate Stochastic for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">kPeriod</span></td>
-        <td></td>
+        <td><p>The K period for the Stochastic calculation.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">dPeriod</span></td>
-        <td></td>
+        <td><p>The D period for the Stochastic calculation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -585,7 +622,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double--.k">K</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.nullable-system.double-,system.nullable-system.double--.d">D</a>)</td>
-        <td></td>
+        <td><p>A tuple containing K and D values.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -594,11 +632,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateVWAP_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateVWAP(System.Collections.Generic.List%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L61">View Source</a>
   </span>
   <a id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateVWAP_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateVWAP*"></a>
   <h4 id="TradingStrategies_Helpers_Interfaces_ITradingCalculator_CalculateVWAP_System_Collections_Generic_List_BacklashDTOs_PseudoCandlestick__System_Int32_" data-uid="TradingStrategies.Helpers.Interfaces.ITradingCalculator.CalculateVWAP(System.Collections.Generic.List{BacklashDTOs.PseudoCandlestick},System.Int32)">CalculateVWAP(List&lt;PseudoCandlestick&gt;, int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Volume Weighted Average Price (VWAP) for the given pseudo candlesticks.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -617,12 +656,14 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.PseudoCandlestick.html">PseudoCandlestick</a>&gt;</td>
         <td><span class="parametername">pseudoCandles</span></td>
-        <td></td>
+        <td><p>The list of pseudo candlesticks to calculate VWAP for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">periods</span></td>
-        <td></td>
+        <td><p>The number of periods to use for the VWAP calculation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -637,7 +678,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.decimal">decimal</a>?</td>
-        <td></td>
+        <td><p>The VWAP value, or null if calculation is not possible.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -653,7 +695,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Helpers_Interfaces_ITradingCalculator.md&amp;value=---%0Auid%3A%20TradingStrategies.Helpers.Interfaces.ITradingCalculator%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/TradingStrategies/Helpers/ITradingCalculator.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

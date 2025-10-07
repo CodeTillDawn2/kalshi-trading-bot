@@ -85,12 +85,10 @@
     <h3 id="classes">
 Classes
 </h3>
-      <h4><a class="xref" href="BacklashBot.State.CalculationsConfig.html">CalculationsConfig</a></h4>
-      <section><p>Configuration class for calculation parameters used in MarketData.
-This replaces the eliminated CalculationConfig from TradingStrategies.</p>
-</section>
       <h4><a class="xref" href="BacklashBot.State.DataCache.html">DataCache</a></h4>
-      <section></section>
+      <section><p>Provides a centralized cache for market data, account information, and trading status.
+Implements thread-safe storage for real-time trading data and state management.</p>
+</section>
       <h4><a class="xref" href="BacklashBot.State.KalshiBotReadyStatus.html">KalshiBotReadyStatus</a></h4>
       <section><p>Manages the readiness status of different components within the Kalshi trading bot system.
 This class provides TaskCompletionSource objects to signal when various parts of the bot
@@ -102,7 +100,52 @@ This class provides a centralized CancellationTokenSource that can be used to co
 graceful shutdown and cancellation across all components of the bot.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.State.MarketData.html">MarketData</a></h4>
-      <section></section>
+      <section><p>Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
+from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
+information used in trading decisions, technical analysis, and snapshot creation.</p>
+<p>The MarketData class maintains:</p>
+<ul>
+<li>Current order book state with bid/ask prices and depths</li>
+<li>Historical candlestick data across multiple timeframes (minute, hour, day)</li>
+<li>Real-time ticker updates and price movements</li>
+<li>Position information and PandL calculations</li>
+<li>Technical indicators (RSI, MACD, Bollinger Bands, etc.)</li>
+<li>Order book change velocities and trade metrics</li>
+<li>Support/resistance levels and market metadata</li>
+</ul>
+<p>Data integrity is ensured through comprehensive input validation:</p>
+<ul>
+<li>Candlestick data validation for non-negative prices (0-100), valid timestamps, and reasonable values</li>
+<li>Ticker data validation for price ranges, volume, and timestamp integrity</li>
+<li>Orderbook data validation for price bounds, quantities, and side validity</li>
+<li>Position data validation for size reasonableness, exposure bounds, and update timestamps
+Invalid data triggers informative warnings via logging but processing continues to maintain system resilience.</li>
+</ul>
+<p>Data is updated through various mechanisms:</p>
+<ul>
+<li>WebSocket events for real-time order book and ticker updates</li>
+<li>Periodic API calls for position and market information</li>
+<li>Asynchronous background calculations for technical indicators and metrics to avoid blocking</li>
+<li>Historical data loading from candlestick storage</li>
+</ul>
+<p>Performance optimizations include:</p>
+<ul>
+<li>Efficient data structures and minimized LINQ queries</li>
+<li>Parallel processing for CPU-intensive calculations</li>
+<li>Binary search for large dataset lookups</li>
+<li>Asynchronous operations to maintain responsiveness</li>
+</ul>
+<p>Calculation parameters such as tolerance percentages, fee rates, time periods for slope calculations,
+and lookback periods are configurable via CalculationConfig to allow runtime customization without code changes.</p>
+<p>This class implements the IMarketData interface and is used throughout the trading bot
+for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.</p>
+</section>
+    <h3 id="enums">
+Enums
+</h3>
+      <h4><a class="xref" href="BacklashBot.State.KalshiBotStatusTracker.BrainMode.html">KalshiBotStatusTracker.BrainMode</a></h4>
+      <section><p>Enum representing the brain mode of the bot.</p>
+</section>
 
 
 </article>

@@ -89,24 +89,33 @@ Interfaces
       <section><p>Interface for brain status service that manages brain instance initialization and status.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.ICentralBrain.html">ICentralBrain</a></h4>
-      <section><p>ICentralBrain</p>
+      <section><p>Defines the contract for the central brain component that manages the overall lifecycle
+and coordination of the trading bot system, including startup, shutdown, and service management.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.ICentralErrorHandler.html">ICentralErrorHandler</a></h4>
-      <section><p>ICentralErrorHandler</p>
+      <section><p>Defines the contract for a centralized error handling service that manages system errors,
+warnings, and connectivity checks throughout the trading bot application.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html">ICentralPerformanceMonitor</a></h4>
-      <section></section>
+      <section><p>Defines the contract for a centralized performance monitoring service that tracks
+system performance metrics across various components including queues, WebSocket connections,
+database operations, and market analysis activities.</p>
+</section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.IInterestScoreService.html">IInterestScoreService</a></h4>
-      <section><p>IInterestScoreService</p>
+      <section><p>Defines the contract for a service that calculates interest scores for markets
+based on various trading metrics and parameters.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.IMarketManagerService.html">IMarketManagerService</a></h4>
-      <section><p>IMarketManagerService</p>
+      <section><p>Defines the contract for a service that manages market operations including resets,
+watch list monitoring, and market state management within the trading bot.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.html">IOvernightActivitiesHelper</a></h4>
-      <section><p>IOvernightActivitiesHelper</p>
+      <section><p>Defines the contract for a helper service that performs maintenance and cleanup operations
+during overnight periods when trading activity is typically lower.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.ISnapshotGroupHelper.html">ISnapshotGroupHelper</a></h4>
-      <section><p>IMarketAnalysisHelper</p>
+      <section><p>Defines the contract for a helper service that manages snapshot grouping operations
+for market analysis and data organization.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Management.Interfaces.ITargetCalculationService.html">ITargetCalculationService</a></h4>
       <section><p>Interface for calculating optimal target number of markets to watch based on performance metrics.

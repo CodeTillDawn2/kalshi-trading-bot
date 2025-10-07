@@ -93,12 +93,17 @@ in-memory storage and database persistence for recovery after application restar
 The service includes configurable history retention, performance metrics collection,
 batch operations, and comprehensive health monitoring.</p>
 </section>
+      <h4><a class="xref" href="BacklashOverseer.Services.OverseerWebSocketMonitorService.html">OverseerWebSocketMonitorService</a></h4>
+      <section><p>Lightweight service for monitoring WebSocket connections and exchange status.
+This service monitors the exchange status and manages WebSocket connections without
+modifying BacklashBot-specific objects.</p>
+</section>
       <h4><a class="xref" href="BacklashOverseer.Services.PerformanceMetricsService.html">PerformanceMetricsService</a></h4>
       <section><p>Centralized service for collecting and managing performance metrics across the KalshiBot Overseer system.
 This service aggregates metrics from various components including WebSocket operations, API calls,
 SignalR communications, overnight tasks, and snapshot processing.</p>
 </section>
-      <h4><a class="xref" href="BacklashOverseer.Services.SnapshotAggregationService.html">SnapshotAggregationService</a></h4>
+      <h4><a class="xref" href="BacklashOverseer.Services.SnapshotService.html">SnapshotService</a></h4>
       <section><p>Provides services for retrieving and processing snapshot group data from the database.
 This service aggregates snapshot groups by market ticker, calculates recorded hours,
 market hours, and recorded hours percentages, and returns structured data for analysis.</p>

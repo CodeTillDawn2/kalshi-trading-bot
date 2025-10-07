@@ -142,20 +142,20 @@ graceful shutdown and cancellation across all components of the bot.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_KalshiBotStatusTracker__.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.State.KalshiBotStatusTracker%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_KalshiBotStatusTracker__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotStatusTrackerConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.State.KalshiBotStatusTracker%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.KalshiBotStatusTrackerConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L73">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker__ctor_" data-uid="BacklashBot.State.KalshiBotStatusTracker.#ctor*"></a>
-  <h4 id="BacklashBot_State_KalshiBotStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_KalshiBotStatusTracker__" data-uid="BacklashBot.State.KalshiBotStatusTracker.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.State.KalshiBotStatusTracker})">KalshiBotStatusTracker(ILogger&lt;KalshiBotStatusTracker&gt;)</h4>
+  <h4 id="BacklashBot_State_KalshiBotStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_State_KalshiBotStatusTracker__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotStatusTrackerConfig__" data-uid="BacklashBot.State.KalshiBotStatusTracker.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.State.KalshiBotStatusTracker},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.KalshiBotStatusTrackerConfig})">KalshiBotStatusTracker(ILogger&lt;KalshiBotStatusTracker&gt;, IPerformanceMonitor?, IOptions&lt;KalshiBotStatusTrackerConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the KalshiBotStatusTracker class.
 Creates the initial CancellationTokenSource and sets up the cancellation state.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public KalshiBotStatusTracker(ILogger&lt;KalshiBotStatusTracker&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public KalshiBotStatusTracker(ILogger&lt;KalshiBotStatusTracker&gt; logger, IPerformanceMonitor? performanceMonitor, IOptions&lt;KalshiBotStatusTrackerConfig&gt; config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -173,6 +173,51 @@ Creates the initial CancellationTokenSource and sets up the cancellation state.<
         <td><p>The logger for tracking cancellation operations.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>The performance monitor for recording metrics.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.KalshiBotStatusTrackerConfig.html">KalshiBotStatusTrackerConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration options for the KalshiBotStatusTracker.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_CurrentBrainMode.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.CurrentBrainMode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L42">View Source</a>
+  </span>
+  <a id="BacklashBot_State_KalshiBotStatusTracker_CurrentBrainMode_" data-uid="BacklashBot.State.KalshiBotStatusTracker.CurrentBrainMode*"></a>
+  <h4 id="BacklashBot_State_KalshiBotStatusTracker_CurrentBrainMode" data-uid="BacklashBot.State.KalshiBotStatusTracker.CurrentBrainMode">CurrentBrainMode</h4>
+  <div class="markdown level1 summary"><p>Gets the current brain mode of the bot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public KalshiBotStatusTracker.BrainMode CurrentBrainMode { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashBot.State.KalshiBotStatusTracker.html">KalshiBotStatusTracker</a>.<a class="xref" href="BacklashBot.State.KalshiBotStatusTracker.BrainMode.html">BrainMode</a></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
@@ -182,7 +227,7 @@ Creates the initial CancellationTokenSource and sets up the cancellation state.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_CancelAll.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.CancelAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L85">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L135">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_CancelAll_" data-uid="BacklashBot.State.KalshiBotStatusTracker.CancelAll*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_CancelAll" data-uid="BacklashBot.State.KalshiBotStatusTracker.CancelAll">CancelAll()</h4>
@@ -203,7 +248,7 @@ After calling this method, the cancellation token will be in a cancelled state.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_Dispose.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L172">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L258">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_Dispose_" data-uid="BacklashBot.State.KalshiBotStatusTracker.Dispose*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_Dispose" data-uid="BacklashBot.State.KalshiBotStatusTracker.Dispose">Dispose()</h4>
@@ -224,7 +269,7 @@ typically during application shutdown. It ensures proper cleanup of unmanaged re
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_DisposeAsync.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.DisposeAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L204">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L289">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_DisposeAsync_" data-uid="BacklashBot.State.KalshiBotStatusTracker.DisposeAsync*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_DisposeAsync" data-uid="BacklashBot.State.KalshiBotStatusTracker.DisposeAsync">DisposeAsync()</h4>
@@ -257,7 +302,7 @@ This provides an async disposal pattern for better resource management in async 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_GetCancellationToken.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.GetCancellationToken%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L69">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L119">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_GetCancellationToken_" data-uid="BacklashBot.State.KalshiBotStatusTracker.GetCancellationToken*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_GetCancellationToken" data-uid="BacklashBot.State.KalshiBotStatusTracker.GetCancellationToken">GetCancellationToken()</h4>
@@ -294,7 +339,7 @@ to respond to shutdown requests gracefully.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_GetMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.GetMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L221">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L306">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_GetMetrics_" data-uid="BacklashBot.State.KalshiBotStatusTracker.GetMetrics*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_GetMetrics" data-uid="BacklashBot.State.KalshiBotStatusTracker.GetMetrics">GetMetrics()</h4>
@@ -326,7 +371,7 @@ to respond to shutdown requests gracefully.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_ResetAll.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L127">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L195">View Source</a>
   </span>
   <a id="BacklashBot_State_KalshiBotStatusTracker_ResetAll_" data-uid="BacklashBot.State.KalshiBotStatusTracker.ResetAll*"></a>
   <h4 id="BacklashBot_State_KalshiBotStatusTracker_ResetAll" data-uid="BacklashBot.State.KalshiBotStatusTracker.ResetAll">ResetAll()</h4>
@@ -342,6 +387,106 @@ This clears any previous cancellation state and allows the bot to restart operat
   <div class="markdown level1 remarks"><p>This method properly disposes of the old CancellationTokenSource before creating a new one.
 It should be called when restarting the bot or when a fresh cancellation state is needed.</p>
 </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_SetOverseerConnected_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.SetOverseerConnected(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L90">View Source</a>
+  </span>
+  <a id="BacklashBot_State_KalshiBotStatusTracker_SetOverseerConnected_" data-uid="BacklashBot.State.KalshiBotStatusTracker.SetOverseerConnected*"></a>
+  <h4 id="BacklashBot_State_KalshiBotStatusTracker_SetOverseerConnected_System_Boolean_" data-uid="BacklashBot.State.KalshiBotStatusTracker.SetOverseerConnected(System.Boolean)">SetOverseerConnected(bool)</h4>
+  <div class="markdown level1 summary"><p>Sets the brain mode based on overseer connection status.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetOverseerConnected(bool connected)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">connected</span></td>
+        <td><p>True if connected to overseer, false otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_SetPerformanceMonitor_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.SetPerformanceMonitor(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L105">View Source</a>
+  </span>
+  <a id="BacklashBot_State_KalshiBotStatusTracker_SetPerformanceMonitor_" data-uid="BacklashBot.State.KalshiBotStatusTracker.SetPerformanceMonitor*"></a>
+  <h4 id="BacklashBot_State_KalshiBotStatusTracker_SetPerformanceMonitor_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="BacklashBot.State.KalshiBotStatusTracker.SetPerformanceMonitor(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">SetPerformanceMonitor(IPerformanceMonitor)</h4>
+  <div class="markdown level1 summary"><p>Sets the performance monitor for recording metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetPerformanceMonitor(IPerformanceMonitor performanceMonitor)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>The performance monitor instance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="events">Events
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker_BrainModeChanged.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker.BrainModeChanged%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L47">View Source</a>
+  </span>
+  <h4 id="BacklashBot_State_KalshiBotStatusTracker_BrainModeChanged" data-uid="BacklashBot.State.KalshiBotStatusTracker.BrainModeChanged">BrainModeChanged</h4>
+  <div class="markdown level1 summary"><p>Event raised when the brain mode changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;KalshiBotStatusTracker.BrainMode&gt;? BrainModeChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="BacklashBot.State.KalshiBotStatusTracker.html">KalshiBotStatusTracker</a>.<a class="xref" href="BacklashBot.State.KalshiBotStatusTracker.BrainMode.html">BrainMode</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a>
@@ -364,7 +509,7 @@ It should be called when restarting the bot or when a fresh cancellation state i
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_KalshiBotStatusTracker.md&amp;value=---%0Auid%3A%20BacklashBot.State.KalshiBotStatusTracker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L21" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/KalshiBotStatusTracker.cs/#L23" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

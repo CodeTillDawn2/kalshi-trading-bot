@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IOrderBookService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="IOrderBookService">
+    <meta name="description" content="Defines the contract for a service that manages order book data and operations, including WebSocket event handling, queue management, and synchronization.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashBot_Services_Interfaces_IOrderBookService" data-uid="BacklashBot.Services.Interfaces.IOrderBookService" class="text-break">Interface IOrderBookService</h1>
-  <div class="markdown level0 summary"><p>IOrderBookService</p>
+  <div class="markdown level0 summary"><p>Defines the contract for a service that manages order book data and operations,
+including WebSocket event handling, queue management, and synchronization.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Services.html">Services</a>.<a class="xref" href="BacklashBot.Services.Interfaces.html">Interfaces</a></h6>
@@ -97,11 +98,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_ClearQueueForMarketAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.ClearQueueForMarketAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L23">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L44">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_ClearQueueForMarketAsync_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.ClearQueueForMarketAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_ClearQueueForMarketAsync_System_String_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.ClearQueueForMarketAsync(System.String)">ClearQueueForMarketAsync(string)</h4>
-  <div class="markdown level1 summary"><p>StopServicesAsync</p>
+  <div class="markdown level1 summary"><p>Clears the queue for the specified market asynchronously.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -121,7 +122,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The ticker symbol of the market.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -130,11 +132,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_ConfigureWebSocketEventHandlers.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.ConfigureWebSocketEventHandlers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L17">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L24">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_ConfigureWebSocketEventHandlers_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.ConfigureWebSocketEventHandlers*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_ConfigureWebSocketEventHandlers" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.ConfigureWebSocketEventHandlers">ConfigureWebSocketEventHandlers()</h4>
-  <div class="markdown level1 summary"><p>IsEventQueueUnderLimit</p>
+  <div class="markdown level1 summary"><p>Configures WebSocket event handlers for real-time order book updates.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -146,11 +148,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetCurrentOrderBook_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetCurrentOrderBook(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L31">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetCurrentOrderBook_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetCurrentOrderBook*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetCurrentOrderBook_System_String_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetCurrentOrderBook(System.String)">GetCurrentOrderBook(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the current order book data for the specified market ticker.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -169,7 +172,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The ticker symbol of the market.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -184,7 +188,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
-        <td></td>
+        <td><p>A list of order book data entries.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -193,7 +198,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetEventQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetEventQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L38">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L76">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetEventQueueProcessingMetrics_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetEventQueueProcessingMetrics*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetEventQueueProcessingMetrics" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetEventQueueProcessingMetrics">GetEventQueueProcessingMetrics()</h4>
@@ -215,7 +220,7 @@ Returns the average processing time and total operations count.</p>
     </thead>
     <tbody>
       <tr>
-        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
         <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
 </td>
       </tr>
@@ -226,7 +231,7 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetMarketLockWaitMetrics_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetMarketLockWaitMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L60">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L98">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetMarketLockWaitMetrics_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetMarketLockWaitMetrics*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetMarketLockWaitMetrics_System_String_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetMarketLockWaitMetrics(System.String)">GetMarketLockWaitMetrics(string)</h4>
@@ -266,7 +271,7 @@ Returns the average wait time and total operations count for the specified marke
     </thead>
     <tbody>
       <tr>
-        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
         <td><p>A tuple containing average wait time in milliseconds and total operations count.</p>
 </td>
       </tr>
@@ -277,7 +282,7 @@ Returns the average wait time and total operations count for the specified marke
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetNotificationQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetNotificationQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L52">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L90">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetNotificationQueueProcessingMetrics_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetNotificationQueueProcessingMetrics*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetNotificationQueueProcessingMetrics" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetNotificationQueueProcessingMetrics">GetNotificationQueueProcessingMetrics()</h4>
@@ -299,7 +304,7 @@ Returns the average processing time and total operations count.</p>
     </thead>
     <tbody>
       <tr>
-        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
         <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
 </td>
       </tr>
@@ -310,11 +315,12 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetQueueCounts.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetQueueCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L31">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L69">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetQueueCounts_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetQueueCounts*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetQueueCounts" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetQueueCounts">GetQueueCounts()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the current counts for event, ticker, and notification queues.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -331,7 +337,8 @@ Returns the average processing time and total operations count.</p>
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.eventqueuecount">EventQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tickerqueuecount">TickerQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.notificationqueuecount">NotificationQueueCount</a>)</td>
-        <td></td>
+        <td><p>A tuple containing the counts for each queue type.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -340,7 +347,7 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_GetTickerQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.GetTickerQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L45">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L83">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_GetTickerQueueProcessingMetrics_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetTickerQueueProcessingMetrics*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_GetTickerQueueProcessingMetrics" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.GetTickerQueueProcessingMetrics">GetTickerQueueProcessingMetrics()</h4>
@@ -362,7 +369,7 @@ Returns the average processing time and total operations count.</p>
     </thead>
     <tbody>
       <tr>
-        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
         <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
 </td>
       </tr>
@@ -373,11 +380,12 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_IsEventQueueUnderLimit_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.IsEventQueueUnderLimit(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L27">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L57">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_IsEventQueueUnderLimit_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.IsEventQueueUnderLimit*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_IsEventQueueUnderLimit_System_Int32_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.IsEventQueueUnderLimit(System.Int32)">IsEventQueueUnderLimit(int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Determines whether the event queue is under the specified limit.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -396,7 +404,8 @@ Returns the average processing time and total operations count.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">limit</span></td>
-        <td></td>
+        <td><p>The maximum allowed queue size.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -411,7 +420,8 @@ Returns the average processing time and total operations count.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p><code>true</code> if the queue is under the limit; otherwise, <code>false</code>.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -420,11 +430,11 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_StartServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.StartServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L25">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L50">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_StartServicesAsync_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.StartServicesAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_StartServicesAsync" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.StartServicesAsync">StartServicesAsync()</h4>
-  <div class="markdown level1 summary"><p>GetQueueCounts</p>
+  <div class="markdown level1 summary"><p>Starts the order book services asynchronously.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -442,7 +452,8 @@ Returns the average processing time and total operations count.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous start operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -451,11 +462,12 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_StopServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.StopServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L29">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L63">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_StopServicesAsync_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.StopServicesAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_StopServicesAsync" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.StopServicesAsync">StopServicesAsync()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Stops the order book services asynchronously.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -472,7 +484,8 @@ Returns the average processing time and total operations count.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous stop operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -481,11 +494,11 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_SyncOrderBookAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.SyncOrderBookAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L38">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IOrderBookService_SyncOrderBookAsync_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.SyncOrderBookAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_SyncOrderBookAsync_System_String_" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.SyncOrderBookAsync(System.String)">SyncOrderBookAsync(string)</h4>
-  <div class="markdown level1 summary"><p>GetQueueCounts</p>
+  <div class="markdown level1 summary"><p>Synchronizes the order book data for the specified market ticker.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -505,7 +518,8 @@ Returns the average processing time and total operations count.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The ticker symbol of the market to synchronize.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -520,7 +534,8 @@ Returns the average processing time and total operations count.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -531,10 +546,11 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_MarketInvalid.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.MarketInvalid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L14">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L19">View Source</a>
   </span>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_MarketInvalid" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.MarketInvalid">MarketInvalid</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Occurs when a market is determined to be invalid.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -560,10 +576,10 @@ Returns the average processing time and total operations count.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService_OrderBookUpdated.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService.OrderBookUpdated%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L14">View Source</a>
   </span>
   <h4 id="BacklashBot_Services_Interfaces_IOrderBookService_OrderBookUpdated" data-uid="BacklashBot.Services.Interfaces.IOrderBookService.OrderBookUpdated">OrderBookUpdated</h4>
-  <div class="markdown level1 summary"><p>ClearQueueForMarketAsync</p>
+  <div class="markdown level1 summary"><p>Occurs when the order book is updated for a specific market ticker.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -597,7 +613,7 @@ Returns the average processing time and total operations count.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IOrderBookService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IOrderBookService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IOrderBookService.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

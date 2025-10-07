@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IScopeManagerService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="IScopeManagerService">
+    <meta name="description" content="Defines the contract for a service that manages dependency injection scopes and provides access to scoped services within the application.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashBot_Services_Interfaces_IScopeManagerService" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService" class="text-break">Interface IScopeManagerService</h1>
-  <div class="markdown level0 summary"><p>IScopeManagerService</p>
+  <div class="markdown level0 summary"><p>Defines the contract for a service that manages dependency injection scopes
+and provides access to scoped services within the application.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritedMembers">
@@ -103,11 +104,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IScopeManagerService_Scope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IScopeManagerService.Scope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L14">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L24">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IScopeManagerService_Scope_" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.Scope*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IScopeManagerService_Scope" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.Scope">Scope</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the current service scope.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -135,11 +137,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IScopeManagerService_CreateScope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IScopeManagerService.CreateScope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L15">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L30">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IScopeManagerService_CreateScope_" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.CreateScope*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IScopeManagerService_CreateScope" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.CreateScope">CreateScope()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Creates a new service scope for dependency injection.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -156,7 +159,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.iservicescope">IServiceScope</a></td>
-        <td></td>
+        <td><p>The newly created service scope.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -165,11 +169,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IScopeManagerService_InitializeScope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IScopeManagerService.InitializeScope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L12">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L14">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IScopeManagerService_InitializeScope_" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.InitializeScope*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IScopeManagerService_InitializeScope" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.InitializeScope">InitializeScope()</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the Scope.</p>
+  <div class="markdown level1 summary"><p>Initializes the service scope for dependency injection.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -181,11 +185,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IScopeManagerService_ResetAll.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IScopeManagerService.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L19">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IScopeManagerService_ResetAll_" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.ResetAll*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IScopeManagerService_ResetAll" data-uid="BacklashBot.Services.Interfaces.IScopeManagerService.ResetAll">ResetAll()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Resets all managed scopes and services.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -203,7 +208,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IScopeManagerService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IScopeManagerService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IScopeManagerService.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

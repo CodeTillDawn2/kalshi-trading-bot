@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IWebSocketMonitorService | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="Defines the contract for a service that monitors WebSocket connections, handles connection management, and provides connection status information.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,9 @@
 
 
   <h1 id="BacklashBot_Services_Interfaces_IWebSocketMonitorService" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService" class="text-break">Interface IWebSocketMonitorService</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Defines the contract for a service that monitors WebSocket connections,
+handles connection management, and provides connection status information.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Services.html">Services</a>.<a class="xref" href="BacklashBot.Services.Interfaces.html">Interfaces</a></h6>
   <h6><strong>Assembly</strong>: BacklashInterfaces.dll</h6>
@@ -96,11 +98,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IWebSocketMonitorService_IsConnected.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IWebSocketMonitorService.IsConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L8">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L32">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_IsConnected_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.IsConnected*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_IsConnected" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.IsConnected">IsConnected()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the WebSocket is currently connected.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -117,7 +120,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p><code>true</code> if connected; otherwise, <code>false</code>.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -126,11 +130,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IWebSocketMonitorService_ShutdownAsync_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IWebSocketMonitorService.ShutdownAsync(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L6">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L20">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_ShutdownAsync_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.ShutdownAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_ShutdownAsync_System_Threading_CancellationToken_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.ShutdownAsync(System.Threading.CancellationToken)">ShutdownAsync(CancellationToken)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Shuts down the WebSocket monitoring services asynchronously.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -149,7 +154,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
         <td><span class="parametername">cancellationToken</span></td>
-        <td></td>
+        <td><p>Cancellation token for the shutdown operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -164,7 +170,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous shutdown operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -173,11 +180,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IWebSocketMonitorService_StartServices_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IWebSocketMonitorService.StartServices(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L5">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L13">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_StartServices_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.StartServices*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_StartServices_System_Threading_CancellationToken_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.StartServices(System.Threading.CancellationToken)">StartServices(CancellationToken)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Starts the WebSocket monitoring services with the provided cancellation token.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -196,7 +204,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
         <td><span class="parametername">cancellationToken</span></td>
-        <td></td>
+        <td><p>Cancellation token to stop the service.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -205,11 +214,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IWebSocketMonitorService_TriggerConnectionCheckAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IWebSocketMonitorService.TriggerConnectionCheckAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L7">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L26">View Source</a>
   </span>
   <a id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_TriggerConnectionCheckAsync_" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.TriggerConnectionCheckAsync*"></a>
   <h4 id="BacklashBot_Services_Interfaces_IWebSocketMonitorService_TriggerConnectionCheckAsync" data-uid="BacklashBot.Services.Interfaces.IWebSocketMonitorService.TriggerConnectionCheckAsync">TriggerConnectionCheckAsync()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Triggers an immediate connection check asynchronously.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -226,7 +236,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous connection check operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -242,7 +253,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_Interfaces_IWebSocketMonitorService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.Interfaces.IWebSocketMonitorService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L3" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Services/IWebSocketMonitorService.cs/#L7" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

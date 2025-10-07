@@ -103,6 +103,10 @@ metrics collection, sophisticated locking mechanisms, and enhanced message dedup
 Manages event counting, order book message queuing, and integrates with data persistence and API services
 for comprehensive market data processing.</p>
 </section>
+      <h4><a class="xref" href="KalshiBotAPI.Websockets.OverseerSubscriptionManager.html">OverseerSubscriptionManager</a></h4>
+      <section><p>Subscription manager specifically for the Overseer application.
+Only subscribes to fill and lifecycle channels, unlike the main bot which subscribes to all market channels.</p>
+</section>
       <h4><a class="xref" href="KalshiBotAPI.Websockets.SubscriptionManager.html">SubscriptionManager</a></h4>
       <section><p>Manages WebSocket channel subscriptions for real-time market data from Kalshi's trading platform.
 Handles subscription lifecycle, state tracking, confirmation processing, and queue management

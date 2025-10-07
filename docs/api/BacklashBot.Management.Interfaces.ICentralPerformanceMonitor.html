@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface ICentralPerformanceMonitor | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="Defines the contract for a centralized performance monitoring service that tracks system performance metrics across various components including queues, WebSocket connections, database operations, and market analysis activities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,28 +81,16 @@
 
 
   <h1 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor" class="text-break">Interface ICentralPerformanceMonitor</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Defines the contract for a centralized performance monitoring service that tracks
+system performance metrics across various components including queues, WebSocket connections,
+database operations, and market analysis activities.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html#BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_System_Boolean_">IPerformanceMonitor.RecordExecutionTime(string, long, bool)</a>
-    </div>
-    <div>
-      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html#BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean_">IPerformanceMonitor.RecordSimulationMetrics(string, Dictionary&lt;string, object&gt;, bool)</a>
-    </div>
-    <div>
-      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html#BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__">IPerformanceMonitor.RecordPerformanceMetrics(string, long, int, int, Dictionary&lt;string, long&gt;)</a>
-    </div>
-    <div>
-      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html#BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordDelayedApiCallMetrics_System_String_System_Int64_System_Double_System_Int64_System_Int32_System_Boolean_">IPerformanceMonitor.RecordDelayedApiCallMetrics(string, long, double, long, int, bool)</a>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Management.html">Management</a>.<a class="xref" href="BacklashBot.Management.Interfaces.html">Interfaces</a></h6>
   <h6><strong>Assembly</strong>: BacklashInterfaces.dll</h6>
   <h5 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public interface ICentralPerformanceMonitor : IPerformanceMonitor</code></pre>
+    <pre><code class="lang-csharp hljs">public interface ICentralPerformanceMonitor</code></pre>
   </div>
   <h3 id="properties">Properties
 </h3>
@@ -111,11 +99,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_BrainInstance.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.BrainInstance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L20">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L80">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_BrainInstance_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.BrainInstance*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_BrainInstance" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.BrainInstance">BrainInstance</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the brain instance identifier.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -141,11 +130,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsShuttingDown.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsShuttingDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L70">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsShuttingDown_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsShuttingDown*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsShuttingDown" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsShuttingDown">IsShuttingDown</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets whether the system is currently shutting down.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -171,11 +161,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsStartingUp.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsStartingUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L17">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L65">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsStartingUp_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsStartingUp*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsStartingUp" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsStartingUp">IsStartingUp</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets whether the system is currently starting up.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -198,14 +189,46 @@
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsWebSocketConnected.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsWebSocketConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L140">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsWebSocketConnected_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsWebSocketConnected*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_IsWebSocketConnected" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.IsWebSocketConnected">IsWebSocketConnected</h4>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the WebSocket connection is currently active.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsWebSocketConnected { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastPerformanceSampleDate.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastPerformanceSampleDate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L75">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastPerformanceSampleDate_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastPerformanceSampleDate*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastPerformanceSampleDate" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastPerformanceSampleDate">LastPerformanceSampleDate</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the date and time of the last performance sample.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -231,11 +254,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleInterval.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleInterval%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L45">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleInterval_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleInterval*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleInterval" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleInterval">LastRefreshCycleInterval</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the interval between refresh cycles.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -261,11 +285,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleSeconds.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L12">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L40">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleSeconds_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleSeconds*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshCycleSeconds" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshCycleSeconds">LastRefreshCycleSeconds</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the duration of the last refresh cycle in seconds.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -291,11 +316,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshMarketCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshMarketCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L14">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L50">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshMarketCount_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshMarketCount*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshMarketCount" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshMarketCount">LastRefreshMarketCount</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the number of markets processed in the last refresh cycle.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -321,11 +347,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshTimeAcceptable.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshTimeAcceptable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L16">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L60">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshTimeAcceptable_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshTimeAcceptable*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshTimeAcceptable" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshTimeAcceptable">LastRefreshTimeAcceptable</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets whether the last refresh cycle time was acceptable.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -351,11 +378,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshUsagePercentage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshUsagePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L15">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L55">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshUsagePercentage_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshUsagePercentage*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_LastRefreshUsagePercentage" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.LastRefreshUsagePercentage">LastRefreshUsagePercentage</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the usage percentage during the last refresh cycle.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -376,68 +404,6 @@
       </tr>
     </tbody>
   </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L117">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics">OverseerClientServiceMetrics</h4>
-  <div class="markdown level1 summary"><p>Gets the OverseerClientService performance metrics.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IReadOnlyDictionary&lt;string, object&gt;? OverseerClientServiceMetrics { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L25">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording">WebSocketConnectionManagerMetricsRecording</h4>
-  <div class="markdown level1 summary"><p>Gets whether WebSocketConnectionManager performance metrics are being recorded.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool WebSocketConnectionManagerMetricsRecording { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -445,11 +411,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L9">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L29">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_System_String_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived(System.String)">CalculateAverageWebsocketEventsReceived(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the average number of WebSocket events received for a specific market ticker.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -468,10 +435,322 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
+        <td><p>The market ticker to calculate averages for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The average number of WebSocket events received.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetCurrentCpuUsage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetCurrentCpuUsage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L85">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetCurrentCpuUsage_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetCurrentCpuUsage*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetCurrentCpuUsage" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetCurrentCpuUsage">GetCurrentCpuUsage()</h4>
+  <div class="markdown level1 summary"><p>Gets the current CPU usage percentage.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetCurrentCpuUsage()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetEventQueueAvg.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetEventQueueAvg%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L90">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetEventQueueAvg_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetEventQueueAvg*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetEventQueueAvg" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetEventQueueAvg">GetEventQueueAvg()</h4>
+  <div class="markdown level1 summary"><p>Gets the average event queue depth.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetEventQueueAvg()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastPerformanceSampleDate.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastPerformanceSampleDate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L135">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastPerformanceSampleDate_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastPerformanceSampleDate*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastPerformanceSampleDate" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastPerformanceSampleDate">GetLastPerformanceSampleDate()</h4>
+  <div class="markdown level1 summary"><p>Gets the timestamp of the last performance sample.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">DateTime? GetLastPerformanceSampleDate()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleInterval.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleInterval%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L115">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleInterval_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleInterval*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleInterval" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleInterval">GetLastRefreshCycleInterval()</h4>
+  <div class="markdown level1 summary"><p>Gets the interval between the last two refresh cycles.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetLastRefreshCycleInterval()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleSeconds.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L110">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleSeconds_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleSeconds*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshCycleSeconds" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshCycleSeconds">GetLastRefreshCycleSeconds()</h4>
+  <div class="markdown level1 summary"><p>Gets the duration of the last refresh cycle in seconds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetLastRefreshCycleSeconds()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshMarketCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshMarketCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L120">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshMarketCount_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshMarketCount*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshMarketCount" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshMarketCount">GetLastRefreshMarketCount()</h4>
+  <div class="markdown level1 summary"><p>Gets the number of markets processed in the last refresh cycle.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetLastRefreshMarketCount()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshTimeAcceptable.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshTimeAcceptable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L130">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshTimeAcceptable_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshTimeAcceptable*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshTimeAcceptable" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshTimeAcceptable">GetLastRefreshTimeAcceptable()</h4>
+  <div class="markdown level1 summary"><p>Gets whether the last refresh cycle completed within acceptable time limits.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool GetLastRefreshTimeAcceptable()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshUsagePercentage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshUsagePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L125">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshUsagePercentage_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshUsagePercentage*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetLastRefreshUsagePercentage" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetLastRefreshUsagePercentage">GetLastRefreshUsagePercentage()</h4>
+  <div class="markdown level1 summary"><p>Gets the CPU usage percentage during the last refresh cycle.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetLastRefreshUsagePercentage()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetNotificationQueueAvg.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetNotificationQueueAvg%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L100">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetNotificationQueueAvg_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetNotificationQueueAvg*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetNotificationQueueAvg" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetNotificationQueueAvg">GetNotificationQueueAvg()</h4>
+  <div class="markdown level1 summary"><p>Gets the average notification queue depth.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetNotificationQueueAvg()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetOrderbookQueueAvg.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetOrderbookQueueAvg%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L105">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetOrderbookQueueAvg_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetOrderbookQueueAvg*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetOrderbookQueueAvg" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetOrderbookQueueAvg">GetOrderbookQueueAvg()</h4>
+  <div class="markdown level1 summary"><p>Gets the average order book queue depth.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetOrderbookQueueAvg()</code></pre>
+  </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-condensed">
     <thead>
@@ -492,11 +771,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueCountRollingAverages.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueCountRollingAverages%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L8">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L22">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueCountRollingAverages_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueCountRollingAverages*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueCountRollingAverages" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueCountRollingAverages">GetQueueCountRollingAverages()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the rolling averages for queue counts across different queue types.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -513,7 +793,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double-.eventqueueavg">EventQueueAvg</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double-.tickerqueueavg">TickerQueueAvg</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double-.notificationqueueavg">NotificationQueueAvg</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double-.orderbookqueueavg">OrderBookQueueAvg</a>)</td>
-        <td></td>
+        <td><p>A tuple containing the average counts for event, ticker, notification, and order book queues.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -522,11 +803,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueHighCountPercentage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueHighCountPercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L10">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L35">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueHighCountPercentage_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueHighCountPercentage*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetQueueHighCountPercentage" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetQueueHighCountPercentage">GetQueueHighCountPercentage()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the percentage of time queues have high counts.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -543,367 +825,39 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The percentage of time queues are at high levels.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetTickerQueueAvg.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetTickerQueueAvg%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L95">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetTickerQueueAvg_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetTickerQueueAvg*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_GetTickerQueueAvg" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.GetTickerQueueAvg">GetTickerQueueAvg()</h4>
+  <div class="markdown level1 summary"><p>Gets the average ticker queue depth.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetTickerQueueAvg()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordBroadcastMetrics_System_Int64_System_Int64_System_Double_System_Double_System_Double_System_Int64_System_Double_System_Int64_System_Double_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordBroadcastMetrics(System.Int64%2CSystem.Int64%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Int64%2CSystem.Double%2CSystem.Int64%2CSystem.Double%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L88">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordBroadcastMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordBroadcastMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordBroadcastMetrics_System_Int64_System_Int64_System_Double_System_Double_System_Double_System_Int64_System_Double_System_Int64_System_Double_System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordBroadcastMetrics(System.Int64,System.Int64,System.Double,System.Double,System.Double,System.Int64,System.Double,System.Int64,System.Double,System.Boolean)">RecordBroadcastMetrics(long, long, double, double, double, long, double, long, double, bool)</h4>
-  <div class="markdown level1 summary"><p>Records broadcast service performance metrics with enablement status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordBroadcastMetrics(long successfulBroadcasts, long failedBroadcasts, double totalBroadcastTimeMs, double averageBroadcastTimeMs, double broadcastSuccessRate, long totalDataSize, double broadcastsPerMinute, long totalMemoryUsed, double averageIntervalDeviationMs, bool metricsEnabled)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">successfulBroadcasts</span></td>
-        <td><p>Number of successful broadcasts.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">failedBroadcasts</span></td>
-        <td><p>Number of failed broadcasts.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">totalBroadcastTimeMs</span></td>
-        <td><p>Total time spent on broadcasts in milliseconds.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">averageBroadcastTimeMs</span></td>
-        <td><p>Average broadcast time in milliseconds.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">broadcastSuccessRate</span></td>
-        <td><p>Success rate percentage.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">totalDataSize</span></td>
-        <td><p>Total size of broadcast data in bytes.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">broadcastsPerMinute</span></td>
-        <td><p>Average broadcasts per minute.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">totalMemoryUsed</span></td>
-        <td><p>Total memory used during broadcasts in bytes.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">averageIntervalDeviationMs</span></td>
-        <td><p>Average interval deviation in milliseconds.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">metricsEnabled</span></td>
-        <td><p>Whether performance metrics are enabled for the calling class.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordDatabaseMetrics_System_Collections_Generic_Dictionary_System_String_System_ValueTuple_System_Int32_System_Int32_System_TimeSpan_System_Double___System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordDatabaseMetrics(System.Collections.Generic.Dictionary%7BSystem.String%2CSystem.ValueTuple%7BSystem.Int32%2CSystem.Int32%2CSystem.TimeSpan%2CSystem.Double%7D%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L105">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordDatabaseMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordDatabaseMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordDatabaseMetrics_System_Collections_Generic_Dictionary_System_String_System_ValueTuple_System_Int32_System_Int32_System_TimeSpan_System_Double___System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordDatabaseMetrics(System.Collections.Generic.Dictionary{System.String,System.ValueTuple{System.Int32,System.Int32,System.TimeSpan,System.Double}},System.Boolean)">RecordDatabaseMetrics(Dictionary&lt;string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)&gt;, bool)</h4>
-  <div class="markdown level1 summary"><p>Records database performance metrics from the KalshiBotContext with enablement status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordDatabaseMetrics(Dictionary&lt;string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)&gt; metrics, bool metricsEnabled)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.timespan,system.double-.successcount">SuccessCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.timespan,system.double-.failurecount">FailureCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.timespan,system.double-.totaltime">TotalTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.timespan,system.double-.averagetimems">AverageTimeMs</a>)&gt;</td>
-        <td><span class="parametername">metrics</span></td>
-        <td><p>Dictionary containing database operation metrics.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">metricsEnabled</span></td>
-        <td><p>Whether performance metrics are enabled for the calling class.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_System_Int32_System_Int64_System_Double_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics(System.Int32%2CSystem.Int64%2CSystem.Double%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L63">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_System_Int32_System_Int64_System_Double_System_Int32_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics(System.Int32,System.Int64,System.Double,System.Int32)">RecordMarketAnalysisHelperMetrics(int, long, double, int)</h4>
-  <div class="markdown level1 summary"><p>Records MarketAnalysisHelper performance metrics.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">totalMarkets</span></td>
-        <td><p>Total number of markets processed.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">totalTimeMs</span></td>
-        <td><p>Total processing time in milliseconds.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">averageTimeMs</span></td>
-        <td><p>Average time per market in milliseconds.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">errorCount</span></td>
-        <td><p>Number of errors encountered.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_System_TimeSpan_System_Int32_System_TimeSpan_System_Int64_System_TimeSpan_System_Int32_System_Int32_System_TimeSpan_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics(System.TimeSpan%2CSystem.Int32%2CSystem.TimeSpan%2CSystem.Int64%2CSystem.TimeSpan%2CSystem.Int32%2CSystem.Int32%2CSystem.TimeSpan%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L45">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_System_TimeSpan_System_Int32_System_TimeSpan_System_Int64_System_TimeSpan_System_Int32_System_Int32_System_TimeSpan_System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics(System.TimeSpan,System.Int32,System.TimeSpan,System.Int64,System.TimeSpan,System.Int32,System.Int32,System.TimeSpan,System.Boolean)">RecordMarketDataInitializerMetrics(TimeSpan, int, TimeSpan, long, TimeSpan, int, int, TimeSpan, bool)</h4>
-  <div class="markdown level1 summary"><p>Records MarketDataInitializer performance metrics with enablement status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordMarketDataInitializerMetrics(TimeSpan totalDuration, int marketCount, TimeSpan averageMarketTime, long memoryDelta, TimeSpan cpuTime, int successfulMarkets, int failedMarkets, TimeSpan totalWaitTime, bool metricsEnabled)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">totalDuration</span></td>
-        <td><p>Total initialization duration.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">marketCount</span></td>
-        <td><p>Number of markets processed.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">averageMarketTime</span></td>
-        <td><p>Average time per market.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">memoryDelta</span></td>
-        <td><p>Memory usage change in bytes.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">cpuTime</span></td>
-        <td><p>CPU time used.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">successfulMarkets</span></td>
-        <td><p>Number of successfully initialized markets.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">failedMarkets</span></td>
-        <td><p>Number of failed market initializations.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">totalWaitTime</span></td>
-        <td><p>Total time spent waiting.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">metricsEnabled</span></td>
-        <td><p>Whether performance metrics are enabled for the calling class.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics(System.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L112">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics(System.Collections.Generic.Dictionary{System.String,System.Object},System.Boolean)">RecordOverseerClientServiceMetrics(Dictionary&lt;string, object&gt;, bool)</h4>
-  <div class="markdown level1 summary"><p>Records OverseerClientService performance metrics with enablement status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordOverseerClientServiceMetrics(Dictionary&lt;string, object&gt; metrics, bool metricsEnabled)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
-        <td><span class="parametername">metrics</span></td>
-        <td><p>Dictionary containing OverseerClientService performance metrics.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">metricsEnabled</span></td>
-        <td><p>Whether performance metrics are enabled for the calling class.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordWebSocketMessageProcessing_System_String_System_Int64_System_Int32_System_Int64_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordWebSocketMessageProcessing(System.String%2CSystem.Int64%2CSystem.Int32%2CSystem.Int64%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L73">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordWebSocketMessageProcessing_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordWebSocketMessageProcessing*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordWebSocketMessageProcessing_System_String_System_Int64_System_Int32_System_Int64_System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordWebSocketMessageProcessing(System.String,System.Int64,System.Int32,System.Int64,System.Boolean)">RecordWebSocketMessageProcessing(string, long, int, long, bool)</h4>
-  <div class="markdown level1 summary"><p>Records WebSocket message processing performance with enablement status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">messageType</span></td>
-        <td><p>The type of WebSocket message being processed.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">processingTimeTicks</span></td>
-        <td><p>The processing time in ticks.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">messageCount</span></td>
-        <td><p>The number of messages processed.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
-        <td><span class="parametername">bufferSizeBytes</span></td>
-        <td><p>The buffer size used in bytes.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">metricsEnabled</span></td>
-        <td><p>Whether performance metrics are enabled for the calling class.</p>
-</td>
       </tr>
     </tbody>
   </table>
@@ -912,11 +866,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_StartTimer.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.StartTimer%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L7">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L16">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_StartTimer_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.StartTimer*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_StartTimer" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.StartTimer">StartTimer()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Starts the performance monitoring timer.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -933,40 +888,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L31">View Source</a>
-  </span>
-  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus*"></a>
-  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_System_Boolean_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)">UpdateWebSocketMetricsRecordingStatus(bool)</h4>
-  <div class="markdown level1 summary"><p>Updates the WebSocket metrics recording status.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void UpdateWebSocketMetricsRecordingStatus(bool isRecording)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">isRecording</span></td>
-        <td><p>True if WebSocket metrics are being recorded, false otherwise.</p>
+        <td><p>A task representing the asynchronous operation.</p>
 </td>
       </tr>
     </tbody>
@@ -983,7 +905,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L3" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L8" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

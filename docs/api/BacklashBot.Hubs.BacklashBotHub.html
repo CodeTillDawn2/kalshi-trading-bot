@@ -145,18 +145,19 @@ Provides methods for broadcasting trading data, confirming target tickers, and p
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_BacklashBotHub__.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.%23ctor(BacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Hubs.BacklashBotHub%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_BacklashBotHub__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_BacklashBotHubConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.%23ctor(BacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Hubs.BacklashBotHub%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.BacklashBotHubConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L20">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L40">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub__ctor_" data-uid="BacklashBot.Hubs.BacklashBotHub.#ctor*"></a>
-  <h4 id="BacklashBot_Hubs_BacklashBotHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_BacklashBotHub__" data-uid="BacklashBot.Hubs.BacklashBotHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.BacklashBotHub})">BacklashBotHub(IServiceFactory, ILogger&lt;BacklashBotHub&gt;)</h4>
-  <div class="markdown level1 summary"></div>
+  <h4 id="BacklashBot_Hubs_BacklashBotHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_BacklashBotHub__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_BacklashBotHubConfig__" data-uid="BacklashBot.Hubs.BacklashBotHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.BacklashBotHub},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.BacklashBotHubConfig})">BacklashBotHub(IServiceFactory, ILogger&lt;BacklashBotHub&gt;, IPerformanceMonitor, IOptions&lt;BacklashBotHubConfig&gt;)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the BacklashBotHub class.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BacklashBotHub(IServiceFactory serviceFactory, ILogger&lt;BacklashBotHub&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public BacklashBotHub(IServiceFactory serviceFactory, ILogger&lt;BacklashBotHub&gt; logger, IPerformanceMonitor performanceMonitor, IOptions&lt;BacklashBotHubConfig&gt; config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -171,12 +172,26 @@ Provides methods for broadcasting trading data, confirming target tickers, and p
       <tr>
         <td><a class="xref" href="BacklashBot.Services.Interfaces.IServiceFactory.html">IServiceFactory</a></td>
         <td><span class="parametername">serviceFactory</span></td>
-        <td></td>
+        <td><p>Factory for creating service instances.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="BacklashBot.Hubs.BacklashBotHub.html">BacklashBotHub</a>&gt;</td>
         <td><span class="parametername">logger</span></td>
-        <td></td>
+        <td><p>Logger for recording hub operations.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>Monitor for recording performance metrics.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.BacklashBotHubConfig.html">BacklashBotHubConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration for BacklashBotHub settings.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -187,7 +202,7 @@ Provides methods for broadcasting trading data, confirming target tickers, and p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_CheckIn_OverseerBotShared_CheckInData_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.CheckIn(OverseerBotShared.CheckInData)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L160">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L222">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_CheckIn_" data-uid="BacklashBot.Hubs.BacklashBotHub.CheckIn*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_CheckIn_OverseerBotShared_CheckInData_" data-uid="BacklashBot.Hubs.BacklashBotHub.CheckIn(OverseerBotShared.CheckInData)">CheckIn(CheckInData)</h4>
@@ -237,11 +252,13 @@ Used for periodic status updates and health monitoring of trading brain instance
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_ClearConnectedClients.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L66">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L199">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_ClearConnectedClients_" data-uid="BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_ClearConnectedClients" data-uid="BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients">ClearConnectedClients()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Clears all connected clients from the collection.
+Used for resetting the client state.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -252,11 +269,13 @@ Used for periodic status updates and health monitoring of trading brain instance
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_ConfirmTargetTickersReceived_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L178">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L259">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_ConfirmTargetTickersReceived_" data-uid="BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_ConfirmTargetTickersReceived_System_String_" data-uid="BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(System.String)">ConfirmTargetTickersReceived(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Confirms to the Overseer that target tickers have been received and processed by a brain instance.
+Used to acknowledge successful receipt of ticker assignments from the Overseer system.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -275,7 +294,8 @@ Used for periodic status updates and health monitoring of trading brain instance
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">brainInstanceName</span></td>
-        <td></td>
+        <td><p>Name of the brain instance that received the target tickers.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -299,7 +319,7 @@ Used for periodic status updates and health monitoring of trading brain instance
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_HandleCheckInResponse_OverseerBotShared_CheckInResponse_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse(OverseerBotShared.CheckInResponse)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L199">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L294">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_HandleCheckInResponse_" data-uid="BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_HandleCheckInResponse_OverseerBotShared_CheckInResponse_" data-uid="BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse(OverseerBotShared.CheckInResponse)">HandleCheckInResponse(CheckInResponse)</h4>
@@ -349,11 +369,13 @@ Handles target ticker assignments and confirmation of successful check-in proces
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_HandleTargetTickersConfirmationResponse_OverseerBotShared_TargetTickersConfirmationResponse_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse(OverseerBotShared.TargetTickersConfirmationResponse)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L282">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L417">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_HandleTargetTickersConfirmationResponse_" data-uid="BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_HandleTargetTickersConfirmationResponse_OverseerBotShared_TargetTickersConfirmationResponse_" data-uid="BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse(OverseerBotShared.TargetTickersConfirmationResponse)">HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Handles the response from the Overseer confirming receipt of target tickers confirmation.
+Processes success/failure status and logs appropriate messages.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -372,68 +394,7 @@ Handles target ticker assignments and confirmation of successful check-in proces
       <tr>
         <td><span class="xref">TargetTickersConfirmationResponse</span></td>
         <td><span class="parametername">response</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_Handshake_System_String_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.Handshake(System.String%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L81">View Source</a>
-  </span>
-  <a id="BacklashBot_Hubs_BacklashBotHub_Handshake_" data-uid="BacklashBot.Hubs.BacklashBotHub.Handshake*"></a>
-  <h4 id="BacklashBot_Hubs_BacklashBotHub_Handshake_System_String_System_String_System_String_" data-uid="BacklashBot.Hubs.BacklashBotHub.Handshake(System.String,System.String,System.String)">Handshake(string, string, string)</h4>
-  <div class="markdown level1 summary"><p>Performs handshake with a connecting client, registers them in the database, and generates an authentication token.
-Updates existing client information or creates new client records as needed.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task Handshake(string clientId, string clientName, string clientType)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientId</span></td>
-        <td><p>Unique identifier for the client</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientName</span></td>
-        <td><p>Name of the client (typically brain instance name)</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientType</span></td>
-        <td><p>Type of client (e.g., &quot;brain&quot;, &quot;dashboard&quot;)</p>
+        <td><p>Response data from the Overseer containing success status and brain instance information.</p>
 </td>
       </tr>
     </tbody>
@@ -449,7 +410,8 @@ Updates existing client information or creates new client records as needed.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A completed task.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -458,11 +420,12 @@ Updates existing client information or creates new client records as needed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_HasConnectedClients.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.HasConnectedClients%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L58">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L187">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_HasConnectedClients_" data-uid="BacklashBot.Hubs.BacklashBotHub.HasConnectedClients*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_HasConnectedClients" data-uid="BacklashBot.Hubs.BacklashBotHub.HasConnectedClients">HasConnectedClients()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Checks if there are any connected clients.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -479,7 +442,8 @@ Updates existing client information or creates new client records as needed.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p>True if there are connected clients, otherwise false.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -488,11 +452,12 @@ Updates existing client information or creates new client records as needed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_OnConnectedAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L28">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L110">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_OnConnectedAsync_" data-uid="BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_OnConnectedAsync" data-uid="BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync">OnConnectedAsync()</h4>
-  <div class="markdown level1 summary"><p>Called when a new connection is established with the hub.</p>
+  <div class="markdown level1 summary"><p>Called when a client connects to the hub.
+Adds the client to the connected clients collection and logs the connection.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -510,7 +475,7 @@ Updates existing client information or creates new client records as needed.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td><p>A <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a> that represents the asynchronous connect.</p>
+        <td><p>A task representing the asynchronous operation.</p>
 </td>
       </tr>
     </tbody>
@@ -522,11 +487,12 @@ Updates existing client information or creates new client records as needed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_System_Exception_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L48">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L151">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_" data-uid="BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_System_Exception_" data-uid="BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)">OnDisconnectedAsync(Exception?)</h4>
-  <div class="markdown level1 summary"><p>Called when a connection with the hub is terminated.</p>
+  <div class="markdown level1 summary"><p>Called when a client disconnects from the hub.
+Removes the client from the connected clients collection and logs the disconnection.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -546,7 +512,8 @@ Updates existing client information or creates new client records as needed.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
         <td><span class="parametername">exception</span></td>
-        <td></td>
+        <td><p>Exception that caused the disconnection, if any.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -561,7 +528,7 @@ Updates existing client information or creates new client records as needed.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td><p>A <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a> that represents the asynchronous disconnect.</p>
+        <td><p>A task representing the asynchronous operation.</p>
 </td>
       </tr>
     </tbody>
@@ -573,7 +540,7 @@ Updates existing client information or creates new client records as needed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub_SendOverseerMessage_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L236">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L351">View Source</a>
   </span>
   <a id="BacklashBot_Hubs_BacklashBotHub_SendOverseerMessage_" data-uid="BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage*"></a>
   <h4 id="BacklashBot_Hubs_BacklashBotHub_SendOverseerMessage_System_String_System_String_" data-uid="BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(System.String,System.String)">SendOverseerMessage(string, string)</h4>
@@ -640,7 +607,7 @@ Currently supports refresh_data messages to trigger data refresh operations acro
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Hubs_BacklashBotHub.md&amp;value=---%0Auid%3A%20BacklashBot.Hubs.BacklashBotHub%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L14" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Hubs/BacklashBotHub.cs/#L18" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

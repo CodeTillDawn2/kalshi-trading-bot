@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IBotReadyStatus | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="IBotReadyStatus">
+    <meta name="description" content="Defines the contract for tracking the readiness status of the trading bot, including initialization completion and browser readiness states.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashBot_State_Interfaces_IBotReadyStatus" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus" class="text-break">Interface IBotReadyStatus</h1>
-  <div class="markdown level0 summary"><p>IBotReadyStatus</p>
+  <div class="markdown level0 summary"><p>Defines the contract for tracking the readiness status of the trading bot,
+including initialization completion and browser readiness states.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.State.html">State</a>.<a class="xref" href="BacklashBot.State.Interfaces.html">Interfaces</a></h6>
@@ -97,11 +98,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_Interfaces_IBotReadyStatus_BrowserReady.md&amp;value=---%0Auid%3A%20BacklashBot.State.Interfaces.IBotReadyStatus.BrowserReady%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L11">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L19">View Source</a>
   </span>
   <a id="BacklashBot_State_Interfaces_IBotReadyStatus_BrowserReady_" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.BrowserReady*"></a>
   <h4 id="BacklashBot_State_Interfaces_IBotReadyStatus_BrowserReady" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.BrowserReady">BrowserReady</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the task completion source that signals when the browser is ready.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -118,7 +120,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.taskcompletionsource-1">TaskCompletionSource</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
-        <td></td>
+        <td><p>The task completion source for browser readiness status.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -127,11 +130,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_Interfaces_IBotReadyStatus_InitializationCompleted.md&amp;value=---%0Auid%3A%20BacklashBot.State.Interfaces.IBotReadyStatus.InitializationCompleted%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L10">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L13">View Source</a>
   </span>
   <a id="BacklashBot_State_Interfaces_IBotReadyStatus_InitializationCompleted_" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.InitializationCompleted*"></a>
   <h4 id="BacklashBot_State_Interfaces_IBotReadyStatus_InitializationCompleted" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.InitializationCompleted">InitializationCompleted</h4>
-  <div class="markdown level1 summary"><p>ResetAll</p>
+  <div class="markdown level1 summary"><p>Gets or sets the task completion source that signals when initialization is completed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -149,7 +152,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.taskcompletionsource-1">TaskCompletionSource</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
-        <td></td>
+        <td><p>The task completion source for initialization status.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -160,11 +164,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_Interfaces_IBotReadyStatus_ResetAll.md&amp;value=---%0Auid%3A%20BacklashBot.State.Interfaces.IBotReadyStatus.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L12">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L24">View Source</a>
   </span>
   <a id="BacklashBot_State_Interfaces_IBotReadyStatus_ResetAll_" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.ResetAll*"></a>
   <h4 id="BacklashBot_State_Interfaces_IBotReadyStatus_ResetAll" data-uid="BacklashBot.State.Interfaces.IBotReadyStatus.ResetAll">ResetAll()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Resets all readiness status indicators to their initial state.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -182,7 +187,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_Interfaces_IBotReadyStatus.md&amp;value=---%0Auid%3A%20BacklashBot.State.Interfaces.IBotReadyStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L5" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/State/IBotReadyStatus.cs/#L7" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

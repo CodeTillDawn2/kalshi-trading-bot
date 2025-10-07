@@ -140,20 +140,20 @@ Key simulation mechanics include:</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SimulationConfig__System_Double_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.%23ctor(TradingStrategies.Strategies.Strategy%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.SimulationConfig%7D%2CSystem.Double%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SimulationConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_System_Double_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.%23ctor(TradingStrategies.Strategies.Strategy%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.SimulationConfig%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L114">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation__ctor_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SimulationConfig__System_Double_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SimulationConfig},System.Double,BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">StrategySimulation(Strategy, IOptions&lt;SimulationConfig&gt;, double, IPerformanceMonitor?)</h4>
+  <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SimulationConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_System_Double_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SimulationConfig},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor,System.Double)">StrategySimulation(Strategy, IOptions&lt;SimulationConfig&gt;, IPerformanceMonitor, double)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulation.html">StrategySimulation</a> class.
 Validates that the strategy parameter is not null to prevent runtime errors.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StrategySimulation(Strategy strategy, IOptions&lt;SimulationConfig&gt; config, double initialCash = 100, IPerformanceMonitor? performanceMonitor = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public StrategySimulation(Strategy strategy, IOptions&lt;SimulationConfig&gt; config, IPerformanceMonitor performanceMonitor, double initialCash = 100)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -178,15 +178,15 @@ Validates that the strategy parameter is not null to prevent runtime errors.</p>
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">initialCash</span></td>
-        <td><p>The initial cash balance for the simulation (default is 100.0).</p>
-</td>
-      </tr>
-      <tr>
         <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
         <td><span class="parametername">performanceMonitor</span></td>
         <td><p>Optional performance monitor to automatically record metrics.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">initialCash</span></td>
+        <td><p>The initial cash balance for the simulation (default is 100.0).</p>
 </td>
       </tr>
     </tbody>
@@ -591,7 +591,7 @@ Each tuple contains (action, side, type, count, price, expiration).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_GetDetailedPerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L753">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L787">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_GetDetailedPerformanceMetrics_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_GetDetailedPerformanceMetrics" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics">GetDetailedPerformanceMetrics()</h4>
@@ -635,7 +635,7 @@ Automatically records metrics to the performance monitor if provided.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity(BacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L430">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L414">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_BacklashDTOs_MarketSnapshot_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity(BacklashDTOs.MarketSnapshot)">GetFinalEquity(MarketSnapshot)</h4>
@@ -757,7 +757,7 @@ separation between real market data and simulation artifacts.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotAsync_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot%2CBacklashDTOs.MarketSnapshot%2CSystem.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L636">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L670">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotAsync_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotAsync_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot_System_Threading_CancellationToken_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot,BacklashDTOs.MarketSnapshot,System.Threading.CancellationToken)">ProcessSnapshotAsync(MarketSnapshot, MarketSnapshot?, CancellationToken)</h4>
@@ -820,7 +820,7 @@ Processes a market snapshot by applying deltas, updating the order book, and exe
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotsAsync_System_Collections_Generic_IEnumerable_BacklashDTOs_MarketSnapshot__System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L706">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L740">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotsAsync_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotsAsync_System_Collections_Generic_IEnumerable_BacklashDTOs_MarketSnapshot__System_Threading_CancellationToken_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable{BacklashDTOs.MarketSnapshot},System.Threading.CancellationToken)">ProcessSnapshotsAsync(IEnumerable&lt;MarketSnapshot&gt;, CancellationToken)</h4>
@@ -876,7 +876,7 @@ Processes a market snapshot by applying deltas, updating the order book, and exe
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_ResetPerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L784">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L818">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_ResetPerformanceMetrics_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_ResetPerformanceMetrics" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics">ResetPerformanceMetrics()</h4>

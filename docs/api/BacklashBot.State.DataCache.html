@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class DataCache | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="Provides a centralized cache for market data, account information, and trading status. Implements thread-safe storage for real-time trading data and state management.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,9 @@
 
 
   <h1 id="BacklashBot_State_DataCache" data-uid="BacklashBot.State.DataCache" class="text-break">Class DataCache</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Provides a centralized cache for market data, account information, and trading status.
+Implements thread-safe storage for real-time trading data and state management.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -129,11 +131,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache__ctor.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L11">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L17">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache__ctor_" data-uid="BacklashBot.State.DataCache.#ctor*"></a>
   <h4 id="BacklashBot_State_DataCache__ctor" data-uid="BacklashBot.State.DataCache.#ctor">DataCache()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the DataCache class.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -146,11 +149,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_AccountBalance.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.AccountBalance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L38">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L61">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_AccountBalance_" data-uid="BacklashBot.State.DataCache.AccountBalance*"></a>
   <h4 id="BacklashBot_State_DataCache_AccountBalance" data-uid="BacklashBot.State.DataCache.AccountBalance">AccountBalance</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the ExchangeStatusChanged.</p>
+  <div class="markdown level1 summary"><p>Gets or sets the current account balance in dollars.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -177,11 +180,13 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_ExchangeStatus.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.ExchangeStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L48">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L85">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_ExchangeStatus_" data-uid="BacklashBot.State.DataCache.ExchangeStatus*"></a>
   <h4 id="BacklashBot_State_DataCache_ExchangeStatus" data-uid="BacklashBot.State.DataCache.ExchangeStatus">ExchangeStatus</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the current exchange operational status.
+When changed, raises the ExchangeStatusChanged event.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -207,11 +212,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_LastWebSocketTimestamp.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.LastWebSocketTimestamp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L75">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L121">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_LastWebSocketTimestamp_" data-uid="BacklashBot.State.DataCache.LastWebSocketTimestamp*"></a>
   <h4 id="BacklashBot_State_DataCache_LastWebSocketTimestamp" data-uid="BacklashBot.State.DataCache.LastWebSocketTimestamp">LastWebSocketTimestamp</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the RecentlyRemovedMarkets.</p>
+  <div class="markdown level1 summary"><p>Gets or sets the timestamp of the last received WebSocket message.
+Used to track the freshness of real-time data connections.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -238,11 +244,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_Markets.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.Markets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L15">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L25">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_Markets_" data-uid="BacklashBot.State.DataCache.Markets*"></a>
   <h4 id="BacklashBot_State_DataCache_Markets" data-uid="BacklashBot.State.DataCache.Markets">Markets</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the AccountBalance.</p>
+  <div class="markdown level1 summary"><p>Gets the thread-safe dictionary containing market data for all tracked markets.
+Key is market ticker, value is the market data interface.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -269,11 +276,13 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_PortfolioValue.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.PortfolioValue%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L40">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L73">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_PortfolioValue_" data-uid="BacklashBot.State.DataCache.PortfolioValue*"></a>
   <h4 id="BacklashBot_State_DataCache_PortfolioValue" data-uid="BacklashBot.State.DataCache.PortfolioValue">PortfolioValue</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the total portfolio value calculated as the sum of market exposure and position ROI amounts across all markets.
+Rounded to 2 decimal places.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -299,11 +308,13 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_RecentlyRemovedMarkets.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.RecentlyRemovedMarkets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L39">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L67">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_RecentlyRemovedMarkets_" data-uid="BacklashBot.State.DataCache.RecentlyRemovedMarkets*"></a>
   <h4 id="BacklashBot_State_DataCache_RecentlyRemovedMarkets" data-uid="BacklashBot.State.DataCache.RecentlyRemovedMarkets">RecentlyRemovedMarkets</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the set of market tickers that were recently removed from watch list.
+Used to prevent immediate re-watching of recently removed markets.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -329,11 +340,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_SoftwareVersion.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.SoftwareVersion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L27">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L44">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_SoftwareVersion_" data-uid="BacklashBot.State.DataCache.SoftwareVersion*"></a>
   <h4 id="BacklashBot_State_DataCache_SoftwareVersion" data-uid="BacklashBot.State.DataCache.SoftwareVersion">SoftwareVersion</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the software version of the application in Major.Minor.Build format.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -359,11 +371,13 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_TradingStatus.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.TradingStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L103">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_TradingStatus_" data-uid="BacklashBot.State.DataCache.TradingStatus*"></a>
   <h4 id="BacklashBot_State_DataCache_TradingStatus" data-uid="BacklashBot.State.DataCache.TradingStatus">TradingStatus</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the current trading operational status.
+When changed, raises the ExchangeStatusChanged event.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -389,11 +403,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_WatchedMarkets.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.WatchedMarkets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L33">View Source</a>
   </span>
   <a id="BacklashBot_State_DataCache_WatchedMarkets_" data-uid="BacklashBot.State.DataCache.WatchedMarkets*"></a>
   <h4 id="BacklashBot_State_DataCache_WatchedMarkets" data-uid="BacklashBot.State.DataCache.WatchedMarkets">WatchedMarkets</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the PortfolioValue.</p>
+  <div class="markdown level1 summary"><p>Gets or sets the set of market tickers currently being watched by the bot.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -422,10 +436,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache_ExchangeStatusChanged.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache.ExchangeStatusChanged%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L56">View Source</a>
   </span>
   <h4 id="BacklashBot_State_DataCache_ExchangeStatusChanged" data-uid="BacklashBot.State.DataCache.ExchangeStatusChanged">ExchangeStatusChanged</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when the exchange or trading status changes.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -462,7 +477,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_State_DataCache.md&amp;value=---%0Auid%3A%20BacklashBot.State.DataCache%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L8" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/State/DataCache.cs/#L12" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

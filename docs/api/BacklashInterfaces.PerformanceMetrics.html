@@ -82,6 +82,22 @@
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="markdown level0 remarks"></div>
+    <h3 id="classes">
+Classes
+</h3>
+      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.html">BasePerformanceMonitor</a></h4>
+      <section><p>Base implementation of IPerformanceMonitor that provides uniform handling of performance metrics.
+This class captures metrics from different VisualTypes and stores them for uniform processing.
+Derived classes should inherit from this to get consistent metric handling.</p>
+</section>
+      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.GeneralPerformanceMetric.html">GeneralPerformanceMetric</a></h4>
+      <section><p>General performance metric for basic measurements like execution time, counts, and ratios.
+Uses only primitive types for uniform GUI handling.</p>
+</section>
+      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.PerformanceMetric.html">PerformanceMetric</a></h4>
+      <section><p>Base class for all performance metrics with uniform structure for GUI visualization.
+All metrics contain only primitive types or simple containers of primitives.</p>
+</section>
     <h3 id="interfaces">
 Interfaces
 </h3>
@@ -89,34 +105,16 @@ Interfaces
       <section><p>Interface for accessing performance metrics from KalshiBotContext.
 This interface provides a standardized way to access database operation performance data.</p>
 </section>
-      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IMessageProcessorPerformanceMetrics.html">IMessageProcessorPerformanceMetrics</a></h4>
-      <section><p>Interface for posting MessageProcessor performance metrics to central monitoring services.
-This interface provides a standardized way to collect and aggregate performance data
-from WebSocket message processing operations including throughput, latency, and queue metrics.</p>
-</section>
-      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.INightActivitiesPerformanceMetrics.html">INightActivitiesPerformanceMetrics</a></h4>
-      <section><p>Interface for accessing performance metrics from OvernightActivitiesHelper.
-This interface provides a standardized way to access overnight task performance data.</p>
-</section>
       <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></h4>
       <section><p>Interface for recording performance metrics across the KalshiBot system.
-Provides standardized methods for tracking execution times and simulation metrics
-with mandatory enablement status to control when metrics are actually recorded.</p>
+Provides methods for each VisualType to ensure uniform handling of different metric types.</p>
 </section>
-      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics.html">ISqlDataServicePerformanceMetrics</a></h4>
-      <section><p>Interface for receiving performance metrics from SqlDataService.
-Classes implementing this interface will automatically receive performance data
-from the SqlDataService when metrics collection is enabled.</p>
-</section>
-      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics.html">ISubscriptionManagerPerformanceMetrics</a></h4>
-      <section><p>Interface for posting SubscriptionManager performance metrics to central monitoring services.
-This interface provides a standardized way to collect and aggregate performance data
-from WebSocket subscription operations and lock contention monitoring.</p>
-</section>
-      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IWebSocketPerformanceMetrics.html">IWebSocketPerformanceMetrics</a></h4>
-      <section><p>Interface for recording and accessing WebSocket performance metrics.
-This interface provides a standardized way to track WebSocket connection,
-message processing, and subscription performance data.</p>
+    <h3 id="enums">
+Enums
+</h3>
+      <h4><a class="xref" href="BacklashInterfaces.PerformanceMetrics.VisualType.html">VisualType</a></h4>
+      <section><p>Defines the visual representation type for performance metrics in GUI components.
+This allows uniform handling of different metric types across all performance monitors.</p>
 </section>
 
 

@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IInterestScoreService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="IInterestScoreService">
+    <meta name="description" content="Defines the contract for a service that calculates interest scores for markets based on various trading metrics and parameters.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashBot_Management_Interfaces_IInterestScoreService" data-uid="BacklashBot.Management.Interfaces.IInterestScoreService" class="text-break">Interface IInterestScoreService</h1>
-  <div class="markdown level0 summary"><p>IInterestScoreService</p>
+  <div class="markdown level0 summary"><p>Defines the contract for a service that calculates interest scores for markets
+based on various trading metrics and parameters.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Management.html">Management</a>.<a class="xref" href="BacklashBot.Management.Interfaces.html">Interfaces</a></h6>
@@ -97,11 +98,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_IInterestScoreService_CalculateMarketInterestScoreAsync_System_Object_System_Int64_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.IInterestScoreService.CalculateMarketInterestScoreAsync(System.Object%2CSystem.Int64%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L22">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L46">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_IInterestScoreService_CalculateMarketInterestScoreAsync_" data-uid="BacklashBot.Management.Interfaces.IInterestScoreService.CalculateMarketInterestScoreAsync*"></a>
   <h4 id="BacklashBot_Management_Interfaces_IInterestScoreService_CalculateMarketInterestScoreAsync_System_Object_System_Int64_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Management.Interfaces.IInterestScoreService.CalculateMarketInterestScoreAsync(System.Object,System.Int64,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">CalculateMarketInterestScoreAsync(dynamic, long, double, double, double, double, double, double, double)</h4>
-  <div class="markdown level1 summary"><p>CalculateMarketInterestScoreAsync</p>
+  <div class="markdown level1 summary"><p>Calculates a detailed interest score for a single market with component breakdown.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -121,47 +122,56 @@
       <tr>
         <td><span class="xref">dynamic</span></td>
         <td><span class="parametername">market</span></td>
-        <td></td>
+        <td><p>Dynamic market object containing market data.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
         <td><span class="parametername">snapshotCount</span></td>
-        <td></td>
+        <td><p>Number of snapshots available for the market.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadTightnessWeight</span></td>
-        <td></td>
+        <td><p>Weight for spread tightness in scoring (default 0.2).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadWidthWeight</span></td>
-        <td></td>
+        <td><p>Weight for spread width in scoring (default 0.15).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumeWeight</span></td>
-        <td></td>
+        <td><p>Weight for volume in scoring (default 0.20).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumePercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for volume percentile in scoring (default 0.1).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">liquidityPercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for liquidity percentile in scoring (default 0.09).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">openInterestPercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for open interest percentile in scoring (default 0.065).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">continuityWeight</span></td>
-        <td></td>
+        <td><p>Weight for continuity in scoring (default 0.145).</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -176,7 +186,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double--.score">score</a>, (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.spreadtightness">spreadTightness</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.spreadwidth">spreadWidth</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.volume">volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.volumepercentile">volumePercentile</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.liquiditypercentile">liquidityPercentile</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.openinterestpercentile">openInterestPercentile</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double-.continuity">continuity</a>) <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.valuetuple-system.double,system.double,system.double,system.double,system.double,system.double,system.double--.scoreparts">scoreParts</a>)&gt;</td>
-        <td></td>
+        <td><p>A tuple containing the total score and a tuple of individual score components.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -185,11 +196,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_IInterestScoreService_GetMarketInterestScores_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Collections_Generic_IEnumerable_System_String__System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.IInterestScoreService.GetMarketInterestScores(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CSystem.Collections.Generic.IEnumerable%7BSystem.String%7D%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L10">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L23">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_IInterestScoreService_GetMarketInterestScores_" data-uid="BacklashBot.Management.Interfaces.IInterestScoreService.GetMarketInterestScores*"></a>
   <h4 id="BacklashBot_Management_Interfaces_IInterestScoreService_GetMarketInterestScores_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Collections_Generic_IEnumerable_System_String__System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Management.Interfaces.IInterestScoreService.GetMarketInterestScores(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,System.Collections.Generic.IEnumerable{System.String},System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">GetMarketInterestScores(IServiceScopeFactory, IEnumerable&lt;string&gt;, double, double, double, double, double, double)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates interest scores for a collection of market tickers using weighted parameters.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -208,42 +220,50 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.iservicescopefactory">IServiceScopeFactory</a></td>
         <td><span class="parametername">scopeFactory</span></td>
-        <td></td>
+        <td><p>Factory for creating service scopes for dependency injection.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
         <td><span class="parametername">tickers</span></td>
-        <td></td>
+        <td><p>Collection of market tickers to score.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadTightnessWeight</span></td>
-        <td></td>
+        <td><p>Weight for spread tightness in scoring (default 0.2).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadWidthWeight</span></td>
-        <td></td>
+        <td><p>Weight for spread width in scoring (default 0.2).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumeWeight</span></td>
-        <td></td>
+        <td><p>Weight for volume in scoring (default 0.33).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumePercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for volume percentile in scoring (default 0.15).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">liquidityPercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for liquidity percentile in scoring (default 0.06).</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">openInterestPercentileWeight</span></td>
-        <td></td>
+        <td><p>Weight for open interest percentile in scoring (default 0.06).</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -258,7 +278,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.double-.ticker">Ticker</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.double-.score">Score</a>)&gt;&gt;</td>
-        <td></td>
+        <td><p>A list of tuples containing ticker and calculated score.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -274,7 +295,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_IInterestScoreService.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.IInterestScoreService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/IInterestScoreService.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

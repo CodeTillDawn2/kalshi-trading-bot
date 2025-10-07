@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface ICentralBrain | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="ICentralBrain">
+    <meta name="description" content="Defines the contract for the central brain component that manages the overall lifecycle and coordination of the trading bot system, including startup, shutdown, and service management.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashBot_Management_Interfaces_ICentralBrain" data-uid="BacklashBot.Management.Interfaces.ICentralBrain" class="text-break">Interface ICentralBrain</h1>
-  <div class="markdown level0 summary"><p>ICentralBrain</p>
+  <div class="markdown level0 summary"><p>Defines the contract for the central brain component that manages the overall lifecycle
+and coordination of the trading bot system, including startup, shutdown, and service management.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritedMembers">
@@ -109,11 +110,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain_IsServicesStopped.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain.IsServicesStopped%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L15">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralBrain_IsServicesStopped_" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsServicesStopped*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralBrain_IsServicesStopped" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsServicesStopped">IsServicesStopped</h4>
-  <div class="markdown level1 summary"><p>StartDashboard</p>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the services are currently stopped.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -131,7 +132,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p><code>true</code> if services are stopped; otherwise, <code>false</code>.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -140,11 +142,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain_IsShuttingDown.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain.IsShuttingDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L16">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L27">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralBrain_IsShuttingDown_" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsShuttingDown*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralBrain_IsShuttingDown" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsShuttingDown">IsShuttingDown</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the system is currently shutting down.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -161,7 +164,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p><code>true</code> if shutting down; otherwise, <code>false</code>.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -170,11 +174,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain_IsStartingUp.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain.IsStartingUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L15">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L21">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralBrain_IsStartingUp_" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsStartingUp*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralBrain_IsStartingUp" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.IsStartingUp">IsStartingUp</h4>
-  <div class="markdown level1 summary"><p>StartDashboard</p>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the system is currently starting up.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -192,7 +196,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td></td>
+        <td><p><code>true</code> if starting up; otherwise, <code>false</code>.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -203,11 +208,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain_ShutdownDashboardAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain.ShutdownDashboardAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L39">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralBrain_ShutdownDashboardAsync_" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.ShutdownDashboardAsync*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralBrain_ShutdownDashboardAsync" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.ShutdownDashboardAsync">ShutdownDashboardAsync()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Shuts down the dashboard and stops all central brain operations asynchronously.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -224,7 +230,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous shutdown operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -233,11 +240,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain_StartDashboard.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain.StartDashboard%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L33">View Source</a>
   </span>
   <a id="BacklashBot_Management_Interfaces_ICentralBrain_StartDashboard_" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.StartDashboard*"></a>
   <h4 id="BacklashBot_Management_Interfaces_ICentralBrain_StartDashboard" data-uid="BacklashBot.Management.Interfaces.ICentralBrain.StartDashboard">StartDashboard()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Starts the dashboard and initializes the central brain operations.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -254,7 +262,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -270,7 +279,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralBrain.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralBrain.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

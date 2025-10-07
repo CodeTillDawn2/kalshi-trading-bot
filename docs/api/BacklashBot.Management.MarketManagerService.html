@@ -119,6 +119,9 @@ Now includes configurable queue limits and extracted target calculation service 
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__performanceMonitor">BaseMarketManagerService._performanceMonitor</a>
     </div>
     <div>
+      <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__centralPerformanceMonitor">BaseMarketManagerService._centralPerformanceMonitor</a>
+    </div>
+    <div>
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__targetCalculationService">BaseMarketManagerService._targetCalculationService</a>
     </div>
     <div>
@@ -140,6 +143,9 @@ Now includes configurable queue limits and extracted target calculation service 
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__centralBrainConfig">BaseMarketManagerService._centralBrainConfig</a>
     </div>
     <div>
+      <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__marketManagerServiceConfig">BaseMarketManagerService._marketManagerServiceConfig</a>
+    </div>
+    <div>
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__statusTrackerService">BaseMarketManagerService._statusTrackerService</a>
     </div>
     <div>
@@ -149,7 +155,7 @@ Now includes configurable queue limits and extracted target calculation service 
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService__resetLock">BaseMarketManagerService._resetLock</a>
     </div>
     <div>
-      <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService_CalculateTarget_BacklashDTOs_PerformanceMetrics_BacklashDTOs_Data_BrainInstanceDTO_">BaseMarketManagerService.CalculateTarget(PerformanceMetrics, BrainInstanceDTO)</a>
+      <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService_CalculateTarget_BacklashDTOs_BrainPerformanceMetricsDTO_BacklashDTOs_Data_BrainInstanceDTO_">BaseMarketManagerService.CalculateTarget(BrainPerformanceMetricsDTO, BrainInstanceDTO)</a>
     </div>
     <div>
       <a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService_RefreshMarkets">BaseMarketManagerService.RefreshMarkets()</a>
@@ -201,13 +207,13 @@ Now includes configurable queue limits and extracted target calculation service 
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IMarketManagerService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_CentralBrainConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_IBrainStatusService_BacklashBot_Management_Interfaces_ITargetCalculationService_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.%23ctor(BacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.IMarketManagerService%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashCommon.Configuration.InstanceNameConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.CentralBrainConfig%7D%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CBacklashBot.Management.Interfaces.IBrainStatusService%2CBacklashBot.Management.Interfaces.ITargetCalculationService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IMarketManagerService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_CentralBrainConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_MarketManagerServiceConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_IBrainStatusService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_BacklashBot_Management_Interfaces_ITargetCalculationService_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.%23ctor(BacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.IMarketManagerService%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashCommon.Configuration.InstanceNameConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.CentralBrainConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.MarketManagerServiceConfig%7D%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CBacklashBot.Management.Interfaces.IBrainStatusService%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor%2CBacklashBot.Management.Interfaces.ITargetCalculationService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L39">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L42">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketManagerService__ctor_" data-uid="BacklashBot.Management.MarketManagerService.#ctor*"></a>
-  <h4 id="BacklashBot_Management_MarketManagerService__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IMarketManagerService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_CentralBrainConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_IBrainStatusService_BacklashBot_Management_Interfaces_ITargetCalculationService_" data-uid="BacklashBot.Management.MarketManagerService.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.IMarketManagerService},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashCommon.Configuration.InstanceNameConfig},Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.CentralBrainConfig},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.IBrainStatusService,BacklashBot.Management.Interfaces.ITargetCalculationService)">MarketManagerService(IServiceFactory, ILogger&lt;IMarketManagerService&gt;, IServiceScopeFactory, ICentralPerformanceMonitor, IOptions&lt;InstanceNameConfig&gt;, IOptions&lt;CentralBrainConfig&gt;, IScopeManagerService, IStatusTrackerService, IBrainStatusService, ITargetCalculationService)</h4>
+  <h4 id="BacklashBot_Management_MarketManagerService__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IMarketManagerService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashCommon_Configuration_InstanceNameConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_CentralBrainConfig__Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_MarketManagerServiceConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_IBrainStatusService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_BacklashBot_Management_Interfaces_ITargetCalculationService_" data-uid="BacklashBot.Management.MarketManagerService.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.IMarketManagerService},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashCommon.Configuration.InstanceNameConfig},Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.CentralBrainConfig},Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.MarketManagerServiceConfig},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.IBrainStatusService,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor,BacklashBot.Management.Interfaces.ITargetCalculationService)">MarketManagerService(IServiceFactory, ILogger&lt;IMarketManagerService&gt;, IServiceScopeFactory, IPerformanceMonitor, IOptions&lt;InstanceNameConfig&gt;, IOptions&lt;CentralBrainConfig&gt;, IOptions&lt;MarketManagerServiceConfig&gt;, IScopeManagerService, IStatusTrackerService, IBrainStatusService, ICentralPerformanceMonitor, ITargetCalculationService)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the MarketManagerService class.
 Creates instances of both managed and unmanaged market management services
 to provide flexible market management strategies based on brain configuration.</p>
@@ -215,7 +221,7 @@ to provide flexible market management strategies based on brain configuration.</
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MarketManagerService(IServiceFactory serviceFactory, ILogger&lt;IMarketManagerService&gt; logger, IServiceScopeFactory scopeFactory, ICentralPerformanceMonitor performanceMonitor, IOptions&lt;InstanceNameConfig&gt; instanceNameConfig, IOptions&lt;CentralBrainConfig&gt; centralBrainConfig, IScopeManagerService scopeManagerService, IStatusTrackerService statusTrackerService, IBrainStatusService brainStatus, ITargetCalculationService targetCalculationService)</code></pre>
+    <pre><code class="lang-csharp hljs">public MarketManagerService(IServiceFactory serviceFactory, ILogger&lt;IMarketManagerService&gt; logger, IServiceScopeFactory scopeFactory, IPerformanceMonitor performanceMonitor, IOptions&lt;InstanceNameConfig&gt; instanceNameConfig, IOptions&lt;CentralBrainConfig&gt; centralBrainConfig, IOptions&lt;MarketManagerServiceConfig&gt; marketManagerServiceConfig, IScopeManagerService scopeManagerService, IStatusTrackerService statusTrackerService, IBrainStatusService brainStatus, ICentralPerformanceMonitor centralPerformanceMonitor, ITargetCalculationService targetCalculationService)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -246,7 +252,7 @@ to provide flexible market management strategies based on brain configuration.</
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html">ICentralPerformanceMonitor</a></td>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
         <td><span class="parametername">performanceMonitor</span></td>
         <td><p>Monitor for tracking system performance metrics</p>
 </td>
@@ -261,6 +267,12 @@ to provide flexible market management strategies based on brain configuration.</
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.CentralBrainConfig.html">CentralBrainConfig</a>&gt;</td>
         <td><span class="parametername">centralBrainConfig</span></td>
         <td><p>Configuration options for central brain parameters</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashBot.Configuration.MarketManagerServiceConfig.html">MarketManagerServiceConfig</a>&gt;</td>
+        <td><span class="parametername">marketManagerServiceConfig</span></td>
+        <td><p>Configuration options for market manager service parameters</p>
 </td>
       </tr>
       <tr>
@@ -282,6 +294,12 @@ to provide flexible market management strategies based on brain configuration.</
 </td>
       </tr>
       <tr>
+        <td><a class="xref" href="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html">ICentralPerformanceMonitor</a></td>
+        <td><span class="parametername">centralPerformanceMonitor</span></td>
+        <td><p>Monitor for tracking system performance metrics</p>
+</td>
+      </tr>
+      <tr>
         <td><a class="xref" href="BacklashBot.Management.Interfaces.ITargetCalculationService.html">ITargetCalculationService</a></td>
         <td><span class="parametername">targetCalculationService</span></td>
         <td><p>Service for calculating optimal market targets</p>
@@ -296,11 +314,13 @@ to provide flexible market management strategies based on brain configuration.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService_ClearMarketsToReset.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.ClearMarketsToReset%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L55">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L64">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketManagerService_ClearMarketsToReset_" data-uid="BacklashBot.Management.MarketManagerService.ClearMarketsToReset*"></a>
   <h4 id="BacklashBot_Management_MarketManagerService_ClearMarketsToReset" data-uid="BacklashBot.Management.MarketManagerService.ClearMarketsToReset">ClearMarketsToReset()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Clears the lists of markets to add after reset and markets to reset.
+This method is thread-safe using a lock to prevent concurrent modifications.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -311,11 +331,13 @@ to provide flexible market management strategies based on brain configuration.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService_HandleMarketResets.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.HandleMarketResets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L65">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L79">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketManagerService_HandleMarketResets_" data-uid="BacklashBot.Management.MarketManagerService.HandleMarketResets*"></a>
   <h4 id="BacklashBot_Management_MarketManagerService_HandleMarketResets" data-uid="BacklashBot.Management.MarketManagerService.HandleMarketResets">HandleMarketResets()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Handles market resets by refreshing markets and resetting them asynchronously.
+Catches and logs any exceptions that occur during the reset process.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -332,19 +354,20 @@ to provide flexible market management strategies based on brain configuration.</
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous operation</p>
+</td>
       </tr>
     </tbody>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_PerformanceMetrics_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.MonitorWatchList(BacklashDTOs.Data.BrainInstanceDTO%2CBacklashDTOs.PerformanceMetrics)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_BrainPerformanceMetricsDTO_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.MonitorWatchList(BacklashDTOs.Data.BrainInstanceDTO%2CBacklashDTOs.BrainPerformanceMetricsDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L99">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L118">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketManagerService_MonitorWatchList_" data-uid="BacklashBot.Management.MarketManagerService.MonitorWatchList*"></a>
-  <h4 id="BacklashBot_Management_MarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_PerformanceMetrics_" data-uid="BacklashBot.Management.MarketManagerService.MonitorWatchList(BacklashDTOs.Data.BrainInstanceDTO,BacklashDTOs.PerformanceMetrics)">MonitorWatchList(BrainInstanceDTO, PerformanceMetrics)</h4>
+  <h4 id="BacklashBot_Management_MarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_BrainPerformanceMetricsDTO_" data-uid="BacklashBot.Management.MarketManagerService.MonitorWatchList(BacklashDTOs.Data.BrainInstanceDTO,BacklashDTOs.BrainPerformanceMetricsDTO)">MonitorWatchList(BrainInstanceDTO, BrainPerformanceMetricsDTO)</h4>
   <div class="markdown level1 summary"><p>Monitors the watch list by delegating to the appropriate market management strategy.
 Routes the monitoring request to either the managed or unmanaged service based on
 the brain instance's ManagedWatchList configuration setting.</p>
@@ -352,7 +375,7 @@ the brain instance's ManagedWatchList configuration setting.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)</code></pre>
+    <pre><code class="lang-csharp hljs">public override Task MonitorWatchList(BrainInstanceDTO brain, BrainPerformanceMetricsDTO metrics)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -371,7 +394,7 @@ the brain instance's ManagedWatchList configuration setting.</p>
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashDTOs.PerformanceMetrics.html">PerformanceMetrics</a></td>
+        <td><a class="xref" href="BacklashDTOs.BrainPerformanceMetricsDTO.html">BrainPerformanceMetricsDTO</a></td>
         <td><span class="parametername">metrics</span></td>
         <td><p>Current performance metrics for decision making</p>
 </td>
@@ -395,17 +418,19 @@ the brain instance's ManagedWatchList configuration setting.</p>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_PerformanceMetrics_">BaseMarketManagerService.MonitorWatchList(BrainInstanceDTO, PerformanceMetrics)</a></div>
+  <div><a class="xref" href="BacklashBot.Management.BaseMarketManagerService.html#BacklashBot_Management_BaseMarketManagerService_MonitorWatchList_BacklashDTOs_Data_BrainInstanceDTO_BacklashDTOs_BrainPerformanceMetricsDTO_">BaseMarketManagerService.MonitorWatchList(BrainInstanceDTO, BrainPerformanceMetricsDTO)</a></div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService_TriggerMarketReset_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService.TriggerMarketReset(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L82">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L101">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketManagerService_TriggerMarketReset_" data-uid="BacklashBot.Management.MarketManagerService.TriggerMarketReset*"></a>
   <h4 id="BacklashBot_Management_MarketManagerService_TriggerMarketReset_System_String_" data-uid="BacklashBot.Management.MarketManagerService.TriggerMarketReset(System.String)">TriggerMarketReset(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Triggers a market reset for the specified market ticker by adding it to the reset list.
+This method is thread-safe using a lock to prevent concurrent modifications.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -424,7 +449,8 @@ the brain instance's ManagedWatchList configuration setting.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The ticker symbol of the market to reset</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -444,7 +470,7 @@ the brain instance's ManagedWatchList configuration setting.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketManagerService.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketManagerService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L19" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketManagerService.cs/#L20" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

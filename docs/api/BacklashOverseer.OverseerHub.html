@@ -147,19 +147,19 @@ monitoring and control of trading bot operations.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashOverseer_Services_BrainPersistenceService_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_OverseerHubConfig__BacklashOverseer_Services_PerformanceMetricsService_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashOverseer.OverseerHub%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashOverseer.Services.BrainPersistenceService%2CMicrosoft.Extensions.Options.IOptions%7BBacklashOverseer.Config.OverseerHubConfig%7D%2CBacklashOverseer.Services.PerformanceMetricsService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashOverseer_Services_BrainPersistenceService_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_OverseerHubConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashOverseer.OverseerHub%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashOverseer.Services.BrainPersistenceService%2CMicrosoft.Extensions.Options.IOptions%7BBacklashOverseer.Config.OverseerHubConfig%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L126">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L141">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub__ctor_" data-uid="BacklashOverseer.OverseerHub.#ctor*"></a>
-  <h4 id="BacklashOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashOverseer_Services_BrainPersistenceService_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_OverseerHubConfig__BacklashOverseer_Services_PerformanceMetricsService_" data-uid="BacklashOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashOverseer.Services.BrainPersistenceService,Microsoft.Extensions.Options.IOptions{BacklashOverseer.Config.OverseerHubConfig},BacklashOverseer.Services.PerformanceMetricsService)">OverseerHub(ILogger&lt;OverseerHub&gt;, IServiceScopeFactory, BrainPersistenceService, IOptions&lt;OverseerHubConfig&gt;, PerformanceMetricsService)</h4>
+  <h4 id="BacklashOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashOverseer_Services_BrainPersistenceService_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_OverseerHubConfig__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="BacklashOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashOverseer.Services.BrainPersistenceService,Microsoft.Extensions.Options.IOptions{BacklashOverseer.Config.OverseerHubConfig},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">OverseerHub(ILogger&lt;OverseerHub&gt;, IServiceScopeFactory, BrainPersistenceService, IOptions&lt;OverseerHubConfig&gt;, IPerformanceMonitor)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the OverseerHub class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OverseerHub(ILogger&lt;OverseerHub&gt; logger, IServiceScopeFactory scopeFactory, BrainPersistenceService brainService, IOptions&lt;OverseerHubConfig&gt; config, PerformanceMetricsService performanceMetrics)</code></pre>
+    <pre><code class="lang-csharp hljs">public OverseerHub(ILogger&lt;OverseerHub&gt; logger, IServiceScopeFactory scopeFactory, BrainPersistenceService brainService, IOptions&lt;OverseerHubConfig&gt; config, IPerformanceMonitor performanceMonitor)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -196,9 +196,9 @@ monitoring and control of trading bot operations.</p>
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashOverseer.Services.PerformanceMetricsService.html">PerformanceMetricsService</a></td>
-        <td><span class="parametername">performanceMetrics</span></td>
-        <td><p>The performance metrics service.</p>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>The performance monitor interface.</p>
 </td>
       </tr>
     </tbody>
@@ -210,7 +210,7 @@ monitoring and control of trading bot operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_CheckIn_OverseerBotShared_CheckInData_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.CheckIn(OverseerBotShared.CheckInData)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L418">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L323">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_CheckIn_" data-uid="BacklashOverseer.OverseerHub.CheckIn*"></a>
   <h4 id="BacklashOverseer_OverseerHub_CheckIn_OverseerBotShared_CheckInData_" data-uid="BacklashOverseer.OverseerHub.CheckIn(OverseerBotShared.CheckInData)">CheckIn(CheckInData)</h4>
@@ -260,7 +260,7 @@ monitoring and control of trading bot operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_ClearConnectedClients.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.ClearConnectedClients%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L210">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L225">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_ClearConnectedClients_" data-uid="BacklashOverseer.OverseerHub.ClearConnectedClients*"></a>
   <h4 id="BacklashOverseer_OverseerHub_ClearConnectedClients" data-uid="BacklashOverseer.OverseerHub.ClearConnectedClients">ClearConnectedClients()</h4>
@@ -276,7 +276,7 @@ monitoring and control of trading bot operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L233">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L248">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_GetPerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.GetPerformanceMetrics*"></a>
   <h4 id="BacklashOverseer_OverseerHub_GetPerformanceMetrics" data-uid="BacklashOverseer.OverseerHub.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
@@ -308,7 +308,7 @@ monitoring and control of trading bot operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HandlePerformanceMetrics_System_Object_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HandlePerformanceMetrics(System.Object)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L791">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L741">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_HandlePerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetrics*"></a>
   <h4 id="BacklashOverseer_OverseerHub_HandlePerformanceMetrics_System_Object_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetrics(System.Object)">HandlePerformanceMetrics(object)</h4>
@@ -359,7 +359,7 @@ Stores the metrics in the brain persistence service for monitoring and analysis.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_System_String_System_Object_System_DateTime_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate(System.String%2CSystem.Object%2CSystem.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L836">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L788">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate*"></a>
   <h4 id="BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_System_String_System_Object_System_DateTime_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate(System.String,System.Object,System.DateTime)">HandlePerformanceMetricsUpdate(string, object, DateTime)</h4>
@@ -419,21 +419,20 @@ Stores the comprehensive performance data for monitoring and display purposes.</
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_Handshake_System_String_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.Handshake(System.String%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_Handshake_OverseerBotShared_HandshakeRequest_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.Handshake(OverseerBotShared.HandshakeRequest)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L302">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L811">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_Handshake_" data-uid="BacklashOverseer.OverseerHub.Handshake*"></a>
-  <h4 id="BacklashOverseer_OverseerHub_Handshake_System_String_System_String_System_String_" data-uid="BacklashOverseer.OverseerHub.Handshake(System.String,System.String,System.String)">Handshake(string, string, string)</h4>
-  <div class="markdown level1 summary"><p>Performs initial handshake with a client, validating and storing client information,
-generating an authentication token, and logging the client to the database.
-Includes rate limiting to prevent abuse.</p>
+  <h4 id="BacklashOverseer_OverseerHub_Handshake_OverseerBotShared_HandshakeRequest_" data-uid="BacklashOverseer.OverseerHub.Handshake(OverseerBotShared.HandshakeRequest)">Handshake(HandshakeRequest)</h4>
+  <div class="markdown level1 summary"><p>Processes initial handshake with a connecting client, validates credentials,
+registers the client, and generates an authentication token for subsequent communications.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task Handshake(string clientId, string clientName, string clientType)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;HandshakeResponse&gt; Handshake(HandshakeRequest request)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -446,21 +445,9 @@ Includes rate limiting to prevent abuse.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientId</span></td>
-        <td><p>Unique identifier for the client.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientName</span></td>
-        <td><p>Name of the client (typically the brain instance name).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">clientType</span></td>
-        <td><p>Type of client connecting (e.g., brain, dashboard).</p>
+        <td><span class="xref">HandshakeRequest</span></td>
+        <td><span class="parametername">request</span></td>
+        <td><p>The handshake request containing client identification information.</p>
 </td>
       </tr>
     </tbody>
@@ -475,8 +462,8 @@ Includes rate limiting to prevent abuse.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td><p>A task representing the asynchronous operation.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<span class="xref">HandshakeResponse</span>&gt;</td>
+        <td><p>A task representing the asynchronous operation that returns a handshake response.</p>
 </td>
       </tr>
     </tbody>
@@ -486,7 +473,7 @@ Includes rate limiting to prevent abuse.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HasConnectedClients.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HasConnectedClients%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L199">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L214">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_HasConnectedClients_" data-uid="BacklashOverseer.OverseerHub.HasConnectedClients*"></a>
   <h4 id="BacklashOverseer_OverseerHub_HasConnectedClients" data-uid="BacklashOverseer.OverseerHub.HasConnectedClients">HasConnectedClients()</h4>
@@ -518,7 +505,7 @@ Includes rate limiting to prevent abuse.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_OnConnectedAsync.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.OnConnectedAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L144">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L159">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_OnConnectedAsync_" data-uid="BacklashOverseer.OverseerHub.OnConnectedAsync*"></a>
   <h4 id="BacklashOverseer_OverseerHub_OnConnectedAsync" data-uid="BacklashOverseer.OverseerHub.OnConnectedAsync">OnConnectedAsync()</h4>
@@ -552,7 +539,7 @@ Includes rate limiting to prevent abuse.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_OnDisconnectedAsync_System_Exception_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.OnDisconnectedAsync(System.Exception)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L176">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L191">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_OnDisconnectedAsync_" data-uid="BacklashOverseer.OverseerHub.OnDisconnectedAsync*"></a>
   <h4 id="BacklashOverseer_OverseerHub_OnDisconnectedAsync_System_Exception_" data-uid="BacklashOverseer.OverseerHub.OnDisconnectedAsync(System.Exception)">OnDisconnectedAsync(Exception?)</h4>
@@ -604,7 +591,7 @@ Includes rate limiting to prevent abuse.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_ResetPerformanceMetrics.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.ResetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L259">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L273">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_ResetPerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.ResetPerformanceMetrics*"></a>
   <h4 id="BacklashOverseer_OverseerHub_ResetPerformanceMetrics" data-uid="BacklashOverseer.OverseerHub.ResetPerformanceMetrics">ResetPerformanceMetrics()</h4>
@@ -620,7 +607,7 @@ Includes rate limiting to prevent abuse.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_SendOverseerMessage_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.SendOverseerMessage(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L868">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L969">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_SendOverseerMessage_" data-uid="BacklashOverseer.OverseerHub.SendOverseerMessage*"></a>
   <h4 id="BacklashOverseer_OverseerHub_SendOverseerMessage_System_String_System_String_" data-uid="BacklashOverseer.OverseerHub.SendOverseerMessage(System.String,System.String)">SendOverseerMessage(string, string)</h4>
@@ -677,7 +664,7 @@ such as data refresh requests.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_SendPerformanceMetrics_OverseerBotShared_PerformanceMetricsData_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.SendPerformanceMetrics(OverseerBotShared.PerformanceMetricsData)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L662">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L614">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_SendPerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.SendPerformanceMetrics*"></a>
   <h4 id="BacklashOverseer_OverseerHub_SendPerformanceMetrics_OverseerBotShared_PerformanceMetricsData_" data-uid="BacklashOverseer.OverseerHub.SendPerformanceMetrics(OverseerBotShared.PerformanceMetricsData)">SendPerformanceMetrics(PerformanceMetricsData)</h4>
@@ -727,7 +714,7 @@ such as data refresh requests.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_SetClientInfoForTesting_System_String_BacklashOverseer_OverseerHub_ClientInfo_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.SetClientInfoForTesting(System.String%2CBacklashOverseer.OverseerHub.ClientInfo)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L224">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L239">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_SetClientInfoForTesting_" data-uid="BacklashOverseer.OverseerHub.SetClientInfoForTesting*"></a>
   <h4 id="BacklashOverseer_OverseerHub_SetClientInfoForTesting_System_String_BacklashOverseer_OverseerHub_ClientInfo_" data-uid="BacklashOverseer.OverseerHub.SetClientInfoForTesting(System.String,BacklashOverseer.OverseerHub.ClientInfo)">SetClientInfoForTesting(string, ClientInfo)</h4>
@@ -778,7 +765,7 @@ such as data refresh requests.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L24" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L25" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

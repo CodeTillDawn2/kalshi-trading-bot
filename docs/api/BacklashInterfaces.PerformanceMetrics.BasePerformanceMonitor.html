@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class BasePerformanceMonitor | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class BasePerformanceMonitor | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Base implementation of IPerformanceMonitor that provides uniform handling of performance metrics. This class captures metrics from different VisualTypes and stores them for uniform processing. Derived classes should inherit from this to get consistent metric handling.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle" data-toggle="collapse" href="#sidetoggle" aria-expanded="true" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor">
+
+
+
+  <h1 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor" class="text-break">Class BasePerformanceMonitor</h1>
+  <div class="markdown level0 summary"><p>Base implementation of IPerformanceMonitor that provides uniform handling of performance metrics.
+This class captures metrics from different VisualTypes and stores them for uniform processing.
+Derived classes should inherit from this to get consistent metric handling.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">BasePerformanceMonitor</span></div>
+      <div class="level2"><a class="xref" href="BacklashBot.Management.CentralPerformanceMonitor.html">CentralPerformanceMonitor</a></div>
+      <div class="level2"><a class="xref" href="BacklashOverseer.Services.PerformanceMetricsService.html">PerformanceMetricsService</a></div>
+      <div class="level2"><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceMonitor.html">PerformanceMonitor</a></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BacklashInterfaces.html">BacklashInterfaces</a>.<a class="xref" href="BacklashInterfaces.PerformanceMetrics.html">PerformanceMetrics</a></h6>
+  <h6><strong>Assembly</strong>: BacklashInterfaces.dll</h6>
+  <h5 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class BasePerformanceMonitor : IPerformanceMonitor</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor__ctor_Microsoft_Extensions_Logging_ILogger_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.%23ctor(Microsoft.Extensions.Logging.ILogger)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L20">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor__ctor_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.#ctor*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor__ctor_Microsoft_Extensions_Logging_ILogger_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.#ctor(Microsoft.Extensions.Logging.ILogger)">BasePerformanceMonitor(ILogger?)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the BasePerformanceMonitor class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected BasePerformanceMonitor(ILogger? logger = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger">ILogger</a></td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>Optional logger for recording operations.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordedMetrics.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordedMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L28">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordedMetrics_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordedMetrics*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordedMetrics" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordedMetrics">RecordedMetrics</h4>
+  <div class="markdown level1 summary"><p>Gets the list of recorded metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;(string ClassName, PerformanceMetric Metric)&gt; RecordedMetrics { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,backlashinterfaces.performancemetrics.performancemetric-.classname">ClassName</a>, <a class="xref" href="BacklashInterfaces.PerformanceMetrics.PerformanceMetric.html">PerformanceMetric</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,backlashinterfaces.performancemetrics.performancemetric-.metric">Metric</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_ClearMetrics.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.ClearMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L258">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_ClearMetrics_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.ClearMetrics*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_ClearMetrics" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.ClearMetrics">ClearMetrics()</h4>
+  <div class="markdown level1 summary"><p>Clears all recorded metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ClearMetrics()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordBadgeMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordBadgeMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L204">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordBadgeMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordBadgeMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordBadgeMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordBadgeMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String)">RecordBadgeMetric(string, string, string, string, double, string, string)</h4>
+  <div class="markdown level1 summary"><p>Records a Badge metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordBadgeMetric(string className, string id, string name, string description, double value, string unit, string category)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordCounterMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordCounterMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L93">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordCounterMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordCounterMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordCounterMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordCounterMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String)">RecordCounterMetric(string, string, string, string, double, string, string)</h4>
+  <div class="markdown level1 summary"><p>Records a Counter metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordCounterMetric(string className, string id, string name, string description, double value, string unit, string category)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordDisabledMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordDisabledMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L232">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordDisabledMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordDisabledMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordDisabledMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordDisabledMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String)">RecordDisabledMetric(string, string, string, string, double, string, string)</h4>
+  <div class="markdown level1 summary"><p>Records a DisabledMetric metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordDisabledMetric(string className, string id, string name, string description, double value, string unit, string category)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordNumericDisplayMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordNumericDisplayMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L178">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordNumericDisplayMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordNumericDisplayMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordNumericDisplayMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordNumericDisplayMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String)">RecordNumericDisplayMetric(string, string, string, string, double, string, string)</h4>
+  <div class="markdown level1 summary"><p>Records a NumericDisplay metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordNumericDisplayMetric(string className, string id, string name, string description, double value, string unit, string category)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordPieChartMetric_System_String_System_String_System_String_System_String_System_Double_System_Nullable_System_Double__System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordPieChartMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L148">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordPieChartMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordPieChartMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordPieChartMetric_System_String_System_String_System_String_System_String_System_Double_System_Nullable_System_Double__System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordPieChartMetric(System.String,System.String,System.String,System.String,System.Double,System.Nullable{System.Double},System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">RecordPieChartMetric(string, string, string, string, double, double?, string, string, double?, double?, double?)</h4>
+  <div class="markdown level1 summary"><p>Records a PieChart metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordPieChartMetric(string className, string id, string name, string description, double value, double? secondaryValue, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">secondaryValue</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">minThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">warningThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">criticalThreshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordProgressBarMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordProgressBarMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L64">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordProgressBarMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordProgressBarMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordProgressBarMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordProgressBarMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">RecordProgressBarMetric(string, string, string, string, double, string, string, double?, double?, double?)</h4>
+  <div class="markdown level1 summary"><p>Records a ProgressBar metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordProgressBarMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">minThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">warningThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">criticalThreshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordSpeedDialMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordSpeedDialMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L33">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordSpeedDialMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordSpeedDialMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordSpeedDialMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordSpeedDialMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">RecordSpeedDialMetric(string, string, string, string, double, string, string, double?, double?, double?)</h4>
+  <div class="markdown level1 summary"><p>Records a SpeedDial metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordSpeedDialMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">minThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">warningThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">criticalThreshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordTrafficLightMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordTrafficLightMetric(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Double%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L119">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordTrafficLightMetric_" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordTrafficLightMetric*"></a>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor_RecordTrafficLightMetric_System_String_System_String_System_String_System_String_System_Double_System_String_System_String_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__" data-uid="BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor.RecordTrafficLightMetric(System.String,System.String,System.String,System.String,System.Double,System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">RecordTrafficLightMetric(string, string, string, string, double, string, string, double?, double?, double?)</h4>
+  <div class="markdown level1 summary"><p>Records a TrafficLight metric with the specified parameters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RecordTrafficLightMetric(string className, string id, string name, string description, double value, string unit, string category, double? minThreshold = null, double? warningThreshold = null, double? criticalThreshold = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">className</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">description</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">unit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">minThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">warningThreshold</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">criticalThreshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_BasePerformanceMonitor.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.BasePerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/BasePerformanceMonitor.cs/#L10" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

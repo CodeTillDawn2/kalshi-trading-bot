@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IMessageProcessor | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="IMessageProcessor">
+    <meta name="description" content="Defines the contract for processing WebSocket messages from Kalshi&#39;s trading platform. Handles message routing, event raising, and queue management for real-time market data.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor" class="text-break">Interface IMessageProcessor</h1>
-  <div class="markdown level0 summary"><p>IMessageProcessor</p>
+  <div class="markdown level0 summary"><p>Defines the contract for processing WebSocket messages from Kalshi's trading platform.
+Handles message routing, event raising, and queue management for real-time market data.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="KalshiBotAPI.html">KalshiBotAPI</a>.<a class="xref" href="KalshiBotAPI.WebSockets.html">WebSockets</a>.<a class="xref" href="KalshiBotAPI.WebSockets.Interfaces.html">Interfaces</a></h6>
@@ -97,11 +98,13 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_LastSequenceNumber.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.LastSequenceNumber%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L88">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L79">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_LastSequenceNumber_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.LastSequenceNumber*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_LastSequenceNumber" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.LastSequenceNumber">LastSequenceNumber</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the last sequence number processed from WebSocket messages.
+Used for tracking message ordering and detecting missed messages.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -127,11 +130,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_OrderBookMessageQueueCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.OrderBookMessageQueueCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L86">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L68">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_OrderBookMessageQueueCount_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.OrderBookMessageQueueCount*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_OrderBookMessageQueueCount" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.OrderBookMessageQueueCount">OrderBookMessageQueueCount</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the current count of order book messages in the processing queue.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -157,11 +161,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_PendingConfirmsCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.PendingConfirmsCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L87">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L73">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_PendingConfirmsCount_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.PendingConfirmsCount*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_PendingConfirmsCount" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.PendingConfirmsCount">PendingConfirmsCount</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the count of pending subscription confirmations.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -193,7 +198,8 @@
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ClearOrderBookQueue_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ClearOrderBookQueue*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ClearOrderBookQueue_System_String_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ClearOrderBookQueue(System.String)">ClearOrderBookQueue(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Clears the order book message queue for a specific market ticker.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -212,7 +218,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The market ticker to clear the queue for.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -221,11 +228,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_GetEventCountsByMarket_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.GetEventCountsByMarket(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L92">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L105">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_GetEventCountsByMarket_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.GetEventCountsByMarket*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_GetEventCountsByMarket_System_String_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.GetEventCountsByMarket(System.String)">GetEventCountsByMarket(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the count of different event types processed for a specific market ticker.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -244,7 +252,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The market ticker to get event counts for.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -259,7 +268,8 @@
     <tbody>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.eventqueuecount">EventQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tickerqueuecount">TickerQueueCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.notificationqueuecount">NotificationQueueCount</a>)</td>
-        <td></td>
+        <td><p>A tuple containing counts for orderbook, trade, and ticker events.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -268,11 +278,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ProcessMessageAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ProcessMessageAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L83">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L51">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ProcessMessageAsync_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ProcessMessageAsync*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ProcessMessageAsync_System_String_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ProcessMessageAsync(System.String)">ProcessMessageAsync(string)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Processes an incoming WebSocket message asynchronously.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -291,7 +302,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">message</span></td>
-        <td></td>
+        <td><p>The JSON message string to process.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -306,7 +318,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous processing operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -315,11 +328,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ResetEventCounts.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ResetEventCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L89">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L84">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ResetEventCounts_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ResetEventCounts*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_ResetEventCounts" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.ResetEventCounts">ResetEventCounts()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Resets all event count counters to zero.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -330,11 +344,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_SetWriteToSql_System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.SetWriteToSql(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L111">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_SetWriteToSql_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.SetWriteToSql*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_SetWriteToSql_System_Boolean_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.SetWriteToSql(System.Boolean)">SetWriteToSql(bool)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Sets whether market data should be written to SQL database.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -353,7 +368,8 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
         <td><span class="parametername">writeToSQL</span></td>
-        <td></td>
+        <td><p>True to enable SQL writing, false to disable.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -362,11 +378,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StartProcessingAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StartProcessingAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L84">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L57">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StartProcessingAsync_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StartProcessingAsync*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StartProcessingAsync" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StartProcessingAsync">StartProcessingAsync()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Starts the message processing operations.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -383,7 +400,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous start operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -392,11 +410,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StopProcessingAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StopProcessingAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L85">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L63">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StopProcessingAsync_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StopProcessingAsync*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_StopProcessingAsync" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.StopProcessingAsync">StopProcessingAsync()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Stops the message processing operations.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -413,7 +432,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous stop operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -422,11 +442,12 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_WaitForEmptyOrderBookQueueAsync_System_String_System_TimeSpan_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.WaitForEmptyOrderBookQueueAsync(System.String%2CSystem.TimeSpan)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L91">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L98">View Source</a>
   </span>
   <a id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_WaitForEmptyOrderBookQueueAsync_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.WaitForEmptyOrderBookQueueAsync*"></a>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_WaitForEmptyOrderBookQueueAsync_System_String_System_TimeSpan_" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.WaitForEmptyOrderBookQueueAsync(System.String,System.TimeSpan)">WaitForEmptyOrderBookQueueAsync(string, TimeSpan)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Waits asynchronously for the order book queue to be empty for a specific market.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -445,12 +466,14 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td></td>
+        <td><p>The market ticker to wait for.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
         <td><span class="parametername">timeout</span></td>
-        <td></td>
+        <td><p>The maximum time to wait before timing out.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -465,7 +488,8 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
-        <td></td>
+        <td><p>A task representing the asynchronous wait operation.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -476,10 +500,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_EventLifecycleReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.EventLifecycleReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L80">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L39">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_EventLifecycleReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.EventLifecycleReceived">EventLifecycleReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when event lifecycle events are received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -505,10 +530,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_FillReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.FillReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L29">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_FillReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.FillReceived">FillReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when fill data is received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -534,10 +560,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_MarketLifecycleReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.MarketLifecycleReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L77">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L34">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_MarketLifecycleReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.MarketLifecycleReceived">MarketLifecycleReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when market lifecycle events are received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -563,10 +590,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_MessageReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.MessageReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L81">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L44">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_MessageReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.MessageReceived">MessageReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when any WebSocket message is received, providing the timestamp.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -592,10 +620,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_OrderBookReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.OrderBookReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L63">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L14">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_OrderBookReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.OrderBookReceived">OrderBookReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when order book data is received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -621,10 +650,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_TickerReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.TickerReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L66">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L19">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_TickerReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.TickerReceived">TickerReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when ticker data is received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -650,10 +680,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_TradeReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.TradeReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L24">View Source</a>
   </span>
   <h4 id="KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor_TradeReceived" data-uid="KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.TradeReceived">TradeReceived</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Event raised when trade data is received from the WebSocket.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -686,7 +717,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_WebSockets_Interfaces_IMessageProcessor.md&amp;value=---%0Auid%3A%20KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L35" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/Interfaces/IMessageProcessor.cs/#L9" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

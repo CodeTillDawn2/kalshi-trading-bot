@@ -128,20 +128,20 @@ batch operations, and comprehensive health monitoring.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_BrainPersistenceServiceConfig__BacklashBotData_Data_Interfaces_IBacklashBotContext_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_Services_BrainPersistenceService__BacklashOverseer_Services_PerformanceMetricsService_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.%23ctor(Microsoft.Extensions.Options.IOptions%7BBacklashOverseer.Config.BrainPersistenceServiceConfig%7D%2CBacklashBotData.Data.Interfaces.IBacklashBotContext%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashOverseer.Services.BrainPersistenceService%7D%2CBacklashOverseer.Services.PerformanceMetricsService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_BrainPersistenceServiceConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_Services_BrainPersistenceService__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.%23ctor(Microsoft.Extensions.Options.IOptions%7BBacklashOverseer.Config.BrainPersistenceServiceConfig%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashOverseer.Services.BrainPersistenceService%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L49">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService__ctor_" data-uid="BacklashOverseer.Services.BrainPersistenceService.#ctor*"></a>
-  <h4 id="BacklashOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_BrainPersistenceServiceConfig__BacklashBotData_Data_Interfaces_IBacklashBotContext_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_Services_BrainPersistenceService__BacklashOverseer_Services_PerformanceMetricsService_" data-uid="BacklashOverseer.Services.BrainPersistenceService.#ctor(Microsoft.Extensions.Options.IOptions{BacklashOverseer.Config.BrainPersistenceServiceConfig},BacklashBotData.Data.Interfaces.IBacklashBotContext,Microsoft.Extensions.Logging.ILogger{BacklashOverseer.Services.BrainPersistenceService},BacklashOverseer.Services.PerformanceMetricsService)">BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt;, IBacklashBotContext?, ILogger&lt;BrainPersistenceService&gt;?, PerformanceMetricsService?)</h4>
+  <h4 id="BacklashOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_BacklashOverseer_Config_BrainPersistenceServiceConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashOverseer_Services_BrainPersistenceService__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_" data-uid="BacklashOverseer.Services.BrainPersistenceService.#ctor(Microsoft.Extensions.Options.IOptions{BacklashOverseer.Config.BrainPersistenceServiceConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashOverseer.Services.BrainPersistenceService},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor)">BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt;, IServiceScopeFactory?, ILogger&lt;BrainPersistenceService&gt;?, IPerformanceMonitor?)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the BrainPersistenceService.
-Automatically starts a background timer for periodic saves if context is provided.</p>
+Automatically starts a background timer for periodic saves if scope factory is provided.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt; config, IBacklashBotContext? context = null, ILogger&lt;BrainPersistenceService&gt;? logger = null, PerformanceMetricsService? performanceMetricsService = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt; config, IServiceScopeFactory? scopeFactory = null, ILogger&lt;BrainPersistenceService&gt;? logger = null, IPerformanceMonitor? performanceMonitor = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -160,9 +160,9 @@ Automatically starts a background timer for periodic saves if context is provide
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashBotData.Data.Interfaces.IBacklashBotContext.html">IBacklashBotContext</a></td>
-        <td><span class="parametername">context</span></td>
-        <td><p>Database context for persistence operations.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.iservicescopefactory">IServiceScopeFactory</a></td>
+        <td><span class="parametername">scopeFactory</span></td>
+        <td><p>Service scope factory for creating database contexts.</p>
 </td>
       </tr>
       <tr>
@@ -172,9 +172,9 @@ Automatically starts a background timer for periodic saves if context is provide
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashOverseer.Services.PerformanceMetricsService.html">PerformanceMetricsService</a></td>
-        <td><span class="parametername">performanceMetricsService</span></td>
-        <td><p>Optional performance metrics service for transmitting metrics.</p>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>Optional performance monitor for transmitting metrics.</p>
 </td>
       </tr>
     </tbody>
@@ -186,7 +186,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_BrainCount.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.BrainCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L516">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L527">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_BrainCount_" data-uid="BacklashOverseer.Services.BrainPersistenceService.BrainCount*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_BrainCount" data-uid="BacklashOverseer.Services.BrainPersistenceService.BrainCount">BrainCount</h4>
@@ -217,7 +217,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_LockMetrics.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.LockMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L580">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L591">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_LockMetrics_" data-uid="BacklashOverseer.Services.BrainPersistenceService.LockMetrics*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_LockMetrics" data-uid="BacklashOverseer.Services.BrainPersistenceService.LockMetrics">LockMetrics</h4>
@@ -248,7 +248,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_ServiceUptime.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.ServiceUptime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L511">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L522">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_ServiceUptime_" data-uid="BacklashOverseer.Services.BrainPersistenceService.ServiceUptime*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_ServiceUptime" data-uid="BacklashOverseer.Services.BrainPersistenceService.ServiceUptime">ServiceUptime</h4>
@@ -279,7 +279,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_TotalHistoryEntries.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.TotalHistoryEntries%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L521">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L532">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_TotalHistoryEntries_" data-uid="BacklashOverseer.Services.BrainPersistenceService.TotalHistoryEntries*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_TotalHistoryEntries" data-uid="BacklashOverseer.Services.BrainPersistenceService.TotalHistoryEntries">TotalHistoryEntries</h4>
@@ -310,7 +310,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_TotalOperations.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.TotalOperations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L506">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L517">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_TotalOperations_" data-uid="BacklashOverseer.Services.BrainPersistenceService.TotalOperations*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_TotalOperations" data-uid="BacklashOverseer.Services.BrainPersistenceService.TotalOperations">TotalOperations</h4>
@@ -341,7 +341,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_TrimmingCounts.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.TrimmingCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L575">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L586">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_TrimmingCounts_" data-uid="BacklashOverseer.Services.BrainPersistenceService.TrimmingCounts*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_TrimmingCounts" data-uid="BacklashOverseer.Services.BrainPersistenceService.TrimmingCounts">TrimmingCounts</h4>
@@ -374,7 +374,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_Dispose.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L650">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L679">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_Dispose_" data-uid="BacklashOverseer.Services.BrainPersistenceService.Dispose*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_Dispose" data-uid="BacklashOverseer.Services.BrainPersistenceService.Dispose">Dispose()</h4>
@@ -390,7 +390,7 @@ Automatically starts a background timer for periodic saves if context is provide
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetAllBrains.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetAllBrains%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L158">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L160">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetAllBrains_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetAllBrains*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetAllBrains" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetAllBrains">GetAllBrains()</h4>
@@ -423,7 +423,7 @@ This provides access to the complete set of brain configurations and states.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetBrain_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetBrain(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L76">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetBrain_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetBrain*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetBrain_System_String_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetBrain(System.String)">GetBrain(string)</h4>
@@ -490,7 +490,7 @@ a new instance is created with the specified name and added to the collection.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetHealthStatus.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetHealthStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L381">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L383">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetHealthStatus_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetHealthStatus*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetHealthStatus" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetHealthStatus">GetHealthStatus()</h4>
@@ -524,7 +524,7 @@ and service uptime for monitoring and diagnostics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetMemoryUsageForBrain_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetMemoryUsageForBrain(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L597">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L608">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetMemoryUsageForBrain_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetMemoryUsageForBrain*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetMemoryUsageForBrain_System_String_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetMemoryUsageForBrain(System.String)">GetMemoryUsageForBrain(string)</h4>
@@ -572,7 +572,7 @@ and service uptime for monitoring and diagnostics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetOperationStats.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetOperationStats%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L548">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L559">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetOperationStats_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetOperationStats*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetOperationStats" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetOperationStats">GetOperationStats()</h4>
@@ -603,7 +603,7 @@ and service uptime for monitoring and diagnostics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetTargetMarketTickers(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L133">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L135">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetTargetMarketTickers*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_System_String_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetTargetMarketTickers(System.String)">GetTargetMarketTickers(string)</h4>
@@ -670,7 +670,7 @@ Target tickers represent the markets the brain should be monitoring.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_GetThreadPoolInfo.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.GetThreadPoolInfo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L619">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L630">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_GetThreadPoolInfo_" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetThreadPoolInfo*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_GetThreadPoolInfo" data-uid="BacklashOverseer.Services.BrainPersistenceService.GetThreadPoolInfo">GetThreadPoolInfo()</h4>
@@ -701,7 +701,7 @@ Target tickers represent the markets the brain should be monitoring.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_InitializeAsync.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.InitializeAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L411">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L413">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_InitializeAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.InitializeAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_InitializeAsync" data-uid="BacklashOverseer.Services.BrainPersistenceService.InitializeAsync">InitializeAsync()</h4>
@@ -732,7 +732,7 @@ Target tickers represent the markets the brain should be monitoring.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L451">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L456">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync" data-uid="BacklashOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync">PersistAllBrainsAsync()</h4>
@@ -763,7 +763,7 @@ Target tickers represent the markets the brain should be monitoring.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_SaveBrainAsync_BacklashOverseer_Models_BrainPersistence_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.SaveBrainAsync(BacklashOverseer.Models.BrainPersistence)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L101">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L103">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_SaveBrainAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.SaveBrainAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_SaveBrainAsync_BacklashOverseer_Models_BrainPersistence_" data-uid="BacklashOverseer.Services.BrainPersistenceService.SaveBrainAsync(BacklashOverseer.Models.BrainPersistence)">SaveBrainAsync(BrainPersistence)</h4>
@@ -831,7 +831,7 @@ optionally persists to database if persistence is enabled.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_System_String_System_Collections_Generic_IEnumerable_System_String__.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync(System.String%2CSystem.Collections.Generic.IEnumerable%7BSystem.String%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L182">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L184">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_System_String_System_Collections_Generic_IEnumerable_System_String__" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync(System.String,System.Collections.Generic.IEnumerable{System.String})">UpdateCurrentMarketTickersAsync(string, IEnumerable&lt;string&gt;)</h4>
@@ -904,7 +904,7 @@ This reflects the markets the brain is actively watching at runtime.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_System_String_System_Collections_Generic_Dictionary_System_String_System_Double__.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L322">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L324">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_System_String_System_Collections_Generic_Dictionary_System_String_System_Double__" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync(System.String,System.Collections.Generic.Dictionary{System.String,System.Double})">UpdateMetricHistoriesBatchAsync(string, Dictionary&lt;string, double&gt;)</h4>
@@ -978,7 +978,7 @@ database persistence calls.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_System_String_System_String_System_Double_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync(System.String%2CSystem.String%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L213">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L215">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_System_String_System_String_System_Double_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync(System.String,System.String,System.Double)">UpdateMetricHistoryAsync(string, string, double)</h4>
@@ -1057,7 +1057,7 @@ Metrics are stored in rolling lists with a configurable maximum number of entrie
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService_UpdatePerformanceMetricsAsync_System_String_System_Object_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService.UpdatePerformanceMetricsAsync(System.String%2CSystem.Object)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L261">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L263">View Source</a>
   </span>
   <a id="BacklashOverseer_Services_BrainPersistenceService_UpdatePerformanceMetricsAsync_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdatePerformanceMetricsAsync*"></a>
   <h4 id="BacklashOverseer_Services_BrainPersistenceService_UpdatePerformanceMetricsAsync_System_String_System_Object_" data-uid="BacklashOverseer.Services.BrainPersistenceService.UpdatePerformanceMetricsAsync(System.String,System.Object)">UpdatePerformanceMetricsAsync(string, object)</h4>
@@ -1137,7 +1137,7 @@ This method stores the performance metrics object as-is for monitoring purposes.
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Services_BrainPersistenceService.md&amp;value=---%0Auid%3A%20BacklashOverseer.Services.BrainPersistenceService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L22" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Services/BrainPersistenceService.cs/#L24" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

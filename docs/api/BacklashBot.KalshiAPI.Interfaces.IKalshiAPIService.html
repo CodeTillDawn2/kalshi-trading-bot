@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IKalshiAPIService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Interface for interacting with the Kalshi API to fetch market data, positions, orders, and other trading information.">
+    <meta name="description" content="Defines the contract for services that interact with the Kalshi trading platform API. This interface provides methods for fetching market data, managing positions and orders, retrieving account information, and accessing exchange status and schedules. Implementations should handle authentication, error handling, and data transformation.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,10 @@
 
 
   <h1 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService" class="text-break">Interface IKalshiAPIService</h1>
-  <div class="markdown level0 summary"><p>Interface for interacting with the Kalshi API to fetch market data, positions, orders, and other trading information.</p>
+  <div class="markdown level0 summary"><p>Defines the contract for services that interact with the Kalshi trading platform API.
+This interface provides methods for fetching market data, managing positions and orders,
+retrieving account information, and accessing exchange status and schedules.
+Implementations should handle authentication, error handling, and data transformation.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.KalshiAPI.html">KalshiAPI</a>.<a class="xref" href="BacklashBot.KalshiAPI.Interfaces.html">Interfaces</a></h6>
@@ -94,10 +97,66 @@
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_CreateOrderAsync_System_String_BacklashDTOs_KalshiAPI_CreateOrderRequest_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.CreateOrderAsync(System.String%2CBacklashDTOs.KalshiAPI.CreateOrderRequest)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L153">View Source</a>
+  </span>
+  <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_CreateOrderAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.CreateOrderAsync*"></a>
+  <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_CreateOrderAsync_System_String_BacklashDTOs_KalshiAPI_CreateOrderRequest_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.CreateOrderAsync(System.String,BacklashDTOs.KalshiAPI.CreateOrderRequest)">CreateOrderAsync(string, CreateOrderRequest)</h4>
+  <div class="markdown level1 summary"><p>Creates an order on the Kalshi platform.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task&lt;CreateOrderResponse?&gt; CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTicker</span></td>
+        <td><p>The market ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.KalshiAPI.CreateOrderRequest.html">CreateOrderRequest</a></td>
+        <td><span class="parametername">orderRequest</span></td>
+        <td><p>The order request details.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.CreateOrderResponse.html">CreateOrderResponse</a>&gt;</td>
+        <td><p>The create order response if successful, null otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchAnnouncementsAsync.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchAnnouncementsAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L101">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L118">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchAnnouncementsAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchAnnouncementsAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchAnnouncementsAsync" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchAnnouncementsAsync">FetchAnnouncementsAsync()</h4>
@@ -129,7 +188,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchCandlesticksAsync_System_String_System_String_System_String_System_Int64_System_Nullable_System_Int64__System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchCandlesticksAsync(System.String%2CSystem.String%2CSystem.String%2CSystem.Int64%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L78">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchCandlesticksAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchCandlesticksAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchCandlesticksAsync_System_String_System_String_System_String_System_Int64_System_Nullable_System_Int64__System_Boolean_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchCandlesticksAsync(System.String,System.String,System.String,System.Int64,System.Nullable{System.Int64},System.Boolean)">FetchCandlesticksAsync(string, string, string, long, long?, bool)</h4>
@@ -209,7 +268,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchEventAsync_System_String_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchEventAsync(System.String%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L38">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L41">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchEventAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchEventAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchEventAsync_System_String_System_Boolean_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchEventAsync(System.String,System.Boolean)">FetchEventAsync(string, bool)</h4>
@@ -265,7 +324,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchExchangeScheduleAsync.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchExchangeScheduleAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L107">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L124">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchExchangeScheduleAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchExchangeScheduleAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchExchangeScheduleAsync" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchExchangeScheduleAsync">FetchExchangeScheduleAsync()</h4>
@@ -297,7 +356,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchMarketsAsync_System_String_System_String_System_String_System_String_System_String_System_String___System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchMarketsAsync(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.String%5B%5D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L24">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchMarketsAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchMarketsAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchMarketsAsync_System_String_System_String_System_String_System_String_System_String_System_String___System_Boolean_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchMarketsAsync(System.String,System.String,System.String,System.String,System.String,System.String[],System.Boolean)">FetchMarketsAsync(string?, string?, string?, string?, string?, string[]?, bool)</h4>
@@ -383,7 +442,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchOrdersAsync_System_String_System_String_System_Nullable_System_Int64__System_Nullable_System_Int64__System_String_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchOrdersAsync(System.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L110">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchOrdersAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchOrdersAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchOrdersAsync_System_String_System_String_System_Nullable_System_Int64__System_Nullable_System_Int64__System_String_System_String_System_Nullable_System_Int32__" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchOrdersAsync(System.String,System.String,System.Nullable{System.Int64},System.Nullable{System.Int64},System.String,System.String,System.Nullable{System.Int32})">FetchOrdersAsync(string?, string?, long?, long?, string?, string?, int?)</h4>
@@ -469,7 +528,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchPositionsAsync_System_String_System_Nullable_System_Int32__System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchPositionsAsync(System.String%2CSystem.Nullable%7BSystem.Int32%7D%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L48">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L65">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchPositionsAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchPositionsAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchPositionsAsync_System_String_System_Nullable_System_Int32__System_String_System_String_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchPositionsAsync(System.String,System.Nullable{System.Int32},System.String,System.String)">FetchPositionsAsync(string?, int?, string?, string?)</h4>
@@ -537,7 +596,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchSeriesAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchSeriesAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L30">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L33">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchSeriesAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchSeriesAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_FetchSeriesAsync_System_String_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.FetchSeriesAsync(System.String)">FetchSeriesAsync(string)</h4>
@@ -587,7 +646,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetBalanceAsync.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetBalanceAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L68">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L85">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetBalanceAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetBalanceAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetBalanceAsync" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetBalanceAsync">GetBalanceAsync()</h4>
@@ -616,10 +675,90 @@
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetEventsAsync_System_Nullable_System_Int32__System_String_System_Boolean_System_String_System_String_System_Nullable_System_Int64__.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetEventsAsync(System.Nullable%7BSystem.Int32%7D%2CSystem.String%2CSystem.Boolean%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int64%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L53">View Source</a>
+  </span>
+  <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetEventsAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetEventsAsync*"></a>
+  <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetEventsAsync_System_Nullable_System_Int32__System_String_System_Boolean_System_String_System_String_System_Nullable_System_Int64__" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetEventsAsync(System.Nullable{System.Int32},System.String,System.Boolean,System.String,System.String,System.Nullable{System.Int64})">GetEventsAsync(int?, string?, bool, string?, string?, long?)</h4>
+  <div class="markdown level1 summary"><p>Fetches a paginated list of events from the Kalshi API.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task&lt;EventsResponse?&gt; GetEventsAsync(int? limit = null, string? cursor = null, bool withNestedMarkets = false, string? status = null, string? seriesTicker = null, long? minCloseTs = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of events to retrieve (1-200, defaults to 100).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional cursor for pagination.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">withNestedMarkets</span></td>
+        <td><p>Whether to include nested markets in the response.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">status</span></td>
+        <td><p>Optional status filter ('open', 'closed', 'settled').</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">seriesTicker</span></td>
+        <td><p>Optional series ticker filter.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><span class="parametername">minCloseTs</span></td>
+        <td><p>Optional minimum close timestamp filter.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.EventsResponse.html">EventsResponse</a>&gt;</td>
+        <td><p>The events response if successful, null otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeScheduleAsync.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeScheduleAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L80">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L97">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeScheduleAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeScheduleAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeScheduleAsync" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeScheduleAsync">GetExchangeScheduleAsync()</h4>
@@ -651,7 +790,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeStatusAsync.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeStatusAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L91">View Source</a>
   </span>
   <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeStatusAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeStatusAsync*"></a>
   <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetExchangeStatusAsync" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetExchangeStatusAsync">GetExchangeStatusAsync()</h4>
@@ -678,6 +817,93 @@
       </tr>
     </tbody>
   </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetMilestonesAsync_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_Int32__System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetMilestonesAsync(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int32%7D%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L138">View Source</a>
+  </span>
+  <a id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetMilestonesAsync_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetMilestonesAsync*"></a>
+  <h4 id="BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_GetMilestonesAsync_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_Int32__System_String_" data-uid="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.GetMilestonesAsync(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int32},System.String)">GetMilestonesAsync(string?, string?, string?, string?, string?, int?, string?)</h4>
+  <div class="markdown level1 summary"><p>Retrieves milestones from the Kalshi API with support for various filters and pagination.
+Provides information about important events, deadlines, or significant occurrences related to markets and trading activities.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task&lt;MilestonesResponse?&gt; GetMilestonesAsync(string? minimumStartDate = null, string? category = null, string? competition = null, string? type = null, string? relatedEventTicker = null, int? limit = null, string? cursor = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">minimumStartDate</span></td>
+        <td><p>Optional minimum start date filter for milestones (RFC3339 timestamp).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">category</span></td>
+        <td><p>Optional filter for milestone category.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">competition</span></td>
+        <td><p>Optional filter for competition.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Optional filter for milestone type.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">relatedEventTicker</span></td>
+        <td><p>Optional filter for related event ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Required limit on the number of milestones to retrieve per request (1-200).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of milestones.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.MilestonesResponse.html">MilestonesResponse</a>&gt;</td>
+        <td><p>The milestones response containing milestone data, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -690,7 +916,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService.md&amp;value=---%0Auid%3A%20BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L8" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/KalshiAPI/IKalshiAPIService.cs/#L11" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -131,19 +131,19 @@ Includes configurable performance metrics for monitoring scope efficiency.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService__ctor_System_IServiceProvider_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IScopeManagerService__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotScopeManagerServiceConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.%23ctor(System.IServiceProvider%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IScopeManagerService%7D%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.KalshiBotScopeManagerServiceConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService__ctor_System_IServiceProvider_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IScopeManagerService__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotScopeManagerServiceConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.%23ctor(System.IServiceProvider%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IScopeManagerService%7D%2CBacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%2CMicrosoft.Extensions.Options.IOptions%7BBacklashBot.Configuration.KalshiBotScopeManagerServiceConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L50">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L49">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService__ctor_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.#ctor*"></a>
-  <h4 id="BacklashBot_Services_KalshiBotScopeManagerService__ctor_System_IServiceProvider_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IScopeManagerService__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotScopeManagerServiceConfig__" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IScopeManagerService},BacklashBot.Management.Interfaces.ICentralPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig})">KalshiBotScopeManagerService(IServiceProvider, ILogger&lt;IScopeManagerService&gt;, ICentralPerformanceMonitor, IOptions&lt;KalshiBotScopeManagerServiceConfig&gt;)</h4>
+  <h4 id="BacklashBot_Services_KalshiBotScopeManagerService__ctor_System_IServiceProvider_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IScopeManagerService__BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_Microsoft_Extensions_Options_IOptions_BacklashBot_Configuration_KalshiBotScopeManagerServiceConfig__" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IScopeManagerService},BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor,Microsoft.Extensions.Options.IOptions{BacklashBot.Configuration.KalshiBotScopeManagerServiceConfig})">KalshiBotScopeManagerService(IServiceProvider, ILogger&lt;IScopeManagerService&gt;, IPerformanceMonitor, IOptions&lt;KalshiBotScopeManagerServiceConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="BacklashBot.Services.KalshiBotScopeManagerService.html">KalshiBotScopeManagerService</a> class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger&lt;IScopeManagerService&gt; logger, ICentralPerformanceMonitor monitor, IOptions&lt;KalshiBotScopeManagerServiceConfig&gt; configOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger&lt;IScopeManagerService&gt; logger, IPerformanceMonitor monitor, IOptions&lt;KalshiBotScopeManagerServiceConfig&gt; configOptions)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -168,7 +168,7 @@ Includes configurable performance metrics for monitoring scope efficiency.</p>
 </td>
       </tr>
       <tr>
-        <td><a class="xref" href="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html">ICentralPerformanceMonitor</a></td>
+        <td><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></td>
         <td><span class="parametername">monitor</span></td>
         <td><p>The central performance monitor for posting metrics.</p>
 </td>
@@ -188,7 +188,7 @@ Includes configurable performance metrics for monitoring scope efficiency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_Scope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.Scope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L40">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L39">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_Scope_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.Scope*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_Scope" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.Scope">Scope</h4>
@@ -197,7 +197,7 @@ Includes configurable performance metrics for monitoring scope efficiency.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IServiceScope? Scope { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IServiceScope Scope { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -221,7 +221,7 @@ Includes configurable performance metrics for monitoring scope efficiency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_CreateScope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.CreateScope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L133">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L132">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_CreateScope_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.CreateScope*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_CreateScope" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.CreateScope">CreateScope()</h4>
@@ -255,7 +255,7 @@ the managed scope used by this service.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_Dispose.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L146">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L145">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_Dispose_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.Dispose*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_Dispose" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.Dispose">Dispose()</h4>
@@ -272,7 +272,7 @@ This method implements the IDisposable pattern for proper cleanup.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_InitializeScope.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.InitializeScope%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L69">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L68">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_InitializeScope_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.InitializeScope*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_InitializeScope" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.InitializeScope">InitializeScope()</h4>
@@ -290,7 +290,7 @@ services can be resolved, preventing runtime errors due to missing dependencies.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_LogMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.LogMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L166">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L188">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_LogMetrics_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.LogMetrics*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_LogMetrics" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.LogMetrics">LogMetrics()</h4>
@@ -306,7 +306,7 @@ services can be resolved, preventing runtime errors due to missing dependencies.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService_ResetAll.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L121">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L120">View Source</a>
   </span>
   <a id="BacklashBot_Services_KalshiBotScopeManagerService_ResetAll_" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.ResetAll*"></a>
   <h4 id="BacklashBot_Services_KalshiBotScopeManagerService_ResetAll" data-uid="BacklashBot.Services.KalshiBotScopeManagerService.ResetAll">ResetAll()</h4>
@@ -338,7 +338,7 @@ the service is being shut down.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_KalshiBotScopeManagerService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.KalshiBotScopeManagerService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L23" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/KalshiBotScopeManagerService.cs/#L22" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
