@@ -82,26 +82,14 @@ Authentication uses RSA private key signing — the key file path is resolved fr
 
 A class library containing all strategy logic, the simulation engine, and ML integration.
 
- TradingStrategies/
- ├── Strategies/
- │   ├── Strategy.cs           # Base strategy abstraction
- │   ├── Signal.cs             # Trade signal model
- │   ├── SignalCondition.cs    # Composable signal conditions
- │   ├── Scenario.cs           # Named scenario for simulation
- │   └── Strats/               # Concrete strategy implementations
- ├── Trading/
- │   ├── TradingOverseer.cs    # Coordinates strategy execution
- │   ├── SimulationEngine.cs   # Backtesting engine core
- │   ├── StrategySimulation.cs
- │   ├── MarketTypeService.cs
- │   ├── EquityCalculator.cs
- │   └── PerformanceMonitor.cs
- ├── ML/
- │   ├── ResearchBus.cs        # Data bus for ML feature extraction
- │   └── SpikePrediction/      # Price spike ML model
- └── Extensions/
+Strategies are built around a composable Signal / SignalCondition / Scenario model — each strategy evaluates one or more typed signal conditions and emits a trade signal with a direction, confidence, and
+metadata. The TradingOverseer coordinates which strategy runs against which market, and SimulationEngine / StrategySimulation provide the backtesting harness. EquityCalculator tracks P&L and equity curves
+during simulation, and PerformanceMonitor records per-strategy timing and metric data.
 
-See Trading Strategies for the full strategy list.
+The ML/ folder contains ResearchBus, a data bus that aggregates candlestick metrics, order book state, and indicator values into feature vectors, along with the SpikePrediction model used by two of the
+live strategies.
+
+See Trading Strategies for the full list of concrete strategy implementations.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
