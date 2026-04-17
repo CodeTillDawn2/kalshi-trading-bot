@@ -12,25 +12,22 @@ check in with an Overseer service, and operators interact with a Windows Forms d
 
 Architecture
 
- graph TD
-     Overseer["BacklashOverseer\nASP.NET Core · SignalR Hub · Monitoring API"]
-     Bot["BacklashBot\nASP.NET Core · CentralBrain"]
-     GUI["TradingGUI\nWindows Forms"]
-     API["KalshiBotAPI\nREST + WebSocket"]
-     Strats["TradingStrategies\n+ ML Engine"]
-     Patterns["BacklashPatterns\n60+ Candlestick Patterns"]
-     Sim["TradingSimulator\nBacktesting"]
-     DB["SQL Server Database"]
-     Storage["Network Share\nParquet / Snapshots"]
- 
-     Overseer -->|SignalR check-ins| Bot
-     GUI -->|SignalR| Bot
-     Bot --> API
-     Bot --> Strats
-     Bot --> Patterns
-     Bot --> Sim
-     Bot --> DB
-     Bot --> Storage
+BacklashBot is a distributed system made up of several independently deployable services that communicate over SignalR and HTTP.
+
+BacklashOverseer sits at the top as the management layer. Bot instances check in with it periodically over SignalR, reporting health and metrics. Operators can observe and control all running bots from a
+single Overseer endpoint.
+
+BacklashBot is the core runtime. Its CentralBrain orchestrates market discovery, WebSocket subscriptions, order book tracking, candlestick ingestion, snapshot writing, and trade execution. It delegates to 
+KalshiBotAPI for all external Kalshi communication, to TradingStrategies for signal evaluation, and to BacklashPatterns for technical analysis. It also hosts a SignalR hub that streams live data to the
+Overseer and to TradingGUI.
+
+TradingGUI is a Windows Forms dashboard that connects to BacklashBot over SignalR. It provides a live view of market state, order books, and performance metrics, and includes a full snapshot viewer for
+replaying historical market data.
+
+TradingSimulator is a standalone backtesting engine. It loads historical snapshots from disk, replays them through the same strategy pipeline used in live trading, and produces detailed P&L and performance
+reports.
+
+All persistent data flows through two shared resources: a SQL Server database for metrics, logs, and event data, and a network share for Parquet-format candlestick files and serialised market snapshots.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
