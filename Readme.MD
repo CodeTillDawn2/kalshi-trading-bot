@@ -1,12 +1,50 @@
 
-Overview
+BacklashBot
 
-BacklashBot is a sophisticated, multi-service automated trading system for the Kalshi prediction market platform. It connects to Kalshi's REST and WebSocket APIs in real time, ingests live order book and
-market data, applies a library of technical analysis strategies and machine learning models to identify trade opportunities, and manages order execution — all while continuously backtesting against
-historical snapshot data to validate and improve strategies.
+BacklashBot is a multi-service automated trading system for the Kalshi prediction market platform. It connects to Kalshi's REST and WebSocket APIs in real time, ingests live order book and market data,
+applies a library of technical analysis strategies and machine learning models to identify trade opportunities, and manages order execution — all while continuously backtesting against historical snapshot
+data to validate and improve strategies.
 
 The system is designed for a distributed, multi-machine deployment: a central data server stores candlestick and snapshot data on a shared network drive, one or more bot instances run independently and
 check in with an Overseer service, and operators interact with a Windows Forms dashboard.
+
+ Status: Paused. Active development and live trading were suspended primarily due to Kalshi's 7% fee structure, which proved difficult to overcome with the available strategy set and market liquidity. The
+ codebase is complete and all services are functional. Backtesting infrastructure and strategy research remain available for continued experimentation.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Table of Contents
+
+ - At a Glance
+ - Architecture
+ - Projects
+ - Trading Strategies
+ - Technical Indicators
+ - Candlestick Patterns
+ - Machine Learning
+ - Performance Monitoring
+ - Technology Stack
+ - Infrastructure and Deployment
+ - Configuration
+ - Security
+ - Testing
+ - Database
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+At a Glance
+
+ - 16 C# projects in a single solution, each independently deployable or referenced as a library
+ - 3 separately deployable services: trading bot, Overseer management API, and Windows Forms dashboard
+ - Real-time WebSocket consumption from Kalshi with production-grade exponential backoff retry, RSA-signed authentication, and sequence-gap detection
+ - SignalR for live streaming between bot instances, Overseer, and the dashboard
+ - 60+ Japanese candlestick patterns implemented individually in BacklashPatterns/PatternDefinitions/
+ - 10 trading strategies including two ML.NET-backed models (spike prediction and ML entry seeker)
+ - Full backtesting engine (TradingSimulator) that replays historical Parquet snapshots through the live strategy pipeline
+ - 18 instrumented performance monitoring classes with per-component enable/disable flags and SQL + SignalR reporting
+ - DocFX API documentation with auto-generated table-of-contents tooling
+ - Circuit breaker logic, configurable retry/batch/queue-depth throughout
+ - RSA private key signing for all Kalshi API requests; no credentials in source
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,8 +75,6 @@ Projects
 
 The core trading engine — an ASP.NET Core service that orchestrates everything at runtime.
 
-Key responsibilities:
-
  - CentralBrain — top-level orchestration loop, startup sequencing, overnight activities, and error recovery with circuit breaker logic
  - Market Management — discovers and subscribes to Kalshi markets; tracks interest scores to prioritise which markets to watch
  - Order Book — maintains real-time order book state per market via WebSocket events (OrderbookChangeTracker, OrderBookService)
@@ -49,20 +85,16 @@ Key responsibilities:
 
 Configuration: BacklashBot/appsettings.json
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 2. BacklashOverseer
 
 A separate ASP.NET Core service providing centralised monitoring and control of one or more BacklashBot instances.
 
- - OverseerHub (OverseerHub.cs, ~51 KB) — SignalR hub through which bot instances register, broadcast status, and receive commands
- - Overseer (Overseer.cs, ~25 KB) — manages bot lifecycle state, tracks health, and aggregates metrics
+ - OverseerHub.cs — SignalR hub through which bot instances register, broadcast status, and receive commands
+ - Overseer.cs — manages bot lifecycle state, tracks health, and aggregates metrics
  - PerformanceMetricsService — collects and exposes performance data from all connected bots
  - wwwroot — static web dashboard served directly by the Overseer
 
 Bot instances check in at a configurable interval (default: 30 seconds) with circuit-breaker protection on the connection.
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 3. KalshiBotAPI
 
@@ -76,22 +108,18 @@ semaphore-based concurrency control
 
 Authentication uses RSA private key signing — the key file path is resolved from a secrets directory outside the repository.
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 4. TradingStrategies
 
 A class library containing all strategy logic, the simulation engine, and ML integration.
 
 Strategies are built around a composable Signal / SignalCondition / Scenario model — each strategy evaluates one or more typed signal conditions and emits a trade signal with a direction, confidence, and
-metadata. The TradingOverseer coordinates which strategy runs against which market, and SimulationEngine / StrategySimulation provide the backtesting harness. EquityCalculator tracks P&L and equity curves
+metadata. TradingOverseer coordinates which strategy runs against which market, and SimulationEngine / StrategySimulation provide the backtesting harness. EquityCalculator tracks P&L and equity curves
 during simulation, and PerformanceMonitor records per-strategy timing and metric data.
 
 The ML/ folder contains ResearchBus, a data bus that aggregates candlestick metrics, order book state, and indicator values into feature vectors, along with the SpikePrediction model used by two of the
 live strategies.
 
 See Trading Strategies for the full list of concrete strategy implementations.
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 5. BacklashPatterns
 
@@ -100,11 +128,9 @@ A dedicated class library for candlestick pattern recognition and trend calculat
  - PatternSearch.cs (~68 KB) — the core pattern-matching engine; searches for all registered patterns against candlestick history
  - TrendCalcs.cs (~28 KB) — computes trend-related technical values (slopes, momentum, regression)
  - PatternUtils.cs (~24 KB) — shared utilities for candle body/shadow analysis
- - HistoricalPatternCache.cs — caches pattern detection results keyed by market and timestamp
- - PatternVisualizer.cs — generates text/ASCII visualizations of detected patterns
+ - HistoricalPatternCache — caches pattern detection results keyed by market and timestamp
+ - PatternVisualizer — generates text visualisations of detected patterns
  - PatternDefinitions/ — 60+ individually implemented candlestick patterns (see Candlestick Patterns)
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 6. TradingSimulator
 
@@ -116,9 +142,7 @@ The backtesting engine that replays historical snapshot data through the strateg
  - DataLoader — loads and deserialises Parquet-based snapshot files
  - StrategyResolver — resolves which strategy implementation to use for a given simulation config
 
-The simulator is designed to run large-scale parallel backtests. Compute constraints were a primary reason development was paused.
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The simulator is designed to run large-scale parallel backtests. Compute constraints were a primary factor in the decision to pause active development.
 
 7. TradingGUI
 
@@ -129,25 +153,18 @@ A Windows Forms desktop application for live monitoring and snapshot review.
  - MarketChartRenderer — renders candlestick/price charts via GDI+
  - TypographyManager (~20 KB) — manages consistent fonts and styling across the UI
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 8. MentionMarketBingo
 
-A lightweight standalone utility application for watching specific Kalshi markets in real time without the full BacklashBot infrastructure.
+A lightweight standalone utility for watching specific Kalshi markets in real time without the full BacklashBot infrastructure.
 
  - Connects directly to the Kalshi WebSocket
  - MentionMarketBingoOrderBookService — maintains live order book state
  - MentionMarketBingoWebSocketMonitorService — monitors WebSocket health
  - Simple Windows Forms GUI for displaying order book depth and price movement
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 9. BacklashSql
 
-SQL schema scripts for the SQL Server database (kalshibot-prd). Contains .sql files for table definitions including OverseerLogs and various performance and metrics tables. The database runs on a dedicated
-host (192.168.1.210).
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL schema scripts for the SQL Server database (kalshibot-prd). Contains .sql files for table definitions including OverseerLogs and various performance and metrics tables.
 
 10. Supporting Libraries
 
@@ -162,14 +179,14 @@ host (192.168.1.210).
 
 Trading Strategies
 
-Each strategy implements a common interface and is selected/weighted by TradingOverseer at runtime. All strategies can be backtested independently via TradingSimulator.
+Each strategy implements a common interface and is selected and weighted by TradingOverseer at runtime. All strategies can be backtested independently via TradingSimulator.
 
  - BollingerBreakout — enters trades when price breaks outside Bollinger Bands, expecting mean reversion or continuation
  - Breakout / Breakout2 — resistance/support breakout detection with two variants of entry confirmation
  - FlowMomentumStrat — order-flow momentum using order book imbalance and trade flow direction
  - LowLiquidityExitExec — specialised exit strategy for low-liquidity conditions to minimise slippage
  - MLEntrySeekerShared — ML-based entry seeker; shares feature extraction logic with the spike prediction model
- - MLSpikePredictionStrat — uses the SpikePredictionModel (ML.NET) to predict imminent price spikes
+ - MLSpikePredictionStrat — uses SpikePredictionModel (ML.NET) to predict imminent price spikes
  - MomentumTrading — classic price/volume momentum with RSI and MACD confirmation
  - NothingEverHappensStrat — designed for flat/range-bound markets; fades movement near resistance and support
  - SlopeMomentumStrat (~118 KB) — the most developed strategy; multi-timeframe slope analysis with comprehensive signal conditions
@@ -225,7 +242,7 @@ SpikePredictionModel (SpikePrediction/SpikePredictionModel.cs, ~40 KB):
  - Used by both MLSpikePredictionStrat (live trading) and MLEntrySeekerShared (entry timing)
  - Training data is sourced from historical snapshot files on the network share
 
-The TradingSimulator/ML/ folder provides simulation-side ML utilities for evaluating model performance against backtested data.
+TradingSimulator/ML/ provides simulation-side ML utilities for evaluating model performance against backtested data.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -235,11 +252,11 @@ A comprehensive, opt-in-per-service performance monitoring system spans 18 class
 
  - IPerformanceMonitor defines RecordExecutionTime() and RecordSimulationMetrics() in both basic and enablement-aware overloads
  - ICentralPerformanceMonitor extends IPerformanceMonitor and is implemented by CentralPerformanceMonitor — the aggregation point for all bot-wide metrics
- - Each service has its own EnablePerformanceMetrics flag in appsettings.json, so metrics collection can be toggled per component at runtime
+ - Each service has its own EnablePerformanceMetrics flag in appsettings.json, so metrics collection can be toggled per component at runtime without redeployment
  - Metrics are stored to the SQL database and broadcast to the Overseer via SignalR
 
-Instrumented classes: TradingOverseer, StrategySimulation, SimulationEngine, MarketTypeService, EquityCalculator, StrategySelectionHelper, PatternSearch, CentralPerformanceMonitor, MarketProcessor,
-WebSocketConnectionManager, KalshiAPIService, CandlestickService, KalshiBotScopeManagerService, OrderbookChangeTracker, WebSocketMonitorService, TradingSnapshotService, PerformanceMonitor,
+Instrumented classes: TradingOverseer, StrategySimulation, SimulationEngine, MarketTypeService, EquityCalculator, StrategySelectionHelper, PatternSearch, CentralPerformanceMonitor, MarketProcessor, 
+WebSocketConnectionManager, KalshiAPIService, CandlestickService, KalshiBotScopeManagerService, OrderbookChangeTracker, WebSocketMonitorService, TradingSnapshotService, PerformanceMonitor, 
 PerformanceMetricsService.
 
 See Performance_Monitoring_Flow_Chart.md for the full flow diagram.
@@ -262,7 +279,7 @@ Technology Stack
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Infrastructure & Deployment
+Infrastructure and Deployment
 
 Multi-machine Setup
 
@@ -339,8 +356,8 @@ test
 
 Database
 
-SQL Server database kalshibot-prd runs on 192.168.1.210. The schema in BacklashSql/sql/ covers overseer logs, performance metrics (execution times, simulation metrics), market data and event logs, and
-WebSocket/API event storage (toggleable via StoreWebSocketEvents).
+SQL Server database kalshibot-prd runs on a dedicated host on the local network. The schema in BacklashSql/sql/ covers Overseer logs, performance metrics (execution times, simulation metrics), market data
+and event logs, and WebSocket/API event storage (toggleable via StoreWebSocketEvents).
 
 Data access uses parameterised retry logic — 3 retries with a 1-second delay, batch size of 100, and a queue depth limit of 10,000 — to handle transient connectivity issues.
 
