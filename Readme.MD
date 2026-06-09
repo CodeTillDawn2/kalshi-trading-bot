@@ -118,9 +118,10 @@ attempts) before services are restarted. An overnight window begins at 3:00 AM, 
 Market Management
 
 Two market management strategies are available behind a shared BaseMarketManagerService base class. ManagedMarketManagerService dynamically adjusts how many markets to watch based on real-time
-system metrics — queue depths, CPU usage, and performance data — automatically scaling back when the system is under load and expanding when headroom allows. UnmanagedMarketManagerService uses
-a fixed target watch count instead, maintaining stable subscriptions without dynamic scaling. Both share the same interest score logic (computed by InterestScoreService) to prioritise which markets
-to subscribe to and which to drop when the watchlist must shrink.
+system metrics — queue depths, CPU usage, and performance data — automatically scaling back when the system is under load and expanding when headroom allows. The target count is computed by
+TargetCalculationService, which derives a separate limit from each queue type (notification, orderbook, event, ticker) and from the configured CPU usage target, then takes the minimum of all valid
+results. UnmanagedMarketManagerService uses a fixed target watch count instead, maintaining stable subscriptions without dynamic scaling. Both share the same interest score logic (computed by
+InterestScoreService) to prioritise which markets to subscribe to and which to drop when the watchlist must shrink.
 
 Monitoring Layer
 
@@ -167,6 +168,8 @@ Serialization
 
 Because snapshots accumulate into large Parquet corpora over time, their JSON is compacted through a layered set of custom JsonConverter implementations in BacklashDTOs.Converters. MarketSnapshotSlimConverter is the outermost layer — it recursively rewrites every property name in the entire JSON tree using a table of roughly 100 short mnemonic codes, so verbose names like VelocityPerMinute_Top_Yes_Bid become vty and StochasticOscillator_Medium becomes stoM. It handles nested sub-keys inside compound types the same way and reads both forms, so files written before the converter existed remain deserializable. OrderbookSlimConverter compacts the order book rows further using single-character keys and abbreviated side values (y/n); because the order book can span dozens of levels and is repeated across every snapshot, this recurs with high frequency. Separate converters handle DateTime fields (compact ISO-8601 without fractional seconds), C# value tuples for multi-component indicators like MACD and Bollinger Bands (which System.Text.Json cannot serialize natively), and fields that embed pre-serialized JSON strings.
 
+MarketSnapshotDelta is a companion class that wraps two consecutive snapshots and computes the diff between them using MarketSnapshot.Diff(). It exposes a typed accessor per field that returns the new value only if that field actually changed — null otherwise — making it efficient to propagate only the parts of a snapshot that moved between evaluation cycles.
+
 Snapshots are written to disk as Parquet files on the network share by TradingSnapshotService, at a configurable interval defaulting to 60 seconds. They carry an integer SnapshotSchemaVersion field (currently version 43). An UpgradeSnapshot() method handles backward compatibility by stepping older snapshots forward through each schema version in sequence, so historical data files remain usable after the schema evolves.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,7 +186,8 @@ MarketData is the central per-market data model. It aggregates everything needed
 all computed technical indicators, and the metric values (velocities, slopes, depth ratios, trade rates) calculated by OrderbookChangeTracker. Every strategy evaluation reads from a MarketData
 instance. DataCache is a thread-safe in-memory store (backed by concurrent dictionaries) holding the live collection of MarketData objects alongside account balance and current trading status.
 KalshiBotReadyStatus coordinates startup sequencing using per-service TaskCompletionSource objects so CentralBrain knows when all services have finished initialising before opening WebSocket
-connections. KalshiBotStatusTracker holds the global CancellationTokenSource used to signal graceful shutdown to all components.
+connections. KalshiBotStatusTracker holds the global CancellationTokenSource used to signal graceful shutdown to all components. BrainStatusService resolves the runtime bot identity at startup:
+it reads the brain instance record from the database to retrieve its registered BrainLock GUID and session identifier, using double-checked locking to ensure the initialization runs exactly once.
 
 Services
 
@@ -224,6 +228,8 @@ check. BrainPersistenceService provides thread-safe storage and retrieval of bra
 and batch database operations. SnapshotService queries the database for snapshot group data, aggregates it by market ticker, and calculates coverage statistics (recorded hours vs. expected market
 hours). OverseerWebSocketMonitorService handles WebSocket connection and exchange status monitoring for the Overseer's own connection to Kalshi, operating independently of BacklashBot's monitoring.
 PerformanceMetricsService collects the metrics stream from all connected bots and makes it available to the static web dashboard served from wwwroot/.
+
+MarketWatchController is a REST API controller that backs the web dashboard with cacheable data endpoints: active market watch assignments and interest scores, brain instance lock groupings with per-instance market counts, current and historical positions, open orders, account balance from the Kalshi API, and snapshot coverage by market. Responses are served from a memory cache with configurable expiry to reduce database pressure, and cache hit/miss rates are tracked through the performance monitoring system.
 
 3. KalshiBotAPI
 
