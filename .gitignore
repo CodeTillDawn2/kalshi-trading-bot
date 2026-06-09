@@ -163,3 +163,4 @@ BacklashBot/Logs/shutodown.log
 /TradingGUI/.vs
 /PatternsTest
 !docs/**
+!docs/**
