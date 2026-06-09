@@ -568,6 +568,6 @@ handle all feed inserts and market/series upserts. Report queries (rpt_ prefix) 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-MIT License — Copyright (c) 2025 BacklashStudios. Free to use, modify, and distribute with attribution.
+MIT License — Copyright (c) 2025 Peter Foley. Free to use, modify, and distribute with attribution.
 
-Built by BacklashStudios · Kalshi prediction market trading bot · .NET 8 · C#
+Built by Peter Foley · Kalshi prediction market trading bot · .NET 8 · C#
