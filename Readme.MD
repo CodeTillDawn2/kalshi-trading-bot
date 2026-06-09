@@ -22,6 +22,7 @@ Table of Contents
  - At a Glance
  - Getting Started
  - Architecture
+ - Market Snapshots
  - Projects
  - Trading Strategies
  - Technical Indicators
@@ -131,6 +132,42 @@ Persistence
 
 All structured data flows through BacklashBotData, an Entity Framework Core + ADO.NET data layer backed by SQL Server. Time-series candlestick data and market snapshots are stored as Parquet files
 on a network share (SmokehouseDataStorage), keeping large binary blobs off the relational database.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Market Snapshots
+
+A MarketSnapshot is the central data structure of BacklashBot — a versioned, point-in-time serialization of a market's complete state. Everything the bot knows about a market at the moment of evaluation is encoded in a single snapshot object, and that same object is what TradingSimulator replays during backtesting. Because live strategy evaluation and historical simulation consume identical data structures, backtests have exact fidelity to production behavior by construction.
+
+Each snapshot captures:
+
+  Order book state — the full order book, best bids and asks for both sides, depth at the best level and at the top four levels, cumulative depth within a configurable price tolerance, bid range, total contract volume on each side, count and volume imbalance across sides, and center-of-mass pricing for YES and NO bids.
+
+  Trade and order flow — rolling-window trade rate, volume, count, and average size broken out by YES and NO, alongside non-trade-related order counts and order volume per minute. A separate set of instantaneous current-window metrics captures the most recent activity independently of the historical rolling window.
+
+  Order book velocity — the rate of change in order book composition (measured in dollars per minute) split into a top-10% price tier and a bottom tier, for both YES and NO sides. This distinguishes aggressive near-market activity from passive depth changes.
+
+  Price history and momentum — all-time and 3-month high and low YES/NO bid prices with timestamps, short- and medium-term bid slopes for each side, bid range, and spread.
+
+  Support and resistance levels — a list of SupportResistanceLevel objects computed via exponential clustering.
+
+  Technical indicators — RSI (short, medium, long), MACD (medium, long), EMA (medium, long), Bollinger Bands (medium, long), ATR (medium, long), VWAP (short, medium), Stochastic Oscillator (short, medium, long), OBV (medium, long), ADX, +DI/-DI, and PSAR.
+
+  Volume history — peak single-day, single-hour, and single-minute volumes, plus aggregate volumes over the last hour, three hours, and month.
+
+  Recent candlesticks — a list of PseudoCandlestick objects embedded directly in the snapshot.
+
+  Position and P&L — current position size, market exposure, buy-in price, upside and downside exposure, realized PnL, fees paid, expected fees, resting order count, and ROI (both percentage and dollar).
+
+  Market metadata — age, time remaining, whether the market can close early, a flag indicating whether change metrics have stabilized (ChangeMetricsMature), the timestamp of the last WebSocket message received, and behavioral classifications for each price side.
+
+  Derived metrics — a CalculateLiquidityScore() method computes a composite 0–100 score from spread, depth at best, cumulative depth within tolerance, volume, imbalance, and estimated slippage. This score is embedded in the snapshot at capture time.
+
+Serialization
+
+Because snapshots accumulate into large Parquet corpora over time, their JSON is compacted through a layered set of custom JsonConverter implementations in BacklashDTOs.Converters. MarketSnapshotSlimConverter is the outermost layer — it recursively rewrites every property name in the entire JSON tree using a table of roughly 100 short mnemonic codes, so verbose names like VelocityPerMinute_Top_Yes_Bid become vty and StochasticOscillator_Medium becomes stoM. It handles nested sub-keys inside compound types the same way and reads both forms, so files written before the converter existed remain deserializable. OrderbookSlimConverter compacts the order book rows further using single-character keys and abbreviated side values (y/n); because the order book can span dozens of levels and is repeated across every snapshot, this recurs with high frequency. Separate converters handle DateTime fields (compact ISO-8601 without fractional seconds), C# value tuples for multi-component indicators like MACD and Bollinger Bands (which System.Text.Json cannot serialize natively), and fields that embed pre-serialized JSON strings.
+
+Snapshots are written to disk as Parquet files on the network share by TradingSnapshotService, at a configurable interval defaulting to 60 seconds. They carry an integer SnapshotSchemaVersion field (currently version 43). An UpgradeSnapshot() method handles backward compatibility by stepping older snapshots forward through each schema version in sequence, so historical data files remain usable after the schema evolves.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
